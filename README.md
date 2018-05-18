@@ -34,7 +34,9 @@ To initialize the SDK, call:
 Radar.initialize(publishableKey);
 ```
 
-where `publishableKey` is a string containing your publishable API key.
+where `publishableKey` is a string containing your Radar publishable API key.
+
+To get a Radar publishable API key, [sign up for a Radar account](https://radar.io).
 
 ### Enable Places
 
