@@ -129,7 +129,7 @@ var _Radar = {
     }
     description = description.trim();
     if (description.length === 0 || description.length > 256) {
-      this._deleteCookie(USER_ID_COOKIE);
+      this._deleteCookie(DESCRIPTION_COOKIE);
       return;
     }
     this._setCookie(DESCRIPTION_COOKIE, description);
