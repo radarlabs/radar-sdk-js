@@ -9,7 +9,7 @@
 In an HTML page, include the SDK using a `<script>` tag:
 
 ```html
-<script src="https://cdn.radar.io/sdk/radar.min.js"></script>
+<script src="https://unpkg.com/radar-sdk-js/radar.min.js"></script>
 ```
 
 In a web app, install the package from npm, then import the module:
