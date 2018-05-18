@@ -194,7 +194,7 @@ var _Radar = {
     }.bind(this), function(err) {
       if (callback) {
         if (err && err.code) {
-          if (err.code === err.PERMISSION_DENIED) {
+          if (err.code === 1) {
             callback(this.STATUS.ERROR_PERMISSIONS);
           } else {
             callback(this.STATUS.ERROR_LOCATION);
