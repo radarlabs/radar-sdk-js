@@ -1,6 +1,6 @@
 {
   "name": "radar-sdk-js",
-  "description": "JavaScript SDK for Radar, the location platform for mobile apps",
+  "description": "Web JavaScript SDK for Radar, the location platform for mobile apps",
   "homepage": "https://radar.io",
   "license": "Apache-2.0",
   "version": "0.0.1",

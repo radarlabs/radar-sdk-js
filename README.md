@@ -56,7 +56,7 @@ Learn more about [Places](https://radar.io/documentation/places).
 
 ### Identify user
 
-Until you identify the user, Radar will automatically identify the user by a random device ID stored in a cookie.
+Until you identify the user, Radar will automatically identify the user by a random UUID "device ID" stored in a cookie.
 
 To identify the user when logged in, call:
 
@@ -74,7 +74,7 @@ Radar.setDescription(description);
 
 where `description` is a string.
 
-You only need to call these methods once, as these settings will be persisted across app sessions.
+You only need to call these functions once, as these settings will be persisted across browser sessions in cookies.
 
 ### Foreground tracking
 
