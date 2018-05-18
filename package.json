@@ -4,7 +4,7 @@
   "homepage": "https://radar.io",
   "license": "Apache-2.0",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "radar.js",
   "scripts": {
     "start": "webpack --config webpack.config.js"
   },
