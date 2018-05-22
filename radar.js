@@ -1,3 +1,4 @@
+var SDK_VERSION = '1.0.0-beta';
 var HOST_COOKIE = 'radar-host';
 var DEVICE_ID_COOKIE = 'radar-deviceId';
 var PUBLISHABLE_KEY_COOKIE = 'radar-publishableKey';
@@ -174,7 +175,8 @@ var _Radar = {
         description: description,
         deviceType: 'Web',
         userAgent: navigator.userAgent,
-        placesProvider: placesProvider
+        placesProvider: placesProvider,
+        sdkVersion: SDK_VERSION
       };
       var headers = {
         Authorization: publishableKey
