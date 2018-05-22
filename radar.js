@@ -1,4 +1,4 @@
-var SDK_VERSION = '1.0.0-beta2';
+var SDK_VERSION = '1.0.0-beta3';
 var HOST_COOKIE = 'radar-host';
 var DEVICE_ID_COOKIE = 'radar-deviceId';
 var PUBLISHABLE_KEY_COOKIE = 'radar-publishableKey';
@@ -183,9 +183,13 @@ var _Radar = {
       this._request(method, url, body, headers, function(res) {
         try {
           res = JSON.parse(res);
-          callback(this.STATUS.SUCCESS, position.coords, res.user, res.events);
+          if (callback) {
+            callback(this.STATUS.SUCCESS, position.coords, res.user, res.events);
+          }
         } catch (err) {
-          callback(this.STATUS.ERROR_SERVER);
+          if (callback) {
+            callback(this.STATUS.ERROR_SERVER);
+          }
         }
       }.bind(this), function(err) {
         if (callback) {
