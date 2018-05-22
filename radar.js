@@ -1,4 +1,4 @@
-var SDK_VERSION = '1.0.0-beta';
+var SDK_VERSION = '1.0.0-beta2';
 var HOST_COOKIE = 'radar-host';
 var DEVICE_ID_COOKIE = 'radar-deviceId';
 var PUBLISHABLE_KEY_COOKIE = 'radar-publishableKey';
@@ -38,7 +38,7 @@ var _Radar = {
     if (!document || !document.cookie) {
       return;
     }
-    document.cookie = key + '=;expires=Thu, 01-Jan-1970 00:00:00 GMT;path=/';
+    document.cookie = key + '=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/';
   },
   _request: function(method, url, body, headers, successCallback, errCallback) {
     var xhr = new XMLHttpRequest();
@@ -99,8 +99,7 @@ var _Radar = {
     this._setCookie(PUBLISHABLE_KEY_COOKIE, publishableKey);
   },
   setPlacesProvider: function(placesProvider) {
-    placesProvider = this.PLACES_PROVIDER[placesProvider];
-    if (!placesProvider) {
+    if (placesProvider !== this.PLACES_PROVIDER.FACEBOOK) {
       placesProvider = this.PLACES_PROVIDER.NONE;
     }
     this._setCookie(PLACES_PROVIDER_COOKIE, placesProvider);
