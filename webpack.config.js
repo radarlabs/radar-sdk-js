@@ -1,17 +1,27 @@
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const path = require('path');
 
 module.exports = {
-  entry: './radar.js',
-  mode: 'production',
-  plugins: [
-    new UglifyJsPlugin({
-      uglifyOptions: {
-        ecma: 5
-      }
-    })
-  ],
+  entry: './src/index.js',
+  mode: process.NODE_ENV === 'production' ? 'production' : 'development',
   output: {
-    filename: 'radar.min.js',
-    path: __dirname
+    path: path.join(__dirname, 'dist'),
+    libraryTarget: 'umd',
+    library: 'Radar',
+    libraryExport: 'default',
+    umdNamedDefine: true
+  },
+  devtool: false,
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+          }
+        ]
+      }
+    ]
   }
 };
