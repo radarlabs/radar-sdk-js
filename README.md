@@ -1,6 +1,6 @@
 ![Radar](https://raw.githubusercontent.com/radarlabs/react-native-radar/master/logo.png)
 
-[![npm](https://img.shields.io/radarlabs/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)
+[![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)
 
 [Radar](https://radar.io) is the location platform for mobile apps.
 
