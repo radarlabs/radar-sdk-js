@@ -23,12 +23,10 @@ export function getCookie(key) {
 
 // set cookie using {key, value}
 export function setCookie(key, value) {
-  if (!document || !document.cookie === undefined) {
+  if (!document || !document.cookie === undefined || typeof value !== 'string') {
     return;
   }
-  if (typeof value != 'string') {
-    return;
-  }
+
   const date = new Date();
   date.setFullYear(date.getFullYear() + 10);
 
