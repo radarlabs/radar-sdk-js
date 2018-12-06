@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.14.1
+
+    steps:
+      - checkout
+
+      - restore_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+
+      - run:
+          name: Install dependencies
+          command: npm install
+
+      - save_cache:
+        key: dependency-cache-{{ checksum "package.json" }}
+        paths:
+          - node_modules
+
+  test:
+    docker:
+      - image: circleci/node:10.14.1-node
+
+    steps:
+      - run:
+          name: Run Tests
+          command: npm run test
+
+      - store_artifacts:
+        path: coverage
+        prefix: coverage
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+        requires:
+          - build

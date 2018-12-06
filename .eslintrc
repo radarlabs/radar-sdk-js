@@ -1,0 +1,30 @@
+{
+  "ecmaFeatures": {
+    "modules": true,
+  },
+  "env": {
+    "browser": true,
+    "mocha": true,
+    "node": true,
+  },
+  "extends": "eslint:recommended",
+  "parser": "babel-eslint",
+  "rules": {
+    "consistent-return": 0,
+    "func-names": 0,
+    "global-require": 0,
+    "max-len": 0,
+    "no-alert": 0,
+    "no-console": 0,
+    "no-param-reassign": 0,
+    "no-plusplus": 0,
+    "no-shadow": 0,
+    "no-underscore-dangle": 0,
+    "no-restricted-properties": [0, {
+      "object": "Math",
+      "property": "pow",
+    }],
+    "no-bitwise": 0,
+    "padded-blocks": 0,
+  }
+}
