@@ -68,7 +68,7 @@ describe('Radar', () => {
       expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, provider);
     });
 
-    it('should set provider to "none" if argument does not equal "facebook"', () => {
+    it('should set provider to "none" if argument does NOT equal "facebook"', () => {
       Radar.setPlacesProvider("other");
       expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, "none");
     });
@@ -145,7 +145,29 @@ describe('Radar', () => {
   });
 
   describe('trackOnce', () => {
-    context('publishable key not set', () => {
+    const publishableKey = 'publishable-key';
+    const userId = 'user-id';
+    const placesProvider = 'facebook';
+    const description = 'description';
+    const deviceId = 'device-id';
+
+    const latitude = 40.7041895;
+    const longitude = -73.9867797;
+    const accuracy = 1;
+    const position = {
+      coords: { accuracy, latitude, longitude },
+    };
+
+    let jsonResponse;
+    let httpRequestSpy;
+    beforeEach(() => {
+      jsonResponse = '{"user":"user-data","events":"matching-events"}';
+      httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess) => {
+        onSuccess(jsonResponse);
+      });
+    });
+
+    context('publishable key NOT set', () => {
       beforeEach(() => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
       });
@@ -157,10 +179,14 @@ describe('Radar', () => {
       });
     });
 
-    context('geolocation not available', () => {
+    context('geolocation NOT available', () => {
       beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns('publishable-key');
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
         global.navigator = {};
+      });
+
+      afterEach(() => {
+        global.navigator = undefined;
       });
 
       it('calls callback with ERROR_LOCATION', () => {
@@ -170,9 +196,9 @@ describe('Radar', () => {
       });
     });
 
-    context('geo position not avaialable', () => {
+    context('geo position NOT avaialable', () => {
       beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns('publishable-key');
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
         const getCurrentPosition = (onSuccess) => {
           onSuccess(null);
@@ -194,24 +220,6 @@ describe('Radar', () => {
     });
 
     context('geo position is available', () => {
-      const publishableKey = 'publishable-key';
-      const userId = 'user-id';
-      const placesProvider = 'facebook';
-      const description = 'description';
-      const deviceId = 'device-id';
-
-      const latitude = 40.7041895;
-      const longitude = -73.9867797;
-      const accuracy = 1;
-      const position = {
-        coords: { accuracy, latitude, longitude },
-      };
-
-      const httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess) => {
-        const JsonResponse = '{"user":"user-data","events":"matching-events"}';
-        onSuccess(JsonResponse);
-      });
-
       beforeEach(() => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
         getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
@@ -228,6 +236,12 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
       });
 
+      afterEach(() => {
+        Device.getId.restore();
+        Http.request.restore();
+        global.navigator = undefined;
+      });
+
       it('should make http request to api, and call the callback with data', () => {
         const callback = sinon.spy();
 
@@ -236,7 +250,7 @@ describe('Radar', () => {
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('PUT');
         expect(url).to.equal('https://api.radar.io/v1/users/user-id');
-        expect(headers).to.deep.equal({ Authorization: 'publishable-key' });
+        expect(headers).to.deep.equal({ Authorization: publishableKey });
         expect(body).to.deep.equal({
           accuracy,
           description,
@@ -253,6 +267,117 @@ describe('Radar', () => {
         });
 
         expect(callback).to.have.been.calledWith(STATUS.SUCCESS, position.coords, 'user-data', 'matching-events');
+      });
+    });
+
+    context('user denies location permissions', () => {
+      beforeEach(() => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const geolocation = {
+          getCurrentPosition: (onSuccess, onError) => {
+            onError({ code: 1 });
+          },
+        };
+
+        global.navigator = { geolocation };
+      });
+
+      afterEach(() => {
+        global.navigator = undefined;
+      });
+
+      it('should call callback with error permissions status', () => {
+        const callback = sinon.spy();
+
+        Radar.trackOnce(callback);
+
+        expect(callback).to.have.been.calledWith(STATUS.ERROR_PERMISSIONS);
+      });
+    });
+
+    context('device error when fetching location', () => {
+      beforeEach(() => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const geolocation = {
+          getCurrentPosition: (onSuccess, onError) => {
+            onError({ code: 2 });
+          },
+        };
+
+        global.navigator = { geolocation };
+      });
+
+      afterEach(() => {
+        global.navigator = undefined;
+      });
+
+      it('should call callback with error location status', () => {
+        const callback = sinon.spy();
+
+        Radar.trackOnce(callback);
+
+        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
+      });
+    });
+
+    context('invalid JSON in success response', () => {
+      beforeEach(() => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const geolocation = {
+          getCurrentPosition: (onSuccess) => { onSuccess(position); },
+        };
+
+        global.navigator = { geolocation };
+
+        jsonResponse = '"invalid_json": true}';
+        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      });
+
+      afterEach(() => {
+        Http.request.restore();
+        global.navigator = undefined;
+      });
+
+      it('should call callback with server error', () => {
+        const callback = sinon.spy();
+
+        Radar.trackOnce(callback);
+
+        expect(callback).to.have.been.calledWith(STATUS.ERROR_SERVER);
+      });
+    });
+
+    context('ajax failure calling api', () => {
+      beforeEach(() => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const geolocation = {
+          getCurrentPosition: (onSuccess) => { onSuccess(position); },
+        };
+
+        global.navigator = { geolocation };
+
+        httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess, onError) => {
+          onError('ajax error');
+        });
+
+        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      });
+
+      afterEach(() => {
+        Http.request.restore();
+        global.navigator = undefined;
+      });
+
+      it('should call callback with Http error', () => {
+        const callback = sinon.spy();
+
+        Radar.trackOnce(callback);
+
+        expect(callback).to.have.been.calledWith('ajax error');
       });
     });
   });

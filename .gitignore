@@ -24,3 +24,5 @@ node_modules/
 npm-debug.log
 *.framework
 dist/
+coverage/
+.nyc_output/
