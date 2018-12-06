@@ -21,7 +21,7 @@
     "build:cjs": "rollup -c rollup-cjs.config.js",
     "build:iife": "rollup -c rollup-iife.config.js",
     "build:iife-min": "rollup -c rollup-iife-min.config.js",
-    "report-coverage": "cat ./coverage/lcov.info | coveralls"
+    "report-coverage": "./node_modules/.bin/codecov"
   },
   "dependencies": {},
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@babel/register": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.2",
+    "codecov": "^3.1.0",
     "eslint": "^5.9.0",
     "mocha": "^5.2.0",
     "npm-run-all": "^4.1.5",

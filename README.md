@@ -2,7 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)
 ![CircleCI branch](https://img.shields.io/circleci/project/github/radarlabs/radar-sdk-js/master.svg)
-[![Coverage Status](https://coveralls.io/repos/github/radarlabs/radar-sdk-js/badge.svg?branch=master)](https://coveralls.io/github/radarlabs/radar-sdk-js?branch=master)
+[![Codecov](https://img.shields.io/codecov/c/github/radarlabs/radar-sdk-js.svg)](https://codecov.io/gh/radarlabs/radar-sdk-js)
+
 
 
 [Radar](https://radar.io) is the location platform for mobile apps.
