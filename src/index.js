@@ -1,17 +1,21 @@
 import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
+import PLACES_PROVIDER from './places_providers';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 
-const PLACES_PROVIDER = {
-  FACEBOOK: 'facebook',
-  NONE: 'none'
-};
-
 class Radar {
+  static get VERSION() {
+    return SDK_VERSION;
+  }
+
+  static get PLACES_PROVIDER() {
+    return PLACES_PROVIDER;
+  }
+
   static initialize(publishableKey) {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
