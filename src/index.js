@@ -16,6 +16,10 @@ class Radar {
     return PLACES_PROVIDER;
   }
 
+  static get STATUS() {
+    return STATUS;
+  }
+
   static initialize(publishableKey) {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
