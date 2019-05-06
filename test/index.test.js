@@ -40,6 +40,12 @@ describe('Radar', () => {
     });
   });
 
+  describe('STATUS', () => {
+    it('should return the list of possible status codes', () => {
+      expect(Radar.STATUS).to.eql(STATUS);
+    });
+  });
+
   describe('initialize', () => {
     context('no publishable key given', () => {
       before(() => {
