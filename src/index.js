@@ -163,6 +163,109 @@ class Radar {
       }
     );
   }
+
+  static geocode(query, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+
+      return;
+    }
+
+    const qs = `query=${query}`;
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/geocode/forward?${qs}`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) callback(STATUS.SUCCESS, response, response.addresses);
+      } catch (e) {
+        if (callback) callback(STATUS.ERROR_SERVER);
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) callback(error);
+    };
+
+    Http.request(method, url, {}, headers, onSuccess, onError);
+  }
+
+  static reverseGeocode(latitude, longitude, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+
+      return;
+    }
+
+    const qs = `latitude=${latitude}&longitude=${longitude}`;
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/geocode/reverse?${qs}`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) callback(STATUS.SUCCESS, response, response.addresses);
+      } catch (e) {
+        if (callback) callback(STATUS.ERROR_SERVER);
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) callback(error);
+    };
+
+    Http.request(method, url, {}, headers, onSuccess, onError);
+  }
+
+  static ipGeocode(callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+
+      return;
+    }
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/geocode/ip`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey
+    }
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) callback(STATUS.SUCCESS, response, response.regions);
+      } catch (e) {
+        if (callback) callback(STATUS.ERROR_SERVER);
+      }
+    }
+
+    const onError = (error) => {
+      if (callback) callback(error);
+    };
+
+    Http.request(method, url, {}, headers, onSuccess, onError);
+  }
 }
 
 export default Radar;
