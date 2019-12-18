@@ -164,6 +164,94 @@ class Radar {
     );
   }
 
+  static searchPlaces(latitude, longitude, radius, chains, categories, groups, limit, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+
+      return;
+    }
+
+    const finalLimit = Math.min(limit, 100);
+    const qs = `latitude=${latitude}&longitude=${longitude}&radius=${radius}&limit=${finalLimit}`;
+    if (chains && chains.length > 0) {
+      qs = qs.concat(`&chains=${chains.join(',')}`);
+    }
+    if (categories && categories.length > 0) {
+      qs = qs.concat(`&categories=${categories.join(',')}`);
+    }
+    if (groups && groups.length > 0) {
+      qs = qs.concat(`&groups=${groups.join(',')}`);
+    }
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/places/search?${qs}`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+      'X-Radar-SDK-Version': SDK_VERSION,
+      'X-Radar-Device-Type': 'Web',
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) callback(STATUS.SUCCESS, response, response.places);
+      } catch (e) {
+        if (callback) callback(STATUS.ERROR_SERVER);
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) callback(error);
+    };
+
+    Http.request(method, url, {}, headers, onSuccess, onError);
+  }
+
+  static searchGeofences(latitude, longitude, radius, tags, limit, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+
+      return;
+    }
+
+    const finalLimit = Math.min(limit, 100);
+    const qs = `latitude=${latitude}&longitude=${longitude}&limit=${limit}`;
+    if (tags && tags.length > 0) {
+      qs = qs.concat(`&tags=${tags.join(',')}`);
+    }
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/geofences/search?${qs}`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+      'X-Radar-SDK-Version': SDK_VERSION,
+      'X-Radar-Device-Type': 'Web'
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) callback(STATUS.SUCCESS, response, response.geofences);
+      } catch (e) {
+        if (callback) callback(STATUS.ERROR_SERVER);
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) callback(error);
+    };
+
+    Http.request(method, url, {}, headers, onSuccess, onError);
+  }
+
   static geocode(query, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
