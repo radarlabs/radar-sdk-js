@@ -179,7 +179,9 @@ class Radar {
     const url = `${host}/v1/geocode/forward?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
+      'X-Radar-SDK-Version': SDK_VERSION,
+      'X-Radar-Device-Type': 'Web',
     };
 
     const onSuccess = (response) => {
@@ -214,7 +216,9 @@ class Radar {
     const url = `${host}/v1/geocode/reverse?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
+      'X-Radar-SDK-Version': SDK_VERSION,
+      'X-Radar-Device-Type': 'Web',
     };
 
     const onSuccess = (response) => {
@@ -247,7 +251,9 @@ class Radar {
     const url = `${host}/v1/geocode/ip`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
+      'X-Radar-SDK-Version': SDK_VERSION,
+      'X-Radar-Device-Type': 'Web',
     }
 
     const onSuccess = (response) => {
