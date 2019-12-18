@@ -105,7 +105,9 @@ class Radar {
 
         // Setup http
         const headers = {
-          Authorization: publishableKey
+          Authorization: publishableKey,
+          'X-Radar-SDK-Version': SDK_VERSION,
+          'X-Radar-Device-Type': 'Web',
         };
 
         const body = {
