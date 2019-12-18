@@ -174,7 +174,7 @@ class Radar {
     }
 
     const finalLimit = Math.min(limit, 100);
-    const qs = `latitude=${latitude}&longitude=${longitude}&radius=${radius}&limit=${finalLimit}`;
+    let qs = `latitude=${latitude}&longitude=${longitude}&radius=${radius}&limit=${finalLimit}`;
     if (chains && chains.length > 0) {
       qs = qs.concat(`&chains=${chains.join(',')}`);
     }
@@ -221,7 +221,7 @@ class Radar {
     }
 
     const finalLimit = Math.min(limit, 100);
-    const qs = `latitude=${latitude}&longitude=${longitude}&limit=${limit}`;
+    let qs = `latitude=${latitude}&longitude=${longitude}&limit=${finalLimit}`;
     if (tags && tags.length > 0) {
       qs = qs.concat(`&tags=${tags.join(',')}`);
     }
