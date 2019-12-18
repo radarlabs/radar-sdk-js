@@ -269,7 +269,11 @@ describe('Radar', () => {
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('PUT');
         expect(url).to.equal('https://api.radar.io/v1/users/user-id');
-        expect(headers).to.deep.equal({ Authorization: publishableKey });
+        expect(headers).to.deep.equal({
+          Authorization: publishableKey,
+          'X-Radar-Device-Type': 'Web',
+          'X-Radar-SDK-Version': SDK_VERSION,
+        });
         expect(body).to.deep.equal({
           accuracy,
           description,
