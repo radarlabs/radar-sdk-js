@@ -6,8 +6,13 @@ export function request(method, url, data, headers, successCallback, errorCallba
 
   let body = {};
   if (method === 'GET') {
-    const qs = Object.entries(data).map(([key, value]) => `${key}=${value}`).join('&');
-    if (qs.length > 0) {
+    const qsArr = [];
+    for (let key in data) {
+      qsArr.push(`${key}=${data[key]}`);
+    }
+
+    if (qsArr.length > 0) {
+      const qs = qsArr.join('&');
       url = `${url}?${qs}`;
     }
   } else {
