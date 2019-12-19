@@ -6,7 +6,7 @@ export function request(method, url, data, headers, successCallback, errorCallba
 
   let body = {};
   if (method === 'GET') {
-    const qs = data.map(([key, value]) => `${key}=${value}`).join('&');
+    const qs = Object.entries(data).map(([key, value]) => `${key}=${value}`).join('&');
     if (qs.length > 0) {
       url = `${url}?${qs}`;
     }
