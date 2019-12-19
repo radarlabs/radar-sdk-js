@@ -12,7 +12,7 @@ export function request(method, url, data, headers, successCallback, errorCallba
     }
 
     if (qsArr.length > 0) {
-      const qs = qsArr.join('&');
+      const qs = encodeURIComponent(qsArr.join('&'));
       url = `${url}?${qs}`;
     }
   } else {
