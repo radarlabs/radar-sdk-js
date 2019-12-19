@@ -175,20 +175,18 @@ class Radar {
       return;
     }
 
-    const finalLimit = Math.min(limit, 100);
-    let qs = `latitude=${latitude}&longitude=${longitude}&radius=${radius}&limit=${finalLimit}`;
-    if (chains && chains.length > 0) {
-      qs = qs.concat(`&chains=${chains.join(',')}`);
-    }
-    if (categories && categories.length > 0) {
-      qs = qs.concat(`&categories=${categories.join(',')}`);
-    }
-    if (groups && groups.length > 0) {
-      qs = qs.concat(`&groups=${groups.join(',')}`);
+    const queryParams = {
+      latitude,
+      longitude,
+      radius,
+      chains: chains.join(','),
+      categories: categories.join(','),
+      groups: groups.join(','),
+      limit: Math.min(limit, 100),
     }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/places/search?${qs}`;
+    const url = `${host}/v1/places/search`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
@@ -214,7 +212,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static searchGeofences(latitude, longitude, radius, tags, limit, callback) {
@@ -228,14 +226,16 @@ class Radar {
       return;
     }
 
-    const finalLimit = Math.min(limit, 100);
-    let qs = `latitude=${latitude}&longitude=${longitude}&limit=${finalLimit}`;
-    if (tags && tags.length > 0) {
-      qs = qs.concat(`&tags=${tags.join(',')}`);
+    const queryParams = {
+      latitude,
+      longitude,
+      radius,
+      tags: tags.join(','),
+      limit: Math.min(limit, 100),
     }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geofences/search?${qs}`;
+    const url = `${host}/v1/geofences/search`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
@@ -261,7 +261,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static geocode(query, callback) {
@@ -275,7 +275,9 @@ class Radar {
       return;
     }
 
-    const qs = `query=${query}`;
+    const queryParams = {
+      query
+    };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/forward?${qs}`;
@@ -304,7 +306,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static reverseGeocode(latitude, longitude, callback) {
@@ -318,7 +320,10 @@ class Radar {
       return;
     }
 
-    const qs = `latitude=${latitude}&longitude=${longitude}`;
+    const queryParams = {
+      latitude,
+      longitude,
+    }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/reverse?${qs}`;
@@ -347,7 +352,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static ipGeocode(callback) {

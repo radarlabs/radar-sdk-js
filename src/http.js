@@ -1,13 +1,22 @@
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
-export function request(method, url, body, headers, successCallback, errorCallback) {
+export function request(method, url, data, headers, successCallback, errorCallback) {
   const xhr = new XMLHttpRequest();
+
+  let body = {};
+  if (method === 'GET') {
+    const qs = data.map(([key, value]) => `${key}=${value}`).join('&');
+    if (qs.length > 0) {
+      url = `${url}?${qs}`;
+    }
+  } else {
+    body = data;
+  }
 
   xhr.open(method, url, true);
 
   xhr.setRequestHeader('Content-Type', 'application/json');
-
   xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
   xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
   for (let header in headers) {
