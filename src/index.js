@@ -105,9 +105,7 @@ class Radar {
 
         // Setup http
         const headers = {
-          Authorization: publishableKey,
-          'X-Radar-SDK-Version': SDK_VERSION,
-          'X-Radar-Device-Type': 'Web',
+          Authorization: publishableKey
         };
 
         const body = {
@@ -170,7 +168,9 @@ class Radar {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
-      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
 
       return;
     }
@@ -191,23 +191,27 @@ class Radar {
     const url = `${host}/v1/places/search?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey,
-      'X-Radar-SDK-Version': SDK_VERSION,
-      'X-Radar-Device-Type': 'Web',
+      Authorization: publishableKey
     };
 
     const onSuccess = (response) => {
       try {
         response = JSON.parse(response);
 
-        if (callback) callback(STATUS.SUCCESS, response, response.places);
+        if (callback) {
+          callback(STATUS.SUCCESS, response, response.places);
+        }
       } catch (e) {
-        if (callback) callback(STATUS.ERROR_SERVER);
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
       }
     };
 
     const onError = (error) => {
-      if (callback) callback(error);
+      if (callback) {
+        callback(error);
+      }
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);
@@ -217,7 +221,9 @@ class Radar {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
-      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
 
       return;
     }
@@ -232,23 +238,27 @@ class Radar {
     const url = `${host}/v1/geofences/search?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey,
-      'X-Radar-SDK-Version': SDK_VERSION,
-      'X-Radar-Device-Type': 'Web'
+      Authorization: publishableKey
     };
 
     const onSuccess = (response) => {
       try {
         response = JSON.parse(response);
 
-        if (callback) callback(STATUS.SUCCESS, response, response.geofences);
+        if (callback) {
+          callback(STATUS.SUCCESS, response, response.geofences);
+        }
       } catch (e) {
-        if (callback) callback(STATUS.ERROR_SERVER);
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
       }
     };
 
     const onError = (error) => {
-      if (callback) callback(error);
+      if (callback) {
+        callback(error);
+      }
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);
@@ -258,7 +268,9 @@ class Radar {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
-      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
 
       return;
     }
@@ -269,23 +281,27 @@ class Radar {
     const url = `${host}/v1/geocode/forward?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey,
-      'X-Radar-SDK-Version': SDK_VERSION,
-      'X-Radar-Device-Type': 'Web',
+      Authorization: publishableKey
     };
 
     const onSuccess = (response) => {
       try {
         response = JSON.parse(response);
 
-        if (callback) callback(STATUS.SUCCESS, response, response.addresses);
+        if (callback) {
+          callback(STATUS.SUCCESS, response, response.addresses);
+        }
       } catch (e) {
-        if (callback) callback(STATUS.ERROR_SERVER);
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
       }
     };
 
     const onError = (error) => {
-      if (callback) callback(error);
+      if (callback) {
+        callback(error);
+      }
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);
@@ -295,7 +311,9 @@ class Radar {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
-      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
 
       return;
     }
@@ -306,23 +324,27 @@ class Radar {
     const url = `${host}/v1/geocode/reverse?${qs}`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey,
-      'X-Radar-SDK-Version': SDK_VERSION,
-      'X-Radar-Device-Type': 'Web',
+      Authorization: publishableKey
     };
 
     const onSuccess = (response) => {
       try {
         response = JSON.parse(response);
 
-        if (callback) callback(STATUS.SUCCESS, response, response.addresses);
+        if (callback) {
+          callback(STATUS.SUCCESS, response, response.addresses);
+        }
       } catch (e) {
-        if (callback) callback(STATUS.ERROR_SERVER);
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
       }
     };
 
     const onError = (error) => {
-      if (callback) callback(error);
+      if (callback) {
+        callback(error);
+      }
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);
@@ -332,7 +354,9 @@ class Radar {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
-      if (callback) callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
 
       return;
     }
@@ -341,23 +365,27 @@ class Radar {
     const url = `${host}/v1/geocode/ip`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey,
-      'X-Radar-SDK-Version': SDK_VERSION,
-      'X-Radar-Device-Type': 'Web',
+      Authorization: publishableKey
     }
 
     const onSuccess = (response) => {
       try {
         response = JSON.parse(response);
 
-        if (callback) callback(STATUS.SUCCESS, response, response.regions);
+        if (callback) {
+          callback(STATUS.SUCCESS, response, response.regions);
+        }
       } catch (e) {
-        if (callback) callback(STATUS.ERROR_SERVER);
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
       }
     }
 
     const onError = (error) => {
-      if (callback) callback(error);
+      if (callback) {
+        callback(error);
+      }
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);

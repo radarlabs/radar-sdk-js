@@ -1,3 +1,4 @@
+import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
 export function request(method, url, body, headers, successCallback, errorCallback) {
@@ -6,6 +7,9 @@ export function request(method, url, body, headers, successCallback, errorCallba
   xhr.open(method, url, true);
 
   xhr.setRequestHeader('Content-Type', 'application/json');
+
+  xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
+  xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
   for (let header in headers) {
     xhr.setRequestHeader(header, headers[header]);
   }
