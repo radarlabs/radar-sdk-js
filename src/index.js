@@ -186,7 +186,7 @@ class Radar {
     }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/places/search`;
+    const url = `${host}/v1/search/places`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
@@ -235,7 +235,7 @@ class Radar {
     }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geofences/search`;
+    const url = `${host}/v1/search/geofences`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
