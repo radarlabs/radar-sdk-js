@@ -280,7 +280,7 @@ class Radar {
     };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/forward?${qs}`;
+    const url = `${host}/v1/geocode/forward`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
@@ -326,7 +326,7 @@ class Radar {
     }
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/reverse?${qs}`;
+    const url = `${host}/v1/geocode/reverse`;
     const method = 'GET';
     const headers = {
       Authorization: publishableKey
