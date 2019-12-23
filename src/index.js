@@ -378,7 +378,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.regions);
+          callback(STATUS.SUCCESS, response, response.country);
         }
       } catch (e) {
         if (callback) {
