@@ -197,7 +197,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.places);
+          callback(STATUS.SUCCESS, response.places);
         }
       } catch (e) {
         if (callback) {
@@ -246,7 +246,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.geofences);
+          callback(STATUS.SUCCESS, response.geofences);
         }
       } catch (e) {
         if (callback) {
@@ -291,7 +291,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.addresses);
+          callback(STATUS.SUCCESS, response.addresses);
         }
       } catch (e) {
         if (callback) {
@@ -337,7 +337,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.addresses);
+          callback(STATUS.SUCCESS, response.addresses);
         }
       } catch (e) {
         if (callback) {
@@ -378,7 +378,7 @@ class Radar {
         response = JSON.parse(response);
 
         if (callback) {
-          callback(STATUS.SUCCESS, response, response.country);
+          callback(STATUS.SUCCESS, response.country);
         }
       } catch (e) {
         if (callback) {
