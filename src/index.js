@@ -1,6 +1,9 @@
 import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
+import * as Navigator from './navigator';
+
+// consts
 import PLACES_PROVIDER from './places_providers';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
@@ -76,92 +79,63 @@ class Radar {
       return;
     }
 
-    if (!navigator || !navigator.geolocation) {
-      if (callback) {
-        callback(STATUS.ERROR_LOCATION);
+    Navigator.getCurrentPosition((status, { accuracy, latitude, longitude }) => {
+      if (status != STATUS.SUCCESS) {
+        callback(status);
       }
-      return;
-    }
 
-    navigator.geolocation.getCurrentPosition(
-      /* on getCurrentPosition success */
-      (position) => {
-        if (!position || !position.coords) {
+      // Get user data
+      const deviceId = Device.getId();
+      const userId = Cookie.getCookie(Cookie.USER_ID);
+      const placesProvider = Cookie.getCookie(Cookie.PLACES_PROVIDER);
+      const description = Cookie.getCookie(Cookie.DESCRIPTION);
+      const _id = userId || deviceId;
+
+      // Setup http
+      const headers = {
+        Authorization: publishableKey
+      };
+
+      const body = {
+        accuracy,
+        description,
+        deviceId,
+        deviceType: 'Web',
+        foreground: true,
+        latitude,
+        longitude,
+        placesProvider,
+        sdkVersion: SDK_VERSION,
+        stopped: true,
+        userAgent: navigator.userAgent,
+        userId,
+      };
+
+      const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+      const url = `${host}/v1/users/${_id}`;
+      const method = 'PUT';
+
+      const onSuccess = (response) => {
+        try {
+          response = JSON.parse(response);
           if (callback) {
-            callback(STATUS.ERROR_LOCATION);
+            callback(STATUS.SUCCESS, position.coords, response.user, response.events);
           }
-          return;
+        } catch (e) {
+          if (callback) {
+            callback(STATUS.ERROR_SERVER);
+          }
         }
+      };
 
-        // Get location data
-        const { accuracy, latitude, longitude } = position.coords;
-
-        // Get user data
-        const deviceId = Device.getId();
-        const userId = Cookie.getCookie(Cookie.USER_ID);
-        const placesProvider = Cookie.getCookie(Cookie.PLACES_PROVIDER);
-        const description = Cookie.getCookie(Cookie.DESCRIPTION);
-        const _id = userId || deviceId;
-
-        // Setup http
-        const headers = {
-          Authorization: publishableKey
-        };
-
-        const body = {
-          accuracy,
-          description,
-          deviceId,
-          deviceType: 'Web',
-          foreground: true,
-          latitude,
-          longitude,
-          placesProvider,
-          sdkVersion: SDK_VERSION,
-          stopped: true,
-          userAgent: navigator.userAgent,
-          userId,
-        };
-
-        const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-        const url = `${host}/v1/users/${_id}`;
-        const method = 'PUT';
-
-        const onSuccess = (response) => {
-          try {
-            response = JSON.parse(response);
-            if (callback) {
-              callback(STATUS.SUCCESS, position.coords, response.user, response.events);
-            }
-          } catch (e) {
-            if (callback) {
-              callback(STATUS.ERROR_SERVER);
-            }
-          }
-        };
-
-        const onError = (error) => {
-          if (callback) {
-            callback(error);
-          }
-        };
-
-        Http.request(method, url, body, headers, onSuccess, onError);
-      },
-
-      /* on getCurrentPosition error */
-      (err) => {
+      const onError = (error) => {
         if (callback) {
-          if (err && err.code) {
-            if (err.code === 1) {
-              callback(STATUS.ERROR_PERMISSIONS);
-            } else {
-              callback(STATUS.ERROR_LOCATION);
-            }
-          }
+          callback(error);
         }
-      }
-    );
+      };
+
+      Http.request(method, url, body, headers, onSuccess, onError);
+    });
   }
 
   static searchPlaces(latitude, longitude, radius, chains, categories, groups, limit, callback) {
