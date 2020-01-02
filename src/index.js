@@ -385,7 +385,7 @@ class Radar {
   }
 
   static geocodeDeviceIP(callback) {
-    geocodeIP(undefined,
+    this.geocodeIP(undefined,
       (status, country) => {
         callback(status, country);
         return;
