@@ -198,47 +198,7 @@ describe('Radar', () => {
       });
     });
 
-    context('geolocation NOT available', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-        global.navigator = {};
-      });
-
-      afterEach(() => {
-        global.navigator = undefined;
-      });
-
-      it('calls callback with ERROR_LOCATION', () => {
-        const callback = sinon.spy();
-        Radar.trackOnce(callback);
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
-      });
-    });
-
-    context('geo position NOT avaialable', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const getCurrentPosition = (onSuccess) => {
-          onSuccess(null);
-        };
-
-        const geolocation = { getCurrentPosition };
-        global.navigator = { geolocation };
-      });
-
-      afterEach(() => {
-        global.navigator = undefined;
-      });
-
-      it('calls callback with ERROR_LOCATION', () => {
-        const callback = sinon.spy();
-        Radar.trackOnce(callback);
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
-      });
-    });
-
-    context('geo position is available', () => {
+    context('should succeed', () => {
       beforeEach(() => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
         getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
@@ -288,58 +248,6 @@ describe('Radar', () => {
         });
 
         expect(callback).to.have.been.calledWith(STATUS.SUCCESS, position.coords, 'user-data', 'matching-events');
-      });
-    });
-
-    context('user denies location permissions', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess, onError) => {
-            onError({ code: 1 });
-          },
-        };
-
-        global.navigator = { geolocation };
-      });
-
-      afterEach(() => {
-        global.navigator = undefined;
-      });
-
-      it('should call callback with error permissions status', () => {
-        const callback = sinon.spy();
-
-        Radar.trackOnce(callback);
-
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_PERMISSIONS);
-      });
-    });
-
-    context('device error when fetching location', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess, onError) => {
-            onError({ code: 2 });
-          },
-        };
-
-        global.navigator = { geolocation };
-      });
-
-      afterEach(() => {
-        global.navigator = undefined;
-      });
-
-      it('should call callback with error location status', () => {
-        const callback = sinon.spy();
-
-        Radar.trackOnce(callback);
-
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
       });
     });
 

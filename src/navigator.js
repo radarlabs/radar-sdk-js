@@ -1,6 +1,6 @@
 import STATUS from './status_codes';
 
-export function getCurrentPosition(callback) {
+export default function getCurrentPosition(callback) {
   if (!navigator || !navigator.geolocation) {
     if (callback) {
       callback(STATUS.ERROR_LOCATION);
@@ -21,6 +21,7 @@ export function getCurrentPosition(callback) {
         const { accuracy, latitude, longitude } = position.coords;
 
         callback(STATUS.SUCCESS, { accuracy, latitude, longitude });
+        return;
       },
       // error callback
       (err) => {
@@ -30,6 +31,7 @@ export function getCurrentPosition(callback) {
           } else {
             callback(STATUS.ERROR_LOCATION);
           }
+          return;
         }
       }
   )

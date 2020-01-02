@@ -1,7 +1,7 @@
 import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
-import * as Navigator from './navigator';
+import getCurrentPosition from './navigator';
 
 // consts
 import PLACES_PROVIDER from './places_providers';
@@ -79,9 +79,12 @@ class Radar {
       return;
     }
 
-    Navigator.getCurrentPosition((status, { accuracy, latitude, longitude }) => {
-      if (status != STATUS.SUCCESS) {
-        callback(status);
+    getCurrentPosition((status, { accuracy, latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
       }
 
       // Get user data
@@ -119,7 +122,7 @@ class Radar {
         try {
           response = JSON.parse(response);
           if (callback) {
-            callback(STATUS.SUCCESS, position.coords, response.user, response.events);
+            callback(STATUS.SUCCESS, { accuracy, latitude, longitude }, response.user, response.events);
           }
         } catch (e) {
           if (callback) {
