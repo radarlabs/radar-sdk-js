@@ -141,7 +141,25 @@ class Radar {
     });
   }
 
-  static searchPlaces(latitude, longitude, radius, chains, categories, groups, limit, callback) {
+  static searchPlaces(radius, chains, categories, groups, limit, callback) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit,
+        (status, places) => {
+          callback(status, places);
+          return;
+        }
+      );
+    });
+  }
+
+  static searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -192,7 +210,25 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static searchGeofences(latitude, longitude, radius, tags, limit, callback) {
+  static searchGeofences(radius, tags, limit, callback) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      searchGeofencesWithLocation(latitude, longitude, radius, tags, limit,
+        (status, geofences) => {
+          callback(status, geofences);
+          return;
+        }
+      );
+    });
+  }
+
+  static searchGeofencesWithLocation(latitude, longitude, radius, tags, limit, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -252,9 +288,7 @@ class Radar {
       return;
     }
 
-    const queryParams = {
-      query
-    };
+    const queryParams = { query };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/forward`;
@@ -286,7 +320,25 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static reverseGeocode(latitude, longitude, callback) {
+  static reverseGeocode(callback) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      reverseGeocodeLocation(latitude, longitude,
+        (status, addresses) => {
+          callback(status, addresses);
+          return;
+        }
+      );
+    });
+  }
+
+  static reverseGeocodeLocation(latitude, longitude, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -332,7 +384,16 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static ipGeocode(callback) {
+  static geocodeDeviceIP(callback) {
+    geocodeIP(undefined,
+      (status, country) => {
+        callback(status, country);
+        return;
+      }
+    );
+  }
+
+  static geocodeIP(ip, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -342,6 +403,8 @@ class Radar {
 
       return;
     }
+
+    const queryParams = { ip };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/ip`;
@@ -370,7 +433,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 }
 
