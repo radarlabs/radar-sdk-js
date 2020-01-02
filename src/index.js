@@ -150,7 +150,7 @@ class Radar {
         return;
       }
 
-      searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit,
+      this.searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit,
         (status, places) => {
           callback(status, places);
           return;
@@ -219,7 +219,7 @@ class Radar {
         return;
       }
 
-      searchGeofencesWithLocation(latitude, longitude, radius, tags, limit,
+      this.searchGeofencesWithLocation(latitude, longitude, radius, tags, limit,
         (status, geofences) => {
           callback(status, geofences);
           return;
@@ -329,7 +329,7 @@ class Radar {
         return;
       }
 
-      reverseGeocodeLocation(latitude, longitude,
+      this.reverseGeocodeLocation(latitude, longitude,
         (status, addresses) => {
           callback(status, addresses);
           return;
