@@ -706,6 +706,16 @@ describe('Radar', () => {
         const geocodeCallback = sinon.spy();
         Radar.geocodeIP(ip, geocodeCallback);
 
+        const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
+        expect(method).to.equal('GET');
+        expect(url).to.equal('https://api.radar.io/v1/geocode/ip');
+        expect(headers).to.deep.equal({
+          Authorization: publishableKey
+        });
+        expect(body).to.deep.equal({
+          ip
+        });
+
         expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-country');
 
         Http.request.restore();
