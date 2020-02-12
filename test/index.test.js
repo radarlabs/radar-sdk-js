@@ -231,7 +231,7 @@ describe('Radar', () => {
         expect(method).to.equal('PUT');
         expect(url).to.equal('https://api.radar.io/v1/users/user-id');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
+          Authorization: publishableKey,
         });
         expect(body).to.deep.equal({
           accuracy,
@@ -312,26 +312,100 @@ describe('Radar', () => {
     });
   });
 
+  describe('context', () => {
+    const publishableKey = 'mock-publishable-key';
+
+    const latitude = 40.7041895;
+    const longitude = -73.9867797;
+
+    context('getContextForLocation', () => {
+      it('should return a publishable key error if not set', () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+
+        const contextCallback = sinon.spy();
+        Radar.getContextForLocation(latitude, longitude, contextCallback);
+
+        expect(contextCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
+      });
+
+      it('should throw a server error if invalid JSON is returned in the response', () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const jsonErrorResponse = '"invalid_json": true}';
+        const httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess, onError) => {
+          onSuccess(jsonErrorResponse);
+        });
+        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+
+        const contextCallback = sinon.spy();
+        Radar.getContextForLocation(latitude, longitude, contextCallback);
+
+        expect(contextCallback).to.be.calledWith(STATUS.ERROR_SERVER);
+
+        Http.request.restore();
+      });
+
+      it('should return the error from the http request', () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess, onError) => {
+          onError('http error');
+        });
+        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+
+        const contextCallback = sinon.spy();
+        Radar.getContextForLocation(latitude, longitude, contextCallback);
+
+        expect(contextCallback).to.be.calledWith('http error');
+
+        Http.request.restore();
+      });
+
+      it('should succeed', () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+        const jsonSuccessResponse = '{"context":"matching-context"}'
+        const httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess, onError) => {
+          onSuccess(jsonSuccessResponse);
+        });
+        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+
+        const contextCallback = sinon.spy();
+        Radar.getContextForLocation(latitude, longitude, contextCallback);
+
+        const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
+        expect(method).to.equal('GET');
+        expect(url).to.equal('https://api.radar.io/v1/context');
+        expect(headers).to.deep.equal({
+          Authorization: publishableKey,
+        });
+        expect(body).to.deep.equal({
+          coordinates: `${latitude},${longitude}`,
+        });
+
+        expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
+
+        Http.request.restore();
+      });
+    });
+  });
+
   describe('search', () => {
     const publishableKey = 'mock-publishable-key';
 
     const latitude = 40.7041895;
     const longitude = -73.9867797;
-    const accuracy = 1;
-    const position = {
-      coords: { accuracy, latitude, longitude }
-    };
 
     const mockRadius = 100;
     const mockChains = ['dunkin', 'sbucks'];
     const mockLimit = 50;
 
-    context('searchPlacesWithLocation', () => {
+    context('searchPlacesNearLocation', () => {
       it('should return a publishable key error if not set', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const searchCallback = sinon.spy();
-        Radar.searchPlacesWithLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
+        Radar.searchPlacesNearLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -346,7 +420,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchPlacesWithLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
+        Radar.searchPlacesNearLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -362,7 +436,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchPlacesWithLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
+        Radar.searchPlacesNearLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith('http error');
 
@@ -379,22 +453,21 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchPlacesWithLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
+        Radar.searchPlacesNearLocation(latitude, longitude, mockRadius, mockChains, [], [], mockLimit, searchCallback);
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
         expect(url).to.equal('https://api.radar.io/v1/search/places');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
+          Authorization: publishableKey,
         });
         expect(body).to.deep.equal({
-          latitude,
-          longitude,
+          near: `${latitude},${longitude}`,
           radius: mockRadius,
           chains: mockChains.join(','),
           categories: '',
           groups: '',
-          limit: mockLimit
+          limit: mockLimit,
         });
 
         expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-places');
@@ -403,12 +476,12 @@ describe('Radar', () => {
       });
     });
 
-    context('searchGeofencesWithLocation', () => {
+    context('seachGeofencesNearLocation', () => {
       it('should return a publishable key error if not set', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const searchCallback = sinon.spy();
-        Radar.searchGeofencesWithLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
+        Radar.searchGeofencesNearLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -423,7 +496,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchGeofencesWithLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
+        Radar.searchGeofencesNearLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -439,7 +512,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchGeofencesWithLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
+        Radar.searchGeofencesNearLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
 
         expect(searchCallback).to.be.calledWith('http error');
 
@@ -456,20 +529,19 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const searchCallback = sinon.spy();
-        Radar.searchGeofencesWithLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
+        Radar.searchGeofencesNearLocation(latitude, longitude, mockRadius, [], mockLimit, searchCallback);
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
         expect(url).to.equal('https://api.radar.io/v1/search/geofences');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
+          Authorization: publishableKey,
         });
         expect(body).to.deep.equal({
-          latitude,
-          longitude,
+          near: `${latitude},${longitude}`,
           radius: mockRadius,
           tags: '',
-          limit: mockLimit
+          limit: mockLimit,
         });
 
         expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-geofences');
@@ -484,8 +556,6 @@ describe('Radar', () => {
 
     const latitude = 40.7041895;
     const longitude = -73.9867797;
-
-    const ip = '192.0.2.28';
 
     const mockQuery = '20 Jay Street';
 
@@ -548,10 +618,10 @@ describe('Radar', () => {
         expect(method).to.equal('GET');
         expect(url).to.equal('https://api.radar.io/v1/geocode/forward');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
+          Authorization: publishableKey,
         });
         expect(body).to.deep.equal({
-          query: mockQuery
+          query: mockQuery,
         });
 
         expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
@@ -619,11 +689,11 @@ describe('Radar', () => {
         expect(method).to.equal('GET');
         expect(url).to.equal('https://api.radar.io/v1/geocode/reverse');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
+          Authorization: publishableKey,
         });
         expect(body).to.deep.equal({
           latitude,
-          longitude
+          longitude,
         });
 
         expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
@@ -632,31 +702,12 @@ describe('Radar', () => {
       });
     });
 
-    context('geocodeDeviceIP', () => {
-      it('should succeed - calling geocodeIP with undefined', () => {
-        const geocodeIPSpy = sinon.spy((ip, callback) => {
-          callback(STATUS.SUCCESS, { country: 'USA'} );
-        });
-        sinon.stub(Radar, 'geocodeIP').callsFake(geocodeIPSpy);
-
-        const geocodeCallback = sinon.spy();
-        Radar.geocodeDeviceIP(geocodeCallback);
-
-        const [ip] = geocodeIPSpy.getCall(0).args;
-        expect(ip).to.be.undefined;
-
-        expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, { country: 'USA' });
-
-        Radar.geocodeIP.restore();
-      });
-    });
-
     context('geocodeIP', () => {
       it('should return a publishable key error if not set', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocodeIP(ip, geocodeCallback);
+        Radar.geocodeIP(geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -671,7 +722,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocodeIP(ip, geocodeCallback);
+        Radar.geocodeIP(geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -687,7 +738,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocodeIP(ip, geocodeCallback);
+        Radar.geocodeIP(geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith('http error');
 
@@ -704,16 +755,13 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocodeIP(ip, geocodeCallback);
+        Radar.geocodeIP(geocodeCallback);
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
         expect(url).to.equal('https://api.radar.io/v1/geocode/ip');
         expect(headers).to.deep.equal({
-          Authorization: publishableKey
-        });
-        expect(body).to.deep.equal({
-          ip
+          Authorization: publishableKey,
         });
 
         expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-country');

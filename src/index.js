@@ -141,7 +141,7 @@ class Radar {
     });
   }
 
-  static searchPlaces(radius, chains, categories, groups, limit, callback) {
+  static getContext(callback) {
     getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
@@ -150,16 +150,16 @@ class Radar {
         return;
       }
 
-      this.searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit,
-        (status, places) => {
-          callback(status, places);
+      this.getContextForLocation(latitude, longitude,
+        (status, context) => {
+          callback(status, context);
           return;
         }
       );
     });
   }
 
-  static searchPlacesWithLocation(latitude, longitude, radius, chains, categories, groups, limit, callback) {
+  static getContextForLocation(latitude, longitude, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -171,8 +171,70 @@ class Radar {
     }
 
     const queryParams = {
-      latitude,
-      longitude,
+      coordinates: `${latitude},${longitude}`,
+    };
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/context`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) {
+          callback(STATUS.SUCCESS, response.context);
+        }
+      } catch (e) {
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) {
+        callback(error);
+      }
+    };
+
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
+  }
+
+  static searchPlaces(radius, chains, categories, groups, limit, callback) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      this.searchPlacesNearLocation(latitude, longitude, radius, chains, categories, groups, limit,
+        (status, places) => {
+          callback(status, places);
+          return;
+        }
+      );
+    });
+  }
+
+  static searchPlacesNearLocation(latitude, longitude, radius, chains, categories, groups, limit, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
+
+      return;
+    }
+
+    const queryParams = {
+      near: `${latitude},${longitude}`,
       radius,
       chains: chains.join(','),
       categories: categories.join(','),
@@ -184,7 +246,7 @@ class Radar {
     const url = `${host}/v1/search/places`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
     };
 
     const onSuccess = (response) => {
@@ -219,7 +281,7 @@ class Radar {
         return;
       }
 
-      this.searchGeofencesWithLocation(latitude, longitude, radius, tags, limit,
+      this.searchGeofencesNearLocation(latitude, longitude, radius, tags, limit,
         (status, geofences) => {
           callback(status, geofences);
           return;
@@ -228,7 +290,7 @@ class Radar {
     });
   }
 
-  static searchGeofencesWithLocation(latitude, longitude, radius, tags, limit, callback) {
+  static searchGeofencesNearLocation(latitude, longitude, radius, tags, limit, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -240,8 +302,7 @@ class Radar {
     }
 
     const queryParams = {
-      latitude,
-      longitude,
+      near: `${latitude},${longitude}`,
       radius,
       tags: tags.join(','),
       limit: Math.min(limit, 100),
@@ -251,7 +312,7 @@ class Radar {
     const url = `${host}/v1/search/geofences`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
     };
 
     const onSuccess = (response) => {
@@ -294,7 +355,7 @@ class Radar {
     const url = `${host}/v1/geocode/forward`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
     };
 
     const onSuccess = (response) => {
@@ -358,7 +419,7 @@ class Radar {
     const url = `${host}/v1/geocode/reverse`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
     };
 
     const onSuccess = (response) => {
@@ -384,16 +445,7 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static geocodeDeviceIP(callback) {
-    this.geocodeIP(undefined,
-      (status, country) => {
-        callback(status, country);
-        return;
-      }
-    );
-  }
-
-  static geocodeIP(ip, callback) {
+  static geocodeIP(callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -404,13 +456,11 @@ class Radar {
       return;
     }
 
-    const queryParams = { ip };
-
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/ip`;
     const method = 'GET';
     const headers = {
-      Authorization: publishableKey
+      Authorization: publishableKey,
     }
 
     const onSuccess = (response) => {
@@ -433,7 +483,7 @@ class Radar {
       }
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, {}, headers, onSuccess, onError);
   }
 }
 
