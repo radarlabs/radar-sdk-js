@@ -338,6 +338,53 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
+  static autocomplete(query, latitude, longitude, limit, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
+
+      return;
+    }
+
+    const queryParams = {
+      query,
+      near: `${latitude},${longitude}`,
+      limit,
+    };
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/search/autocomplete`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) {
+          callback(STATUS.SUCCESS, response.addresses);
+        }
+      } catch (e) {
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
+      }
+    }
+
+    const onError = (error) => {
+      if (callback) {
+        callback(error);
+      }
+    };
+
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
+  }
+
   static geocode(query, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
@@ -411,9 +458,8 @@ class Radar {
     }
 
     const queryParams = {
-      latitude,
-      longitude,
-    }
+      coordinates: `${latitude},${longitude}`,
+    };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/reverse`;
