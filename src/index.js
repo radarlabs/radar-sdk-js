@@ -240,7 +240,7 @@ class Radar {
       categories: categories.join(','),
       groups: groups.join(','),
       limit: Math.min(limit, 100),
-    }
+    };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/search/places`;
@@ -306,7 +306,7 @@ class Radar {
       radius,
       tags: tags.join(','),
       limit: Math.min(limit, 100),
-    }
+    };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/search/geofences`;
@@ -507,7 +507,7 @@ class Radar {
     const method = 'GET';
     const headers = {
       Authorization: publishableKey,
-    }
+    };
 
     const onSuccess = (response) => {
       try {
@@ -530,6 +530,72 @@ class Radar {
     };
 
     Http.request(method, url, {}, headers, onSuccess, onError);
+  }
+
+  static getDistance(destLat, destLng, modes, units) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      this.getDistanceFromLocation(latitude, longitude, destLat, destLng, modes, units,
+        (status, routes) => {
+          callback(status, routes);
+          return;
+        }
+      );
+    });
+  }
+
+  static getDistanceFromLocation(originLat, originLng, destLat, destLng, modes, units, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
+
+      return;
+    }
+
+    const queryParams = {
+      origin: `${originLat},${originLng}`,
+      destination: `${destLat},${destLng}`,
+      modes: modes.join(','),
+      units,
+    };
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/route/distance`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) {
+          callback(STATUS.SUCCESS, response.routes);
+        }
+      } catch (e) {
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
+      }
+    }
+
+    const onError = (error) => {
+      if (callback) {
+        callback(error);
+      }
+    };
+
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 }
 
