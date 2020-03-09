@@ -154,8 +154,7 @@ class Radar {
         (status, context) => {
           callback(status, context);
           return;
-        }
-      );
+        });
     });
   }
 
@@ -217,8 +216,7 @@ class Radar {
         (status, places) => {
           callback(status, places);
           return;
-        }
-      );
+        });
     });
   }
 
@@ -285,8 +283,7 @@ class Radar {
         (status, geofences) => {
           callback(status, geofences);
           return;
-        }
-      );
+        });
     });
   }
 
@@ -321,6 +318,71 @@ class Radar {
 
         if (callback) {
           callback(STATUS.SUCCESS, response.geofences);
+        }
+      } catch (e) {
+        if (callback) {
+          callback(STATUS.ERROR_SERVER);
+        }
+      }
+    };
+
+    const onError = (error) => {
+      if (callback) {
+        callback(error);
+      }
+    };
+
+    Http.request(method, url, queryParams, headers, onSuccess, onError);
+  }
+
+  static searchPoints(radius, tags, limit, callback) {
+    getCurrentPosition((status, { latitude, longitude }) => {
+      if (status !== STATUS.SUCCESS) {
+        if (callback) {
+          callback(status);
+        }
+        return;
+      }
+
+      this.searchPointsNearLocation(latitude, longitude, radius, tags, limit,
+        (status, points) => {
+          callback(status, points);
+          return;
+        });
+    });
+  }
+
+  static searchPointsNearLocation(latitude, longitude, radius, tags, limit, callback) {
+    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+
+    if (!publishableKey) {
+      if (callback) {
+        callback(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
+
+      return;
+    }
+
+    const queryParams = {
+      near: `${latitude},${longitude}`,
+      radius,
+      tags: tags.join(','),
+      limit: Math.min(limit, 100),
+    };
+
+    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    const url = `${host}/v1/search/points`;
+    const method = 'GET';
+    const headers = {
+      Authorization: publishableKey,
+    };
+
+    const onSuccess = (response) => {
+      try {
+        response = JSON.parse(response);
+
+        if (callback) {
+          callback(STATUS.SUCCESS, response.points);
         }
       } catch (e) {
         if (callback) {
