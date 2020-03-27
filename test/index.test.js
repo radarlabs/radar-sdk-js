@@ -10,7 +10,6 @@ import * as Device from '../src/device';
 import * as Http from '../src/http';
 import Radar from '../src/index';
 
-import PLACES_PROVIDER from '../src/places_providers';
 import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
 
@@ -32,12 +31,6 @@ describe('Radar', () => {
   describe('VERSION', () => {
     it('should return sdk version', () => {
       expect(Radar.VERSION).to.eq(SDK_VERSION);
-    });
-  });
-
-  describe('PLACES_PROVIDER', () => {
-    it('should return places providers object', () => {
-      expect(Radar.PLACES_PROVIDER).to.eql(PLACES_PROVIDER);
     });
   });
 
