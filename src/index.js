@@ -508,7 +508,7 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static geocode(query, callback) {
+  static geocode({ query }, callback) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -560,7 +560,8 @@ class Radar {
         return;
       }
 
-      this.reverseGeocodeLocation(latitude, longitude,
+      this.reverseGeocodeLocation(
+        { latitude, longitude },
         (status, addresses) => {
           callback(status, addresses);
           return;
@@ -569,7 +570,13 @@ class Radar {
     });
   }
 
-  static reverseGeocodeLocation(latitude, longitude, callback) {
+  static reverseGeocodeLocation(
+    {
+      latitude,
+      longitude
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -655,7 +662,15 @@ class Radar {
     Http.request(method, url, {}, headers, onSuccess, onError);
   }
 
-  static getDistance(destLat, destLng, modes, units) {
+  static getDistance(
+    {
+      destinationLat,
+      destinationLng,
+      modes,
+      units,
+    },
+    callback
+  ) {
     getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
@@ -664,7 +679,15 @@ class Radar {
         return;
       }
 
-      this.getDistanceFromLocation(latitude, longitude, destLat, destLng, modes, units,
+      this.getDistanceFromLocation(
+        {
+          originLat: latitude,
+          originLng: longitude,
+          destinationLat,
+          destinationLng,
+          modes,
+          units
+        },
         (status, routes) => {
           callback(status, routes);
           return;
@@ -673,7 +696,17 @@ class Radar {
     });
   }
 
-  static getDistanceFromLocation(originLat, originLng, destLat, destLng, modes, units, callback) {
+  static getDistanceFromLocation(
+    {
+      originLat,
+      originLng,
+      destinationLat,
+      destinationLng,
+      modes,
+      units,
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -686,7 +719,7 @@ class Radar {
 
     const queryParams = {
       origin: `${originLat},${originLng}`,
-      destination: `${destLat},${destLng}`,
+      destination: `${destinationLat},${destinationLng}`,
       modes: modes.join(','),
       units,
     };

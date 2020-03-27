@@ -841,7 +841,7 @@ describe('Radar', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocode(mockQuery, geocodeCallback);
+        Radar.geocode({ query: mockQuery }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -856,7 +856,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocode(mockQuery, geocodeCallback);
+        Radar.geocode({ query: mockQuery }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -872,7 +872,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocode(mockQuery, geocodeCallback);
+        Radar.geocode({ query: mockQuery }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith('http error');
 
@@ -889,7 +889,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.geocode(mockQuery, geocodeCallback);
+        Radar.geocode({ query: mockQuery }, geocodeCallback);
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
@@ -912,7 +912,7 @@ describe('Radar', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const geocodeCallback = sinon.spy();
-        Radar.reverseGeocodeLocation(latitude, longitude, geocodeCallback);
+        Radar.reverseGeocodeLocation({ latitude, longitude }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -927,7 +927,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.reverseGeocodeLocation(latitude, longitude, geocodeCallback);
+        Radar.reverseGeocodeLocation({ latitude, longitude }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -943,7 +943,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.reverseGeocodeLocation(latitude, longitude, geocodeCallback);
+        Radar.reverseGeocodeLocation({ latitude, longitude }, geocodeCallback);
 
         expect(geocodeCallback).to.be.calledWith('http error');
 
@@ -960,7 +960,7 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const geocodeCallback = sinon.spy();
-        Radar.reverseGeocodeLocation(latitude, longitude, geocodeCallback);
+        Radar.reverseGeocodeLocation({ latitude, longitude }, geocodeCallback);
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
@@ -1052,8 +1052,8 @@ describe('Radar', () => {
 
     const originLat = 40.7041895;
     const originLng = -73.9867797;
-    const destLat = 40.7032123;
-    const destLng = -73.9936137;
+    const destinationLat = 40.7032123;
+    const destinationLng = -73.9936137;
     const mockModes = ['foot', 'bike', 'car'];
     const mockUnits = 'imperial';
 
@@ -1062,7 +1062,17 @@ describe('Radar', () => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
         const routingCallback = sinon.spy();
-        Radar.getDistanceFromLocation(originLat, originLng, destLat, destLng, mockModes, mockUnits, routingCallback);
+        Radar.getDistanceFromLocation(
+          {
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            modes: mockModes,
+            units: mockUnits,
+          },
+          routingCallback
+        );
 
         expect(routingCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
       });
@@ -1077,7 +1087,17 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const routingCallback = sinon.spy();
-        Radar.getDistanceFromLocation(originLat, originLng, destLat, destLng, mockModes, mockUnits, routingCallback);
+        Radar.getDistanceFromLocation(
+          {
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            modes: mockModes,
+            units: mockUnits,
+          },
+          routingCallback
+        );
 
         expect(routingCallback).to.be.calledWith(STATUS.ERROR_SERVER);
 
@@ -1093,7 +1113,17 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const routingCallback = sinon.spy();
-        Radar.getDistanceFromLocation(originLat, originLng, destLat, destLng, mockModes, mockUnits, routingCallback);
+        Radar.getDistanceFromLocation(
+          {
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            modes: mockModes,
+            units: mockUnits,
+          },
+          routingCallback
+        );
 
         expect(routingCallback).to.be.calledWith('http error');
 
@@ -1110,7 +1140,17 @@ describe('Radar', () => {
         sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
         const routingCallback = sinon.spy();
-        Radar.getDistanceFromLocation(originLat, originLng, destLat, destLng, mockModes, mockUnits, routingCallback);
+        Radar.getDistanceFromLocation(
+          {
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            modes: mockModes,
+            units: mockUnits,
+          },
+          routingCallback
+        );
 
         const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
         expect(method).to.equal('GET');
@@ -1120,7 +1160,7 @@ describe('Radar', () => {
         });
         expect(body).to.deep.equal({
           origin: `${originLat},${originLng}`,
-          destination: `${destLat},${destLng}`,
+          destination: `${destinationLat},${destinationLng}`,
           modes: mockModes.join(','),
           units: mockUnits,
         });
