@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-import SDK_VESRION from '../src/version';
+import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
 import * as Http from '../src/http';
 
@@ -127,7 +127,7 @@ describe('http', () => {
       expect(errorCallback).to.not.be.called;
 
       expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
-      expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VESRION);
+      expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
     });
 
     it('should inject GET parameters into the url querystring', () => {

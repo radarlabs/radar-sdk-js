@@ -2,7 +2,6 @@
 export const DESCRIPTION = 'radar-description';
 export const DEVICE_ID = 'radar-deviceId';
 export const HOST = 'radar-host';
-export const PLACES_PROVIDER = 'radar-placesProvider';
 export const PUBLISHABLE_KEY = 'radar-publishableKey';
 export const USER_ID = 'radar-userId';
 

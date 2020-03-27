@@ -44,20 +44,6 @@ To get a Radar publishable API key, [sign up for a Radar account](https://radar.
 
 ### Enable Places
 
-If you are using Places, you must set Facebook as your place data provider.
-
-To set Facebook as your place data provider, call:
-
-```javascript
-Radar.setPlacesProvider(Radar.PLACES_PROVIDER.FACEBOOK);
-```
-
-To disable Places later, call:
-
-```javascript
-Radar.setPlacesProvider(Radar.PLACES_PROVIDER.NONE);
-```
-
 Learn more about [Places](https://radar.io/documentation/places).
 
 ### Identify user

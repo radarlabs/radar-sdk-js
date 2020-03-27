@@ -81,19 +81,6 @@ describe('Radar', () => {
     });
   });
 
-  describe('setPlacesProvider', () => {
-    it('should save provider to cookie', () => {
-      const provider = 'facebook';
-      Radar.setPlacesProvider(provider);
-      expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, provider);
-    });
-
-    it('should set provider to "none" if argument does NOT equal "facebook"', () => {
-      Radar.setPlacesProvider("other");
-      expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, "none");
-    });
-  });
-
   describe('setUserId', () => {
     context('no userId given', () => {
       it('should delete userId from cookie', () => {
@@ -167,7 +154,6 @@ describe('Radar', () => {
   describe('trackOnce', () => {
     const publishableKey = 'publishable-key';
     const userId = 'user-id';
-    const placesProvider = 'facebook';
     const description = 'description';
     const deviceId = 'device-id';
 
@@ -203,7 +189,6 @@ describe('Radar', () => {
       beforeEach(() => {
         getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
         getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
-        getCookieStub.withArgs(Cookie.PLACES_PROVIDER).returns(placesProvider);
         getCookieStub.withArgs(Cookie.DESCRIPTION).returns(description);
         sinon.stub(Device, 'getId').returns(deviceId);
 
@@ -241,7 +226,6 @@ describe('Radar', () => {
           foreground: true,
           latitude,
           longitude,
-          placesProvider,
           sdkVersion: SDK_VERSION,
           stopped: true,
           userAgent: undefined,

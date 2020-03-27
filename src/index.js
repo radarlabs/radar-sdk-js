@@ -34,13 +34,6 @@ class Radar {
     Cookie.setCookie(Cookie.HOST, host, true);
   }
 
-  static setPlacesProvider(placesProvider) {
-    if (placesProvider !== PLACES_PROVIDER.FACEBOOK) {
-      placesProvider = PLACES_PROVIDER.NONE;
-    }
-    Cookie.setCookie(Cookie.PLACES_PROVIDER, placesProvider);
-  }
-
   static setUserId(userId) {
     if (!userId) {
       Cookie.deleteCookie(Cookie.USER_ID);
@@ -90,7 +83,6 @@ class Radar {
       // Get user data
       const deviceId = Device.getId();
       const userId = Cookie.getCookie(Cookie.USER_ID);
-      const placesProvider = Cookie.getCookie(Cookie.PLACES_PROVIDER);
       const description = Cookie.getCookie(Cookie.DESCRIPTION);
       const _id = userId || deviceId;
 
@@ -107,7 +99,6 @@ class Radar {
         foreground: true,
         latitude,
         longitude,
-        placesProvider,
         sdkVersion: SDK_VERSION,
         stopped: true,
         userAgent: navigator.userAgent,
