@@ -141,7 +141,8 @@ class Radar {
         return;
       }
 
-      this.getContextForLocation(latitude, longitude,
+      this.getContextForLocation(
+        { latitude, longitude },
         (status, context) => {
           callback(status, context);
           return;
@@ -149,7 +150,13 @@ class Radar {
     });
   }
 
-  static getContextForLocation(latitude, longitude, callback) {
+  static getContextForLocation(
+    {
+      latitude,
+      longitude
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -194,7 +201,16 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static searchPlaces(radius, chains, categories, groups, limit, callback) {
+  static searchPlaces(
+    {
+      radius,
+      chains,
+      categories,
+      groups,
+      limit
+    },
+    callback
+  ) {
     getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
@@ -203,7 +219,8 @@ class Radar {
         return;
       }
 
-      this.searchPlacesNearLocation(latitude, longitude, radius, chains, categories, groups, limit,
+      this.searchPlacesNearLocation(
+        { latitude, longitude, radius, chains, categories, groups, limit },
         (status, places) => {
           callback(status, places);
           return;
@@ -211,7 +228,18 @@ class Radar {
     });
   }
 
-  static searchPlacesNearLocation(latitude, longitude, radius, chains, categories, groups, limit, callback) {
+  static searchPlacesNearLocation(
+    {
+      latitude,
+      longitude,
+      radius,
+      chains,
+      categories,
+      groups,
+      limit
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -261,7 +289,14 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static searchGeofences(radius, tags, limit, callback) {
+  static searchGeofences(
+    {
+      radius,
+      tags,
+      limit,
+    },
+    callback
+  ) {
     getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
@@ -270,7 +305,8 @@ class Radar {
         return;
       }
 
-      this.searchGeofencesNearLocation(latitude, longitude, radius, tags, limit,
+      this.searchGeofencesNearLocation(
+        { latitude, longitude, radius, tags, limit },
         (status, geofences) => {
           callback(status, geofences);
           return;
@@ -278,7 +314,16 @@ class Radar {
     });
   }
 
-  static searchGeofencesNearLocation(latitude, longitude, radius, tags, limit, callback) {
+  static searchGeofencesNearLocation(
+    {
+      latitude,
+      longitude,
+      radius,
+      tags,
+      limit
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -326,7 +371,14 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static searchPoints(radius, tags, limit, callback) {
+  static searchPoints(
+    {
+      radius,
+      tags,
+      limit,
+    },
+    callback
+  ) {
     getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
@@ -335,7 +387,8 @@ class Radar {
         return;
       }
 
-      this.searchPointsNearLocation(latitude, longitude, radius, tags, limit,
+      this.searchPointsNearLocation(
+        { latitude, longitude, radius, tags, limit },
         (status, points) => {
           callback(status, points);
           return;
@@ -343,7 +396,16 @@ class Radar {
     });
   }
 
-  static searchPointsNearLocation(latitude, longitude, radius, tags, limit, callback) {
+  static searchPointsNearLocation(
+    {
+      latitude,
+      longitude,
+      radius,
+      tags,
+      limit,
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
@@ -391,7 +453,15 @@ class Radar {
     Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
-  static autocomplete(query, latitude, longitude, limit, callback) {
+  static autocomplete(
+    {
+      query,
+      latitude,
+      longitude,
+      limit,
+    },
+    callback
+  ) {
     const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
 
     if (!publishableKey) {
