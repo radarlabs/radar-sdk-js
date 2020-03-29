@@ -1045,8 +1045,10 @@ describe('Radar', () => {
 
     const originLat = 40.7041895;
     const originLng = -73.9867797;
+    const origin = `${originLat},${originLng}`;
     const destinationLat = 40.7032123;
     const destinationLng = -73.9936137;
+    const destination = `${destinationLat},${destinationLng}`;
     const mockModes = ['foot', 'bike', 'car'];
     const mockUnits = 'imperial';
 
@@ -1057,10 +1059,8 @@ describe('Radar', () => {
         const routingCallback = sinon.spy();
         Radar.getDistanceFromLocation(
           {
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
+            origin,
+            destination,
             modes: mockModes,
             units: mockUnits,
           },
@@ -1082,10 +1082,8 @@ describe('Radar', () => {
         const routingCallback = sinon.spy();
         Radar.getDistanceFromLocation(
           {
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
+            origin,
+            destination,
             modes: mockModes,
             units: mockUnits,
           },
@@ -1108,10 +1106,8 @@ describe('Radar', () => {
         const routingCallback = sinon.spy();
         Radar.getDistanceFromLocation(
           {
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
+            origin,
+            destination,
             modes: mockModes,
             units: mockUnits,
           },
@@ -1135,10 +1131,8 @@ describe('Radar', () => {
         const routingCallback = sinon.spy();
         Radar.getDistanceFromLocation(
           {
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
+            origin,
+            destination,
             modes: mockModes,
             units: mockUnits,
           },
