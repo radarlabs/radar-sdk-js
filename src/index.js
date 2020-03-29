@@ -659,8 +659,7 @@ class Radar {
 
   static getDistance(
     {
-      destinationLat,
-      destinationLng,
+      destination,
       modes,
       units,
     },
@@ -676,10 +675,8 @@ class Radar {
 
       this.getDistanceFromLocation(
         {
-          originLat: latitude,
-          originLng: longitude,
-          destinationLat,
-          destinationLng,
+          origin: `${latitude},${longitude}`,
+          destination,
           modes,
           units
         },
@@ -693,10 +690,8 @@ class Radar {
 
   static getDistanceFromLocation(
     {
-      originLat,
-      originLng,
-      destinationLat,
-      destinationLng,
+      origin,
+      destination,
       modes,
       units,
     },
@@ -713,8 +708,8 @@ class Radar {
     }
 
     const queryParams = {
-      origin: `${originLat},${originLng}`,
-      destination: `${destinationLat},${destinationLng}`,
+      origin,
+      destination,
       modes: modes.join(','),
       units,
     };
