@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import getCurrentPosition from '../src/navigator';
+import Navigator from '../src/navigator';
 import STATUS from '../src/status_codes';
 
 describe('Navigator', () => {
@@ -17,7 +17,7 @@ describe('Navigator', () => {
     global.navigator = {};
 
     const callback = sinon.spy();
-    getCurrentPosition(callback);
+    Navigator.getCurrentPosition(callback);
 
     expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
   });
@@ -31,7 +31,7 @@ describe('Navigator', () => {
     global.navigator = { geolocation };
 
     const callback = sinon.spy();
-    getCurrentPosition(callback);
+    Navigator.getCurrentPosition(callback);
 
     expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
   });
@@ -45,7 +45,7 @@ describe('Navigator', () => {
     global.navigator = { geolocation };
 
     const callback = sinon.spy();
-    getCurrentPosition(callback);
+    Navigator.getCurrentPosition(callback);
 
     expect(callback).to.be.calledWith(STATUS.ERROR_PERMISSIONS);
   });
@@ -59,7 +59,7 @@ describe('Navigator', () => {
     global.navigator = { geolocation };
 
     const callback = sinon.spy();
-    getCurrentPosition(callback);
+    Navigator.getCurrentPosition(callback);
 
     expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
   });
@@ -80,7 +80,7 @@ describe('Navigator', () => {
     global.navigator = { geolocation };
 
     const callback = sinon.spy();
-    getCurrentPosition(callback);
+    Navigator.getCurrentPosition(callback);
     expect(callback).to.be.calledWith(STATUS.SUCCESS, position.coords);
   });
 });

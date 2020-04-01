@@ -1,14 +1,16 @@
+// consts
 import STATUS from './status_codes';
 
-export default function getCurrentPosition(callback) {
-  if (!navigator || !navigator.geolocation) {
-    if (callback) {
-      callback(STATUS.ERROR_LOCATION);
+class Navigator {
+  static getCurrentPosition(callback) {
+    if (!navigator || !navigator.geolocation) {
+      if (callback) {
+        callback(STATUS.ERROR_LOCATION);
+      }
+      return;
     }
-    return;
-  }
 
-  navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.getCurrentPosition(
       // success callback
       (position) => {
         if (!position || !position.coords) {
@@ -34,5 +36,8 @@ export default function getCurrentPosition(callback) {
           return;
         }
       }
-  )
+    )
+  }
 }
+
+export default Navigator;

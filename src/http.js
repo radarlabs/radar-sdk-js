@@ -1,3 +1,4 @@
+// consts
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 

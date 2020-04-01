@@ -1,7 +1,8 @@
 import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
-import getCurrentPosition from './navigator';
+import Navigator from './navigator';
+import Routing from './routing';
 
 // consts
 import SDK_VERSION from './version';
@@ -67,7 +68,7 @@ class Radar {
       return;
     }
 
-    getCurrentPosition((status, { accuracy, latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { accuracy, latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -128,7 +129,7 @@ class Radar {
   }
 
   static getContext(callback) {
-    getCurrentPosition((status, { latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -206,7 +207,7 @@ class Radar {
     },
     callback
   ) {
-    getCurrentPosition((status, { latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -292,7 +293,7 @@ class Radar {
     },
     callback
   ) {
-    getCurrentPosition((status, { latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -374,7 +375,7 @@ class Radar {
     },
     callback
   ) {
-    getCurrentPosition((status, { latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -547,7 +548,7 @@ class Radar {
   }
 
   static reverseGeocode(callback) {
-    getCurrentPosition((status, { latitude, longitude }) => {
+    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         if (callback) {
           callback(status);
@@ -659,23 +660,34 @@ class Radar {
 
   static getDistance(
     {
+      origin,
       destination,
       modes,
       units,
     },
     callback
   ) {
-    getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
+    if (!callback) {
+      return;
+    }
 
-      this.getDistanceFromLocation(
+    if (origin) {
+      Routing.getDistanceWithOrigin(
         {
-          origin: `${latitude},${longitude}`,
+          origin,
+          destination,
+          modes,
+          units,
+        },
+        (status, routes) => {
+          callback(status, routes);
+          return
+        }
+      );
+    }
+    else {
+      Routing.getDistanceToDestination(
+        {
           destination,
           modes,
           units
@@ -684,64 +696,8 @@ class Radar {
           callback(status, routes);
           return;
         }
-      );
-    });
-  }
-
-  static getDistanceFromLocation(
-    {
-      origin,
-      destination,
-      modes,
-      units,
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
-      return;
+      )
     }
-
-    const queryParams = {
-      origin,
-      destination,
-      modes: modes.join(','),
-      units,
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/route/distance`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.routes);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    }
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 }
 
