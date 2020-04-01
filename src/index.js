@@ -2,6 +2,7 @@ import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
 import Navigator from './navigator';
+import Geocoding from './geocoding';
 import Routing from './routing';
 
 // consts
@@ -505,157 +506,44 @@ class Radar {
   }
 
   static geocode({ query }, callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+    if (!callback) {
       return;
     }
 
-    const queryParams = { query };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/forward`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.addresses);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
-  }
-
-  static reverseGeocode(callback) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
-
-      this.reverseGeocodeLocation(
-        { latitude, longitude },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      );
+    Geocoding.geocode({ query }, (status, addresses) => {
+      callback(status, addresses);
     });
   }
 
-  static reverseGeocodeLocation(
-    {
-      latitude,
-      longitude
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+  static reverseGeocode({ latitude, longitude }, callback) {
+    if (!callback) {
       return;
     }
 
-    const queryParams = {
-      coordinates: `${latitude},${longitude}`,
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/reverse`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.addresses);
+    if (latitude && longitude) {
+      Geocoding.reverseGeocodeLocation(
+        { latitude, longitude },
+        (status, addresses) => {
+          callback(status, addresses);
         }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
+      );
+    } else {
+      Geocoding.reverseGeocode(
+        (status, addresses) => {
+          callback(status, addresses);
         }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+      );
+    }
   }
 
-  static geocodeIP(callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+  static ipGeocode(callback) {
+    if (!callback) {
       return;
     }
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/ip`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.country);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    }
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Geocoding.ipGeocode((status, country) => {
+      callback(status, country);
+    });
   }
 
   static getDistance(
