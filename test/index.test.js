@@ -6,10 +6,12 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import * as Cookie from '../src/cookie';
-import Radar from '../src/index';
+import Navigator from '../src/navigator';
 
 import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
+
+import Radar from '../src/index';
 
 describe('Radar', () => {
   let getCookieStub;
@@ -138,6 +140,56 @@ describe('Radar', () => {
         const description = 'abc123';
         Radar.setDescription(description);
         expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DESCRIPTION, description);
+      });
+    });
+  });
+
+  context('getLocation', () => {
+    let navigatorStub;
+
+    const latitude = 40.7041895;
+    const longitude = -73.9867797;
+    const accuracy = 5;
+
+    beforeEach(() => {
+      navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
+    });
+
+    afterEach(() => {
+      Navigator.getCurrentPosition.restore();
+    });
+
+    it('should skip calling Navigator if no callback present', () => {
+      Radar.getLocation();
+
+      expect(navigatorStub).to.have.callCount(0);
+    });
+
+    it('should propagate the status if not successful', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const locationCallback = sinon.spy();
+      Radar.getLocation(locationCallback);
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(locationCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should succeed', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
+      });
+
+      const locationCallback = sinon.spy();
+      Radar.getLocation(locationCallback);
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(locationCallback).to.be.calledWith(STATUS.SUCCESS, {
+        latitude: 40.7041895,
+        longitude: -73.9867797,
+        accuracy: 5,
       });
     });
   });

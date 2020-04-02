@@ -1,4 +1,5 @@
 import * as Cookie from './cookie';
+import Navigator from './navigator';
 
 import Context from './api/context';
 import Geocoding from './api/geocoding';
@@ -56,6 +57,22 @@ class Radar {
       return;
     }
     Cookie.setCookie(Cookie.DESCRIPTION, description);
+  }
+
+  static getLocation(callback) {
+    if (!callback) {
+      return;
+    }
+
+    Navigator.getCurrentPosition((status, { latitude, longitude, accuracy }) => {
+      if (status !== STATUS.SUCCESS) {
+        callback(status);
+        return;
+      }
+
+      callback(status, { latitude, longitude, accuracy });
+      return;
+    });
   }
 
   static trackOnce({ latitude, longitude, accuracy }, callback) {
