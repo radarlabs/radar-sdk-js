@@ -1,18 +1,14 @@
 import * as Cookie from './cookie';
-import * as Device from './device';
-import * as Http from './http';
-import Navigator from './navigator';
 
 import Context from './context';
 import Geocoding from './geocoding';
 import Routing from './routing';
 import Search from './search';
+import Track from './track';
 
 // consts
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
-
-const DEFAULT_HOST = 'https://api.radar.io';
 
 class Radar {
   static get VERSION() {
@@ -62,74 +58,30 @@ class Radar {
     Cookie.setCookie(Cookie.DESCRIPTION, description);
   }
 
-  static trackOnce(callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
+  static trackOnce({ latitude, longitude, accuracy }, callback) {
+    if (!callback) {
       return;
     }
 
-    Navigator.getCurrentPosition((status, { accuracy, latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
-
-      // Get user data
-      const deviceId = Device.getId();
-      const userId = Cookie.getCookie(Cookie.USER_ID);
-      const description = Cookie.getCookie(Cookie.DESCRIPTION);
-      const _id = userId || deviceId;
-
-      // Setup http
-      const headers = {
-        Authorization: publishableKey
-      };
-
-      const body = {
-        accuracy,
-        description,
-        deviceId,
-        deviceType: 'Web',
-        foreground: true,
-        latitude,
-        longitude,
-        sdkVersion: SDK_VERSION,
-        stopped: true,
-        userAgent: navigator.userAgent,
-        userId,
-      };
-
-      const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-      const url = `${host}/v1/users/${_id}`;
-      const method = 'PUT';
-
-      const onSuccess = (response) => {
-        try {
-          response = JSON.parse(response);
+    if (latitude && longitude && accuracy) {
+      Track.trackOnceWithLocation({ latitude, longitude, accuracy },
+        (status, location, user, events) => {
           if (callback) {
-            callback(STATUS.SUCCESS, { accuracy, latitude, longitude }, response.user, response.events);
-          }
-        } catch (e) {
-          if (callback) {
-            callback(STATUS.ERROR_SERVER);
+            callback(status, location, user, events);
+            return;
           }
         }
-      };
-
-      const onError = (error) => {
-        if (callback) {
-          callback(error);
+      );
+    } else {
+      Track.trackOnce(
+        (status, location, user, events) => {
+          if (callback) {
+            callback(status, location, user, events);
+            return;
+          }
         }
-      };
-
-      Http.request(method, url, body, headers, onSuccess, onError);
-    });
+      );
+    }
   }
 
   static getContext({ latitude, longitude }, callback) {

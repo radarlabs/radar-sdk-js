@@ -16,9 +16,9 @@ class Navigator {
           return;
         }
 
-        const { accuracy, latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
 
-        callback(STATUS.SUCCESS, { accuracy, latitude, longitude });
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
         return;
       },
       // error callback
