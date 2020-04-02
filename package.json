@@ -15,7 +15,7 @@
     "prepare": "npm run build",
     "prebuild": "rimraf dist",
     "build": "npm-run-all --parallel build:*",
-    "test": "nyc --reporter=lcov --reporter=text mocha test/*.test.js --require @babel/register",
+    "test": "nyc --reporter=lcov --reporter=text mocha ./test/** --require @babel/register",
     "test:watch": "npm run test -- -w",
     "demo": "npm run build && node demo/server.js",
     "build:cjs": "rollup -c rollup-cjs.config.js",

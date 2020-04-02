@@ -1,11 +1,11 @@
-import * as Cookie from './cookie';
-import * as Device from './device';
-import * as Http from './http';
-import Navigator from './navigator';
+import * as Cookie from '../cookie';
+import * as Device from '../device';
+import * as Http from '../http';
+import Navigator from '../navigator';
 
 // consts
-import SDK_VERSION from './version';
-import STATUS from './status_codes';
+import SDK_VERSION from '../version';
+import STATUS from '../status_codes';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 

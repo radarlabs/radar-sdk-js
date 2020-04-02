@@ -1,9 +1,9 @@
-import * as Cookie from './cookie';
-import * as Http from './http';
-import Navigator from './navigator';
+import * as Cookie from '../cookie';
+import * as Http from '../http';
+import Navigator from '../navigator';
 
 // consts
-import STATUS from './status_codes';
+import STATUS from '../status_codes';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 

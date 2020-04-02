@@ -1,10 +1,10 @@
 import * as Cookie from './cookie';
 
-import Context from './context';
-import Geocoding from './geocoding';
-import Routing from './routing';
-import Search from './search';
-import Track from './track';
+import Context from './api/context';
+import Geocoding from './api/geocoding';
+import Routing from './api/routing';
+import Search from './api/search';
+import Track from './api/track';
 
 // consts
 import SDK_VERSION from './version';

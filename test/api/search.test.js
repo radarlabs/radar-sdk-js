@@ -5,11 +5,11 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../src/cookie';
-import * as Http from '../src/http';
-import STATUS from '../src/status_codes';
+import * as Cookie from '../../src/cookie';
+import * as Http from '../../src/http';
+import STATUS from '../../src/status_codes';
 
-import Search from '../src/search';
+import Search from '../../src/api/search';
 
 describe('Search', () => {
   let getCookieStub;
