@@ -3,6 +3,7 @@ import * as Device from './device';
 import * as Http from './http';
 import Navigator from './navigator';
 
+import Context from './context';
 import Geocoding from './geocoding';
 import Routing from './routing';
 import Search from './search';
@@ -131,73 +132,26 @@ class Radar {
     });
   }
 
-  static getContext(callback) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
-
-      this.getContextForLocation(
-        { latitude, longitude },
-        (status, context) => {
-          callback(status, context);
-          return;
-        });
-    });
-  }
-
-  static getContextForLocation(
-    {
-      latitude,
-      longitude
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+  static getContext({ latitude, longitude }, callback) {
+    if (!callback) {
       return;
     }
 
-    const queryParams = {
-      coordinates: `${latitude},${longitude}`,
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/context`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.context);
+    if (latitude && longitude) {
+      Context.getContextForLocation({ latitude, longitude },
+        (status, context) => {
+          callback(status, context);
+          return;
         }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
+      );
+    } else {
+      Context.getContext(
+        (status, context) => {
+          callback(status, context);
+          return;
         }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+      );
+    }
   }
 
   static searchPlaces(
