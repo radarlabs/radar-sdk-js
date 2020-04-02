@@ -2,8 +2,10 @@ import * as Cookie from './cookie';
 import * as Device from './device';
 import * as Http from './http';
 import Navigator from './navigator';
+
 import Geocoding from './geocoding';
 import Routing from './routing';
+import Search from './search';
 
 // consts
 import SDK_VERSION from './version';
@@ -200,6 +202,7 @@ class Radar {
 
   static searchPlaces(
     {
+      near,
       radius,
       chains,
       categories,
@@ -208,301 +211,84 @@ class Radar {
     },
     callback
   ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
-
-      this.searchPlacesNearLocation(
-        { latitude, longitude, radius, chains, categories, groups, limit },
-        (status, places) => {
-          callback(status, places);
-          return;
-        });
-    });
-  }
-
-  static searchPlacesNearLocation(
-    {
-      latitude,
-      longitude,
-      radius,
-      chains,
-      categories,
-      groups,
-      limit
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+    if (!callback) {
       return;
     }
 
-    const queryParams = {
-      near: `${latitude},${longitude}`,
-      radius,
-      chains: chains.join(','),
-      categories: categories.join(','),
-      groups: groups.join(','),
-      limit: Math.min(limit, 100),
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/places`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.places);
+    if (near) {
+      Search.searchPlacesNear({ near, radius, chains, categories, groups, limit },
+        (status, places) => {
+          callback(status, places);
+          return;
         }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
+      );
+    } else {
+      Search.searchPlaces({ radius, chains, categories, groups, limit },
+        (status, places) => {
+          callback(status, places);
+          return;
         }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+      );
+    }
   }
 
   static searchGeofences(
     {
+      near,
       radius,
       tags,
       limit,
     },
     callback
   ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
+    if (!callback) {
+      return;
+    }
 
-      this.searchGeofencesNearLocation(
-        { latitude, longitude, radius, tags, limit },
+    if (near) {
+      Search.searchGeofencesNear({ near, radius, tags, limit },
         (status, geofences) => {
           callback(status, geofences);
           return;
-        });
-    });
-  }
-
-  static searchGeofencesNearLocation(
-    {
-      latitude,
-      longitude,
-      radius,
-      tags,
-      limit
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
-      return;
-    }
-
-    const queryParams = {
-      near: `${latitude},${longitude}`,
-      radius,
-      tags: tags.join(','),
-      limit: Math.min(limit, 100),
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/geofences`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.geofences);
         }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
-  }
-
-  static searchPoints(
-    {
-      radius,
-      tags,
-      limit,
-    },
-    callback
-  ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        if (callback) {
-          callback(status);
-        }
-        return;
-      }
-
-      this.searchPointsNearLocation(
-        { latitude, longitude, radius, tags, limit },
-        (status, points) => {
-          callback(status, points);
+      );
+    } else {
+      Search.searchGeofences({ radius, tags, limit },
+        (status, geofences) => {
+          callback(status, geofences);
           return;
-        });
-    });
-  }
-
-  static searchPointsNearLocation(
-    {
-      latitude,
-      longitude,
-      radius,
-      tags,
-      limit,
-    },
-    callback
-  ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
-      return;
+        }
+      );
     }
-
-    const queryParams = {
-      near: `${latitude},${longitude}`,
-      radius,
-      tags: tags.join(','),
-      limit: Math.min(limit, 100),
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/points`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.points);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    };
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static autocomplete(
     {
       query,
-      latitude,
-      longitude,
+      near,
       limit,
     },
     callback
   ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
+    if (!callback) {
       return;
     }
 
-    const queryParams = {
-      query,
-      near: `${latitude},${longitude}`,
-      limit,
-    };
-
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/autocomplete`;
-    const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
-
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.addresses);
+    if (near) {
+      Search.autocompleteNear({ query, near, limit },
+        (status, addresses) => {
+          callback(status, addresses);
+          return;
         }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
+      );
+    } else {
+      Search.autocomplete({ query, limit },
+        (status, addresses) => {
+          callback(status, addresses);
+          return;
         }
-      }
+      );
     }
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
   }
 
   static geocode({ query }, callback) {
@@ -512,6 +298,7 @@ class Radar {
 
     Geocoding.geocode({ query }, (status, addresses) => {
       callback(status, addresses);
+      return;
     });
   }
 
@@ -521,16 +308,17 @@ class Radar {
     }
 
     if (latitude && longitude) {
-      Geocoding.reverseGeocodeLocation(
-        { latitude, longitude },
+      Geocoding.reverseGeocodeLocation({ latitude, longitude },
         (status, addresses) => {
           callback(status, addresses);
+          return;
         }
       );
     } else {
       Geocoding.reverseGeocode(
         (status, addresses) => {
           callback(status, addresses);
+          return;
         }
       );
     }
@@ -543,6 +331,7 @@ class Radar {
 
     Geocoding.ipGeocode((status, country) => {
       callback(status, country);
+      return;
     });
   }
 
@@ -560,31 +349,20 @@ class Radar {
     }
 
     if (origin) {
-      Routing.getDistanceWithOrigin(
-        {
-          origin,
-          destination,
-          modes,
-          units,
-        },
-        (status, routes) => {
-          callback(status, routes);
-          return
-        }
-      );
-    }
-    else {
-      Routing.getDistanceToDestination(
-        {
-          destination,
-          modes,
-          units
-        },
+      Routing.getDistanceWithOrigin({ origin, destination, modes, units },
         (status, routes) => {
           callback(status, routes);
           return;
         }
-      )
+      );
+    }
+    else {
+      Routing.getDistanceToDestination({ destination, modes, units },
+        (status, routes) => {
+          callback(status, routes);
+          return;
+        }
+      );
     }
   }
 }

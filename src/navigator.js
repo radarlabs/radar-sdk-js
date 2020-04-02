@@ -4,9 +4,7 @@ import STATUS from './status_codes';
 class Navigator {
   static getCurrentPosition(callback) {
     if (!navigator || !navigator.geolocation) {
-      if (callback) {
-        callback(STATUS.ERROR_LOCATION);
-      }
+      callback(STATUS.ERROR_LOCATION);
       return;
     }
 
@@ -14,9 +12,7 @@ class Navigator {
       // success callback
       (position) => {
         if (!position || !position.coords) {
-          if (callback) {
-            callback(STATUS.ERROR_LOCATION);
-          }
+          callback(STATUS.ERROR_LOCATION);
           return;
         }
 
@@ -27,7 +23,7 @@ class Navigator {
       },
       // error callback
       (err) => {
-        if (callback && err && err.code) {
+        if (err && err.code) {
           if (err.code === 1) {
             callback(STATUS.ERROR_PERMISSIONS);
           } else {
