@@ -61,7 +61,7 @@ class Radar {
 
   static getLocation(callback) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Navigator.getCurrentPosition((status, { latitude, longitude, accuracy }) => {
@@ -75,21 +75,9 @@ class Radar {
     });
   }
 
-  static trackOnce({ latitude, longitude, accuracy }, callback) {
-    if (!callback) {
-      return;
-    }
-
-    if (latitude && longitude && accuracy) {
-      Track.trackOnceWithLocation({ latitude, longitude, accuracy },
-        (status, location, user, events) => {
-          if (callback) {
-            callback(status, location, user, events);
-            return;
-          }
-        }
-      );
-    } else {
+  static trackOnce(arg0, arg1) {
+    if (!arg0 || (typeof arg0 === 'function')) {
+      const callback = arg0;
       Track.trackOnce(
         (status, location, user, events) => {
           if (callback) {
@@ -97,24 +85,40 @@ class Radar {
             return;
           }
         }
-      );
+      )
+    } else if (typeof arg0 === 'object') {
+      const { latitude, longitude, accuracy } = arg0;
+      const callback = arg1;
+      Track.trackOnceWithLocation({ latitude, longitude, accuracy },
+        (status, location, user, events) => {
+          if (callback) {
+            callback(status, location, user, events);
+            return;
+          }
+        }
+      )
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
   }
 
-  static getContext({ latitude, longitude }, callback) {
-    if (!callback) {
-      return;
+  static getContext(arg0, arg1) {
+    if (!arg0) {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
-    if (latitude && longitude) {
-      Context.getContextForLocation({ latitude, longitude },
+    if (typeof arg0 === 'function') {
+      const callback = arg0;
+      Context.getContext(
         (status, context) => {
           callback(status, context);
           return;
         }
       );
-    } else {
-      Context.getContext(
+    } else if (typeof arg0 === 'object') {
+      const { latitude, longitude } = arg0;
+      const callback = arg1;
+      Context.getContextForLocation({ latitude, longitude },
         (status, context) => {
           callback(status, context);
           return;
@@ -135,7 +139,7 @@ class Radar {
     callback
   ) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     if (near) {
@@ -165,7 +169,7 @@ class Radar {
     callback
   ) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     if (near) {
@@ -194,7 +198,7 @@ class Radar {
     callback
   ) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     if (near) {
@@ -216,7 +220,7 @@ class Radar {
 
   static geocode({ query }, callback) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Geocoding.geocode({ query }, (status, addresses) => {
@@ -225,25 +229,28 @@ class Radar {
     });
   }
 
-  static reverseGeocode({ latitude, longitude }, callback) {
-    if (!callback) {
-      return;
+  static reverseGeocode(arg0, arg1) {
+    if (!arg0) {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
-    if (latitude && longitude) {
-      Geocoding.reverseGeocodeLocation({ latitude, longitude },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      );
-    } else {
+    if (typeof arg0 === 'function') {
+      const callback = arg0;
       Geocoding.reverseGeocode(
         (status, addresses) => {
           callback(status, addresses);
           return;
         }
-      );
+      )
+    } else if (typeof arg0 === 'object') {
+      const { latitude, longitude } = arg0;
+      const callback = arg1;
+      Geocoding.reverseGeocodeLocation({ latitude, longitude },
+        (status, addresses) => {
+          callback(status, addresses);
+          return;
+        }
+      )
     }
   }
 
@@ -268,7 +275,7 @@ class Radar {
     callback
   ) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     if (origin) {

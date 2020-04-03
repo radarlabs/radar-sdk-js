@@ -159,10 +159,16 @@ describe('Radar', () => {
       Navigator.getCurrentPosition.restore();
     });
 
-    it('should skip calling Navigator if no callback present', () => {
-      Radar.getLocation();
+    it('should throw an error if no callback present', () => {
+      let e;
+      try {
+        Radar.getLocation();
+      } catch (_e) {
+        e = _e;
+      }
 
       expect(navigatorStub).to.have.callCount(0);
+      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
     it('should propagate the status if not successful', () => {
