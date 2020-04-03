@@ -52,14 +52,6 @@ class Search {
     },
     callback,
   ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      callback(STATUS.ERROR_PUBLISHABLE_KEY);
-
-      return;
-    }
-
     const queryParams = {
       near: `${near.latitude},${near.longitude}`,
       radius,
@@ -72,9 +64,6 @@ class Search {
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/search/places`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -90,7 +79,7 @@ class Search {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 
   static searchGeofences(
@@ -131,16 +120,6 @@ class Search {
     },
     callback,
   ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
-      return;
-    }
-
     const queryParams = {
       near: `${near.latitude},${near.longitude}`,
       radius,
@@ -151,9 +130,6 @@ class Search {
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/search/geofences`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -175,7 +151,7 @@ class Search {
       }
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 
   static autocomplete(
@@ -213,16 +189,6 @@ class Search {
     },
     callback
   ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-
-      return;
-    }
-
     const queryParams = {
       query,
       near: `${near.latitude},${near.longitude}`,
@@ -232,9 +198,6 @@ class Search {
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/search/autocomplete`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -256,7 +219,7 @@ class Search {
       }
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 }
 

@@ -1,11 +1,17 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
+import * as Cookie from '../src/cookie';
 import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
+
 import * as Http from '../src/http';
 
 describe('http', () => {
+  let getCookieStub;
+
+  const publishableKey = 'mock-publishable-key';
+
   describe('request PUT', () => {
 
     let request;
@@ -19,13 +25,18 @@ describe('http', () => {
         request = xhrRequest;
       };
 
+      getCookieStub = sinon.stub(Cookie, 'getCookie');
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
       successCallback = sinon.spy();
       errorCallback = sinon.spy();
 
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', { 'Content-Type': 'application/json' }, { 'Authorization': 'api-key' }, successCallback, errorCallback);
+      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, successCallback, errorCallback);
     });
 
     afterEach(() => {
+      Cookie.getCookie.restore();
+
       global.XMLHttpRequest.restore();
     });
 
@@ -106,17 +117,22 @@ describe('http', () => {
         request = xhrRequest;
       };
 
+      getCookieStub = sinon.stub(Cookie, 'getCookie');
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
       successCallback = sinon.spy();
       errorCallback = sinon.spy();
 
       data = { query: '20 Jay Street' };
       getResponse = '{ meta: { code: 200 }, addresses: [{ latitude: 40.7039, longitude: -73.9867 }] }';
 
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', data, { 'Authorization': 'publishable-key' }, successCallback, errorCallback);
+      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', data, successCallback, errorCallback);
     });
 
     afterEach(() => {
       global.XMLHttpRequest.restore();
+
+      Cookie.getCookie.restore();
     });
 
     it('should always include Device-Type and SDK-Version headers', () => {
@@ -140,5 +156,27 @@ describe('http', () => {
       const urlencodedData = encodeURIComponent(`query=${data.query}`);
       expect(request.url).to.contain(`?${urlencodedData}`);
     });
+  });
+
+  it('should return a publishable key error if not set', () => {
+    global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
+
+    let request;
+    global.XMLHttpRequest.onCreate = (xhrRequest) => {
+      request = xhrRequest;
+    };
+
+    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+
+    const successCallback = sinon.spy();
+    const errorCallback = sinon.spy();
+
+    Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, successCallback, errorCallback);
+
+    expect(errorCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
+    expect(successCallback).not.called;
+
+    Cookie.getCookie.restore();
   });
 });

@@ -49,14 +49,6 @@ class Routing {
     },
     callback
   ) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      callback(STATUS.ERROR_PUBLISHABLE_KEY);
-
-      return;
-    }
-
     const queryParams = {
       origin: `${origin.latitude},${origin.longitude}`,
       destination: `${destination.latitude},${destination.longitude}`,
@@ -67,9 +59,6 @@ class Routing {
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/route/distance`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -85,7 +74,7 @@ class Routing {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 }
 

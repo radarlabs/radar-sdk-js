@@ -1,8 +1,10 @@
+import * as Cookie from './cookie';
+
 // consts
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
-export function request(method, url, data, headers, successCallback, errorCallback) {
+export function request(method, url, data, successCallback, errorCallback) {
   const xhr = new XMLHttpRequest();
 
   let body = {};
@@ -22,12 +24,16 @@ export function request(method, url, data, headers, successCallback, errorCallba
 
   xhr.open(method, url, true);
 
+  const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+  if (!publishableKey) {
+    errorCallback(STATUS.ERROR_PUBLISHABLE_KEY);
+    return;
+  }
+
+  xhr.setRequestHeader('Authorization', publishableKey);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
   xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
-  for (let header in headers) {
-    xhr.setRequestHeader(header, headers[header]);
-  }
 
   xhr.onload = () => {
     if (xhr.status == 200) {

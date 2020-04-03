@@ -9,22 +9,11 @@ const DEFAULT_HOST = 'https://api.radar.io';
 
 class Geocoding {
   static geocode({ query }, callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      callback(STATUS.ERROR_PUBLISHABLE_KEY);
-
-      return;
-    }
-
     const queryParams = { query };
 
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/forward`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -40,7 +29,7 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 
   static reverseGeocode(callback) {
@@ -61,14 +50,6 @@ class Geocoding {
   }
 
   static reverseGeocodeLocation({ latitude, longitude }, callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      callback(STATUS.ERROR_PUBLISHABLE_KEY);
-
-      return;
-    }
-
     const queryParams = {
       coordinates: `${latitude},${longitude}`,
     };
@@ -76,9 +57,6 @@ class Geocoding {
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/reverse`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -94,24 +72,13 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, headers, onSuccess, onError);
+    Http.request(method, url, queryParams, onSuccess, onError);
   }
 
   static ipGeocode(callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      callback(STATUS.ERROR_PUBLISHABLE_KEY);
-
-      return;
-    }
-
     const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
     const url = `${host}/v1/geocode/ip`;
     const method = 'GET';
-    const headers = {
-      Authorization: publishableKey,
-    };
 
     const onSuccess = (response) => {
       try {
@@ -127,7 +94,7 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, {}, headers, onSuccess, onError);
+    Http.request(method, url, {}, onSuccess, onError);
   }
 }
 

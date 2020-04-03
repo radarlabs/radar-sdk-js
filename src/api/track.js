@@ -30,25 +30,11 @@ class Track {
   }
 
   static trackOnceWithLocation({ latitude, longitude, accuracy }, callback) {
-    const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
-
-    if (!publishableKey) {
-      if (callback) {
-        callback(STATUS.ERROR_PUBLISHABLE_KEY);
-      }
-      return;
-    }
-
     // Get user data
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
     const _id = userId || deviceId;
-
-    // Setup http
-    const headers = {
-      Authorization: publishableKey
-    };
 
     const body = {
       accuracy,
@@ -86,7 +72,7 @@ class Track {
       }
     };
 
-    Http.request(method, url, body, headers, onSuccess, onError);
+    Http.request(method, url, body, onSuccess, onError);
   }
 }
 
