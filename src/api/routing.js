@@ -1,11 +1,8 @@
-import * as Cookie from '../cookie';
 import * as Http from '../http';
 import Navigator from '../navigator';
 
 // consts
 import STATUS from '../status_codes';
-
-const DEFAULT_HOST = 'https://api.radar.io';
 
 class Routing {
   static getDistanceToDestination(
@@ -56,8 +53,7 @@ class Routing {
       units,
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/route/distance`;
+    const path = `v1/route/distance`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -74,7 +70,7 @@ class Routing {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 }
 

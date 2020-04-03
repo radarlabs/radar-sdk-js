@@ -1,11 +1,8 @@
-import * as Cookie from '../cookie';
 import * as Http from '../http';
 import Navigator from '../navigator';
 
 // consts
 import STATUS from '../status_codes';
-
-const DEFAULT_HOST = 'https://api.radar.io';
 
 class Search {
   static searchPlaces(
@@ -61,8 +58,7 @@ class Search {
       limit: Math.min(limit, 100),
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/places`;
+    const path = `v1/search/places`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -79,7 +75,7 @@ class Search {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 
   static searchGeofences(
@@ -127,8 +123,7 @@ class Search {
       limit: Math.min(limit, 100),
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/geofences`;
+    const path = `v1/search/geofences`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -151,7 +146,7 @@ class Search {
       }
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 
   static autocomplete(
@@ -195,8 +190,7 @@ class Search {
       limit,
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/search/autocomplete`;
+    const path = `v1/search/autocomplete`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -219,7 +213,7 @@ class Search {
       }
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 }
 

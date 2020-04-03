@@ -7,8 +7,6 @@ import Navigator from '../navigator';
 import SDK_VERSION from '../version';
 import STATUS from '../status_codes';
 
-const DEFAULT_HOST = 'https://api.radar.io';
-
 class Track {
   static trackOnce(callback) {
     Navigator.getCurrentPosition((status, { latitude, longitude, accuracy }) => {
@@ -49,8 +47,7 @@ class Track {
       userId,
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/users/${_id}`;
+    const path = `v1/users/${_id}`;
     const method = 'PUT';
 
     const onSuccess = (response) => {
@@ -72,7 +69,7 @@ class Track {
       }
     };
 
-    Http.request(method, url, body, onSuccess, onError);
+    Http.request(method, path, body, onSuccess, onError);
   }
 }
 

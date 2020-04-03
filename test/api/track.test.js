@@ -42,7 +42,7 @@ describe('Track', () => {
   context('trackOnceWithLocation', () => {
     it('should throw a server error if invalid JSON is returned in the response', () => {
       const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonErrorResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -54,7 +54,7 @@ describe('Track', () => {
     });
 
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onError('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -67,7 +67,7 @@ describe('Track', () => {
 
     it('should succeed', () => {
       const jsonSuccessResponse = '{"user":"user-data","events":"matching-events"}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonSuccessResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -75,9 +75,9 @@ describe('Track', () => {
       const trackCallback = sinon.spy();
       Track.trackOnceWithLocation({ latitude, longitude, accuracy }, trackCallback);
 
-      const [method, url, body] = httpRequestSpy.getCall(0).args;
+      const [method, path, body] = httpRequestSpy.getCall(0).args;
       expect(method).to.equal('PUT');
-      expect(url).to.equal('https://api.radar.io/v1/users/user-id');
+      expect(path).to.equal('v1/users/user-id');
       expect(body).to.deep.equal({
         accuracy,
         description,

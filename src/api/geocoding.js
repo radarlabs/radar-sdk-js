@@ -1,18 +1,14 @@
-import * as Cookie from '../cookie';
 import * as Http from '../http';
 import Navigator from '../navigator';
 
 // consts
 import STATUS from '../status_codes';
 
-const DEFAULT_HOST = 'https://api.radar.io';
-
 class Geocoding {
   static geocode({ query }, callback) {
     const queryParams = { query };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/forward`;
+    const path = `v1/geocode/forward`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -29,7 +25,7 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 
   static reverseGeocode(callback) {
@@ -54,8 +50,7 @@ class Geocoding {
       coordinates: `${latitude},${longitude}`,
     };
 
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/reverse`;
+    const path = `v1/geocode/reverse`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -72,12 +67,11 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, onSuccess, onError);
   }
 
   static ipGeocode(callback) {
-    const host = Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
-    const url = `${host}/v1/geocode/ip`;
+    const path = `v1/geocode/ip`;
     const method = 'GET';
 
     const onSuccess = (response) => {
@@ -94,7 +88,7 @@ class Geocoding {
       callback(error);
     };
 
-    Http.request(method, url, {}, onSuccess, onError);
+    Http.request(method, path, {}, onSuccess, onError);
   }
 }
 

@@ -1,12 +1,14 @@
 import * as Cookie from './cookie';
 
 // consts
+import API_HOST from './api_host';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
-export function request(method, url, data, successCallback, errorCallback) {
+export function request(method, path, data, successCallback, errorCallback) {
   const xhr = new XMLHttpRequest();
 
+  let url = `${API_HOST.getHost()}/${path}`;
   let body = {};
   if (method === 'GET') {
     const qsArr = [];

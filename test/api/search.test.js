@@ -5,15 +5,12 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../../src/cookie';
 import * as Http from '../../src/http';
 import STATUS from '../../src/status_codes';
 
 import Search from '../../src/api/search';
 
 describe('Search', () => {
-  let getCookieStub;
-
   const latitude = 40.7041895;
   const longitude = -73.9867797;
 
@@ -22,20 +19,14 @@ describe('Search', () => {
   const mockLimit = 50;
   const mockQuery = 'mock-query';
 
-  beforeEach(() => {
-    getCookieStub = sinon.stub(Cookie, 'getCookie');
-  });
-
   afterEach(() => {
-    Cookie.getCookie.restore();
-
     Http.request.restore();
   });
 
   context('searchPlacesNear', () => {
     it('should throw a server error if invalid JSON is returned in the response', () => {
       const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonErrorResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -57,7 +48,7 @@ describe('Search', () => {
     });
 
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onError('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -80,7 +71,7 @@ describe('Search', () => {
 
     it('should succeed', () => {
       const jsonSuccessResponse = '{"places":"matching-places"}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonSuccessResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -98,9 +89,9 @@ describe('Search', () => {
         searchCallback
       );
 
-      const [method, url, body] = httpRequestSpy.getCall(0).args;
+      const [method, path, body] = httpRequestSpy.getCall(0).args;
       expect(method).to.equal('GET');
-      expect(url).to.equal('https://api.radar.io/v1/search/places');
+      expect(path).to.equal('v1/search/places');
       expect(body).to.deep.equal({
         near: `${latitude},${longitude}`,
         radius: mockRadius,
@@ -117,7 +108,7 @@ describe('Search', () => {
   context('searchGeofencesNear', () => {
     it('should throw a server error if invalid JSON is returned in the response', () => {
       const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonErrorResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -140,7 +131,7 @@ describe('Search', () => {
     });
 
     it('should return the error form the http request', () => {
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onError('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -164,7 +155,7 @@ describe('Search', () => {
 
     it('should succeed', () => {
       const jsonSuccessResponse = '{"geofences":"matching-geofences"}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonSuccessResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -183,9 +174,9 @@ describe('Search', () => {
         searchCallback
       );
 
-      const [method, url, body] = httpRequestSpy.getCall(0).args;
+      const [method, path, body] = httpRequestSpy.getCall(0).args;
       expect(method).to.equal('GET');
-      expect(url).to.equal('https://api.radar.io/v1/search/geofences');
+      expect(path).to.equal('v1/search/geofences');
       expect(body).to.deep.equal({
         near: `${latitude},${longitude}`,
         radius: mockRadius,
@@ -200,7 +191,7 @@ describe('Search', () => {
   context('autocompleteNear', () => {
     it('should throw a server error if invalid JSON is returned in the response', () => {
       const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonErrorResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -222,7 +213,7 @@ describe('Search', () => {
     });
 
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onError('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -245,7 +236,7 @@ describe('Search', () => {
 
     it('should succeed', () => {
       const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
-      const httpRequestSpy = sinon.spy((method, url, body, onSuccess, onError) => {
+      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
         onSuccess(jsonSuccessResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
@@ -263,9 +254,9 @@ describe('Search', () => {
         searchCallback
       );
 
-      const [method, url, body] = httpRequestSpy.getCall(0).args;
+      const [method, path, body] = httpRequestSpy.getCall(0).args;
       expect(method).to.equal('GET');
-      expect(url).to.equal('https://api.radar.io/v1/search/autocomplete');
+      expect(path).to.equal('v1/search/autocomplete');
       expect(body).to.deep.equal({
         query: mockQuery,
         near: `${latitude},${longitude}`,
