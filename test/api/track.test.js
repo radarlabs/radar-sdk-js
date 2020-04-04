@@ -42,8 +42,8 @@ describe('Track', () => {
   context('trackOnceWithLocation', () => {
     it('should throw a server error if invalid JSON is returned in the response', () => {
       const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, jsonErrorResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -54,8 +54,8 @@ describe('Track', () => {
     });
 
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -67,8 +67,8 @@ describe('Track', () => {
 
     it('should succeed', () => {
       const jsonSuccessResponse = '{"user":"user-data","events":"matching-events"}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, jsonSuccessResponse);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 

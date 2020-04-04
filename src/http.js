@@ -5,7 +5,15 @@ import API_HOST from './api_host';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
-export function request(method, path, data, successCallback, errorCallback) {
+function _handleResponse(response, jsonKey) {
+  if (jsonKey) {
+    const res = JSON.parse(response);
+    return res[jsonKey];
+  }
+  return response;
+}
+
+export function request(method, path, data, jsonKey, callback) {
   const xhr = new XMLHttpRequest();
 
   let url = `${API_HOST.getHost()}/${path}`;
@@ -28,7 +36,7 @@ export function request(method, path, data, successCallback, errorCallback) {
 
   const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
   if (!publishableKey) {
-    errorCallback(STATUS.ERROR_PUBLISHABLE_KEY);
+    callback(STATUS.ERROR_PUBLISHABLE_KEY);
     return;
   }
 
@@ -39,22 +47,27 @@ export function request(method, path, data, successCallback, errorCallback) {
 
   xhr.onload = () => {
     if (xhr.status == 200) {
-      successCallback(xhr.response);
+      try {
+        const response = _handleResponse(xhr.response, jsonKey);
+        callback(STATUS.SUCCESS, response);
+      } catch (e) {
+        callback(STATUS.ERROR_SERVER);
+      }
     } else if (xhr.status == 401) {
-      errorCallback(STATUS.ERROR_UNAUTHORIZED);
+      callback(STATUS.ERROR_UNAUTHORIZED);
     } else if (xhr.status == 429) {
-      errorCallback(STATUS.ERROR_RATE_LIMIT);
+      callback(STATUS.ERROR_RATE_LIMIT);
     } else {
-      errorCallback(STATUS.ERROR_SERVER);
+      callback(STATUS.ERROR_SERVER);
     }
   }
 
   xhr.onerror = function() {
-    errorCallback(STATUS.ERROR_SERVER);
+    callback(STATUS.ERROR_SERVER);
   }
 
   xhr.timeout = function() {
-    errorCallback(STATUS.ERROR_NETWORK);
+    callback(STATUS.ERROR_NETWORK);
   }
 
   xhr.send(JSON.stringify(body));

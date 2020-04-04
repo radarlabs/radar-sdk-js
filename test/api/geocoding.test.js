@@ -21,22 +21,9 @@ describe('Geocoding', () => {
   });
 
   context('geocode', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const geocodeCallback = sinon.spy();
-      Geocoding.geocode({ query: mockQuery }, geocodeCallback);
-
-      expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -47,9 +34,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -68,22 +54,9 @@ describe('Geocoding', () => {
   });
 
   context('reverseGeocodeLocation', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const geocodeCallback = sinon.spy();
-      Geocoding.reverseGeocodeLocation({ latitude, longitude }, geocodeCallback);
-
-      expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -94,9 +67,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -115,22 +87,9 @@ describe('Geocoding', () => {
   });
 
   context('ipGeocode', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const geocodeCallback = sinon.spy();
-      Geocoding.ipGeocode(geocodeCallback);
-
-      expect(geocodeCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -141,9 +100,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () =>{
-      const jsonSuccessResponse = '{"country":"matching-country"}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, 'matching-country');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 

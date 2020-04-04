@@ -15,8 +15,7 @@ describe('http', () => {
   describe('request PUT', () => {
 
     let request;
-    let successCallback;
-    let errorCallback;
+    let httpCallback;
 
     beforeEach(() => {
       global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
@@ -28,10 +27,9 @@ describe('http', () => {
       getCookieStub = sinon.stub(Cookie, 'getCookie');
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      successCallback = sinon.spy();
-      errorCallback = sinon.spy();
+      httpCallback = sinon.spy();
 
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, successCallback, errorCallback);
+      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
     });
 
     afterEach(() => {
@@ -45,8 +43,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.respond(200, {}, '{ success: "true" }');
 
-        expect(successCallback).to.have.been.calledWith('{ success: "true" }');
-        expect(errorCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, '{ success: "true" }');
       });
     });
 
@@ -55,8 +52,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.respond(401);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
-        expect(successCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
       });
     });
 
@@ -65,8 +61,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.respond(429);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
-        expect(successCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
       });
     });
 
@@ -75,8 +70,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.respond(500);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-        expect(successCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
       });
     });
 
@@ -85,8 +79,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.onerror();
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-        expect(successCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
       });
     });
 
@@ -95,8 +88,7 @@ describe('http', () => {
         expect(request).to.not.be.null;
         request.timeout();
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
-        expect(successCallback).to.not.have.been.called;
+        expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
       });
     });
   });
@@ -104,8 +96,7 @@ describe('http', () => {
   describe('request GET', () => {
 
     let request;
-    let successCallback;
-    let errorCallback;
+    let httpCallback;
 
     let data;
     let getResponse;
@@ -120,13 +111,12 @@ describe('http', () => {
       getCookieStub = sinon.stub(Cookie, 'getCookie');
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      successCallback = sinon.spy();
-      errorCallback = sinon.spy();
+      httpCallback = sinon.spy();
 
       data = { query: '20 Jay Street' };
       getResponse = '{ meta: { code: 200 }, addresses: [{ latitude: 40.7039, longitude: -73.9867 }] }';
 
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', data, successCallback, errorCallback);
+      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', data, null, httpCallback);
     });
 
     afterEach(() => {
@@ -139,8 +129,7 @@ describe('http', () => {
       expect(request).to.not.be.null;
       request.respond(200, {}, getResponse);
 
-      expect(successCallback).to.be.calledWith(getResponse);
-      expect(errorCallback).to.not.be.called;
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, getResponse);
 
       expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
       expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
@@ -150,8 +139,7 @@ describe('http', () => {
       expect(request).to.not.be.null;
       request.respond(200, {}, getResponse);
 
-      expect(successCallback).to.be.calledWith(getResponse);
-      expect(errorCallback).to.not.be.called;
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, getResponse);
 
       const urlencodedData = encodeURIComponent(`query=${data.query}`);
       expect(request.url).to.contain(`?${urlencodedData}`);
@@ -169,14 +157,61 @@ describe('http', () => {
     getCookieStub = sinon.stub(Cookie, 'getCookie');
     getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
-    const successCallback = sinon.spy();
-    const errorCallback = sinon.spy();
+    const httpCallback = sinon.spy();
 
-    Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, successCallback, errorCallback);
+    Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
 
-    expect(errorCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
-    expect(successCallback).not.called;
+    expect(httpCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
 
     Cookie.getCookie.restore();
+    global.XMLHttpRequest.restore();
+  });
+
+  it('should return a server error on invalid JSON', () => {
+    global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
+
+    let request;
+    global.XMLHttpRequest.onCreate = (xhrRequest) => {
+      request = xhrRequest;
+    };
+
+    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+    const httpCallback = sinon.spy();
+    Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
+
+    const jsonErrorResponse = '"invalid_json": true}';
+    expect(request).to.not.be.null;
+    request.respond(200, {}, jsonErrorResponse);
+
+    expect(httpCallback).to.be.calledWith(STATUS.ERROR_SERVER);
+
+    Cookie.getCookie.restore();
+    global.XMLHttpRequest.restore();
+  });
+
+  it('should grab the nested payload via jsonKey', () => {
+    global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
+
+    let request;
+    global.XMLHttpRequest.onCreate = (xhrRequest) => {
+      request = xhrRequest;
+    };
+
+    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+    const httpCallback = sinon.spy();
+    Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
+
+    const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
+    expect(request).to.not.be.null;
+    request.respond(200, {}, jsonSuccessResponse);
+
+    expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+
+    Cookie.getCookie.restore();
+    global.XMLHttpRequest.restore();
   });
 });

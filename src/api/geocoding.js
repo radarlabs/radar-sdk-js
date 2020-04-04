@@ -11,21 +11,12 @@ class Geocoding {
     const path = `v1/geocode/forward`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        callback(STATUS.SUCCESS, response.addresses);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    const onError = (error) => {
-      callback(error);
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'addresses', httpCallback);
   }
 
   static reverseGeocode(callback) {
@@ -53,42 +44,24 @@ class Geocoding {
     const path = `v1/geocode/reverse`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        callback(STATUS.SUCCESS, response.addresses);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    const onError = (error) => {
-      callback(error);
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'addresses', httpCallback);
   }
 
   static ipGeocode(callback) {
     const path = `v1/geocode/ip`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        callback(STATUS.SUCCESS, response.country);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
-    }
-
-    const onError = (error) => {
-      callback(error);
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    Http.request(method, path, {}, onSuccess, onError);
+    Http.request(method, path, {}, 'address', httpCallback);
   }
 }
 

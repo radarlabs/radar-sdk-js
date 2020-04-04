@@ -50,26 +50,26 @@ class Track {
     const path = `v1/users/${_id}`;
     const method = 'PUT';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-        if (callback) {
-          callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, response.user, response.events);
+    const httpCallback = (status, response) => {
+      if (status === STATUS.SUCCESS) {
+        try {
+          response = JSON.parse(response);
+          if (callback) {
+            callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, response.user, response.events);
+          }
+        } catch (e) {
+          if (callback) {
+            callback(STATUS.ERROR_SERVER);
+          }
         }
-      } catch (e) {
+      } else {
         if (callback) {
-          callback(STATUS.ERROR_SERVER);
+          callback(status);
         }
       }
     };
 
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, path, body, onSuccess, onError);
+    Http.request(method, path, body, null, httpCallback);
   }
 }
 

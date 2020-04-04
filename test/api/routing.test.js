@@ -26,30 +26,9 @@ describe('Routing', () => {
   });
 
   context('getDistanceWithOrigin', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const routingCallback = sinon.spy();
-      Routing.getDistanceWithOrigin(
-        {
-          origin,
-          destination,
-          modes: mockModes,
-          units: mockUnits,
-        },
-        routingCallback,
-      );
-
-      expect(routingCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -68,9 +47,8 @@ describe('Routing', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"routes":["matching-routes"]}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, ['matching-routes']);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -94,6 +72,8 @@ describe('Routing', () => {
         modes: mockModes.join(','),
         units: mockUnits,
       });
+
+      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
     });
   });
 });

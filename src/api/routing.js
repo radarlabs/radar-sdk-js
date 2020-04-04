@@ -56,21 +56,11 @@ class Routing {
     const path = `v1/route/distance`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        callback(STATUS.SUCCESS, response.routes);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
     }
 
-    const onError = (error) => {
-      callback(error);
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'routes', httpCallback);
   }
 }
 

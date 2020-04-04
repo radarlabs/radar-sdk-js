@@ -24,32 +24,9 @@ describe('Search', () => {
   });
 
   context('searchPlacesNear', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const searchCallback = sinon.spy();
-      Search.searchPlacesNear(
-        {
-          near: { latitude, longitude },
-          radius: mockRadius,
-          chains: mockChains,
-          categories: [],
-          groups: [],
-          limit: mockLimit
-        },
-        searchCallback
-      );
-
-      expect(searchCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -70,9 +47,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"places":"matching-places"}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, 'matching-places');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -106,33 +82,9 @@ describe('Search', () => {
   });
 
   context('searchGeofencesNear', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const searchCallback = sinon.spy();
-      Search.searchGeofencesNear(
-        {
-          near: {
-            latitude,
-            longitude,
-          },
-          radius: mockRadius,
-          tags: [],
-          limit: mockLimit,
-        },
-        searchCallback
-      );
-
-      expect(searchCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error form the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -154,9 +106,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"geofences":"matching-geofences"}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, 'matching-geofences');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -189,32 +140,9 @@ describe('Search', () => {
   });
 
   context('autocompleteNear', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonErrorResponse);
-      });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-
-      const searchCallback = sinon.spy();
-      Search.autocompleteNear(
-        {
-          query: mockQuery,
-          near: {
-            latitude,
-            longitude,
-          },
-          limit: mockLimit,
-        },
-        searchCallback
-      );
-
-      expect(searchCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onError('http error');
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback('http error');
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -235,9 +163,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
-      const httpRequestSpy = sinon.spy((method, path, body, onSuccess, onError) => {
-        onSuccess(jsonSuccessResponse);
+      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
       });
       sinon.stub(Http, 'request').callsFake(httpRequestSpy);
 
@@ -262,6 +189,8 @@ describe('Search', () => {
         near: `${latitude},${longitude}`,
         limit: mockLimit,
       });
+
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 });

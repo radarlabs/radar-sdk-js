@@ -61,21 +61,12 @@ class Search {
     const path = `v1/search/places`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        callback(STATUS.SUCCESS, response.places);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    const onError = (error) => {
-      callback(error);
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'places', httpCallback);
   }
 
   static searchGeofences(
@@ -126,27 +117,12 @@ class Search {
     const path = `v1/search/geofences`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.geofences);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'geofences', httpCallback);
   }
 
   static autocomplete(
@@ -193,27 +169,12 @@ class Search {
     const path = `v1/search/autocomplete`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
-
-        if (callback) {
-          callback(STATUS.SUCCESS, response.addresses);
-        }
-      } catch (e) {
-        if (callback) {
-          callback(STATUS.ERROR_SERVER);
-        }
-      }
-    }
-
-    const onError = (error) => {
-      if (callback) {
-        callback(error);
-      }
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
     };
 
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'addresses', httpCallback);
   }
 }
 

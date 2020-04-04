@@ -28,21 +28,12 @@ class Context {
     const path = `v1/context`;
     const method = 'GET';
 
-    const onSuccess = (response) => {
-      try {
-        response = JSON.parse(response);
+    const httpCallback = (status, response) => {
+      callback(status, response);
+      return;
+    }
 
-        callback(STATUS.SUCCESS, response.context);
-      } catch (e) {
-        callback(STATUS.ERROR_SERVER);
-      }
-    };
-
-    const onError = (error) => {
-      callback(error);
-    };
-
-    Http.request(method, path, queryParams, onSuccess, onError);
+    Http.request(method, path, queryParams, 'context', httpCallback);
   }
 }
 
