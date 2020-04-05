@@ -9,6 +9,7 @@ class Context {
     Navigator.getCurrentPosition((status, { latitude, longitude }) => {
       if (status !== STATUS.SUCCESS) {
         callback(status);
+        return;
       }
 
       this.getContextForLocation({ latitude, longitude },

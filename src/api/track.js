@@ -14,12 +14,13 @@ class Track {
         if (callback) {
           callback(status);
         }
+        return;
       }
 
       this.trackOnceWithLocation({ latitude, longitude, accuracy },
         (status, location, user, events) => {
           if (callback) {
-            callback(status, user, location, events);
+            callback(status, location, user, events);
           }
           return;
         }

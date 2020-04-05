@@ -6,23 +6,100 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import * as Http from '../../src/http';
+import Navigator from '../../src/navigator';
 import STATUS from '../../src/status_codes';
 
 import Routing from '../../src/api/routing';
 
 describe('Routing', () => {
+  let httpStub;
+  let navigatorStub;
+
+  const latitude = 40.7041895;
+  const longitude = -73.9867797;
   const origin = {
-    latitude: 40.7041895,
-    longitude: -73.9867797,
+    latitude,
+    longitude,
   }
-  const destinationLat = 40.7032123;
-  const destinationLng = -73.9936137;
-  const destination = `${destinationLat},${destinationLng}`;
+  const destination = {
+    latitude: 40.7032123,
+    longitude: -73.9936137,
+  };
   const mockModes = ['foot', 'bike', 'car'];
   const mockUnits = 'imperial';
 
+  beforeEach(() => {
+    httpStub = sinon.stub(Http, 'request');
+
+    navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
+  });
+
   afterEach(() => {
     Http.request.restore();
+
+    Navigator.getCurrentPosition.restore();
+  });
+
+  context('getDistanceToDestination', () => {
+    let routingStub;
+
+    beforeEach(() => {
+      routingStub = sinon.stub(Routing, 'getDistanceWithOrigin');
+    });
+
+    afterEach(() => {
+      Routing.getDistanceWithOrigin.restore();
+    });
+
+    it('should propagate a navigator error', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const routingCallback = sinon.spy();
+      Routing.getDistanceToDestination(
+        {
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        },
+        routingCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(routingStub).to.not.be.called;
+      expect(routingCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should return the results of getDistanceWithOrigin', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude });
+      });
+      routingStub.callsFake(({ origin, destination, modes, units }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-routes']);
+      });
+
+      const routingCallback = sinon.spy();
+      Routing.getDistanceToDestination(
+        {
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        },
+        routingCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(routingStub).to.be.calledWith(
+        {
+          origin: { latitude, longitude },
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        }
+      );
+      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
+    });
   });
 
   context('getDistanceWithOrigin', () => {
@@ -30,7 +107,7 @@ describe('Routing', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback('http error');
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const routingCallback = sinon.spy();
       Routing.getDistanceWithOrigin(
@@ -50,7 +127,7 @@ describe('Routing', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback(STATUS.SUCCESS, ['matching-routes']);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const routingCallback = sinon.spy();
       Routing.getDistanceWithOrigin(

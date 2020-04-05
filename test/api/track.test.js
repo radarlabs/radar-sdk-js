@@ -8,6 +8,7 @@ const { expect } = chai;
 import * as Cookie from '../../src/cookie';
 import * as Device from '../../src/device';
 import * as Http from '../../src/http';
+import Navigator from '../../src/navigator';
 import SDK_VERSION from '../../src/version';
 import STATUS from '../../src/status_codes';
 
@@ -15,6 +16,8 @@ import Track from '../../src/api/track';
 
 describe('Track', () => {
   let getCookieStub;
+  let httpStub;
+  let navigatorStub;
 
   const userId = 'user-id';
   const description = 'description';
@@ -26,6 +29,8 @@ describe('Track', () => {
 
   beforeEach(() => {
     getCookieStub = sinon.stub(Cookie, 'getCookie');
+    httpStub = sinon.stub(Http, 'request');
+    navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     sinon.stub(Device, 'getId').returns(deviceId);
 
     getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
@@ -34,9 +39,55 @@ describe('Track', () => {
 
   afterEach(() => {
     Cookie.getCookie.restore();
-    Device.getId.restore();
-
     Http.request.restore();
+    Navigator.getCurrentPosition.restore();
+    Device.getId.restore();
+  });
+
+  context('trackOnce', () => {
+    let trackStub;
+
+    beforeEach(() => {
+      trackStub = sinon.stub(Track, 'trackOnceWithLocation');
+    });
+
+    afterEach(() => {
+      Track.trackOnceWithLocation.restore();
+    });
+
+    it('should propagate a navigator error', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const trackCallback = sinon.spy();
+      Track.trackOnce(trackCallback);
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(trackStub).to.not.be.called;
+      expect(trackCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should return the results of trackOnceWithLocation', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
+      });
+      trackStub.callsFake(({ latitude, longitude, accuracy }, callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
+      });
+
+      const trackCallback = sinon.spy();
+      Track.trackOnce(trackCallback);
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(trackStub).to.be.calledWith({ latitude, longitude, accuracy });
+      expect(trackCallback).to.be.calledWith(
+        STATUS.SUCCESS,
+        { latitude, longitude, accuracy },
+        'user-data',
+        'matching-events'
+      );
+    });
   });
 
   context('trackOnceWithLocation', () => {
@@ -45,7 +96,7 @@ describe('Track', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback(STATUS.SUCCESS, jsonErrorResponse);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const trackCallback = sinon.spy();
       Track.trackOnceWithLocation({ latitude, longitude, accuracy }, trackCallback);
@@ -57,7 +108,7 @@ describe('Track', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback('http error');
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const trackCallback = sinon.spy();
       Track.trackOnceWithLocation({ latitude, longitude, accuracy }, trackCallback);
@@ -70,7 +121,7 @@ describe('Track', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback(STATUS.SUCCESS, jsonSuccessResponse);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const trackCallback = sinon.spy();
       Track.trackOnceWithLocation({ latitude, longitude, accuracy }, trackCallback);

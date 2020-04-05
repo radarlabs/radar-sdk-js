@@ -6,11 +6,15 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import * as Http from '../../src/http';
+import Navigator from '../../src/navigator';
 import STATUS from '../../src/status_codes';
 
 import Search from '../../src/api/search';
 
 describe('Search', () => {
+  let httpStub;
+  let navigatorStub;
+
   const latitude = 40.7041895;
   const longitude = -73.9867797;
 
@@ -19,8 +23,84 @@ describe('Search', () => {
   const mockLimit = 50;
   const mockQuery = 'mock-query';
 
+  beforeEach(() => {
+    httpStub = sinon.stub(Http, 'request');
+
+    navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
+  });
+
   afterEach(() => {
     Http.request.restore();
+
+    Navigator.getCurrentPosition.restore();
+  });
+
+  context('searchPlaces', () => {
+    let searchStub;
+
+    beforeEach(() => {
+      searchStub = sinon.stub(Search, 'searchPlacesNear');
+    });
+
+    afterEach(() => {
+      Search.searchPlacesNear.restore();
+    });
+
+    it('should propagate a navigator error', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const searchCallback = sinon.spy();
+      Search.searchPlaces(
+        {
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(searchStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should return the results of searchPlacesNear', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude });
+      });
+      searchStub.callsFake(({ near, radius, chains, categories, groups, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-places']);
+      });
+
+      const searchCallback = sinon.spy();
+      Search.searchPlaces(
+        {
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(searchStub).to.be.calledWith(
+        {
+          near: { latitude, longitude },
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
+        }
+      );
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
+    });
   });
 
   context('searchPlacesNear', () => {
@@ -28,7 +108,7 @@ describe('Search', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback('http error');
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.searchPlacesNear(
@@ -38,9 +118,9 @@ describe('Search', () => {
           chains: mockChains,
           categories: [],
           groups: [],
-          limit: mockLimit
+          limit: mockLimit,
         },
-        searchCallback
+        searchCallback,
       );
 
       expect(searchCallback).to.be.calledWith('http error');
@@ -48,9 +128,9 @@ describe('Search', () => {
 
     it('should succeed', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, 'matching-places');
+        callback(STATUS.SUCCESS, ['matching-places']);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.searchPlacesNear(
@@ -62,7 +142,7 @@ describe('Search', () => {
           groups: [],
           limit: mockLimit
         },
-        searchCallback
+        searchCallback,
       );
 
       const [method, path, body] = httpRequestSpy.getCall(0).args;
@@ -77,7 +157,68 @@ describe('Search', () => {
         limit: mockLimit,
       });
 
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-places');
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
+    });
+  });
+
+  context('searchGeofences', () => {
+    let searchStub;
+
+    beforeEach(() => {
+      searchStub = sinon.stub(Search, 'searchGeofencesNear');
+    });
+
+    afterEach(() => {
+      Search.searchGeofencesNear.restore();
+    });
+
+    it('should propagate a navigator error', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const searchCallback = sinon.spy();
+      Search.searchGeofences(
+        {
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(searchStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should return the results of searchGeofencesNear', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude });
+      });
+      searchStub.callsFake(({ near, radius, tags, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-geofences']);
+      });
+
+      const searchCallback = sinon.spy();
+      Search.searchGeofences(
+        {
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(searchStub).to.be.calledWith(
+        {
+          near: { latitude, longitude },
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
+        }
+      );
     });
   });
 
@@ -86,7 +227,7 @@ describe('Search', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback('http error');
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.searchGeofencesNear(
@@ -99,7 +240,7 @@ describe('Search', () => {
           tags: [],
           limit: mockLimit,
         },
-        searchCallback
+        searchCallback,
       );
 
       expect(searchCallback).to.be.calledWith('http error');
@@ -107,9 +248,9 @@ describe('Search', () => {
 
     it('should succeed', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, 'matching-geofences');
+        callback(STATUS.SUCCESS, ['matching-geofences']);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.searchGeofencesNear(
@@ -122,7 +263,7 @@ describe('Search', () => {
           tags: [],
           limit: mockLimit,
         },
-        searchCallback
+        searchCallback,
       );
 
       const [method, path, body] = httpRequestSpy.getCall(0).args;
@@ -135,7 +276,66 @@ describe('Search', () => {
         limit: mockLimit,
       });
 
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-geofences');
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-geofences']);
+    });
+  });
+
+  context('autocomplete', () => {
+    let autocompleteStub;
+
+    beforeEach(() => {
+      autocompleteStub = sinon.stub(Search, 'autocompleteNear');
+    });
+
+    afterEach(() => {
+      Search.autocompleteNear.restore();
+    });
+
+    it('should propagate a navigator error', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
+      });
+
+      const searchCallback = sinon.spy();
+      Search.autocomplete(
+        {
+          query: mockQuery,
+          limit: mockLimit,
+        },
+        searchCallback
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(autocompleteStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    });
+
+    it('should return the results of autocompleteNear', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude });
+      });
+      autocompleteStub.callsFake(({ query, near, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
+      });
+
+      const searchCallback = sinon.spy();
+      Search.autocomplete(
+        {
+          query: mockQuery,
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(autocompleteStub).to.be.calledWith(
+        {
+          query: mockQuery,
+          near: { latitude, longitude },
+          limit: mockLimit,
+        }
+      );
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 
@@ -144,7 +344,7 @@ describe('Search', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback('http error');
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.autocompleteNear(
@@ -156,7 +356,7 @@ describe('Search', () => {
           },
           limit: mockLimit,
         },
-        searchCallback
+        searchCallback,
       );
 
       expect(searchCallback).to.be.calledWith('http error');
@@ -166,7 +366,7 @@ describe('Search', () => {
       const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
         callback(STATUS.SUCCESS, ['matching-addresses']);
       });
-      sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      httpStub.callsFake(httpRequestSpy);
 
       const searchCallback = sinon.spy();
       Search.autocompleteNear(
@@ -178,7 +378,7 @@ describe('Search', () => {
           },
           limit: mockLimit,
         },
-        searchCallback
+        searchCallback,
       );
 
       const [method, path, body] = httpRequestSpy.getCall(0).args;
