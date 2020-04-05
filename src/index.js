@@ -256,7 +256,7 @@ class Radar {
 
   static ipGeocode(callback) {
     if (!callback) {
-      return;
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Geocoding.ipGeocode((status, country) => {

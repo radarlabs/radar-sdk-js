@@ -281,10 +281,10 @@ describe('Search', () => {
   });
 
   context('autocomplete', () => {
-    let autocompleteStub;
+    let searchStub;
 
     beforeEach(() => {
-      autocompleteStub = sinon.stub(Search, 'autocompleteNear');
+      searchStub = sinon.stub(Search, 'autocompleteNear');
     });
 
     afterEach(() => {
@@ -306,7 +306,7 @@ describe('Search', () => {
       );
 
       expect(navigatorStub).to.have.callCount(1);
-      expect(autocompleteStub).to.not.be.called;
+      expect(searchStub).to.not.be.called;
       expect(searchCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
     });
 
@@ -314,7 +314,7 @@ describe('Search', () => {
       navigatorStub.callsFake((callback) => {
         callback(STATUS.SUCCESS, { latitude, longitude });
       });
-      autocompleteStub.callsFake(({ query, near, limit }, callback) => {
+      searchStub.callsFake(({ query, near, limit }, callback) => {
         callback(STATUS.SUCCESS, ['matching-addresses']);
       });
 
@@ -328,7 +328,7 @@ describe('Search', () => {
       );
 
       expect(navigatorStub).to.have.callCount(1);
-      expect(autocompleteStub).to.be.calledWith(
+      expect(searchStub).to.be.calledWith(
         {
           query: mockQuery,
           near: { latitude, longitude },
