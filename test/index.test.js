@@ -344,14 +344,14 @@ describe('Radar', () => {
     it('should call getContextWithLocation if the first arg is a location object', () => {
       contextLocationStub.callsFake(({ latitude, longitude }, callback) => {
         callback(STATUS.SUCCESS, 'matching-context');
-
-        const contextCallback = sinon.spy();
-        Radar.getContext({ latitude, longitude }, contextCallback);
-
-        expect(contextStub).to.not.be.called;
-        expect(contextLocationStub).to.have.callCount(1);
-        expectt(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
       });
+
+      const contextCallback = sinon.spy();
+      Radar.getContext({ latitude, longitude }, contextCallback);
+
+      expect(contextStub).to.not.be.called;
+      expect(contextLocationStub).to.have.callCount(1);
+      expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
     });
   });
 
