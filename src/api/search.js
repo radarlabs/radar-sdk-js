@@ -58,15 +58,12 @@ class Search {
       limit: Math.min(limit, 100),
     };
 
-    const path = `v1/search/places`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, queryParams, 'places', httpCallback);
+    Http.request('GET', 'v1/search/places', queryParams,
+      (status, response) => {
+        callback(status, response ? response.places : null);
+        return;
+      }
+    );
   }
 
   static searchGeofences(
@@ -114,15 +111,12 @@ class Search {
       limit: Math.min(limit, 100),
     };
 
-    const path = `v1/search/geofences`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, queryParams, 'geofences', httpCallback);
+    Http.request('GET', 'v1/search/geofences', queryParams,
+      (status, response) => {
+        callback(status, response ? response.geofences : null);
+        return;
+      }
+    );
   }
 
   static autocomplete(
@@ -166,15 +160,12 @@ class Search {
       limit,
     };
 
-    const path = `v1/search/autocomplete`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, queryParams, 'addresses', httpCallback);
+    Http.request('GET', 'v1/search/autocomplete', queryParams,
+      (status, response) => {
+        callback(status, response ? response.addresses : null);
+        return;
+      }
+    );
   }
 }
 

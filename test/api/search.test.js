@@ -105,7 +105,7 @@ describe('Search', () => {
 
   context('searchPlacesNear', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -127,8 +127,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, ['matching-places']);
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { places: ['matching-places'] });
       });
       httpStub.callsFake(httpRequestSpy);
 
@@ -224,7 +224,7 @@ describe('Search', () => {
 
   context('searchGeofencesNear', () => {
     it('should return the error form the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -247,8 +247,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, ['matching-geofences']);
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { geofences: ['matching-geofences'] });
       });
       httpStub.callsFake(httpRequestSpy);
 
@@ -341,7 +341,7 @@ describe('Search', () => {
 
   context('autocompleteNear', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -363,8 +363,8 @@ describe('Search', () => {
     });
 
     it('should succeed', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { addresses: ['matching-addresses'] });
       });
       httpStub.callsFake(httpRequestSpy);
 

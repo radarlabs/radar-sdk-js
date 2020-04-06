@@ -5,15 +5,7 @@ import API_HOST from './api_host';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
-function _handleResponse(response, jsonKey) {
-  if (jsonKey) {
-    const res = JSON.parse(response);
-    return res[jsonKey];
-  }
-  return response;
-}
-
-export function request(method, path, data, jsonKey, callback) {
+export function request(method, path, data, callback) {
   const xhr = new XMLHttpRequest();
 
   let url = `${API_HOST.getHost()}/${path}`;
@@ -48,8 +40,7 @@ export function request(method, path, data, jsonKey, callback) {
   xhr.onload = () => {
     if (xhr.status == 200) {
       try {
-        const response = _handleResponse(xhr.response, jsonKey);
-        callback(STATUS.SUCCESS, response);
+        callback(STATUS.SUCCESS, JSON.parse(xhr.response));
       } catch (e) {
         callback(STATUS.ERROR_SERVER);
       }

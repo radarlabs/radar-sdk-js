@@ -34,7 +34,7 @@ describe('Geocoding', () => {
 
   context('geocode', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -46,8 +46,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { addresses: ['matching-addresses'] });
       });
       httpStub.callsFake(httpRequestSpy);
 
@@ -108,7 +108,7 @@ describe('Geocoding', () => {
 
   context('reverseGeocodeLocation', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -120,8 +120,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { addresses: ['matching-addresses'] });
       });
       httpStub.callsFake(httpRequestSpy);
 
@@ -141,7 +141,7 @@ describe('Geocoding', () => {
 
   context('ipGeocode', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -153,8 +153,8 @@ describe('Geocoding', () => {
     });
 
     it('should succeed', () =>{
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, 'matching-address');
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { address: 'matching-address' });
       });
       httpStub.callsFake(httpRequestSpy);
 

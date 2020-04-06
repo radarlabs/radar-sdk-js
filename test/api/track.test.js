@@ -91,21 +91,8 @@ describe('Track', () => {
   });
 
   context('trackOnceWithLocation', () => {
-    it('should throw a server error if invalid JSON is returned in the response', () => {
-      const jsonErrorResponse = '"invalid_json": true}';
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, jsonErrorResponse);
-      });
-      httpStub.callsFake(httpRequestSpy);
-
-      const trackCallback = sinon.spy();
-      Track.trackOnceWithLocation({ latitude, longitude, accuracy }, trackCallback);
-
-      expect(trackCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -117,8 +104,8 @@ describe('Track', () => {
     });
 
     it('should succeed', () => {
-      const jsonSuccessResponse = '{"user":"user-data","events":"matching-events"}';
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const jsonSuccessResponse = {"user":"user-data","events":"matching-events"};
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback(STATUS.SUCCESS, jsonSuccessResponse);
       });
       httpStub.callsFake(httpRequestSpy);

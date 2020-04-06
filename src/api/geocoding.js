@@ -8,15 +8,12 @@ class Geocoding {
   static geocode({ query }, callback) {
     const queryParams = { query };
 
-    const path = `v1/geocode/forward`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, queryParams, 'addresses', httpCallback);
+    Http.request('GET', 'v1/geocode/forward', queryParams,
+      (status, response) => {
+        callback(status, response ? response.addresses : null);
+        return;
+      }
+    );
   }
 
   static reverseGeocode(callback) {
@@ -41,27 +38,21 @@ class Geocoding {
       coordinates: `${latitude},${longitude}`,
     };
 
-    const path = `v1/geocode/reverse`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, queryParams, 'addresses', httpCallback);
+    Http.request('GET', 'v1/geocode/reverse', queryParams,
+      (status, response) => {
+        callback(status, response ? response.addresses : null);
+        return;
+      }
+    );
   }
 
   static ipGeocode(callback) {
-    const path = `v1/geocode/ip`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    };
-
-    Http.request(method, path, {}, 'address', httpCallback);
+    Http.request('GET', 'v1/geocode/ip', {},
+      (status, response) => {
+        callback(status, response ? response.address : null);
+        return;
+      }
+    );
   }
 }
 

@@ -53,14 +53,12 @@ class Routing {
       units,
     };
 
-    const path = `v1/route/distance`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-    }
-
-    Http.request(method, path, queryParams, 'routes', httpCallback);
+    Http.request('GET', 'v1/route/distance', queryParams,
+      (status, response) => {
+        callback(status, response ? response.routes : null);
+        return;
+      }
+    );
   }
 }
 

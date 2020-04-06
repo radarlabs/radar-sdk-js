@@ -26,15 +26,12 @@ class Context {
       coordinates: `${latitude},${longitude}`,
     };
 
-    const path = `v1/context`;
-    const method = 'GET';
-
-    const httpCallback = (status, response) => {
-      callback(status, response);
-      return;
-    }
-
-    Http.request(method, path, queryParams, 'context', httpCallback);
+    Http.request('GET', `v1/context`, queryParams,
+      (status, response) => {
+        callback(status, response ? response.context : null);
+        return;
+      }
+    );
   }
 }
 

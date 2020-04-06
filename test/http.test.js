@@ -35,19 +35,19 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
-      request.respond(200, {}, '{ success: "true" }');
+      request.respond(200, {}, '{"success":true}');
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, '{ success: "true" }');
+      expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, { success: true });
     });
 
     it('should respond with unauthorized status', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.respond(401);
@@ -59,7 +59,7 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.respond(429);
@@ -71,7 +71,7 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.respond(500);
@@ -83,7 +83,7 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.onerror();
@@ -95,7 +95,7 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', {}, null, httpCallback);
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.timeout();
@@ -106,13 +106,13 @@ describe('http', () => {
 
   context('GET request', () => {
     const data = { query: '20 Jay Street' };
-    const getResponse = '{ meta: { code: 200 }, addresses: [{ latitude: 40.7039, longitude: -73.9867 }] }';
+    const getResponse = '{ "meta": { "code": 200 }, "addresses": [{ "latitude": 40.7039, "longitude": -73.9867 }] }';
 
     it('should return a publishable key error if not set', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
       const httpCallback = sinon.spy();
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
+      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
 
       expect(httpCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
     });
@@ -121,12 +121,12 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('GET', 'https://api.radar.io/v1/geocode/ip', {}, null, httpCallback);
+      Http.request('GET', 'v1/geocode/ip', {}, httpCallback);
 
       expect(request).to.not.be.null;
       request.respond(200, {}, getResponse);
 
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, getResponse);
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
 
       expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
       expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
@@ -136,12 +136,12 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', data, null, httpCallback);
+      Http.request('GET', 'v1/geocode/forward', data, httpCallback);
 
       expect(request).to.not.be.null;
       request.respond(200, {}, getResponse);
 
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, getResponse);
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
 
       const urlencodedData = encodeURIComponent(`query=${data.query}`);
       expect(request.url).to.contain(`?${urlencodedData}`);
@@ -151,26 +151,13 @@ describe('http', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpCallback = sinon.spy();
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
+      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
 
       const jsonErrorResponse = '"invalid_json": true}';
       expect(request).to.not.be.null;
       request.respond(200, {}, jsonErrorResponse);
 
       expect(httpCallback).to.be.calledWith(STATUS.ERROR_SERVER);
-    });
-
-    it('should grab the nested payload via jsonKey', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'https://api.radar.io/v1/geocode/forward', { query: '20 Jay Street' }, 'addresses', httpCallback);
-
-      const jsonSuccessResponse = '{"addresses":["matching-addresses"]}';
-      expect(request).to.not.be.null;
-      request.respond(200, {}, jsonSuccessResponse);
-
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 });

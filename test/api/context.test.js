@@ -73,7 +73,7 @@ describe('Context', () => {
 
   context('getContextForLocation', () => {
     it('should return the error from the http request', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
         callback('http error');
       });
       httpStub.callsFake(httpRequestSpy);
@@ -85,8 +85,8 @@ describe('Context', () => {
     });
 
     it('should propagate a successful response', () => {
-      const httpRequestSpy = sinon.spy((method, path, body, jsonKey, callback) => {
-        callback(STATUS.SUCCESS, 'matching-context');
+      const httpRequestSpy = sinon.spy((method, path, body, callback) => {
+        callback(STATUS.SUCCESS, { context: 'matching-context' });
       });
       httpStub.callsFake(httpRequestSpy);
 
