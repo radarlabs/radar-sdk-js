@@ -1,91 +1,163 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
+import * as Cookie from '../src/cookie';
+import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
+
 import * as Http from '../src/http';
 
 describe('http', () => {
-  describe('request', () => {
+  let getCookieStub;
 
-    let request;
-    let successCallback;
-    let errorCallback;
+  let request;
 
-    beforeEach(() => {
-      global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
+  const publishableKey = 'mock-publishable-key';
 
-      global.XMLHttpRequest.onCreate = (xhrRequest) => {
-        request = xhrRequest;
-      };
+  beforeEach(() => {
+    global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
 
-      successCallback = sinon.spy();
-      errorCallback = sinon.spy();
+    global.XMLHttpRequest.onCreate = (xhrRequest) => {
+      request = xhrRequest;
+    };
 
-      Http.request('PUT', 'https://api.radar.io/v1/users/userId', { 'Content-Type': 'application/json' }, { 'Authorization': 'api-key' }, successCallback, errorCallback);
+    getCookieStub = sinon.stub(Cookie, 'getCookie');
+  });
+
+  afterEach(() => {
+    global.XMLHttpRequest.restore();
+
+    Cookie.getCookie.restore();
+  });
+
+  context('PUT request', () => {
+    it('should call callback with api response on success', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(200, {}, '{"success":true}');
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, { success: true });
     });
 
-    afterEach(() => {
-      global.XMLHttpRequest.restore();
+    it('should respond with unauthorized status', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(401);
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
     });
 
-    context('success', () => {
-      it('should call callback with api response', () => {
-        expect(request).to.not.be.null;
-        request.respond(200, {}, '{ success: "true" }');
+    it('should respond with rate limit error status', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(successCallback).to.have.been.calledWith('{ success: "true" }');
-        expect(errorCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(429);
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
     });
 
-    context('unauthorized', () => {
-      it('should respond with unauthorized status', () => {
-        expect(request).to.not.be.null;
-        request.respond(401);
+    it('should respond with server error status on 500', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
-        expect(successCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(500);
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
     });
 
-    context('rate limit error', () => {
-      it('should respond with rate limit error status', () => {
-        expect(request).to.not.be.null;
-        request.respond(429);
+    it('should respond with server error status on request error', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
-        expect(successCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.onerror();
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
     });
 
-    context('server error', () => {
-      it('should respond with server error status', () => {
-        expect(request).to.not.be.null;
-        request.respond(500);
+    it('should respond with network error status on timeout', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-        expect(successCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.timeout();
+
+      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
+    });
+  });
+
+  context('GET request', () => {
+    const data = { query: '20 Jay Street' };
+    const getResponse = '{ "meta": { "code": 200 }, "addresses": [{ "latitude": 40.7039, "longitude": -73.9867 }] }';
+
+    it('should return a publishable key error if not set', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+
+      const httpCallback = sinon.spy();
+      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
+
+      expect(httpCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
     });
 
-    context('error', () => {
-      it('should respond with server error status', () => {
-        expect(request).to.not.be.null;
-        request.onerror();
+    it('should always include Device-Type and SDK-Version headers', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-        expect(successCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('GET', 'v1/geocode/ip', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(200, {}, getResponse);
+
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
+
+      expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
+      expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
     });
 
-    context('timeout', () => {
-      it('should respond with network error status', () => {
-        expect(request).to.not.be.null;
-        request.timeout();
+    it('should inject GET parameters into the url querystring', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-        expect(errorCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
-        expect(successCallback).to.not.have.been.called;
-      });
+      const httpCallback = sinon.spy();
+      Http.request('GET', 'v1/geocode/forward', data, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(200, {}, getResponse);
+
+      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
+
+      const urlencodedData = encodeURIComponent(`query=${data.query}`);
+      expect(request.url).to.contain(`?${urlencodedData}`);
+    });
+
+    it('should return a server error on invalid JSON', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpCallback = sinon.spy();
+      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
+
+      const jsonErrorResponse = '"invalid_json": true}';
+      expect(request).to.not.be.null;
+      request.respond(200, {}, jsonErrorResponse);
+
+      expect(httpCallback).to.be.calledWith(STATUS.ERROR_SERVER);
     });
   });
 });

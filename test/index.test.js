@@ -6,15 +6,41 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import * as Cookie from '../src/cookie';
-import * as Device from '../src/device';
-import * as Http from '../src/http';
-import Radar from '../src/index';
-import PLACES_PROVIDER from '../src/places_providers';
+import Navigator from '../src/navigator';
+
+import Context from '../src/api/context';
+import Geocoding from '../src/api/geocoding';
+import Routing from '../src/api/routing';
+import Search from '../src/api/search';
+import Track from '../src/api/track';
+
 import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
 
+import Radar from '../src/index';
+
 describe('Radar', () => {
   let getCookieStub;
+
+  const latitude = 40.7041895;
+  const longitude = -73.9867797;
+  const accuracy = 5;
+
+  // search
+  const mockRadius = 100;
+  const mockChains = ['dunkin', 'sbucks'];
+  const mockLimit = 50;
+
+  // geocoding
+  const mockQuery = 'mock-query';
+
+  // routing
+  const destination = {
+    latitude: 40.7032123,
+    longitude: -73.9936137,
+  };
+  const mockModes = ['foot', 'bike', 'car'];
+  const mockUnits = 'imperial';
 
   beforeEach(() => {
     sinon.stub(Cookie, 'deleteCookie');
@@ -31,12 +57,6 @@ describe('Radar', () => {
   describe('VERSION', () => {
     it('should return sdk version', () => {
       expect(Radar.VERSION).to.eq(SDK_VERSION);
-    });
-  });
-
-  describe('PLACES_PROVIDER', () => {
-    it('should return places providers object', () => {
-      expect(Radar.PLACES_PROVIDER).to.eql(PLACES_PROVIDER);
     });
   });
 
@@ -77,19 +97,6 @@ describe('Radar', () => {
       const host = 'http://fakehost.com';
       Radar.setHost(host);
       expect(Cookie.setCookie).to.have.been.calledWith(Cookie.HOST, host);
-    });
-  });
-
-  describe('setPlacesProvider', () => {
-    it('should save provider to cookie', () => {
-      const provider = 'facebook';
-      Radar.setPlacesProvider(provider);
-      expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, provider);
-    });
-
-    it('should set provider to "none" if argument does NOT equal "facebook"', () => {
-      Radar.setPlacesProvider("other");
-      expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PLACES_PROVIDER, "none");
     });
   });
 
@@ -163,241 +170,609 @@ describe('Radar', () => {
     });
   });
 
-  describe('trackOnce', () => {
-    const publishableKey = 'publishable-key';
-    const userId = 'user-id';
-    const placesProvider = 'facebook';
-    const description = 'description';
-    const deviceId = 'device-id';
+  context('getLocation', () => {
+    let navigatorStub;
 
     const latitude = 40.7041895;
     const longitude = -73.9867797;
-    const accuracy = 1;
-    const position = {
-      coords: { accuracy, latitude, longitude },
-    };
+    const accuracy = 5;
 
-    let jsonResponse;
-    let httpRequestSpy;
     beforeEach(() => {
-      jsonResponse = '{"user":"user-data","events":"matching-events"}';
-      httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess) => {
-        onSuccess(jsonResponse);
-      });
+      navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     });
 
-    context('publishable key NOT set', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
-      });
-
-      it('calls callback with ERROR_PUBLISHABLE_KEY', () => {
-        const callback = sinon.spy();
-        Radar.trackOnce(callback);
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
-      });
+    afterEach(() => {
+      Navigator.getCurrentPosition.restore();
     });
 
-    context('geolocation NOT available', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-        global.navigator = {};
-      });
+    it('should throw an error if no callback present', () => {
+      let e;
+      try {
+        Radar.getLocation();
+      } catch (_e) {
+        e = _e;
+      }
 
-      afterEach(() => {
-        global.navigator = undefined;
-      });
-
-      it('calls callback with ERROR_LOCATION', () => {
-        const callback = sinon.spy();
-        Radar.trackOnce(callback);
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
-      });
+      expect(navigatorStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    context('geo position NOT avaialable', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const getCurrentPosition = (onSuccess) => {
-          onSuccess(null);
-        };
-
-        const geolocation = { getCurrentPosition };
-        global.navigator = { geolocation };
+    it('should propagate the status if not successful', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.ERROR_LOCATION, {});
       });
 
-      afterEach(() => {
-        global.navigator = undefined;
-      });
+      const locationCallback = sinon.spy();
+      Radar.getLocation(locationCallback);
 
-      it('calls callback with ERROR_LOCATION', () => {
-        const callback = sinon.spy();
-        Radar.trackOnce(callback);
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
-      });
+      expect(navigatorStub).to.have.callCount(1);
+      expect(locationCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
     });
 
-    context('geo position is available', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-        getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
-        getCookieStub.withArgs(Cookie.PLACES_PROVIDER).returns(placesProvider);
-        getCookieStub.withArgs(Cookie.DESCRIPTION).returns(description);
-        sinon.stub(Device, 'getId').returns(deviceId);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess) => { onSuccess(position); },
-        };
-
-        global.navigator = { geolocation };
-
-        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+    it('should succeed', () => {
+      navigatorStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
       });
 
-      afterEach(() => {
-        Device.getId.restore();
-        Http.request.restore();
-        global.navigator = undefined;
+      const locationCallback = sinon.spy();
+      Radar.getLocation(locationCallback);
+
+      expect(navigatorStub).to.have.callCount(1);
+      expect(locationCallback).to.be.calledWith(STATUS.SUCCESS, {
+        latitude: 40.7041895,
+        longitude: -73.9867797,
+        accuracy: 5,
+      });
+    });
+  });
+
+  context('trackOnce', () => {
+    let trackStub;
+    let trackLocationStub;
+
+    beforeEach(() => {
+      trackStub = sinon.stub(Track, 'trackOnce');
+      trackLocationStub = sinon.stub(Track, 'trackOnceWithLocation');
+    });
+
+    afterEach(() => {
+      Track.trackOnce.restore();
+      Track.trackOnceWithLocation.restore();
+    });
+
+    it('should throw an error on invalid params', () => {
+      let e;
+      try {
+        Radar.trackOnce(3);
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(trackStub).to.not.be.called;
+      expect(trackLocationStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call trackOnce with no args', () => {
+      trackStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
       });
 
-      it('should make http request to api, and call the callback with data', () => {
-        const callback = sinon.spy();
+      Radar.trackOnce();
 
-        Radar.trackOnce(callback);
+      expect(trackStub).to.have.callCount(1);
+      expect(trackLocationStub).to.not.be.called;
+    });
 
-        const [method, url, body, headers] = httpRequestSpy.getCall(0).args;
-        expect(method).to.equal('PUT');
-        expect(url).to.equal('https://api.radar.io/v1/users/user-id');
-        expect(headers).to.deep.equal({ Authorization: publishableKey });
-        expect(body).to.deep.equal({
-          accuracy,
-          description,
-          deviceId,
-          deviceType: 'Web',
-          foreground: true,
-          latitude,
-          longitude,
-          placesProvider,
-          sdkVersion: SDK_VERSION,
-          stopped: true,
-          userAgent: undefined,
-          userId,
+    it('should call trackOnce if the first arg is a callback', () => {
+      trackStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
+      });
+
+      const trackCallback = sinon.spy();
+      Radar.trackOnce(trackCallback);
+
+      expect(trackStub).to.have.callCount(1);
+      expect(trackLocationStub).to.not.be.called;
+      expect(trackCallback).to.be.calledWith(
+        STATUS.SUCCESS,
+        { latitude, longitude, accuracy },
+        'user-data',
+        'matching-events'
+      );
+    });
+
+    it('should call trackOnceWithLocation if the first arg is a location object', () => {
+      trackLocationStub.callsFake(({ latitude, longitude, accuracy }, callback) => {
+        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
+      });
+
+      const trackCallback = sinon.spy();
+      Radar.trackOnce({ latitude, longitude, accuracy }, trackCallback);
+
+      expect(trackStub).to.not.be.called;
+      expect(trackLocationStub).to.have.callCount(1);
+      expect(trackCallback).to.be.calledWith(
+        STATUS.SUCCESS,
+        { latitude, longitude, accuracy },
+        'user-data',
+        'matching-events'
+      );
+    });
+  });
+
+  context('getContext', () => {
+    let contextStub;
+    let contextLocationStub;
+
+    beforeEach(() => {
+      contextStub = sinon.stub(Context, 'getContext');
+      contextLocationStub = sinon.stub(Context, 'getContextForLocation');
+    });
+
+    afterEach(() => {
+      Context.getContext.restore();
+      Context.getContextForLocation.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.getContext();
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(contextStub).to.not.be.called;
+      expect(contextLocationStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call getContext if the first arg is a callback', () => {
+      contextStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, 'matching-context');
+      });
+
+      const contextCallback = sinon.spy();
+      Radar.getContext(contextCallback);
+
+      expect(contextStub).to.have.callCount(1);
+      expect(contextLocationStub).to.not.be.called;
+      expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
+    });
+
+    it('should call getContextWithLocation if the first arg is a location object', () => {
+      contextLocationStub.callsFake(({ latitude, longitude }, callback) => {
+        callback(STATUS.SUCCESS, 'matching-context');
+      });
+
+      const contextCallback = sinon.spy();
+      Radar.getContext({ latitude, longitude }, contextCallback);
+
+      expect(contextStub).to.not.be.called;
+      expect(contextLocationStub).to.have.callCount(1);
+      expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
+    });
+  });
+
+  context('searchPlaces', () => {
+    let searchStub;
+    let searchNearStub;
+
+    beforeEach(() => {
+      searchStub = sinon.stub(Search, 'searchPlaces');
+      searchNearStub = sinon.stub(Search, 'searchPlacesNear');
+    });
+
+    afterEach(() => {
+      Search.searchPlaces.restore();
+      Search.searchPlacesNear.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.searchPlaces({
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
         });
+      } catch (_e) {
+        e = _e;
+      }
 
-        expect(callback).to.have.been.calledWith(STATUS.SUCCESS, position.coords, 'user-data', 'matching-events');
-      });
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    context('user denies location permissions', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess, onError) => {
-            onError({ code: 1 });
-          },
-        };
-
-        global.navigator = { geolocation };
+    it('should call searchPlaces if near is not provided', () => {
+      searchStub.callsFake(({ radius, chains, categories, groups, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-places']);
       });
 
-      afterEach(() => {
-        global.navigator = undefined;
-      });
+      const searchCallback = sinon.spy();
+      Radar.searchPlaces(
+        {
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
 
-      it('should call callback with error permissions status', () => {
-        const callback = sinon.spy();
-
-        Radar.trackOnce(callback);
-
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_PERMISSIONS);
-      });
+      expect(searchStub).to.have.callCount(1);
+      expect(searchNearStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
     });
 
-    context('device error when fetching location', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess, onError) => {
-            onError({ code: 2 });
-          },
-        };
-
-        global.navigator = { geolocation };
+    it('should call searchPlacesNear if near is provided', () => {
+      searchNearStub.callsFake(({ near, radius, chains, categories, groups, limit}, callback) => {
+        callback(STATUS.SUCCESS, ['matching-places']);
       });
 
-      afterEach(() => {
-        global.navigator = undefined;
-      });
+      const searchCallback = sinon.spy();
+      Radar.searchPlaces(
+        {
+          near: { latitude, longitude },
+          radius: mockRadius,
+          chains: mockChains,
+          categories: [],
+          groups: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
 
-      it('should call callback with error location status', () => {
-        const callback = sinon.spy();
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.have.callCount(1);
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
+    });
+  });
 
-        Radar.trackOnce(callback);
+  context('searchGeofences', () => {
+    let searchStub;
+    let searchNearStub;
 
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_LOCATION);
-      });
+    beforeEach(() => {
+      searchStub = sinon.stub(Search, 'searchGeofences');
+      searchNearStub = sinon.stub(Search, 'searchGeofencesNear');
     });
 
-    context('invalid JSON in success response', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess) => { onSuccess(position); },
-        };
-
-        global.navigator = { geolocation };
-
-        jsonResponse = '"invalid_json": true}';
-        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
-      });
-
-      afterEach(() => {
-        Http.request.restore();
-        global.navigator = undefined;
-      });
-
-      it('should call callback with server error', () => {
-        const callback = sinon.spy();
-
-        Radar.trackOnce(callback);
-
-        expect(callback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-      });
+    afterEach(() => {
+      Search.searchGeofences.restore();
+      Search.searchGeofencesNear.restore();
     });
 
-    context('ajax failure calling api', () => {
-      beforeEach(() => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-        const geolocation = {
-          getCurrentPosition: (onSuccess) => { onSuccess(position); },
-        };
-
-        global.navigator = { geolocation };
-
-        httpRequestSpy = sinon.spy((method, url, body, headers, onSuccess, onError) => {
-          onError('ajax error');
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.searchGeofences({
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
         });
+      } catch (_e) {
+        e = _e;
+      }
 
-        sinon.stub(Http, 'request').callsFake(httpRequestSpy);
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call searchGeofences if near is not provided', () => {
+      searchStub.callsFake(({ radius, tags, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-geofences']);
       });
 
-      afterEach(() => {
-        Http.request.restore();
-        global.navigator = undefined;
+      const searchCallback = sinon.spy();
+      Radar.searchGeofences(
+        {
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(searchStub).to.have.callCount(1);
+      expect(searchNearStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-geofences']);
+    });
+
+    it('should call searchGeofencesNear if near is provided', () => {
+      searchNearStub.callsFake(({ near, radius, tags, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-geofences']);
       });
 
-      it('should call callback with Http error', () => {
-        const callback = sinon.spy();
+      const searchCallback = sinon.spy();
+      Radar.searchGeofences(
+        {
+          near: { latitude, longitude },
+          radius: mockRadius,
+          tags: [],
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
 
-        Radar.trackOnce(callback);
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.have.callCount(1);
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-geofences']);
+    });
+  });
 
-        expect(callback).to.have.been.calledWith('ajax error');
+  context('autocomplete', () => {
+    let searchStub;
+    let searchNearStub;
+
+    beforeEach(() => {
+      searchStub = sinon.stub(Search, 'autocomplete');
+      searchNearStub = sinon.stub(Search, 'autocompleteNear');
+    });
+
+    afterEach(() => {
+      Search.autocomplete.restore();
+      Search.autocompleteNear.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.autocomplete({
+          query: mockQuery,
+          limit: mockLimit,
+        });
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call autocomplete if near is not provided', () => {
+      searchStub.callsFake(({ query, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
       });
+
+      const searchCallback = sinon.spy();
+      Radar.autocomplete(
+        {
+          query: mockQuery,
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(searchStub).to.have.callCount(1);
+      expect(searchNearStub).to.not.be.called;
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+    });
+
+    it('should call autocompleteNear if near is provided', () => {
+      searchNearStub.callsFake(({ query, near, limit }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
+      });
+
+      const searchCallback = sinon.spy();
+      Radar.autocomplete(
+        {
+          query: mockQuery,
+          near: { latitude, longitude },
+          limit: mockLimit,
+        },
+        searchCallback,
+      );
+
+      expect(searchStub).to.not.be.called;
+      expect(searchNearStub).to.have.callCount(1);
+      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+    });
+  });
+
+  context('geocode', () => {
+    let geocodeStub;
+
+    beforeEach(() => {
+      geocodeStub = sinon.stub(Geocoding, 'geocode');
+    });
+
+    afterEach(() => {
+      Geocoding.geocode.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.geocode({ query: mockQuery });
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(geocodeStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call geocode on success', () => {
+      geocodeStub.callsFake(({ query }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
+      });
+
+      const geocodeCallback = sinon.spy();
+      Radar.geocode({ query: mockQuery }, geocodeCallback);
+
+      expect(geocodeStub).to.have.callCount(1);
+      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+    });
+  });
+
+  context('reverseGeocode', () => {
+    let geocodeStub;
+    let geocodeLocationStub;
+
+    beforeEach(() => {
+      geocodeStub = sinon.stub(Geocoding, 'reverseGeocode');
+      geocodeLocationStub = sinon.stub(Geocoding, 'reverseGeocodeLocation');
+    });
+
+    afterEach(() => {
+      Geocoding.reverseGeocode.restore();
+      Geocoding.reverseGeocodeLocation.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.reverseGeocode();
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(geocodeStub).to.not.be.called;
+      expect(geocodeLocationStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call reverseGeocode if the first arg is a callback', () => {
+      geocodeStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
+      });
+
+      const geocodeCallback = sinon.spy();
+      Radar.reverseGeocode(geocodeCallback);
+
+      expect(geocodeStub).to.have.callCount(1);
+      expect(geocodeLocationStub).to.not.be.called;
+      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+    });
+
+    it('should call reverseGeocodeLocation if the first arg is a location object', () => {
+      geocodeLocationStub.callsFake(({ latitude, longitude }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-addresses']);
+      });
+
+      const geocodeCallback = sinon.spy();
+      Radar.reverseGeocode({ latitude, longitude }, geocodeCallback);
+
+      expect(geocodeStub).to.not.be.called;
+      expect(geocodeLocationStub).to.have.callCount(1);
+      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
+    });
+  });
+
+  context('ipGeocode', () => {
+    let geocodeStub;
+
+    beforeEach(() => {
+      geocodeStub = sinon.stub(Geocoding, 'ipGeocode');
+    });
+
+    afterEach(() => {
+      Geocoding.ipGeocode.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.ipGeocode();
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(geocodeStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call ipGeocode on success', () => {
+      geocodeStub.callsFake((callback) => {
+        callback(STATUS.SUCCESS, 'matching-address');
+      });
+
+      const geocodeCallback = sinon.spy();
+      Radar.ipGeocode(geocodeCallback);
+
+      expect(geocodeStub).to.have.callCount(1);
+      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-address');
+    });
+  });
+
+  context('getDistance', () => {
+    let routingStub;
+    let routingOriginStub;
+
+    beforeEach(() => {
+      routingStub = sinon.stub(Routing, 'getDistanceToDestination');
+      routingOriginStub = sinon.stub(Routing, 'getDistanceWithOrigin');
+    });
+
+    afterEach(() => {
+      Routing.getDistanceToDestination.restore();
+      Routing.getDistanceWithOrigin.restore();
+    });
+
+    it('should throw an error if no callback provided', () => {
+      let e;
+      try {
+        Radar.getDistance({
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        });
+      } catch (_e) {
+        e = _e;
+      }
+
+      expect(routingStub).to.not.be.called;
+      expect(routingOriginStub).to.not.be.called;
+      expect(e.message).to.equal('ERROR_PARAMETERS');
+    });
+
+    it('should call getDistanceToDestination if near is not provided', () => {
+      routingStub.callsFake(({ destination, modes, units }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-routes']);
+      });
+
+      const routingCallback = sinon.spy();
+      Radar.getDistance(
+        {
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        },
+        routingCallback,
+      );
+
+      expect(routingStub).to.have.callCount(1);
+      expect(routingOriginStub).to.not.be.called;
+      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
+    });
+
+    it('should call getDistanceWithOrigin if near is provided', () => {
+      routingOriginStub.callsFake(({ origin, destination, modes, units }, callback) => {
+        callback(STATUS.SUCCESS, ['matching-routes']);
+      });
+
+      const routingCallback = sinon.spy();
+      Radar.getDistance(
+        {
+          origin: { latitude, longitude },
+          destination,
+          modes: mockModes,
+          units: mockUnits,
+        },
+        routingCallback,
+      );
+
+      expect(routingStub).to.not.be.called;
+      expect(routingOriginStub).to.have.callCount(1);
+      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
     });
   });
 });
