@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../src/cookie';
+import  Cookie from '../src/cookie';
 import Navigator from '../src/navigator';
 
 import Context from '../src/api/context';

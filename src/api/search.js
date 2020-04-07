@@ -1,171 +1,125 @@
-import * as Http from '../http';
+import  Http from '../http';
 import Navigator from '../navigator';
 
-// consts
-import STATUS from '../status_codes';
+const DEFAULT_LIMIT = 100;
+
+const getLimit = (limit) => {
+  if (!limit || Number.isNaN(limit)) {
+    return DEFAULT_LIMIT;
+  }
+  return Math.min(limit, DEFAULT_LIMIT);
+}
 
 class Search {
-  static searchPlaces(
-    {
-      radius,
-      chains,
-      categories,
-      groups,
-      limit,
-    },
-    callback,
-  ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
+  static async searchPlaces(searchOptions={}) {
+    if (!searchOptions.near) {
+      const { latitude, longitude } = await Navigator.getCurrentPosition();
+      searchOptions.near = { latitude, longitude };
+    }
 
-      this.searchPlacesNear(
-        {
-          near: { latitude, longitude },
-          radius,
-          chains,
-          categories,
-          groups,
-          limit,
-        },
-        (status, places) => {
-          callback(status, places);
-          return;
-        }
-      );
-    });
-  }
-
-  static searchPlacesNear(
-    {
+    let {
       near,
       radius,
       chains,
       categories,
       groups,
       limit,
-    },
-    callback,
-  ) {
-    const queryParams = {
-      near: `${near.latitude},${near.longitude}`,
+    } = searchOptions;
+
+    if (near) {
+      near = `${near.latitude},${near.longitude}`;
+    }
+    if (chains) {
+      chains = chains.join(',');
+    }
+    if (categories) {
+      categories = categories.join(',');
+    }
+    if (groups) {
+      groups = groups.join(',');
+    }
+
+    limit = getLimit(limit);
+
+    const params = {
+      near,
       radius,
-      chains: chains.join(','),
-      categories: categories.join(','),
-      groups: groups.join(','),
-      limit: Math.min(limit, 100),
+      chains,
+      categories,
+      groups,
+      limit,
     };
 
-    Http.request('GET', 'v1/search/places', queryParams,
-      (status, response) => {
-        callback(status, response ? response.places : null);
-        return;
-      }
-    );
+    const response = await Http.request('GET', 'v1/search/places', params);
+
+    return response.places;
   }
 
-  static searchGeofences(
-    {
-      radius,
-      tags,
-      limit,
-    },
-    callback,
-  ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
+  static async searchGeofences(searchOptions={}) {
+    if (!searchOptions.near) {
+      const { latitude, longitude } = await Navigator.getCurrentPosition();
+      searchOptions.near = { latitude, longitude };
+    }
 
-      this.searchGeofencesNear(
-        {
-          near: { latitude, longitude },
-          radius,
-          tags,
-          limit,
-        },
-        (status, geofences) => {
-          callback(status, geofences);
-          return;
-        }
-      );
-    });
-  }
-
-  static searchGeofencesNear(
-    {
+    let {
       near,
       radius,
       tags,
       limit,
-    },
-    callback,
-  ) {
-    const queryParams = {
-      near: `${near.latitude},${near.longitude}`,
+    } = searchOptions;
+
+    if (near) {
+      near = `${near.latitude},${near.longitude}`;
+    }
+    if (tags) {
+      tags = tags.join(',');
+    }
+
+    limit = getLimit(limit);
+
+    const params = {
+      near,
       radius,
-      tags: tags.join(','),
-      limit: Math.min(limit, 100),
+      tags,
+      limit,
     };
 
-    Http.request('GET', 'v1/search/geofences', queryParams,
-      (status, response) => {
-        callback(status, response ? response.geofences : null);
-        return;
-      }
-    );
+    const response = await Http.request('GET', 'v1/search/geofences', params);
+
+    return response.geofences;
   }
 
-  static autocomplete(
-    {
-      query,
-      limit,
-    },
-    callback
-  ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
 
-      this.autocompleteNear(
-        {
-          query,
-          near: { latitude, longitude },
-          limit,
-        },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      )
-    });
-  }
+  static async autocomplete(searchOptions={}) {
+    // NOTE: I'm not sure how caching works with getCurrentPosition,
+    // but this could be problematic here if needs to compute each time.
+    // We could add a cache: true flag to retreive previous value
+    if (!searchOptions.near) {
+      const { latitude, longitude } = await Navigator.getCurrentPosition();
+      searchOptions.near = { latitude, longitude };
+    }
 
-  static autocompleteNear(
-    {
+    let {
       query,
       near,
       limit,
-    },
-    callback
-  ) {
-    const queryParams = {
+    } = searchOptions;
+
+    if (near) {
+      near = `${near.latitude},${near.longitude}`;
+    }
+
+    limit = getLimit(limit);
+
+    const params = {
       query,
-      near: `${near.latitude},${near.longitude}`,
+      near,
       limit,
     };
 
-    Http.request('GET', 'v1/search/autocomplete', queryParams,
-      (status, response) => {
-        callback(status, response ? response.addresses : null);
-        return;
-      }
-    );
+    const response = await Http.request('GET', 'v1/search/autocomplete', params);
+
+    return response.addresses;
   }
 }
 

@@ -1,58 +1,36 @@
-import * as Http from '../http';
+import  Http from '../http';
 import Navigator from '../navigator';
 
-// consts
-import STATUS from '../status_codes';
-
 class Geocoding {
-  static geocode({ query }, callback) {
-    const queryParams = { query };
+  static async geocode(geocodeOptions={}) {
+    const { query } = geocodeOptions;
 
-    Http.request('GET', 'v1/geocode/forward', queryParams,
-      (status, response) => {
-        callback(status, response ? response.addresses : null);
-        return;
-      }
-    );
+    const response = await Http.request('GET', 'v1/geocode/forward', { query });
+
+    return response.addresses;
   }
 
-  static reverseGeocode(callback) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
+  static async reverseGeocode(geocodeOptions={}) {
+    if (!geocodeOptions.latitude || !geocodeOptions.longitude) {
+      const { latitude, longitude } = await Navigator.getCurrentPosition();
+      geocodeOptions.latitude = latitude;
+      geocodeOptions.longitude = longitude;
+    }
 
-      this.reverseGeocodeLocation(
-        { latitude, longitude },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      );
-    });
-  }
+    const { latitude, longitude } = geocodeOptions;
 
-  static reverseGeocodeLocation({ latitude, longitude }, callback) {
-    const queryParams = {
+    const params = {
       coordinates: `${latitude},${longitude}`,
     };
 
-    Http.request('GET', 'v1/geocode/reverse', queryParams,
-      (status, response) => {
-        callback(status, response ? response.addresses : null);
-        return;
-      }
-    );
+    const response = await Http.request('GET', 'v1/geocode/reverse', params);
+
+    return response.address;
   }
 
-  static ipGeocode(callback) {
-    Http.request('GET', 'v1/geocode/ip', {},
-      (status, response) => {
-        callback(status, response ? response.address : null);
-        return;
-      }
-    );
+  static async ipGeocode() {
+    const response = await Http.request('GET', 'v1/geocode/ip', {});
+    return response.address;
   }
 }
 

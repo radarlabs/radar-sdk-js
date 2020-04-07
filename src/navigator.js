@@ -2,37 +2,35 @@
 import STATUS from './status_codes';
 
 class Navigator {
-  static getCurrentPosition(callback) {
-    if (!navigator || !navigator.geolocation) {
-      callback(STATUS.ERROR_LOCATION, {});
-      return;
-    }
+  static getCurrentPosition() {
+    return new Promsie((resolve, reject) => {
 
-    navigator.geolocation.getCurrentPosition(
-      // success callback
-      (position) => {
-        if (!position || !position.coords) {
-          callback(STATUS.ERROR_LOCATION, {});
-          return;
-        }
-
-        const { latitude, longitude, accuracy } = position.coords;
-
-        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
-        return;
-      },
-      // error callback
-      (err) => {
-        if (err && err.code) {
-          if (err.code === 1) {
-            callback(STATUS.ERROR_PERMISSIONS, {});
-          } else {
-            callback(STATUS.ERROR_LOCATION, {});
-          }
-          return;
-        }
+      if (!navigator || !navigator.geolocation) {
+        return reject(STATUS.ERROR_LOCATION);
       }
-    )
+
+      navigator.geolocation.getCurrentPosition(
+        // success callback
+        (position) => {
+          if (!position || !position.coords) {
+            return reject(STATUS.ERROR_LOCATION);
+          }
+
+          const { latitude, longitude, accuracy } = position.coords;
+
+          return resolve({ latitude, longitude, accuracy });
+        },
+        // error callback
+        (err) => {
+          if (err && err.code) {
+            if (err.code === 1) {
+              return reject(STATUS.ERROR_PERMISSIONS);
+            }
+          }
+          return reject(STATUS.ERROR_LOCATION);
+        }
+      );
+    });
   }
 }
 

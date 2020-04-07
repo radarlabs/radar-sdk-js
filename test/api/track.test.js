@@ -5,9 +5,9 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../../src/cookie';
-import * as Device from '../../src/device';
-import * as Http from '../../src/http';
+import  Cookie from '../../src/cookie';
+import  Device from '../../src/device';
+import  Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import SDK_VERSION from '../../src/version';
 import STATUS from '../../src/status_codes';

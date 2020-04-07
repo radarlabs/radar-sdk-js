@@ -5,8 +5,8 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../src/cookie';
-import * as Device from '../src/device';
+import  Cookie from '../src/cookie';
+import  Device from '../src/device';
 
 describe('Device', () => {
   describe('getId', () => {

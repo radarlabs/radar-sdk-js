@@ -1,4 +1,4 @@
-import * as Cookie from './cookie';
+import  Cookie from './cookie';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 
