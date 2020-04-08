@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-import  Cookie from '../src/cookie';
+import Cookie from '../src/cookie';
 
 describe('Cookie', () => {
   describe('getCookie', () => {

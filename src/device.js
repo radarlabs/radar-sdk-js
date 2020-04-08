@@ -1,4 +1,4 @@
-import  Cookie from './cookie';
+import Cookie from './cookie';
 
 const generateUUID = () => {
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {

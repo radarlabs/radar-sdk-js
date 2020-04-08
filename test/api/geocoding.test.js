@@ -7,7 +7,7 @@ const { expect } = chai;
 
 import { latitude, longitude } from '../common';
 
-import  Http from '../../src/http';
+import Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import STATUS from '../../src/status_codes';
 

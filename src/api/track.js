@@ -1,6 +1,6 @@
-import  Cookie from '../cookie';
-import  Device from '../device';
-import  Http from '../http';
+import Cookie from '../cookie';
+import Device from '../device';
+import Http from '../http';
 import Navigator from '../navigator';
 
 // consts

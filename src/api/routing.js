@@ -1,4 +1,4 @@
-import  Http from '../http';
+import Http from '../http';
 import Navigator from '../navigator';
 
 class Routing {

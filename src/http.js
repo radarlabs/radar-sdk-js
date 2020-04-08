@@ -1,4 +1,4 @@
-import  Cookie from './cookie';
+import Cookie from './cookie';
 
 // consts
 import API_HOST from './api_host';

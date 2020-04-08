@@ -1,11 +1,11 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-import  Cookie from '../src/cookie';
+import Cookie from '../src/cookie';
 import SDK_VERSION from '../src/version';
 import STATUS from '../src/status_codes';
 
-import  Http from '../src/http';
+import Http from '../src/http';
 
 describe('Http', () => {
   let getCookieStub;

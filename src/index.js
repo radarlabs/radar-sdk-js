@@ -1,4 +1,4 @@
-import  Cookie from './cookie';
+import Cookie from './cookie';
 import Navigator from './navigator';
 
 import Context from './api/context';

@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import  Http from '../../src/http';
+import Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import STATUS from '../../src/status_codes';
 
