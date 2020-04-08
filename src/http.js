@@ -13,11 +13,11 @@ export function request(method, path, data, callback) {
   if (method === 'GET') {
     const qsArr = [];
     for (let key in data) {
-      qsArr.push(`${key}=${data[key]}`);
+      qsArr.push(`${key}=${encodeURIComponent(data[key])}`);
     }
 
     if (qsArr.length > 0) {
-      const qs = encodeURIComponent(qsArr.join('&'));
+      const qs = qsArr.join('&');
       url = `${url}?${qs}`;
     }
   } else {
@@ -44,9 +44,11 @@ export function request(method, path, data, callback) {
       } catch (e) {
         callback(STATUS.ERROR_SERVER);
       }
-    } else if (xhr.status == 401) {
+    } else if (xhr.status === 400) {
+      callback(STATUS.ERROR_PARAMETERS);
+    } else if (xhr.status === 401) {
       callback(STATUS.ERROR_UNAUTHORIZED);
-    } else if (xhr.status == 429) {
+    } else if (xhr.status === 429) {
       callback(STATUS.ERROR_RATE_LIMIT);
     } else {
       callback(STATUS.ERROR_SERVER);

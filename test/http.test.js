@@ -43,6 +43,18 @@ describe('http', () => {
       expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, { success: true });
     });
 
+    it('should respond with a 400', () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpCallback = sinon.spy();
+      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+
+      expect(request).to.not.be.null;
+      request.respond(400);
+
+      expect(httpCallback).to.be.calledWith(STATUS.ERROR_PARAMETERS);
+    });
+
     it('should respond with unauthorized status', () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
@@ -143,7 +155,7 @@ describe('http', () => {
 
       expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
 
-      const urlencodedData = encodeURIComponent(`query=${data.query}`);
+      const urlencodedData = `query=${encodeURIComponent(data.query)}`;
       expect(request.url).to.contain(`?${urlencodedData}`);
     });
 
