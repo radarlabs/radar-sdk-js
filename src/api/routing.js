@@ -32,9 +32,7 @@ class Routing {
       units,
     };
 
-    const response = await Http.request('GET', 'v1/route/distance', params);
-
-    return response.routes;
+    return Http.request('GET', 'v1/route/distance', params);
   }
 }
 

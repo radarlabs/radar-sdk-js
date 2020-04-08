@@ -3,7 +3,7 @@ import STATUS from './status_codes';
 
 class Navigator {
   static getCurrentPosition() {
-    return new Promsie((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
       if (!navigator || !navigator.geolocation) {
         return reject(STATUS.ERROR_LOCATION);

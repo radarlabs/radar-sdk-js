@@ -33,12 +33,9 @@ class Track {
     };
 
     const response = await Http.request('PUT', `v1/users/${_id}`, body);
+    response.location = location;
 
-    return {
-      location,
-      user: response.user,
-      events: response.events,
-    };
+    return response;
   }
 }
 

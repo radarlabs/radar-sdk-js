@@ -13,9 +13,7 @@ class Context {
       coordinates: `${latitude},${longitude}`,
     };
 
-    const response = await Http.request('GET', `v1/context`, params);
-
-    return response.context;
+    return Http.request('GET', `v1/context`, params);
   }
 }
 

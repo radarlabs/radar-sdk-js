@@ -50,9 +50,7 @@ class Search {
       limit,
     };
 
-    const response = await Http.request('GET', 'v1/search/places', params);
-
-    return response.places;
+    return Http.request('GET', 'v1/search/places', params);
   }
 
   static async searchGeofences(searchOptions={}) {
@@ -84,9 +82,7 @@ class Search {
       limit,
     };
 
-    const response = await Http.request('GET', 'v1/search/geofences', params);
-
-    return response.geofences;
+    return Http.request('GET', 'v1/search/geofences', params);
   }
 
 
@@ -117,9 +113,7 @@ class Search {
       limit,
     };
 
-    const response = await Http.request('GET', 'v1/search/autocomplete', params);
-
-    return response.addresses;
+    return Http.request('GET', 'v1/search/autocomplete', params);
   }
 }
 

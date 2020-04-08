@@ -7,7 +7,7 @@ import STATUS from '../src/status_codes';
 
 import  Http from '../src/http';
 
-describe('http', () => {
+describe('Http', () => {
   let getCookieStub;
 
   let request;
@@ -26,81 +26,86 @@ describe('http', () => {
 
   afterEach(() => {
     global.XMLHttpRequest.restore();
-
     Cookie.getCookie.restore();
   });
 
   context('PUT request', () => {
-    it('should call callback with api response on success', () => {
+
+    let httpRequest;
+
+    beforeEach(() => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.respond(200, {}, '{"success":true}');
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, { success: true });
+      httpRequest = Http.request('PUT', 'v1/users/userId', {});
     });
 
-    it('should respond with unauthorized status', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    it('should call callback with api response on success', async () => {
+      setTimeout(() => {
+        request.respond(200, {}, '{"success":true}');
+      });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+      const response = await httpRequest;
 
-      expect(request).to.not.be.null;
-      request.respond(401);
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
+      expect(response).to.deep.equal({ success: true });
     });
 
-    it('should respond with rate limit error status', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    it('should respond with unauthorized status', async () => {
+      setTimeout(() => {
+        request.respond(401);
+      });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.respond(429);
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_UNAUTHORIZED);
+      }
     });
 
-    it('should respond with server error status on 500', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    it('should respond with rate limit error status', async () => {
+      setTimeout(() => {
+        request.respond(429);
+      });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.respond(500);
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_RATE_LIMIT);
+      }
     });
 
-    it('should respond with server error status on request error', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    it('should respond with server error status on 500', async () => {
+      setTimeout(() => {
+        request.respond(500);
+      });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.onerror();
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+      }
     });
 
-    it('should respond with network error status on timeout', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    it('should respond with server error status on request error', async () => {
+      setTimeout(() => {
+        request.onerror();
+      });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+      }
+    });
 
-      expect(request).to.not.be.null;
-      request.timeout();
+    it('should respond with network error status on timeout', async () => {
+      setTimeout(() => {
+        request.timeout();
+      });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_NETWORK);
+      }
     });
   });
 
@@ -108,56 +113,65 @@ describe('http', () => {
     const data = { query: '20 Jay Street' };
     const getResponse = '{ "meta": { "code": 200 }, "addresses": [{ "latitude": 40.7039, "longitude": -73.9867 }] }';
 
-    it('should return a publishable key error if not set', () => {
+    it('should return a publishable key error if not set', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
-
-      expect(httpCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
+      try {
+        await Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_PUBLISHABLE_KEY);
+      }
     });
 
-    it('should always include Device-Type and SDK-Version headers', () => {
+    it('should always include Device-Type and SDK-Version headers', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/ip', {}, httpCallback);
+      const httpRequest = Http.request('GET', 'v1/geocode/ip', {});
 
-      expect(request).to.not.be.null;
-      request.respond(200, {}, getResponse);
+      setTimeout(() => {
+        request.respond(200, {}, getResponse);
+      });
 
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
+      const response = await httpRequest;
 
       expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
       expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
+
+      expect(response.meta.code).to.equal(200);
     });
 
-    it('should inject GET parameters into the url querystring', () => {
+    it('should inject GET parameters into the url querystring', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', data, httpCallback);
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
 
-      expect(request).to.not.be.null;
-      request.respond(200, {}, getResponse);
+      setTimeout(() => {
+        request.respond(200, {}, getResponse);
+      });
 
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
+      const response = await httpRequest;
 
       const urlencodedData = encodeURIComponent(`query=${data.query}`);
       expect(request.url).to.contain(`?${urlencodedData}`);
+
+      expect(response.meta.code).to.equal(200);
     });
 
-    it('should return a server error on invalid JSON', () => {
+    it('should return a server error on invalid JSON', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
 
-      const jsonErrorResponse = '"invalid_json": true}';
-      expect(request).to.not.be.null;
-      request.respond(200, {}, jsonErrorResponse);
+      setTimeout(() => {
+        const jsonErrorResponse = '"invalid_json": true}';
+        request.respond(200, {}, jsonErrorResponse);
+      });
 
-      expect(httpCallback).to.be.calledWith(STATUS.ERROR_SERVER);
+      try {
+        await httpRequest;
+      } catch (e) {
+        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+      }
     });
   });
 });

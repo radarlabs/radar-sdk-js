@@ -11,6 +11,13 @@ import Track from './api/track';
 import SDK_VERSION from './version';
 import STATUS from './status_codes';
 
+const handleError = (e) => {
+  if (STATUS[e.toString()]) {
+    return STATUS[e.toString()];
+  }
+  throw e;
+};
+
 class Radar {
   static get VERSION() {
     return SDK_VERSION;
@@ -68,7 +75,9 @@ class Radar {
       .then((location) => {
         callback(STATUS.SUCCESS, location);
       })
-      .catch(callback);
+      .catch((e) => {
+        callback(handleError(e));
+      });
   }
 
   static trackOnce(arg0, arg1) {
@@ -82,25 +91,29 @@ class Radar {
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (arg0 === 'object') {
+    } else if (typeof arg0 === 'object') {
       position = arg0;
 
       if (typeof arg1 !== 'function') {
         throw new Error(STATUS.ERROR_MISSING_CALLBACK);
       }
       callback = arg1;
+
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Track.trackOnce(position)
-      .then(({ location, user, events }) => {
-        callback(STATUS.SUCCESS, location, user, events);
+      .then((response) => {
+        const { location, user, events } = response;
+        callback(STATUS.SUCCESS, location, user, events, response);
       })
       .catch(callback);
   }
 
   static getContext(arg0, arg1) {
     if (!arg0) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     let callback;
@@ -109,18 +122,21 @@ class Radar {
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (arg0 === 'object') {
+    } else if (typeof arg0 === 'object') {
       position = arg0;
 
       if (typeof arg1 !== 'function') {
         throw new Error(STATUS.ERROR_MISSING_CALLBACK);
       }
       callback = arg1;
+
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Context.getContext(position)
-      .then((context) => {
-        callback(STATUS.SUCCESS, context);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.context, response);
       })
       .catch(callback);
   }
@@ -131,8 +147,8 @@ class Radar {
     }
 
     Search.searchPlaces(searchOptions)
-      .then((places) => {
-        callback(STATUS.SUCCESS, places);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.places, response);
       })
       .catch(callback);
   }
@@ -143,8 +159,8 @@ class Radar {
     }
 
     Search.searchGeofences(searchOptions)
-      .then((geofences) => {
-        callback(STATUS.SUCCESS, geofences);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.geofences, response);
       })
       .catch(callback);
   }
@@ -155,8 +171,8 @@ class Radar {
     }
 
     Search.autocomplete(searchOptions)
-      .then((addresses) => {
-        callback(STATUS.SUCCESS, addresses);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.addresses, response);
       })
       .catch(callback);
   }
@@ -167,8 +183,8 @@ class Radar {
     }
 
     Geocoding.geocode(geocodeOptions)
-      .then((addresses) => {
-        callback(STATUS.SUCCESS, addresses);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.addresses, response);
       })
       .catch(callback);
   }
@@ -184,18 +200,21 @@ class Radar {
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (arg0 === 'object') {
+    } else if (typeof arg0 === 'object') {
       geocodeOptions = arg0;
 
       if (typeof arg1 !== 'function') {
         throw new Error(STATUS.ERROR_MISSING_CALLBACK);
       }
       callback = arg1;
+
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Geocoding.reverseGeocode(geocodeOptions)
-      .then((address) => {
-        callback(STATUS.SUCCESS, address);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.addresses, response);
       })
       .catch(callback);
   }
@@ -206,8 +225,8 @@ class Radar {
     }
 
     Geocoding.ipGeocode()
-      .then((address) => {
-        callback(STATUS.SUCCESS, address);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.address, response);
       })
       .catch(callback);
   }
@@ -218,8 +237,8 @@ class Radar {
     }
 
     Routing.getDistanceToDestination(routingOptions)
-      .then((routes) => {
-        callback(STATUS.SUCCESS, routes);
+      .then((response) => {
+        callback(STATUS.SUCCESS, response.routes, response);
       })
       .catch(callback);
   }
