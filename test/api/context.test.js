@@ -9,7 +9,7 @@ import { latitude, longitude } from '../common';
 
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import STATUS from '../../src/status_codes';
+import ERROR from '../../src/error_codes';
 
 import Context from '../../src/api/context';
 
@@ -32,11 +32,11 @@ describe('Context', () => {
   context('getContext', () => {
     describe('location permissions denied', () => {
       it('should throw a navigation error', () => {
-        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
+        navigatorStub.rejects(ERROR.PERMISSIONS);
 
         return Context.getContext()
           .catch((err) => {
-            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
+            expect(err.toString()).to.eq(ERROR.PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
           });
       });

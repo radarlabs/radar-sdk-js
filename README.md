@@ -81,13 +81,13 @@ Radar.trackOnce(function(status, location, user, events) {
 `status` will be a string, one of:
 
 - `Radar.STATUS.SUCCESS`: the request succeeded
-- `Radar.STATUS.ERROR_PUBLISHABLE_KEY`: the SDK was not initialized
-- `Radar.STATUS.ERROR_PERMISSIONS`: the user has not granted location permissions for the website
-- `Radar.STATUS.ERROR_LOCATION`: location services were unavailable, or the location request timed out
-- `Radar.STATUS.ERROR_NETWORK`: the network was unavailable, or the network connection timed out
-- `Radar.STATUS.ERROR_UNAUTHORIZED`: the publishable API key is invalid
-- `Radar.STATUS.ERROR_RATE_LIMIT`: exceeded rate limit of 1 request per second per user or 60 requests per hour per user
-- `Radar.STATUS.ERROR_SERVER`: an internal server error occurred
+- `Radar.ERROR.PUBLISHABLE_KEY`: the SDK was not initialized
+- `Radar.ERROR.PERMISSIONS`: the user has not granted location permissions for the website
+- `Radar.ERROR.LOCATION`: location services were unavailable, or the location request timed out
+- `Radar.ERROR.NETWORK`: the network was unavailable, or the network connection timed out
+- `Radar.ERROR.UNAUTHORIZED`: the publishable API key is invalid
+- `Radar.ERROR.RATE_LIMIT`: exceeded rate limit of 1 request per second per user or 60 requests per hour per user
+- `Radar.ERROR.SERVER`: an internal server error occurred
 
 ## Support
 

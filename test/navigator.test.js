@@ -5,7 +5,7 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import Navigator from '../src/navigator';
-import STATUS from '../src/status_codes';
+import ERROR from '../src/error_codes';
 
 describe('Navigator', () => {
   afterEach(() => {
@@ -17,7 +17,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 
@@ -31,7 +31,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 
@@ -45,7 +45,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_PERMISSIONS);
+        expect(e).to.equal(ERROR.PERMISSIONS);
       });
   });
 
@@ -59,7 +59,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 

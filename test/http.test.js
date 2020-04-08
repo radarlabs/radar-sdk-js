@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 import Cookie from '../src/cookie';
 import SDK_VERSION from '../src/version';
-import STATUS from '../src/status_codes';
+import ERROR from '../src/error_codes';
 
 import Http from '../src/http';
 
@@ -56,7 +56,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_UNAUTHORIZED);
+        expect(e.toString()).to.equal(ERROR.UNAUTHORIZED);
       }
     });
 
@@ -68,7 +68,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_RATE_LIMIT);
+        expect(e.toString()).to.equal(ERROR.RATE_LIMIT);
       }
     });
 
@@ -80,7 +80,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+        expect(e.toString()).to.equal(ERROR.SERVER);
       }
     });
 
@@ -92,7 +92,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+        expect(e.toString()).to.equal(ERROR.SERVER);
       }
     });
 
@@ -104,7 +104,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_NETWORK);
+        expect(e.toString()).to.equal(ERROR.NETWORK);
       }
     });
   });
@@ -119,7 +119,7 @@ describe('Http', () => {
       try {
         await Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_PUBLISHABLE_KEY);
+        expect(e.toString()).to.equal(ERROR.PUBLISHABLE_KEY);
       }
     });
 
@@ -170,7 +170,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(STATUS.ERROR_SERVER);
+        expect(e.toString()).to.equal(ERROR.SERVER);
       }
     });
   });

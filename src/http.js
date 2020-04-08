@@ -3,7 +3,7 @@ import Cookie from './cookie';
 // consts
 import API_HOST from './api_host';
 import SDK_VERSION from './version';
-import STATUS from './status_codes';
+import ERROR from './error_codes';
 
 class Http {
   static request(method, path, data) {
@@ -32,7 +32,7 @@ class Http {
 
       const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
       if (!publishableKey) {
-        reject(STATUS.ERROR_PUBLISHABLE_KEY);
+        reject(ERROR.PUBLISHABLE_KEY);
         return;
       }
 
@@ -46,23 +46,23 @@ class Http {
           try {
             resolve(JSON.parse(xhr.response));
           } catch (e) {
-            reject(STATUS.ERROR_SERVER);
+            reject(ERROR.SERVER);
           }
         } else if (xhr.status == 401) {
-          reject(STATUS.ERROR_UNAUTHORIZED);
+          reject(ERROR.UNAUTHORIZED);
         } else if (xhr.status == 429) {
-          reject(STATUS.ERROR_RATE_LIMIT);
+          reject(ERROR.RATE_LIMIT);
         } else {
-          reject(STATUS.ERROR_SERVER);
+          reject(ERROR.SERVER);
         }
       }
 
       xhr.onerror = function() {
-        reject(STATUS.ERROR_SERVER);
+        reject(ERROR.SERVER);
       }
 
       xhr.timeout = function() {
-        reject(STATUS.ERROR_NETWORK);
+        reject(ERROR.NETWORK);
       }
 
       xhr.send(JSON.stringify(body));
