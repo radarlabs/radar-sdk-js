@@ -14,6 +14,8 @@ describe('Http', () => {
 
   const publishableKey = 'mock-publishable-key';
 
+  const successResponse = '{ "meta": { "code": 200 } }';
+
   beforeEach(() => {
     global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
 
@@ -29,59 +31,61 @@ describe('Http', () => {
     Cookie.getCookie.restore();
   });
 
-  context('PUT request', () => {
+  context('http requests', () => {
 
     let httpRequest;
 
     beforeEach(() => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-      httpRequest = Http.request('PUT', 'v1/users/userId', {});
+      httpRequest = Http.request('PUT', 'v1/users/userId', { valid: true, invalid: undefined });
     });
 
-    it('should call callback with api response on success', async () => {
-      setTimeout(() => {
-        request.respond(200, {}, '{"success":true}');
+    describe('success', () => {
+      it('should return api response on success', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
+
+        const response = await httpRequest;
+
+        expect(response.meta.code).to.equal(200);
       });
 
-      const response = await httpRequest;
+      it('should always include Device-Type and SDK-Version headers', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
 
-      expect(response).to.deep.equal({ success: true });
-    });
+        const response = await httpRequest;
 
-    it('should respond with unauthorized status', async () => {
-      setTimeout(() => {
-        request.respond(401);
+        expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
+        expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
+
+        expect(response.meta.code).to.equal(200);
       });
 
-      try {
+      it('should filter out undefined values in data', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
+
         await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.UNAUTHORIZED);
-      }
+
+        expect(request.requestBody).to.equal('{"valid":true}');
+      });
     });
 
-    it('should respond with rate limit error status', async () => {
-      setTimeout(() => {
-        request.respond(429);
+    describe('error', () => {
+      it('should return api error', async () => {
+        setTimeout(() => {
+          request.respond(401, {}, '{"meta":{"code":401,"message":"unauthorized"}}');
+        });
+
+        const response = await httpRequest;
+
+        expect(response.meta.code).to.equal(401);
+        expect(response.meta.message).to.equal('unauthorized');
       });
-
-      try {
-        await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.RATE_LIMIT);
-      }
-    });
-
-    it('should respond with server error status on 500', async () => {
-      setTimeout(() => {
-        request.respond(500);
-      });
-
-      try {
-        await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.SERVER);
-      }
     });
 
     it('should respond with server error status on request error', async () => {
@@ -107,61 +111,18 @@ describe('Http', () => {
         expect(e.message).to.equal(ERROR.NETWORK);
       }
     });
-  });
-
-  context('GET request', () => {
-    const data = { query: '20 Jay Street' };
-    const getResponse = '{ "meta": { "code": 200 }, "addresses": [{ "latitude": 40.7039, "longitude": -73.9867 }] }';
 
     it('should return a publishable key error if not set', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
 
       try {
-        await Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
+        await Http.request('PUT', 'v1/users/userId', {});
       } catch (e) {
         expect(e.message).to.equal(ERROR.PUBLISHABLE_KEY);
       }
     });
 
-    it('should always include Device-Type and SDK-Version headers', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpRequest = Http.request('GET', 'v1/geocode/ip', {});
-
-      setTimeout(() => {
-        request.respond(200, {}, getResponse);
-      });
-
-      const response = await httpRequest;
-
-      expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
-      expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
-
-      expect(response.meta.code).to.equal(200);
-    });
-
-    it('should inject GET parameters into the url querystring', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
-
-      setTimeout(() => {
-        request.respond(200, {}, getResponse);
-      });
-
-      const response = await httpRequest;
-
-      const urlencodedData = encodeURIComponent(`query=${data.query}`);
-      expect(request.url).to.contain(`?${urlencodedData}`);
-
-      expect(response.meta.code).to.equal(200);
-    });
-
     it('should return a server error on invalid JSON', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpRequest = Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
-
       setTimeout(() => {
         const jsonErrorResponse = '"invalid_json": true}';
         request.respond(200, {}, jsonErrorResponse);
@@ -172,6 +133,42 @@ describe('Http', () => {
       } catch (e) {
         expect(e.message).to.equal(ERROR.SERVER);
       }
+    });
+  });
+
+  context('GET request', () => {
+    const data = { query: '20 Jay Street' };
+
+    it('should inject GET parameters into the url querystring', async () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
+
+      setTimeout(() => {
+        request.respond(200, {}, successResponse);
+      });
+
+      const response = await httpRequest;
+
+      const urlencodedData = `query=${encodeURIComponent(data.query)}`;
+      expect(request.url).to.contain(`?${urlencodedData}`);
+
+      expect(response.meta.code).to.equal(200);
+    });
+
+    it('should not append querystring of no params', async () => {
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', {});
+
+      setTimeout(() => {
+        request.respond(200, {}, successResponse);
+      });
+
+      const response = await httpRequest;
+
+      expect(request.url).to.not.contain('?');
+      expect(response.meta.code).to.equal(200);
     });
   });
 });

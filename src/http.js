@@ -13,19 +13,27 @@ class Http {
 
       let url = `${API_HOST.getHost()}/${path}`;
 
+      // remove undefined values
       let body = {};
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+        if (value !== undefined) {
+          body[key] = value;
+        }
+      });
+
+      // convert data to querystring for GET
       if (method === 'GET') {
-        const qsArr = [];
-        for (let key in data) {
-          qsArr.push(`${key}=${data[key]}`);
+        const params = Object.keys(body).map((key) => (
+          `${key}=${encodeURIComponent(body[key])}`
+        ));
+
+        if (params.length > 0) {
+          const queryString = params.join('&');
+          url = `${url}?${queryString}`;
         }
 
-        if (qsArr.length > 0) {
-          const qs = encodeURIComponent(qsArr.join('&'));
-          url = `${url}?${qs}`;
-        }
-      } else {
-        body = data;
+        body = undefined; // dont send body for GET request
       }
 
       xhr.open(method, url, true);
@@ -42,17 +50,9 @@ class Http {
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
       xhr.onload = () => {
-        if (xhr.status == 200) {
-          try {
-            resolve(JSON.parse(xhr.response));
-          } catch (e) {
-            reject(new Error(ERROR.SERVER));
-          }
-        } else if (xhr.status == 401) {
-          reject(new Error(ERROR.UNAUTHORIZED));
-        } else if (xhr.status == 429) {
-          reject(new Error(ERROR.RATE_LIMIT));
-        } else {
+        try {
+          resolve(JSON.parse(xhr.response));
+        } catch (e) {
           reject(new Error(ERROR.SERVER));
         }
       }
