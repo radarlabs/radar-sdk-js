@@ -10,6 +10,7 @@ import Track from './api/track';
 // consts
 import SDK_VERSION from './version';
 import ERROR from './error_codes';
+import SUCCESS from './status_codes';
 
 class Radar {
   static get VERSION() {
@@ -66,16 +67,12 @@ class Radar {
 
     Navigator.getCurrentPosition()
       .then((location) => {
-        callback(null, { location });
+        callback(null, { location, status: SUCCESS });
       })
       .catch(callback);
   }
 
   static trackOnce(arg0, arg1) {
-    if (!arg0) {
-      throw new Error(ERROR.MISSING_CALLBACK);
-    }
-
     let callback;
     let location;
 
@@ -84,18 +81,17 @@ class Radar {
 
     } else if (typeof arg0 === 'object') {
       location = arg0;
-
-      if (typeof arg1 !== 'function') {
-        throw new Error(ERROR.MISSING_CALLBACK);
-      }
       callback = arg1;
 
-    } else {
+    } else if (arg0) {
       throw new Error(ERROR.PARAMETERS);
     }
 
     Track.trackOnce(location)
       .then((response) => {
+        if (!callback) {
+          return;
+        }
         callback(null, {
           location: response.location,
           user: response.user,
@@ -131,7 +127,7 @@ class Radar {
 
     Context.getContext(location)
       .then((response) => {
-        callback(null, response.context, response);
+        callback(null, { context: response.context, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -143,7 +139,7 @@ class Radar {
 
     Search.searchPlaces(searchOptions)
       .then((response) => {
-        callback(null, { places: response.places, response });
+        callback(null, { places: response.places, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -155,7 +151,7 @@ class Radar {
 
     Search.searchGeofences(searchOptions)
       .then((response) => {
-        callback(null, { geofences: response.geofences, response });
+        callback(null, { geofences: response.geofences, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -167,7 +163,7 @@ class Radar {
 
     Search.autocomplete(searchOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, response });
+        callback(null, { addresses: response.addresses, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -179,7 +175,7 @@ class Radar {
 
     Geocoding.geocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, response });
+        callback(null, { addresses: response.addresses, staus: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -209,7 +205,7 @@ class Radar {
 
     Geocoding.reverseGeocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, response });
+        callback(null, { addresses: response.addresses, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -221,7 +217,7 @@ class Radar {
 
     Geocoding.ipGeocode()
       .then((response) => {
-        callback(null, { address: response.address, response });
+        callback(null, { address: response.address, status: SUCCESS }, response);
       })
       .catch(callback);
   }
@@ -233,7 +229,7 @@ class Radar {
 
     Routing.getDistanceToDestination(routingOptions)
       .then((response) => {
-        callback(null, { routes: response.routes, response });
+        callback(null, { routes: response.routes, status: SUCCESS }, response);
       })
       .catch(callback);
   }

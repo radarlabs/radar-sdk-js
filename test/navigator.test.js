@@ -17,7 +17,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e.message).to.equal(ERROR.LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 
@@ -31,7 +31,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e.message).to.equal(ERROR.LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 
@@ -45,7 +45,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e.message).to.equal(ERROR.PERMISSIONS);
+        expect(e).to.equal(ERROR.PERMISSIONS);
       });
   });
 
@@ -59,7 +59,7 @@ describe('Navigator', () => {
 
     return Navigator.getCurrentPosition()
       .catch((e) => {
-        expect(e.message).to.equal(ERROR.LOCATION);
+        expect(e).to.equal(ERROR.LOCATION);
       });
   });
 

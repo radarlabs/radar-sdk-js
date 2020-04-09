@@ -76,63 +76,160 @@ describe('Http', () => {
     });
 
     describe('error', () => {
-      it('should return api error', async () => {
+      it('should return bad request error', async () => {
         setTimeout(() => {
-          request.respond(401, {}, '{"meta":{"code":401,"message":"unauthorized"}}');
+          request.respond(400, {}, '{"meta":{"code":400}}');
         });
 
-        const response = await httpRequest;
-
-        expect(response.meta.code).to.equal(401);
-        expect(response.meta.message).to.equal('unauthorized');
-      });
-    });
-
-    it('should respond with server error status on request error', async () => {
-      setTimeout(() => {
-        request.onerror();
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.BAD_REQUEST);
+        }
       });
 
-      try {
-        await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.SERVER);
-      }
-    });
+      it('should return bad request error', async () => {
+        setTimeout(() => {
+          request.respond(400, {}, '{"meta":{"code":400}}');
+        });
 
-    it('should respond with network error status on timeout', async () => {
-      setTimeout(() => {
-        request.timeout();
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.BAD_REQUEST);
+        }
       });
 
-      try {
-        await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.NETWORK);
-      }
-    });
+      it('should return unauthorized error', async () => {
+        setTimeout(() => {
+          request.respond(401, {}, '{"meta":{"code":401}}');
+        });
 
-    it('should return a publishable key error if not set', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
-
-      try {
-        await Http.request('PUT', 'v1/users/userId', {});
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.PUBLISHABLE_KEY);
-      }
-    });
-
-    it('should return a server error on invalid JSON', async () => {
-      setTimeout(() => {
-        const jsonErrorResponse = '"invalid_json": true}';
-        request.respond(200, {}, jsonErrorResponse);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.UNAUTHORIZED);
+        }
       });
 
-      try {
-        await httpRequest;
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.SERVER);
-      }
+      it('should return payment required error', async () => {
+        setTimeout(() => {
+          request.respond(402, {}, '{"meta":{"code":402}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.PAYMENT_REQUIRED);
+        }
+      });
+
+      it('should return forbidden error', async () => {
+        setTimeout(() => {
+          request.respond(403, {}, '{"meta":{"code":403}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.FORBIDDEN);
+        }
+      });
+
+      it('should return not found error', async () => {
+        setTimeout(() => {
+          request.respond(404, {}, '{"meta":{"code":404}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.NOT_FOUND);
+        }
+      });
+
+      it('should return rate limit error', async () => {
+        setTimeout(() => {
+          request.respond(429, {}, '{"meta":{"code":429}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.RATE_LIMIT);
+        }
+      });
+
+      it('should return server error', async () => {
+        setTimeout(() => {
+          request.respond(500, {}, '{"meta":{"code":500}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.SERVER);
+        }
+      });
+
+      it('should return unknown error', async () => {
+        setTimeout(() => {
+          request.respond(600, {}, '{"meta":{"code":600}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.UNKNOWN);
+        }
+      });
+
+      it('should respond with server error status on request error', async () => {
+        setTimeout(() => {
+          request.onerror();
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.SERVER);
+        }
+      });
+
+      it('should respond with network error status on timeout', async () => {
+        setTimeout(() => {
+          request.timeout();
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.NETWORK);
+        }
+      });
+
+      it('should return a publishable key error if not set', async () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+
+        try {
+          await Http.request('PUT', 'v1/users/userId', {});
+        } catch (e) {
+          expect(e).to.equal(ERROR.PUBLISHABLE_KEY);
+        }
+      });
+
+      it('should return a server error on invalid JSON', async () => {
+        setTimeout(() => {
+          const jsonErrorResponse = '"invalid_json": true}';
+          request.respond(200, {}, jsonErrorResponse);
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(ERROR.SERVER);
+        }
+      });
     });
   });
 

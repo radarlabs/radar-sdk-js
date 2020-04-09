@@ -230,19 +230,6 @@ describe('Radar', () => {
       }
     });
 
-    it('should throw an error if no callback', () => {
-      try {
-        Radar.trackOnce();
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.MISSING_CALLBACK);
-      }
-      try {
-        Radar.trackOnce({});
-      } catch (e) {
-        expect(e.message).to.equal(ERROR.MISSING_CALLBACK);
-      }
-    });
-
     it('should call trackOnce if the first arg is a callback', (done) => {
       trackStub.resolves({
         location: { latitude, longitude, accuracy },
@@ -273,6 +260,16 @@ describe('Radar', () => {
         expect(events).to.equal('matching-events');
         done();
       });
+    });
+
+    it('should not throw an error if no callback given', () => {
+      trackStub.resolves({
+        location: { latitude, longitude, accuracy },
+        user: 'user-data',
+        events: 'matching-events',
+      });
+
+      Radar.trackOnce();
     });
   });
 
@@ -313,7 +310,7 @@ describe('Radar', () => {
         context: 'matching-context'
       });
 
-      Radar.getContext((err, context) => {
+      Radar.getContext((err, { context }) => {
         expect(err).to.equal(null);
         expect(context).to.equal('matching-context');
         done();
@@ -325,7 +322,7 @@ describe('Radar', () => {
         context: 'matching-context'
       });
 
-      Radar.getContext({ latitude, longitude }, (err, context) => {
+      Radar.getContext({ latitude, longitude }, (err, { context }) => {
         expect(err).to.equal(null);
         expect(context).to.equal('matching-context');
         done();

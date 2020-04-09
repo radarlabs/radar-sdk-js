@@ -40,7 +40,7 @@ class Http {
 
       const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
       if (!publishableKey) {
-        reject(new Error(ERROR.PUBLISHABLE_KEY));
+        reject(ERROR.PUBLISHABLE_KEY);
         return;
       }
 
@@ -50,19 +50,37 @@ class Http {
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
       xhr.onload = () => {
-        try {
-          resolve(JSON.parse(xhr.response));
-        } catch (e) {
-          reject(new Error(ERROR.SERVER));
+        if (xhr.status == 200) {
+          try {
+            resolve(JSON.parse(xhr.response));
+          } catch (e) {
+            reject(ERROR.SERVER);
+          }
+        } else if (xhr.status === 400) {
+          reject(ERROR.BAD_REQUEST);
+        } else if (xhr.status === 401) {
+          reject(ERROR.UNAUTHORIZED);
+        } else if (xhr.status === 402) {
+          reject(ERROR.PAYMENT_REQUIRED);
+        } else if (xhr.status === 403) {
+          reject(ERROR.FORBIDDEN);
+        } else if (xhr.status === 404) {
+          reject(ERROR.NOT_FOUND);
+        } else if (xhr.status === 429) {
+          reject(ERROR.RATE_LIMIT);
+        } else if (500 <= xhr.status && xhr.status < 600) {
+          reject(ERROR.SERVER);
+        } else {
+          reject(ERROR.UNKNOWN);
         }
       }
 
       xhr.onerror = function() {
-        reject(new Error(ERROR.SERVER));
+        reject(ERROR.SERVER);
       }
 
       xhr.timeout = function() {
-        reject(new Error(ERROR.NETWORK));
+        reject(ERROR.NETWORK);
       }
 
       xhr.send(JSON.stringify(body));

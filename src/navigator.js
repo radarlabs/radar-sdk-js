@@ -5,14 +5,14 @@ class Navigator {
     return new Promise((resolve, reject) => {
 
       if (!navigator || !navigator.geolocation) {
-        return reject(new Error(ERROR.LOCATION));
+        return reject(ERROR.LOCATION);
       }
 
       navigator.geolocation.getCurrentPosition(
         // success callback
         (position) => {
           if (!position || !position.coords) {
-            return reject(new Error(ERROR.LOCATION));
+            return reject(ERROR.LOCATION);
           }
 
           const { latitude, longitude, accuracy } = position.coords;
@@ -22,9 +22,9 @@ class Navigator {
         // error callback
         (err) => {
           if (err && err.code && err.code === 1) {
-            return reject(new Error(ERROR.PERMISSIONS));
+            return reject(ERROR.PERMISSIONS);
           }
-          return reject(new Error(ERROR.LOCATION));
+          return reject(ERROR.LOCATION);
         }
       );
     });
