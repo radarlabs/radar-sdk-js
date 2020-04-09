@@ -32,7 +32,7 @@ class Http {
 
       const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
       if (!publishableKey) {
-        reject(ERROR.PUBLISHABLE_KEY);
+        reject(new Error(ERROR.PUBLISHABLE_KEY));
         return;
       }
 
@@ -46,23 +46,23 @@ class Http {
           try {
             resolve(JSON.parse(xhr.response));
           } catch (e) {
-            reject(ERROR.SERVER);
+            reject(new Error(ERROR.SERVER));
           }
         } else if (xhr.status == 401) {
-          reject(ERROR.UNAUTHORIZED);
+          reject(new Error(ERROR.UNAUTHORIZED));
         } else if (xhr.status == 429) {
-          reject(ERROR.RATE_LIMIT);
+          reject(new Error(ERROR.RATE_LIMIT));
         } else {
-          reject(ERROR.SERVER);
+          reject(new Error(ERROR.SERVER));
         }
       }
 
       xhr.onerror = function() {
-        reject(ERROR.SERVER);
+        reject(new Error(ERROR.SERVER));
       }
 
       xhr.timeout = function() {
-        reject(ERROR.NETWORK);
+        reject(new Error(ERROR.NETWORK));
       }
 
       xhr.send(JSON.stringify(body));

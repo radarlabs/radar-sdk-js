@@ -56,7 +56,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.UNAUTHORIZED);
+        expect(e.message).to.equal(ERROR.UNAUTHORIZED);
       }
     });
 
@@ -68,7 +68,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.RATE_LIMIT);
+        expect(e.message).to.equal(ERROR.RATE_LIMIT);
       }
     });
 
@@ -80,7 +80,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.SERVER);
+        expect(e.message).to.equal(ERROR.SERVER);
       }
     });
 
@@ -92,7 +92,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.SERVER);
+        expect(e.message).to.equal(ERROR.SERVER);
       }
     });
 
@@ -104,7 +104,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.NETWORK);
+        expect(e.message).to.equal(ERROR.NETWORK);
       }
     });
   });
@@ -119,7 +119,7 @@ describe('Http', () => {
       try {
         await Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' });
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.PUBLISHABLE_KEY);
+        expect(e.message).to.equal(ERROR.PUBLISHABLE_KEY);
       }
     });
 
@@ -170,7 +170,7 @@ describe('Http', () => {
       try {
         await httpRequest;
       } catch (e) {
-        expect(e.toString()).to.equal(ERROR.SERVER);
+        expect(e.message).to.equal(ERROR.SERVER);
       }
     });
   });
