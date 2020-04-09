@@ -1,11 +1,22 @@
-// cookie keys
-export const DESCRIPTION = 'radar-description';
-export const DEVICE_ID = 'radar-deviceId';
-export const HOST = 'radar-host';
-export const PUBLISHABLE_KEY = 'radar-publishableKey';
-export const USER_ID = 'radar-userId';
-
 class Cookie {
+
+  // KEYS
+  static get DESCRIPTION() {
+    return 'radar-description';
+  }
+  static get DEVICE_ID() {
+    return 'radar-deviceId';
+  }
+  static get HOST() {
+    return 'radar-host';
+  }
+  static get PUBLISHABLE_KEY() {
+    return 'radar-publishableKey';
+  }
+  static get USER_ID () {
+    return 'radar-userId';
+  }
+
 // parse cookie string to return value at {key}
   static getCookie(key) {
     if (!document || document.cookie === undefined) {
