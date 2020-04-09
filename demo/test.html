@@ -101,19 +101,20 @@
 
         Radar.initialize(publishableKey);
 
-        Radar.trackOnce(function(status, location, user, events) {
-          console.log(status, location, user, events);
+        Radar.trackOnce(function(err, { location, user, events, response }) {
+          console.log(err, location, user, events);
 
           $('input,button').prop('disabled', false);
           $('.loader').addClass('d-none');
 
-          if (status.startsWith('ERROR')) {
-            $('#error-message').html(status);
+          if (err) {
+            console.error(err);
+            $('#error-message').html(err);
             $('.error').removeClass('d-none');
             return;
           }
 
-          $('#status').html(status);
+          $('#status').html(formatCode(response.meta));
 
           $('#location').html(formatCode({
             accuracy: location.accuracy,

@@ -1,18 +1,20 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-import * as Cookie from '../src/cookie';
+import Cookie from '../src/cookie';
 import SDK_VERSION from '../src/version';
-import STATUS from '../src/status_codes';
+import STATUS from '../src/status';
 
-import * as Http from '../src/http';
+import Http from '../src/http';
 
-describe('http', () => {
+describe('Http', () => {
   let getCookieStub;
 
   let request;
 
   const publishableKey = 'mock-publishable-key';
+
+  const successResponse = '{ "meta": { "code": 200 } }';
 
   beforeEach(() => {
     global.XMLHttpRequest = sinon.useFakeXMLHttpRequest();
@@ -26,138 +28,244 @@ describe('http', () => {
 
   afterEach(() => {
     global.XMLHttpRequest.restore();
-
     Cookie.getCookie.restore();
   });
 
-  context('PUT request', () => {
-    it('should call callback with api response on success', () => {
+  context('http requests', () => {
+
+    let httpRequest;
+
+    beforeEach(() => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.respond(200, {}, '{"success":true}');
-
-      expect(httpCallback).to.have.been.calledWith(STATUS.SUCCESS, { success: true });
+      httpRequest = Http.request('PUT', 'v1/users/userId', { valid: true, invalid: undefined });
     });
 
-    it('should respond with unauthorized status', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    describe('success', () => {
+      it('should return api response on success', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+        const response = await httpRequest;
 
-      expect(request).to.not.be.null;
-      request.respond(401);
+        expect(response.meta.code).to.equal(200);
+      });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_UNAUTHORIZED);
+      it('should always include Device-Type and SDK-Version headers', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
+
+        const response = await httpRequest;
+
+        expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
+        expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
+
+        expect(response.meta.code).to.equal(200);
+      });
+
+      it('should filter out undefined values in data', async () => {
+        setTimeout(() => {
+          request.respond(200, {}, successResponse);
+        });
+
+        await httpRequest;
+
+        expect(request.requestBody).to.equal('{"valid":true}');
+      });
     });
 
-    it('should respond with rate limit error status', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+    describe('error', () => {
+      it('should return bad request error', async () => {
+        setTimeout(() => {
+          request.respond(400, {}, '{"meta":{"code":400}}');
+        });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
+        }
+      });
 
-      expect(request).to.not.be.null;
-      request.respond(429);
+      it('should return bad request error', async () => {
+        setTimeout(() => {
+          request.respond(400, {}, '{"meta":{"code":400}}');
+        });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_RATE_LIMIT);
-    });
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
+        }
+      });
 
-    it('should respond with server error status on 500', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      it('should return unauthorized error', async () => {
+        setTimeout(() => {
+          request.respond(401, {}, '{"meta":{"code":401}}');
+        });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_UNAUTHORIZED);
+        }
+      });
 
-      expect(request).to.not.be.null;
-      request.respond(500);
+      it('should return payment required error', async () => {
+        setTimeout(() => {
+          request.respond(402, {}, '{"meta":{"code":402}}');
+        });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-    });
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_PAYMENT_REQUIRED);
+        }
+      });
 
-    it('should respond with server error status on request error', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      it('should return forbidden error', async () => {
+        setTimeout(() => {
+          request.respond(403, {}, '{"meta":{"code":403}}');
+        });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_FORBIDDEN);
+        }
+      });
 
-      expect(request).to.not.be.null;
-      request.onerror();
+      it('should return not found error', async () => {
+        setTimeout(() => {
+          request.respond(404, {}, '{"meta":{"code":404}}');
+        });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_SERVER);
-    });
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_NOT_FOUND);
+        }
+      });
 
-    it('should respond with network error status on timeout', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      it('should return rate limit error', async () => {
+        setTimeout(() => {
+          request.respond(429, {}, '{"meta":{"code":429}}');
+        });
 
-      const httpCallback = sinon.spy();
-      Http.request('PUT', 'v1/users/userId', {}, httpCallback);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_RATE_LIMIT);
+        }
+      });
 
-      expect(request).to.not.be.null;
-      request.timeout();
+      it('should return server error', async () => {
+        setTimeout(() => {
+          request.respond(500, {}, '{"meta":{"code":500}}');
+        });
 
-      expect(httpCallback).to.have.been.calledWith(STATUS.ERROR_NETWORK);
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_SERVER);
+        }
+      });
+
+      it('should return unknown error', async () => {
+        setTimeout(() => {
+          request.respond(600, {}, '{"meta":{"code":600}}');
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_UNKNOWN);
+        }
+      });
+
+      it('should respond with server error status on request error', async () => {
+        setTimeout(() => {
+          request.onerror();
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_SERVER);
+        }
+      });
+
+      it('should respond with network error status on timeout', async () => {
+        setTimeout(() => {
+          request.timeout();
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_NETWORK);
+        }
+      });
+
+      it('should return a publishable key error if not set', async () => {
+        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+
+        try {
+          await Http.request('PUT', 'v1/users/userId', {});
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_PUBLISHABLE_KEY);
+        }
+      });
+
+      it('should return a server error on invalid JSON', async () => {
+        setTimeout(() => {
+          const jsonErrorResponse = '"invalid_json": true}';
+          request.respond(200, {}, jsonErrorResponse);
+        });
+
+        try {
+          await httpRequest;
+        } catch (e) {
+          expect(e).to.equal(STATUS.ERROR_SERVER);
+        }
+      });
     });
   });
 
   context('GET request', () => {
     const data = { query: '20 Jay Street' };
-    const getResponse = '{ "meta": { "code": 200 }, "addresses": [{ "latitude": 40.7039, "longitude": -73.9867 }] }';
 
-    it('should return a publishable key error if not set', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
-
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
-
-      expect(httpCallback).to.be.calledWith(STATUS.ERROR_PUBLISHABLE_KEY);
-    });
-
-    it('should always include Device-Type and SDK-Version headers', () => {
+    it('should inject GET parameters into the url querystring', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/ip', {}, httpCallback);
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
 
-      expect(request).to.not.be.null;
-      request.respond(200, {}, getResponse);
+      setTimeout(() => {
+        request.respond(200, {}, successResponse);
+      });
 
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
+      const response = await httpRequest;
 
-      expect(request.requestHeaders['X-Radar-Device-Type'], 'Web');
-      expect(request.requestHeaders['X-Radar-SDK-Version'], SDK_VERSION);
-    });
-
-    it('should inject GET parameters into the url querystring', () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', data, httpCallback);
-
-      expect(request).to.not.be.null;
-      request.respond(200, {}, getResponse);
-
-      expect(httpCallback).to.be.calledWith(STATUS.SUCCESS, JSON.parse(getResponse));
-
-      const urlencodedData = encodeURIComponent(`query=${data.query}`);
+      const urlencodedData = `query=${encodeURIComponent(data.query)}`;
       expect(request.url).to.contain(`?${urlencodedData}`);
+
+      expect(response.meta.code).to.equal(200);
     });
 
-    it('should return a server error on invalid JSON', () => {
+    it('should not append querystring of no params', async () => {
       getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpCallback = sinon.spy();
-      Http.request('GET', 'v1/geocode/forward', { query: '20 Jay Street' }, httpCallback);
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', {});
 
-      const jsonErrorResponse = '"invalid_json": true}';
-      expect(request).to.not.be.null;
-      request.respond(200, {}, jsonErrorResponse);
+      setTimeout(() => {
+        request.respond(200, {}, successResponse);
+      });
 
-      expect(httpCallback).to.be.calledWith(STATUS.ERROR_SERVER);
+      const response = await httpRequest;
+
+      expect(request.url).to.not.contain('?');
+      expect(response.meta.code).to.equal(200);
     });
   });
 });

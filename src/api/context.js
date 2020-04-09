@@ -1,37 +1,19 @@
-import * as Http from '../http';
+import Http from '../http';
 import Navigator from '../navigator';
 
-// consts
-import STATUS from '../status_codes';
-
 class Context {
-  static getContext(callback) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
+  static async getContext(location={}) {
+    if (!location.latitude || !location.longitude) {
+      location = await Navigator.getCurrentPosition();
+    }
 
-      this.getContextForLocation({ latitude, longitude },
-        (status, context) => {
-          callback(status, context);
-          return;
-        }
-      )
-    });
-  }
+    const { latitude, longitude } = location;
 
-  static getContextForLocation({ latitude, longitude }, callback) {
-    const queryParams = {
+    const params = {
       coordinates: `${latitude},${longitude}`,
     };
 
-    Http.request('GET', `v1/context`, queryParams,
-      (status, response) => {
-        callback(status, response ? response.context : null);
-        return;
-      }
-    );
+    return Http.request('GET', `v1/context`, params);
   }
 }
 

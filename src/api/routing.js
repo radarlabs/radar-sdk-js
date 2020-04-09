@@ -1,64 +1,37 @@
-import * as Http from '../http';
+import Http from '../http';
 import Navigator from '../navigator';
 
-// consts
-import STATUS from '../status_codes';
-
 class Routing {
-  static getDistanceToDestination(
-    {
-      destination,
-      modes,
-      units,
-    },
-    callback
-  ) {
-    Navigator.getCurrentPosition((status, { latitude, longitude }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
+  static async getDistanceToDestination(routingOptions={}) {
+    if (!routingOptions.origin) {
+      const { latitude, longitude } = await Navigator.getCurrentPosition();
+      routingOptions.origin = { latitude, longitude };
+    }
 
-      this.getDistanceWithOrigin(
-        {
-          origin: {
-            latitude,
-            longitude,
-          },
-          destination,
-          modes,
-          units,
-        },
-        (status, routes) => {
-          callback(status, routes);
-          return;
-        },
-      );
-    });
-  }
-
-  static getDistanceWithOrigin(
-    {
+    let {
       origin,
       destination,
       modes,
       units,
-    },
-    callback
-  ) {
-    const queryParams = {
-      origin: `${origin.latitude},${origin.longitude}`,
-      destination: `${destination.latitude},${destination.longitude}`,
-      modes: modes.join(','),
+    } = routingOptions;
+
+    origin = `${origin.latitude},${origin.longitude}`;
+
+    if (destination) {
+      destination = `${destination.latitude},${destination.longitude}`;
+    }
+    if (modes) {
+      modes = modes.join(',');
+    }
+
+    const params = {
+      origin,
+      destination,
+      modes,
       units,
     };
 
-    Http.request('GET', 'v1/route/distance', queryParams,
-      (status, response) => {
-        callback(status, response ? response.routes : null);
-        return;
-      }
-    );
+    return Http.request('GET', 'v1/route/distance', params);
   }
 }
 

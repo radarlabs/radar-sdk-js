@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import * as Cookie from '../src/cookie';
+import Cookie from '../src/cookie';
 import Navigator from '../src/navigator';
 
 import Context from '../src/api/context';
@@ -15,37 +15,38 @@ import Search from '../src/api/search';
 import Track from '../src/api/track';
 
 import SDK_VERSION from '../src/version';
-import STATUS from '../src/status_codes';
+import STATUS from '../src/status';
 
 import Radar from '../src/index';
 
-describe('Radar', () => {
-  let getCookieStub;
+import { latitude, longitude } from './common';
 
-  const latitude = 40.7041895;
-  const longitude = -73.9867797;
+describe('Radar', () => {
   const accuracy = 5;
 
   // search
-  const mockRadius = 100;
-  const mockChains = ['dunkin', 'sbucks'];
-  const mockLimit = 50;
+  const radius = 100;
+  const chains = ['dunkin', 'sbucks'];
+  const categories = ['coffee-shop'];
+  const groups = ['airport'];
+  const tags = ['geofence-tags'];
+  const limit = 50;
 
   // geocoding
-  const mockQuery = 'mock-query';
+  const query = 'mock-query';
 
   // routing
   const destination = {
     latitude: 40.7032123,
     longitude: -73.9936137,
   };
-  const mockModes = ['foot', 'bike', 'car'];
-  const mockUnits = 'imperial';
+  const modes = ['foot', 'bike', 'car'];
+  const units = 'imperial';
 
   beforeEach(() => {
     sinon.stub(Cookie, 'deleteCookie');
     sinon.stub(Cookie, 'setCookie');
-    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    sinon.stub(Cookie, 'getCookie');
   });
 
   afterEach(() => {
@@ -173,10 +174,6 @@ describe('Radar', () => {
   context('getLocation', () => {
     let navigatorStub;
 
-    const latitude = 40.7041895;
-    const longitude = -73.9867797;
-    const accuracy = 5;
-
     beforeEach(() => {
       navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     });
@@ -186,394 +183,240 @@ describe('Radar', () => {
     });
 
     it('should throw an error if no callback present', () => {
-      let e;
       try {
         Radar.getLocation();
-      } catch (_e) {
-        e = _e;
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(navigatorStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should propagate the status if not successful', () => {
-      navigatorStub.callsFake((callback) => {
-        callback(STATUS.ERROR_LOCATION, {});
+    it('should propagate the err if not successful', () => {
+      navigatorStub.rejects(STATUS.ERROR_LOCATION);
+
+      Radar.getLocation((err) => {
+        expect(err.toString()).to.equal(STATUS.ERROR_LOCATION);
       });
-
-      const locationCallback = sinon.spy();
-      Radar.getLocation(locationCallback);
-
-      expect(navigatorStub).to.have.callCount(1);
-      expect(locationCallback).to.be.calledWith(STATUS.ERROR_LOCATION);
     });
 
-    it('should succeed', () => {
-      navigatorStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, { latitude, longitude, accuracy });
-      });
+    it('should succeed', (done) => {
+      navigatorStub.resolves({ latitude, longitude, accuracy });
 
-      const locationCallback = sinon.spy();
-      Radar.getLocation(locationCallback);
-
-      expect(navigatorStub).to.have.callCount(1);
-      expect(locationCallback).to.be.calledWith(STATUS.SUCCESS, {
-        latitude: 40.7041895,
-        longitude: -73.9867797,
-        accuracy: 5,
+      Radar.getLocation((err, { latitude, longitude, accuracy }) => {
+        expect(err).to.equal(null);
+        expect(latitude).to.equal(latitude);
+        expect(longitude).to.equal(longitude);
+        expect(accuracy).to.equal(accuracy);
+        done();
       });
     });
   });
 
   context('trackOnce', () => {
     let trackStub;
-    let trackLocationStub;
 
     beforeEach(() => {
       trackStub = sinon.stub(Track, 'trackOnce');
-      trackLocationStub = sinon.stub(Track, 'trackOnceWithLocation');
     });
 
     afterEach(() => {
       Track.trackOnce.restore();
-      Track.trackOnceWithLocation.restore();
     });
 
     it('should throw an error on invalid params', () => {
-      let e;
       try {
         Radar.trackOnce(3);
-      } catch (_e) {
-        e = _e;
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
       }
-
-      expect(trackStub).to.not.be.called;
-      expect(trackLocationStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call trackOnce with no args', () => {
-      trackStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
+    it('should call trackOnce if the first arg is a callback', (done) => {
+      trackStub.resolves({
+        location: { latitude, longitude, accuracy },
+        user: 'user-data',
+        events: 'matching-events',
+      });
+
+      Radar.trackOnce((err, { location, user, events }) => {
+        expect(err).to.equal(null);
+        expect(location).to.deep.equal({ latitude, longitude, accuracy });
+        expect(user).to.equal('user-data');
+        expect(events).to.equal('matching-events');
+        done();
+      });
+    });
+
+    it('should call trackOnce if the first arg is a location object', (done) => {
+      trackStub.resolves({
+        location: { latitude, longitude, accuracy },
+        user: 'user-data',
+        events: 'matching-events',
+      });
+
+      Radar.trackOnce({ latitude, longitude, accuracy }, (err, { location, user, events }) => {
+        expect(err).to.equal(null);
+        expect(location).to.deep.equal({ latitude, longitude, accuracy });
+        expect(user).to.equal('user-data');
+        expect(events).to.equal('matching-events');
+        done();
+      });
+    });
+
+    it('should not throw an error if no callback given', () => {
+      trackStub.resolves({
+        location: { latitude, longitude, accuracy },
+        user: 'user-data',
+        events: 'matching-events',
       });
 
       Radar.trackOnce();
-
-      expect(trackStub).to.have.callCount(1);
-      expect(trackLocationStub).to.not.be.called;
-    });
-
-    it('should call trackOnce if the first arg is a callback', () => {
-      trackStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
-      });
-
-      const trackCallback = sinon.spy();
-      Radar.trackOnce(trackCallback);
-
-      expect(trackStub).to.have.callCount(1);
-      expect(trackLocationStub).to.not.be.called;
-      expect(trackCallback).to.be.calledWith(
-        STATUS.SUCCESS,
-        { latitude, longitude, accuracy },
-        'user-data',
-        'matching-events'
-      );
-    });
-
-    it('should call trackOnceWithLocation if the first arg is a location object', () => {
-      trackLocationStub.callsFake(({ latitude, longitude, accuracy }, callback) => {
-        callback(STATUS.SUCCESS, { latitude, longitude, accuracy }, 'user-data', 'matching-events');
-      });
-
-      const trackCallback = sinon.spy();
-      Radar.trackOnce({ latitude, longitude, accuracy }, trackCallback);
-
-      expect(trackStub).to.not.be.called;
-      expect(trackLocationStub).to.have.callCount(1);
-      expect(trackCallback).to.be.calledWith(
-        STATUS.SUCCESS,
-        { latitude, longitude, accuracy },
-        'user-data',
-        'matching-events'
-      );
     });
   });
 
   context('getContext', () => {
     let contextStub;
-    let contextLocationStub;
 
     beforeEach(() => {
       contextStub = sinon.stub(Context, 'getContext');
-      contextLocationStub = sinon.stub(Context, 'getContextForLocation');
     });
 
     afterEach(() => {
       Context.getContext.restore();
-      Context.getContextForLocation.restore();
+    });
+
+    it('should throw an error on invalid params', () => {
+      try {
+        Radar.getContext(3);
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
+      }
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
         Radar.getContext();
-      } catch (_e) {
-        e = _e;
+      } catch (e) {
+        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
       }
-
-      expect(contextStub).to.not.be.called;
-      expect(contextLocationStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
+      try {
+        Radar.getContext({});
+      } catch (e) {
+        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
+      }
     });
 
-    it('should call getContext if the first arg is a callback', () => {
-      contextStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, 'matching-context');
+    it('should call getContext if the first arg is a callback', (done) => {
+      contextStub.resolves({
+        context: 'matching-context'
       });
 
-      const contextCallback = sinon.spy();
-      Radar.getContext(contextCallback);
-
-      expect(contextStub).to.have.callCount(1);
-      expect(contextLocationStub).to.not.be.called;
-      expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
+      Radar.getContext((err, { context }) => {
+        expect(err).to.equal(null);
+        expect(context).to.equal('matching-context');
+        done();
+      });
     });
 
-    it('should call getContextWithLocation if the first arg is a location object', () => {
-      contextLocationStub.callsFake(({ latitude, longitude }, callback) => {
-        callback(STATUS.SUCCESS, 'matching-context');
+    it('should call getContext if the first arg is a location', (done) => {
+      contextStub.resolves({
+        context: 'matching-context'
       });
 
-      const contextCallback = sinon.spy();
-      Radar.getContext({ latitude, longitude }, contextCallback);
-
-      expect(contextStub).to.not.be.called;
-      expect(contextLocationStub).to.have.callCount(1);
-      expect(contextCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-context');
+      Radar.getContext({ latitude, longitude }, (err, { context }) => {
+        expect(err).to.equal(null);
+        expect(context).to.equal('matching-context');
+        done();
+      });
     });
   });
 
   context('searchPlaces', () => {
     let searchStub;
-    let searchNearStub;
 
     beforeEach(() => {
       searchStub = sinon.stub(Search, 'searchPlaces');
-      searchNearStub = sinon.stub(Search, 'searchPlacesNear');
     });
 
     afterEach(() => {
       Search.searchPlaces.restore();
-      Search.searchPlacesNear.restore();
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
-        Radar.searchPlaces({
-          radius: mockRadius,
-          chains: mockChains,
-          categories: [],
-          groups: [],
-          limit: mockLimit,
-        });
-      } catch (_e) {
-        e = _e;
+        Radar.searchPlaces({});
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call searchPlaces if near is not provided', () => {
-      searchStub.callsFake(({ radius, chains, categories, groups, limit }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-places']);
+    it('should call searchPlaces', (done) => {
+      searchStub.resolves({ places: 'matching-places' });
+
+      Radar.searchPlaces({ radius, chains, categories, groups, limit }, (err, { places }) => {
+        expect(err).to.equal(null);
+        expect(places).to.equal('matching-places');
+        done();
       });
-
-      const searchCallback = sinon.spy();
-      Radar.searchPlaces(
-        {
-          radius: mockRadius,
-          chains: mockChains,
-          categories: [],
-          groups: [],
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.have.callCount(1);
-      expect(searchNearStub).to.not.be.called;
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
-    });
-
-    it('should call searchPlacesNear if near is provided', () => {
-      searchNearStub.callsFake(({ near, radius, chains, categories, groups, limit}, callback) => {
-        callback(STATUS.SUCCESS, ['matching-places']);
-      });
-
-      const searchCallback = sinon.spy();
-      Radar.searchPlaces(
-        {
-          near: { latitude, longitude },
-          radius: mockRadius,
-          chains: mockChains,
-          categories: [],
-          groups: [],
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.have.callCount(1);
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-places']);
     });
   });
 
   context('searchGeofences', () => {
     let searchStub;
-    let searchNearStub;
 
     beforeEach(() => {
       searchStub = sinon.stub(Search, 'searchGeofences');
-      searchNearStub = sinon.stub(Search, 'searchGeofencesNear');
     });
 
     afterEach(() => {
       Search.searchGeofences.restore();
-      Search.searchGeofencesNear.restore();
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
-        Radar.searchGeofences({
-          radius: mockRadius,
-          tags: [],
-          limit: mockLimit,
-        });
-      } catch (_e) {
-        e = _e;
+        Radar.searchGeofences({});
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call searchGeofences if near is not provided', () => {
-      searchStub.callsFake(({ radius, tags, limit }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-geofences']);
+    it('should call searchGeofences', (done) => {
+      searchStub.resolves({ geofences: 'matching-geofences' });
+
+      Radar.searchGeofences({ radius, tags, limit }, (err, { geofences }) => {
+        expect(err).to.equal(null);
+        expect(geofences).to.equal('matching-geofences');
+        done();
       });
-
-      const searchCallback = sinon.spy();
-      Radar.searchGeofences(
-        {
-          radius: mockRadius,
-          tags: [],
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.have.callCount(1);
-      expect(searchNearStub).to.not.be.called;
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-geofences']);
-    });
-
-    it('should call searchGeofencesNear if near is provided', () => {
-      searchNearStub.callsFake(({ near, radius, tags, limit }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-geofences']);
-      });
-
-      const searchCallback = sinon.spy();
-      Radar.searchGeofences(
-        {
-          near: { latitude, longitude },
-          radius: mockRadius,
-          tags: [],
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.have.callCount(1);
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-geofences']);
     });
   });
 
   context('autocomplete', () => {
     let searchStub;
-    let searchNearStub;
 
     beforeEach(() => {
       searchStub = sinon.stub(Search, 'autocomplete');
-      searchNearStub = sinon.stub(Search, 'autocompleteNear');
     });
 
     afterEach(() => {
       Search.autocomplete.restore();
-      Search.autocompleteNear.restore();
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
-        Radar.autocomplete({
-          query: mockQuery,
-          limit: mockLimit,
-        });
-      } catch (_e) {
-        e = _e;
+        Radar.autocomplete({});
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call autocomplete if near is not provided', () => {
-      searchStub.callsFake(({ query, limit }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+    it('should call autocomplete', (done) => {
+      searchStub.resolves({ addresses: 'matching-addresses' });
+
+      Radar.autocomplete( { query, limit }, (err, { addresses }) => {
+        expect(err).to.equal(null);
+        expect(addresses).to.equal('matching-addresses');
+        done();
       });
-
-      const searchCallback = sinon.spy();
-      Radar.autocomplete(
-        {
-          query: mockQuery,
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.have.callCount(1);
-      expect(searchNearStub).to.not.be.called;
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
-    });
-
-    it('should call autocompleteNear if near is provided', () => {
-      searchNearStub.callsFake(({ query, near, limit }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
-      });
-
-      const searchCallback = sinon.spy();
-      Radar.autocomplete(
-        {
-          query: mockQuery,
-          near: { latitude, longitude },
-          limit: mockLimit,
-        },
-        searchCallback,
-      );
-
-      expect(searchStub).to.not.be.called;
-      expect(searchNearStub).to.have.callCount(1);
-      expect(searchCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 
@@ -589,81 +432,71 @@ describe('Radar', () => {
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
-        Radar.geocode({ query: mockQuery });
-      } catch (_e) {
-        e = _e;
+        Radar.geocode({ query: query });
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(geocodeStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call geocode on success', () => {
-      geocodeStub.callsFake(({ query }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+    it('should call geocode', (done) => {
+      geocodeStub.resolves({ addresses: 'matching-addresses' });
+
+      Radar.geocode({ query }, (err, { addresses }) => {
+        expect(err).to.equal(null);
+        expect(addresses).to.equal('matching-addresses');
+        done();
       });
-
-      const geocodeCallback = sinon.spy();
-      Radar.geocode({ query: mockQuery }, geocodeCallback);
-
-      expect(geocodeStub).to.have.callCount(1);
-      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 
   context('reverseGeocode', () => {
     let geocodeStub;
-    let geocodeLocationStub;
 
     beforeEach(() => {
       geocodeStub = sinon.stub(Geocoding, 'reverseGeocode');
-      geocodeLocationStub = sinon.stub(Geocoding, 'reverseGeocodeLocation');
     });
 
     afterEach(() => {
       Geocoding.reverseGeocode.restore();
-      Geocoding.reverseGeocodeLocation.restore();
     });
 
-    it('should throw an error if no callback provided', () => {
-      let e;
+    it('should throw an error if invalid arguments', () => {
       try {
         Radar.reverseGeocode();
-      } catch (_e) {
-        e = _e;
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
       }
-
-      expect(geocodeStub).to.not.be.called;
-      expect(geocodeLocationStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
+      try {
+        Radar.reverseGeocode(true);
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
+      }
+      try {
+        Radar.reverseGeocode({}, false);
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
+      }
     });
 
-    it('should call reverseGeocode if the first arg is a callback', () => {
-      geocodeStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+    it('should call reverseGeocode if the first arg is a callback', (done) => {
+      geocodeStub.resolves({ addresses: 'matching-addresses' });
+
+      Radar.reverseGeocode((err, { addresses }) => {
+        expect(err).to.equal(null);
+        expect(addresses).to.equal('matching-addresses');
+        done();
       });
-
-      const geocodeCallback = sinon.spy();
-      Radar.reverseGeocode(geocodeCallback);
-
-      expect(geocodeStub).to.have.callCount(1);
-      expect(geocodeLocationStub).to.not.be.called;
-      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
 
-    it('should call reverseGeocodeLocation if the first arg is a location object', () => {
-      geocodeLocationStub.callsFake(({ latitude, longitude }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-addresses']);
+    it('should call reverseGeocodeLocation if the first arg is a location object', (done) => {
+      geocodeStub.resolves({ addresses: 'matching-addresses' });
+
+      Radar.reverseGeocode({ latitude, longitude }, (err, { addresses }) => {
+        expect(err).to.equal(null);
+        expect(addresses).to.equal('matching-addresses');
+        done();
       });
-
-      const geocodeCallback = sinon.spy();
-      Radar.reverseGeocode({ latitude, longitude }, geocodeCallback);
-
-      expect(geocodeStub).to.not.be.called;
-      expect(geocodeLocationStub).to.have.callCount(1);
-      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-addresses']);
     });
   });
 
@@ -679,100 +512,51 @@ describe('Radar', () => {
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
         Radar.ipGeocode();
-      } catch (_e) {
-        e = _e;
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(geocodeStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call ipGeocode on success', () => {
-      geocodeStub.callsFake((callback) => {
-        callback(STATUS.SUCCESS, 'matching-address');
+    it('should call ipGeocode', (done) => {
+      geocodeStub.resolves({ address: 'matching-address' });
+
+      Radar.ipGeocode((err, { address }) => {
+        expect(err).to.equal(null);
+        expect(address).to.equal('matching-address');
+        done();
       });
-
-      const geocodeCallback = sinon.spy();
-      Radar.ipGeocode(geocodeCallback);
-
-      expect(geocodeStub).to.have.callCount(1);
-      expect(geocodeCallback).to.be.calledWith(STATUS.SUCCESS, 'matching-address');
     });
   });
 
   context('getDistance', () => {
     let routingStub;
-    let routingOriginStub;
 
     beforeEach(() => {
       routingStub = sinon.stub(Routing, 'getDistanceToDestination');
-      routingOriginStub = sinon.stub(Routing, 'getDistanceWithOrigin');
     });
 
     afterEach(() => {
       Routing.getDistanceToDestination.restore();
-      Routing.getDistanceWithOrigin.restore();
     });
 
     it('should throw an error if no callback provided', () => {
-      let e;
       try {
-        Radar.getDistance({
-          destination,
-          modes: mockModes,
-          units: mockUnits,
-        });
-      } catch (_e) {
-        e = _e;
+        Radar.getDistance({});
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
-
-      expect(routingStub).to.not.be.called;
-      expect(routingOriginStub).to.not.be.called;
-      expect(e.message).to.equal('ERROR_PARAMETERS');
     });
 
-    it('should call getDistanceToDestination if near is not provided', () => {
-      routingStub.callsFake(({ destination, modes, units }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-routes']);
+    it('should call getDistanceToDestination', (done) => {
+      routingStub.resolves({ routes: 'matching-routes' });
+
+      Radar.getDistance({ destination, modes, units }, (err, { routes }) => {
+        expect(err).to.equal(null);
+        expect(routes).to.equal('matching-routes');
+        done();
       });
-
-      const routingCallback = sinon.spy();
-      Radar.getDistance(
-        {
-          destination,
-          modes: mockModes,
-          units: mockUnits,
-        },
-        routingCallback,
-      );
-
-      expect(routingStub).to.have.callCount(1);
-      expect(routingOriginStub).to.not.be.called;
-      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
-    });
-
-    it('should call getDistanceWithOrigin if near is provided', () => {
-      routingOriginStub.callsFake(({ origin, destination, modes, units }, callback) => {
-        callback(STATUS.SUCCESS, ['matching-routes']);
-      });
-
-      const routingCallback = sinon.spy();
-      Radar.getDistance(
-        {
-          origin: { latitude, longitude },
-          destination,
-          modes: mockModes,
-          units: mockUnits,
-        },
-        routingCallback,
-      );
-
-      expect(routingStub).to.not.be.called;
-      expect(routingOriginStub).to.have.callCount(1);
-      expect(routingCallback).to.be.calledWith(STATUS.SUCCESS, ['matching-routes']);
     });
   });
 });

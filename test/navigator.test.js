@@ -1,12 +1,11 @@
 const chai = require('chai');
-const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
 const { expect } = chai;
 
 import Navigator from '../src/navigator';
-import STATUS from '../src/status_codes';
+import STATUS from '../src/status';
 
 describe('Navigator', () => {
   afterEach(() => {
@@ -16,10 +15,10 @@ describe('Navigator', () => {
   it('should report a location error if geolocation is not available', () => {
     global.navigator = {};
 
-    const callback = sinon.spy();
-    Navigator.getCurrentPosition(callback);
-
-    expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    return Navigator.getCurrentPosition()
+      .catch((e) => {
+        expect(e).to.equal(STATUS.ERROR_LOCATION);
+      });
   });
 
   it('should report a location error if position coordinates are not available', () => {
@@ -30,10 +29,10 @@ describe('Navigator', () => {
     };
     global.navigator = { geolocation };
 
-    const callback = sinon.spy();
-    Navigator.getCurrentPosition(callback);
-
-    expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    return Navigator.getCurrentPosition()
+      .catch((e) => {
+        expect(e).to.equal(STATUS.ERROR_LOCATION);
+      });
   });
 
   it('should report a permissions error if the user denies location permissions', () => {
@@ -44,10 +43,10 @@ describe('Navigator', () => {
     };
     global.navigator = { geolocation };
 
-    const callback = sinon.spy();
-    Navigator.getCurrentPosition(callback);
-
-    expect(callback).to.be.calledWith(STATUS.ERROR_PERMISSIONS);
+    return Navigator.getCurrentPosition()
+      .catch((e) => {
+        expect(e).to.equal(STATUS.ERROR_PERMISSIONS);
+      });
   });
 
   it('should report a location error if the device errors out fetching location', () => {
@@ -58,16 +57,17 @@ describe('Navigator', () => {
     };
     global.navigator = { geolocation };
 
-    const callback = sinon.spy();
-    Navigator.getCurrentPosition(callback);
-
-    expect(callback).to.be.calledWith(STATUS.ERROR_LOCATION);
+    return Navigator.getCurrentPosition()
+      .catch((e) => {
+        expect(e).to.equal(STATUS.ERROR_LOCATION);
+      });
   });
 
   it('should succeed', () => {
     const latitude = 40.7041895;
     const longitude = -73.9867797;
     const accuracy = 1;
+
     const position = {
       coords: { accuracy, latitude, longitude },
     };
@@ -77,10 +77,14 @@ describe('Navigator', () => {
         onSuccess(position);
       },
     };
+
     global.navigator = { geolocation };
 
-    const callback = sinon.spy();
-    Navigator.getCurrentPosition(callback);
-    expect(callback).to.be.calledWith(STATUS.SUCCESS, position.coords);
+    return Navigator.getCurrentPosition()
+      .then((location) => {
+        expect(location.latitude).to.equal(latitude);
+        expect(location.longitude).to.equal(longitude);
+        expect(location.accuracy).to.equal(accuracy);
+      });
   });
 });

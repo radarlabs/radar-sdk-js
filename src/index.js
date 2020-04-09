@@ -1,4 +1,4 @@
-import * as Cookie from './cookie';
+import Cookie from './cookie';
 import Navigator from './navigator';
 
 import Context from './api/context';
@@ -9,7 +9,7 @@ import Track from './api/track';
 
 // consts
 import SDK_VERSION from './version';
-import STATUS from './status_codes';
+import STATUS from './status';
 
 class Radar {
   static get VERSION() {
@@ -61,172 +61,122 @@ class Radar {
 
   static getLocation(callback) {
     if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
-    Navigator.getCurrentPosition((status, { latitude, longitude, accuracy }) => {
-      if (status !== STATUS.SUCCESS) {
-        callback(status);
-        return;
-      }
-
-      callback(status, { latitude, longitude, accuracy });
-      return;
-    });
+    Navigator.getCurrentPosition()
+      .then((location) => {
+        callback(null, { location, status: STATUS.SUCCESS });
+      })
+      .catch(callback);
   }
 
   static trackOnce(arg0, arg1) {
-    if (!arg0 || (typeof arg0 === 'function')) {
-      const callback = arg0;
-      Track.trackOnce(
-        (status, location, user, events) => {
-          if (callback) {
-            callback(status, location, user, events);
-            return;
-          }
-        }
-      )
+    let callback;
+    let location;
+
+    if (typeof arg0 === 'function') {
+      callback = arg0;
+
     } else if (typeof arg0 === 'object') {
-      const { latitude, longitude, accuracy } = arg0;
-      const callback = arg1;
-      Track.trackOnceWithLocation({ latitude, longitude, accuracy },
-        (status, location, user, events) => {
-          if (callback) {
-            callback(status, location, user, events);
-            return;
-          }
-        }
-      )
-    } else {
+      location = arg0;
+      callback = arg1;
+
+    } else if (arg0) {
       throw new Error(STATUS.ERROR_PARAMETERS);
     }
+
+    Track.trackOnce(location)
+      .then((response) => {
+        if (!callback) {
+          return;
+        }
+        callback(null, {
+          location: response.location,
+          user: response.user,
+          events: response.events,
+          status: STATUS.SUCCESS,
+        }, response);
+      })
+      .catch(callback);
   }
 
   static getContext(arg0, arg1) {
     if (!arg0) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
+
+    let callback;
+    let location;
 
     if (typeof arg0 === 'function') {
-      const callback = arg0;
-      Context.getContext(
-        (status, context) => {
-          callback(status, context);
-          return;
-        }
-      );
+      callback = arg0;
+
     } else if (typeof arg0 === 'object') {
-      const { latitude, longitude } = arg0;
-      const callback = arg1;
-      Context.getContextForLocation({ latitude, longitude },
-        (status, context) => {
-          callback(status, context);
-          return;
-        }
-      );
-    }
-  }
+      location = arg0;
 
-  static searchPlaces(
-    {
-      near,
-      radius,
-      chains,
-      categories,
-      groups,
-      limit
-    },
-    callback
-  ) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
-    }
+      if (typeof arg1 !== 'function') {
+        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+      }
+      callback = arg1;
 
-    if (near) {
-      Search.searchPlacesNear({ near, radius, chains, categories, groups, limit },
-        (status, places) => {
-          callback(status, places);
-          return;
-        }
-      );
     } else {
-      Search.searchPlaces({ radius, chains, categories, groups, limit },
-        (status, places) => {
-          callback(status, places);
-          return;
-        }
-      );
-    }
-  }
-
-  static searchGeofences(
-    {
-      near,
-      radius,
-      tags,
-      limit,
-    },
-    callback
-  ) {
-    if (!callback) {
       throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
-    if (near) {
-      Search.searchGeofencesNear({ near, radius, tags, limit },
-        (status, geofences) => {
-          callback(status, geofences);
-          return;
-        }
-      );
-    } else {
-      Search.searchGeofences({ radius, tags, limit },
-        (status, geofences) => {
-          callback(status, geofences);
-          return;
-        }
-      );
-    }
+    Context.getContext(location)
+      .then((response) => {
+        callback(null, { context: response.context, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 
-  static autocomplete(
-    {
-      query,
-      near,
-      limit,
-    },
-    callback
-  ) {
+  static searchPlaces(searchOptions, callback) {
     if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
-    if (near) {
-      Search.autocompleteNear({ query, near, limit },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      );
-    } else {
-      Search.autocomplete({ query, limit },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      );
-    }
+    Search.searchPlaces(searchOptions)
+      .then((response) => {
+        callback(null, { places: response.places, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 
-  static geocode({ query }, callback) {
+  static searchGeofences(searchOptions, callback) {
     if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
-    Geocoding.geocode({ query }, (status, addresses) => {
-      callback(status, addresses);
-      return;
-    });
+    Search.searchGeofences(searchOptions)
+      .then((response) => {
+        callback(null, { geofences: response.geofences, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
+  }
+
+  static autocomplete(searchOptions, callback) {
+    if (!callback) {
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+    }
+
+    Search.autocomplete(searchOptions)
+      .then((response) => {
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
+  }
+
+  static geocode(geocodeOptions, callback) {
+    if (!callback) {
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+    }
+
+    Geocoding.geocode(geocodeOptions)
+      .then((response) => {
+        callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 
   static reverseGeocode(arg0, arg1) {
@@ -234,66 +184,53 @@ class Radar {
       throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
+    let callback;
+    let geocodeOptions;
+
     if (typeof arg0 === 'function') {
-      const callback = arg0;
-      Geocoding.reverseGeocode(
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      )
+      callback = arg0;
+
     } else if (typeof arg0 === 'object') {
-      const { latitude, longitude } = arg0;
-      const callback = arg1;
-      Geocoding.reverseGeocodeLocation({ latitude, longitude },
-        (status, addresses) => {
-          callback(status, addresses);
-          return;
-        }
-      )
+      geocodeOptions = arg0;
+
+      if (typeof arg1 !== 'function') {
+        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+      }
+      callback = arg1;
+
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
+
+    Geocoding.reverseGeocode(geocodeOptions)
+      .then((response) => {
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 
   static ipGeocode(callback) {
     if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
-    Geocoding.ipGeocode((status, country) => {
-      callback(status, country);
-      return;
-    });
+    Geocoding.ipGeocode()
+      .then((response) => {
+        callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 
-  static getDistance(
-    {
-      origin,
-      destination,
-      modes,
-      units,
-    },
-    callback
-  ) {
+  static getDistance(routingOptions, callback) {
     if (!callback) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
-    if (origin) {
-      Routing.getDistanceWithOrigin({ origin, destination, modes, units },
-        (status, routes) => {
-          callback(status, routes);
-          return;
-        }
-      );
-    }
-    else {
-      Routing.getDistanceToDestination({ destination, modes, units },
-        (status, routes) => {
-          callback(status, routes);
-          return;
-        }
-      );
-    }
+    Routing.getDistanceToDestination(routingOptions)
+      .then((response) => {
+        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
+      })
+      .catch(callback);
   }
 }
 
