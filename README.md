@@ -73,7 +73,7 @@ The SDK uses the [HTML5 geolocation API](https://developer.mozilla.org/en-US/doc
 To track the user's location, call:
 
 ```javascript
-Radar.trackOnce(function(err, location, user, events) {
+Radar.trackOnce(function(err, { location, user, events }) {
   if (!err) {
     // do something with location, user, events
   }

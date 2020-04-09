@@ -201,7 +201,7 @@ describe('Radar', () => {
     it('should succeed', (done) => {
       navigatorStub.resolves({ latitude, longitude, accuracy });
 
-      Radar.getLocation((err, latitude, longitude, accuracy) => {
+      Radar.getLocation((err, { latitude, longitude, accuracy }) => {
         expect(err).to.equal(null);
         expect(latitude).to.equal(latitude);
         expect(longitude).to.equal(longitude);
@@ -250,7 +250,7 @@ describe('Radar', () => {
         events: 'matching-events',
       });
 
-      Radar.trackOnce((err, location, user, events) => {
+      Radar.trackOnce((err, { location, user, events }) => {
         expect(err).to.equal(null);
         expect(location).to.deep.equal({ latitude, longitude, accuracy });
         expect(user).to.equal('user-data');
@@ -259,14 +259,14 @@ describe('Radar', () => {
       });
     });
 
-    it('should call trackOnceWithLocation if the first arg is a location object', (done) => {
+    it('should call trackOnce if the first arg is a location object', (done) => {
       trackStub.resolves({
         location: { latitude, longitude, accuracy },
         user: 'user-data',
         events: 'matching-events',
       });
 
-      Radar.trackOnce({ latitude, longitude, accuracy }, (err, location, user, events) => {
+      Radar.trackOnce({ latitude, longitude, accuracy }, (err, { location, user, events }) => {
         expect(err).to.equal(null);
         expect(location).to.deep.equal({ latitude, longitude, accuracy });
         expect(user).to.equal('user-data');
@@ -355,7 +355,7 @@ describe('Radar', () => {
     it('should call searchPlaces', (done) => {
       searchStub.resolves({ places: 'matching-places' });
 
-      Radar.searchPlaces({ radius, chains, categories, groups, limit }, (err, places) => {
+      Radar.searchPlaces({ radius, chains, categories, groups, limit }, (err, { places }) => {
         expect(err).to.equal(null);
         expect(places).to.equal('matching-places');
         done();
@@ -385,7 +385,7 @@ describe('Radar', () => {
     it('should call searchGeofences', (done) => {
       searchStub.resolves({ geofences: 'matching-geofences' });
 
-      Radar.searchGeofences({ radius, tags, limit }, (err, geofences) => {
+      Radar.searchGeofences({ radius, tags, limit }, (err, { geofences }) => {
         expect(err).to.equal(null);
         expect(geofences).to.equal('matching-geofences');
         done();
@@ -415,7 +415,7 @@ describe('Radar', () => {
     it('should call autocomplete', (done) => {
       searchStub.resolves({ addresses: 'matching-addresses' });
 
-      Radar.autocomplete( { query, limit }, (err, addresses) => {
+      Radar.autocomplete( { query, limit }, (err, { addresses }) => {
         expect(err).to.equal(null);
         expect(addresses).to.equal('matching-addresses');
         done();
@@ -445,7 +445,7 @@ describe('Radar', () => {
     it('should call geocode', (done) => {
       geocodeStub.resolves({ addresses: 'matching-addresses' });
 
-      Radar.geocode({ query }, (err, addresses) => {
+      Radar.geocode({ query }, (err, { addresses }) => {
         expect(err).to.equal(null);
         expect(addresses).to.equal('matching-addresses');
         done();
@@ -485,7 +485,7 @@ describe('Radar', () => {
     it('should call reverseGeocode if the first arg is a callback', (done) => {
       geocodeStub.resolves({ addresses: 'matching-addresses' });
 
-      Radar.reverseGeocode((err, addresses) => {
+      Radar.reverseGeocode((err, { addresses }) => {
         expect(err).to.equal(null);
         expect(addresses).to.equal('matching-addresses');
         done();
@@ -495,7 +495,7 @@ describe('Radar', () => {
     it('should call reverseGeocodeLocation if the first arg is a location object', (done) => {
       geocodeStub.resolves({ addresses: 'matching-addresses' });
 
-      Radar.reverseGeocode({ latitude, longitude }, (err, addresses) => {
+      Radar.reverseGeocode({ latitude, longitude }, (err, { addresses }) => {
         expect(err).to.equal(null);
         expect(addresses).to.equal('matching-addresses');
         done();
@@ -525,7 +525,7 @@ describe('Radar', () => {
     it('should call ipGeocode', (done) => {
       geocodeStub.resolves({ address: 'matching-address' });
 
-      Radar.ipGeocode((err, address) => {
+      Radar.ipGeocode((err, { address }) => {
         expect(err).to.equal(null);
         expect(address).to.equal('matching-address');
         done();
@@ -555,7 +555,7 @@ describe('Radar', () => {
     it('should call getDistanceToDestination', (done) => {
       routingStub.resolves({ routes: 'matching-routes' });
 
-      Radar.getDistance({ destination, modes, units }, (err, routes) => {
+      Radar.getDistance({ destination, modes, units }, (err, { routes }) => {
         expect(err).to.equal(null);
         expect(routes).to.equal('matching-routes');
         done();
