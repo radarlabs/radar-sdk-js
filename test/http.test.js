@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 import Cookie from '../src/cookie';
 import SDK_VERSION from '../src/version';
-import ERROR from '../src/error_codes';
+import STATUS from '../src/status';
 
 import Http from '../src/http';
 
@@ -84,7 +84,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.BAD_REQUEST);
+          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
         }
       });
 
@@ -96,7 +96,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.BAD_REQUEST);
+          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
         }
       });
 
@@ -108,7 +108,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.UNAUTHORIZED);
+          expect(e).to.equal(STATUS.ERROR_UNAUTHORIZED);
         }
       });
 
@@ -120,7 +120,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.PAYMENT_REQUIRED);
+          expect(e).to.equal(STATUS.ERROR_PAYMENT_REQUIRED);
         }
       });
 
@@ -132,7 +132,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.FORBIDDEN);
+          expect(e).to.equal(STATUS.ERROR_FORBIDDEN);
         }
       });
 
@@ -144,7 +144,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.NOT_FOUND);
+          expect(e).to.equal(STATUS.ERROR_NOT_FOUND);
         }
       });
 
@@ -156,7 +156,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.RATE_LIMIT);
+          expect(e).to.equal(STATUS.ERROR_RATE_LIMIT);
         }
       });
 
@@ -168,7 +168,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.SERVER);
+          expect(e).to.equal(STATUS.ERROR_SERVER);
         }
       });
 
@@ -180,7 +180,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.UNKNOWN);
+          expect(e).to.equal(STATUS.ERROR_UNKNOWN);
         }
       });
 
@@ -192,7 +192,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.SERVER);
+          expect(e).to.equal(STATUS.ERROR_SERVER);
         }
       });
 
@@ -204,7 +204,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.NETWORK);
+          expect(e).to.equal(STATUS.ERROR_NETWORK);
         }
       });
 
@@ -214,7 +214,7 @@ describe('Http', () => {
         try {
           await Http.request('PUT', 'v1/users/userId', {});
         } catch (e) {
-          expect(e).to.equal(ERROR.PUBLISHABLE_KEY);
+          expect(e).to.equal(STATUS.ERROR_PUBLISHABLE_KEY);
         }
       });
 
@@ -227,7 +227,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(ERROR.SERVER);
+          expect(e).to.equal(STATUS.ERROR_SERVER);
         }
       });
     });

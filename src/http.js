@@ -3,7 +3,7 @@ import Cookie from './cookie';
 // consts
 import API_HOST from './api_host';
 import SDK_VERSION from './version';
-import ERROR from './error_codes';
+import STATUS from './status';
 
 class Http {
   static request(method, path, data) {
@@ -40,7 +40,7 @@ class Http {
 
       const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
       if (!publishableKey) {
-        reject(ERROR.PUBLISHABLE_KEY);
+        reject(STATUS.ERROR_PUBLISHABLE_KEY);
         return;
       }
 
@@ -54,33 +54,33 @@ class Http {
           try {
             resolve(JSON.parse(xhr.response));
           } catch (e) {
-            reject(ERROR.SERVER);
+            reject(STATUS.ERROR_SERVER);
           }
         } else if (xhr.status === 400) {
-          reject(ERROR.BAD_REQUEST);
+          reject(STATUS.ERROR_BAD_REQUEST);
         } else if (xhr.status === 401) {
-          reject(ERROR.UNAUTHORIZED);
+          reject(STATUS.ERROR_UNAUTHORIZED);
         } else if (xhr.status === 402) {
-          reject(ERROR.PAYMENT_REQUIRED);
+          reject(STATUS.ERROR_PAYMENT_REQUIRED);
         } else if (xhr.status === 403) {
-          reject(ERROR.FORBIDDEN);
+          reject(STATUS.ERROR_FORBIDDEN);
         } else if (xhr.status === 404) {
-          reject(ERROR.NOT_FOUND);
+          reject(STATUS.ERROR_NOT_FOUND);
         } else if (xhr.status === 429) {
-          reject(ERROR.RATE_LIMIT);
+          reject(STATUS.ERROR_RATE_LIMIT);
         } else if (500 <= xhr.status && xhr.status < 600) {
-          reject(ERROR.SERVER);
+          reject(STATUS.ERROR_SERVER);
         } else {
-          reject(ERROR.UNKNOWN);
+          reject(STATUS.ERROR_UNKNOWN);
         }
       }
 
       xhr.onerror = function() {
-        reject(ERROR.SERVER);
+        reject(STATUS.ERROR_SERVER);
       }
 
       xhr.timeout = function() {
-        reject(ERROR.NETWORK);
+        reject(STATUS.ERROR_NETWORK);
       }
 
       xhr.send(JSON.stringify(body));

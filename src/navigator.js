@@ -1,18 +1,18 @@
-import ERROR from './error_codes';
+import STATUS from './status';
 
 class Navigator {
   static getCurrentPosition() {
     return new Promise((resolve, reject) => {
 
       if (!navigator || !navigator.geolocation) {
-        return reject(ERROR.LOCATION);
+        return reject(STATUS.ERROR_LOCATION);
       }
 
       navigator.geolocation.getCurrentPosition(
         // success callback
         (position) => {
           if (!position || !position.coords) {
-            return reject(ERROR.LOCATION);
+            return reject(STATUS.ERROR_LOCATION);
           }
 
           const { latitude, longitude, accuracy } = position.coords;
@@ -22,9 +22,9 @@ class Navigator {
         // error callback
         (err) => {
           if (err && err.code && err.code === 1) {
-            return reject(ERROR.PERMISSIONS);
+            return reject(STATUS.ERROR_PERMISSIONS);
           }
-          return reject(ERROR.LOCATION);
+          return reject(STATUS.ERROR_LOCATION);
         }
       );
     });

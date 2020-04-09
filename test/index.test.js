@@ -15,7 +15,7 @@ import Search from '../src/api/search';
 import Track from '../src/api/track';
 
 import SDK_VERSION from '../src/version';
-import ERROR from '../src/error_codes';
+import STATUS from '../src/status';
 
 import Radar from '../src/index';
 
@@ -61,9 +61,9 @@ describe('Radar', () => {
     });
   });
 
-  describe('ERROR', () => {
-    it('should return the list of possible error codes', () => {
-      expect(Radar.ERROR).to.eql(ERROR);
+  describe('STATUS', () => {
+    it('should return the list of possible status codes', () => {
+      expect(Radar.STATUS).to.eql(STATUS);
     });
   });
 
@@ -191,10 +191,10 @@ describe('Radar', () => {
     });
 
     it('should propagate the err if not successful', () => {
-      navigatorStub.rejects(ERROR.LOCATION);
+      navigatorStub.rejects(STATUS.ERROR_LOCATION);
 
       Radar.getLocation((err) => {
-        expect(err.toString()).to.equal(ERROR.LOCATION);
+        expect(err.toString()).to.equal(STATUS.ERROR_LOCATION);
       });
     });
 
@@ -296,12 +296,12 @@ describe('Radar', () => {
       try {
         Radar.getContext();
       } catch (e) {
-        expect(e.message).to.equal(ERROR.MISSING_CALLBACK);
+        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
       }
       try {
         Radar.getContext({});
       } catch (e) {
-        expect(e.message).to.equal(ERROR.MISSING_CALLBACK);
+        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
       }
     });
 

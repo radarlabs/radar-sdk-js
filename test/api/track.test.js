@@ -9,7 +9,7 @@ import Cookie from '../../src/cookie';
 import Device from '../../src/device';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import ERROR from '../../src/error_codes';
+import STATUS from '../../src/status';
 
 import Track from '../../src/api/track';
 
@@ -49,11 +49,11 @@ describe('Track', () => {
   context('trackOnce', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', () => {
-        navigatorStub.rejects(ERROR.PERMISSIONS);
+        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
 
         return Track.trackOnce()
           .catch((err) => {
-            expect(err.toString()).to.eq(ERROR.PERMISSIONS);
+            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
           });
       });

@@ -9,16 +9,15 @@ import Track from './api/track';
 
 // consts
 import SDK_VERSION from './version';
-import ERROR from './error_codes';
-import STATUS from './status_codes';
+import STATUS from './status';
 
 class Radar {
   static get VERSION() {
     return SDK_VERSION;
   }
 
-  static get ERROR() {
-    return ERROR;
+  static get STATUS() {
+    return STATUS;
   }
 
   static initialize(publishableKey) {
@@ -62,7 +61,7 @@ class Radar {
 
   static getLocation(callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Navigator.getCurrentPosition()
@@ -84,7 +83,7 @@ class Radar {
       callback = arg1;
 
     } else if (arg0) {
-      throw new Error(ERROR.PARAMETERS);
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Track.trackOnce(location)
@@ -104,7 +103,7 @@ class Radar {
 
   static getContext(arg0, arg1) {
     if (!arg0) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     let callback;
@@ -117,12 +116,12 @@ class Radar {
       location = arg0;
 
       if (typeof arg1 !== 'function') {
-        throw new Error(ERROR.MISSING_CALLBACK);
+        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
       }
       callback = arg1;
 
     } else {
-      throw new Error(ERROR.PARAMETERS);
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Context.getContext(location)
@@ -134,7 +133,7 @@ class Radar {
 
   static searchPlaces(searchOptions, callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Search.searchPlaces(searchOptions)
@@ -146,7 +145,7 @@ class Radar {
 
   static searchGeofences(searchOptions, callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Search.searchGeofences(searchOptions)
@@ -158,7 +157,7 @@ class Radar {
 
   static autocomplete(searchOptions, callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Search.autocomplete(searchOptions)
@@ -170,7 +169,7 @@ class Radar {
 
   static geocode(geocodeOptions, callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Geocoding.geocode(geocodeOptions)
@@ -182,7 +181,7 @@ class Radar {
 
   static reverseGeocode(arg0, arg1) {
     if (!arg0) {
-      throw new Error(ERROR.PARAMETERS);
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     let callback;
@@ -195,12 +194,12 @@ class Radar {
       geocodeOptions = arg0;
 
       if (typeof arg1 !== 'function') {
-        throw new Error(ERROR.MISSING_CALLBACK);
+        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
       }
       callback = arg1;
 
     } else {
-      throw new Error(ERROR.PARAMETERS);
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Geocoding.reverseGeocode(geocodeOptions)
@@ -212,7 +211,7 @@ class Radar {
 
   static ipGeocode(callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Geocoding.ipGeocode()
@@ -224,7 +223,7 @@ class Radar {
 
   static getDistance(routingOptions, callback) {
     if (!callback) {
-      throw new Error(ERROR.MISSING_CALLBACK);
+      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
     }
 
     Routing.getDistanceToDestination(routingOptions)

@@ -7,7 +7,7 @@ const { expect } = chai;
 
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import ERROR from '../../src/error_codes';
+import STATUS from '../../src/status';
 
 import Search from '../../src/api/search';
 
@@ -42,11 +42,11 @@ describe('Search', () => {
   context('searchPlaces', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', () => {
-        navigatorStub.rejects(ERROR.PERMISSIONS);
+        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
 
         return Search.searchPlaces()
           .catch((err) => {
-            expect(err.toString()).to.eq(ERROR.PERMISSIONS);
+            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
           });
       });
@@ -81,11 +81,11 @@ describe('Search', () => {
   context('searchGeofences', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', () => {
-        navigatorStub.rejects(ERROR.PERMISSIONS);
+        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
 
         return Search.searchGeofences()
           .catch((err) => {
-            expect(err.toString()).to.eq(ERROR.PERMISSIONS);
+            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
           });
       });
@@ -120,11 +120,11 @@ describe('Search', () => {
   context('autocomplete', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', () => {
-        navigatorStub.rejects(ERROR.PERMISSIONS);
+        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
 
         return Search.autocomplete()
           .catch((err) => {
-            expect(err.toString()).to.eq(ERROR.PERMISSIONS);
+            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
           });
       });

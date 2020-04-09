@@ -80,7 +80,7 @@ Radar.trackOnce(function(err, { location, user, events }) {
 });
 ```
 
-`error` will be null for a successfull call. Errors thrown by the Radar SKD include:
+`error` will be null for a successfull call. Errors thrown by the Radar SDK include:
 
 - `ERROR_PUBLISHABLE_KEY`: the SDK was not initialized
 - `ERROR_PERMISSIONS`: the user has not granted location permissions for the website
