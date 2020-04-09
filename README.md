@@ -73,21 +73,24 @@ The SDK uses the [HTML5 geolocation API](https://developer.mozilla.org/en-US/doc
 To track the user's location, call:
 
 ```javascript
-Radar.trackOnce(function(status, location, user, events) {
-  // do something with status, location, user, events
+Radar.trackOnce(function(err, location, user, events) {
+  if (!err) {
+    // do something with location, user, events
+  }
 });
 ```
 
-`status` will be a string, one of:
+`error` will be null for a successfull call. Errors thrown by the Radar SKD include:
 
-- `Radar.STATUS.SUCCESS`: the request succeeded
-- `Radar.ERROR.PUBLISHABLE_KEY`: the SDK was not initialized
-- `Radar.ERROR.PERMISSIONS`: the user has not granted location permissions for the website
-- `Radar.ERROR.LOCATION`: location services were unavailable, or the location request timed out
-- `Radar.ERROR.NETWORK`: the network was unavailable, or the network connection timed out
-- `Radar.ERROR.UNAUTHORIZED`: the publishable API key is invalid
-- `Radar.ERROR.RATE_LIMIT`: exceeded rate limit of 1 request per second per user or 60 requests per hour per user
-- `Radar.ERROR.SERVER`: an internal server error occurred
+- `ERROR_PUBLISHABLE_KEY`: the SDK was not initialized
+- `ERROR_PERMISSIONS`: the user has not granted location permissions for the website
+- `ERROR_LOCATION`: location services were unavailable, or the location request timed out
+- `ERROR_NETWORK`: the network was unavailable, or the network connection timed out
+- `ERROR_UNAUTHORIZED`: the publishable API key is invalid
+- `ERROR_RATE_LIMIT`: exceeded rate limit of 1 request per second per user or 60 requests per hour per user
+- `ERROR_SERVER`: an internal server error occurred
+- `ERROR_PARAMETERS`: one or more of the parameters are invalid
+- `ERROR_MISSING_CALLBACK`: no callback was provided
 
 ## Support
 
