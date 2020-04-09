@@ -56,14 +56,28 @@ describe('Routing', () => {
     });
 
     describe('location permissions approved', () => {
-      it('should return a routing response', () => {
-        navigatorStub.resolves(origin);
-        httpStub.resolves(routingResponse);
+      describe('no args given', () => {
+        it('should return a routing response', () => {
+          navigatorStub.resolves(origin);
+          httpStub.resolves(routingResponse);
 
-        return Routing.getDistanceToDestination({ destination, modes, units })
-          .then((response) => {
-            expect(response).to.equal(routingResponse);
-          });
+          return Routing.getDistanceToDestination()
+            .then((response) => {
+              expect(response).to.equal(routingResponse);
+            });
+        });
+      });
+
+      describe('all args given', () => {
+        it('should return a routing response', () => {
+          navigatorStub.resolves(origin);
+          httpStub.resolves(routingResponse);
+
+          return Routing.getDistanceToDestination({ destination, modes, units })
+            .then((response) => {
+              expect(response).to.equal(routingResponse);
+            });
+        });
       });
     });
   });

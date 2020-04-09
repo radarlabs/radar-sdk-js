@@ -15,9 +15,8 @@ class Routing {
       units,
     } = routingOptions;
 
-    if (origin) {
-      origin = `${origin.latitude},${origin.longitude}`;
-    }
+    origin = `${origin.latitude},${origin.longitude}`;
+
     if (destination) {
       destination = `${destination.latitude},${destination.longitude}`;
     }

@@ -1,15 +1,6 @@
 import Http from '../http';
 import Navigator from '../navigator';
 
-const DEFAULT_LIMIT = 100;
-
-const getLimit = (limit) => {
-  if (!limit || Number.isNaN(limit)) {
-    return DEFAULT_LIMIT;
-  }
-  return Math.min(limit, DEFAULT_LIMIT);
-}
-
 class Search {
   static async searchPlaces(searchOptions={}) {
     if (!searchOptions.near) {
@@ -26,9 +17,8 @@ class Search {
       limit,
     } = searchOptions;
 
-    if (near) {
-      near = `${near.latitude},${near.longitude}`;
-    }
+    near = `${near.latitude},${near.longitude}`;
+
     if (chains) {
       chains = chains.join(',');
     }
@@ -38,8 +28,6 @@ class Search {
     if (groups) {
       groups = groups.join(',');
     }
-
-    limit = getLimit(limit);
 
     const params = {
       near,
@@ -66,14 +54,11 @@ class Search {
       limit,
     } = searchOptions;
 
-    if (near) {
-      near = `${near.latitude},${near.longitude}`;
-    }
+    near = `${near.latitude},${near.longitude}`;
+
     if (tags) {
       tags = tags.join(',');
     }
-
-    limit = getLimit(limit);
 
     const params = {
       near,
@@ -101,11 +86,7 @@ class Search {
       limit,
     } = searchOptions;
 
-    if (near) {
-      near = `${near.latitude},${near.longitude}`;
-    }
-
-    limit = getLimit(limit);
+    near = `${near.latitude},${near.longitude}`;
 
     const params = {
       query,

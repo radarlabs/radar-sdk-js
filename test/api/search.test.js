@@ -57,7 +57,20 @@ describe('Search', () => {
         navigatorStub.resolves({ latitude, longitude });
         httpStub.resolves(placesResponse);
 
-        return Search.searchPlaces({ radius, chains, categories, groups, limit })
+        return Search.searchPlaces()
+          .then((response) => {
+            expect(response).to.equal(placesResponse);
+          });
+      });
+    });
+
+    describe('location is given', () => {
+      it('should return a placeSearch response', () => {
+        httpStub.resolves(placesResponse);
+
+        const near = { latitude, longitude };
+
+        return Search.searchPlaces({ near, radius, chains, categories, groups, limit })
           .then((response) => {
             expect(response).to.equal(placesResponse);
           });
@@ -83,7 +96,20 @@ describe('Search', () => {
         navigatorStub.resolves({ latitude, longitude });
         httpStub.resolves(geofencesResponse);
 
-        return Search.searchGeofences({ radius, chains, tags, limit })
+        return Search.searchGeofences()
+          .then((response) => {
+            expect(response).to.equal(geofencesResponse);
+          });
+      });
+    });
+
+    describe('location is given', () => {
+      it('should return a geofenceSearch response', () => {
+        httpStub.resolves(geofencesResponse);
+
+        const near = { latitude, longitude };
+
+        return Search.searchGeofences({ near, radius, chains, tags, limit })
           .then((response) => {
             expect(response).to.equal(geofencesResponse);
           });
@@ -109,7 +135,20 @@ describe('Search', () => {
         navigatorStub.resolves({ latitude, longitude });
         httpStub.resolves(autocompleteResponse);
 
-        return Search.autocomplete({ query, limit })
+        return Search.autocomplete({ query })
+          .then((response) => {
+            expect(response).to.equal(autocompleteResponse);
+          });
+      });
+    });
+
+    describe('location is given', () => {
+      it('should return an autocomplete response', () => {
+        httpStub.resolves(autocompleteResponse);
+
+        const near = { latitude, longitude };
+
+        return Search.autocomplete({ near, query, limit })
           .then((response) => {
             expect(response).to.equal(autocompleteResponse);
           });

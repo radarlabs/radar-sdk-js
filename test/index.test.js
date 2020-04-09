@@ -194,7 +194,7 @@ describe('Radar', () => {
       navigatorStub.rejects(ERROR.LOCATION);
 
       Radar.getLocation((err) => {
-        expect(err).to.equal(ERROR.LOCATION);
+        expect(err.toString()).to.equal(ERROR.LOCATION);
       });
     });
 
@@ -314,6 +314,18 @@ describe('Radar', () => {
       });
 
       Radar.getContext((err, context) => {
+        expect(err).to.equal(null);
+        expect(context).to.equal('matching-context');
+        done();
+      });
+    });
+
+    it('should call getContext if the first arg is a location', (done) => {
+      contextStub.resolves({
+        context: 'matching-context'
+      });
+
+      Radar.getContext({ latitude, longitude }, (err, context) => {
         expect(err).to.equal(null);
         expect(context).to.equal('matching-context');
         done();
@@ -459,9 +471,14 @@ describe('Radar', () => {
         expect(e.message).to.equal('ERROR_PARAMETERS');
       }
       try {
-        Radar.reverseGeocode(3);
+        Radar.reverseGeocode(true);
       } catch (e) {
         expect(e.message).to.equal('ERROR_PARAMETERS');
+      }
+      try {
+        Radar.reverseGeocode({}, false);
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
     });
 

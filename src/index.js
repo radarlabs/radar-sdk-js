@@ -11,13 +11,6 @@ import Track from './api/track';
 import SDK_VERSION from './version';
 import ERROR from './error_codes';
 
-const handleError = (e) => {
-  if (ERROR[e.toString()]) {
-    return ERROR[e.toString()];
-  }
-  throw e;
-};
-
 class Radar {
   static get VERSION() {
     return SDK_VERSION;
@@ -75,9 +68,7 @@ class Radar {
       .then((location) => {
         callback(null, location);
       })
-      .catch((e) => {
-        callback(handleError(e));
-      });
+      .catch(callback);
   }
 
   static trackOnce(arg0, arg1) {
@@ -117,13 +108,13 @@ class Radar {
     }
 
     let callback;
-    let position;
+    let location;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
 
     } else if (typeof arg0 === 'object') {
-      position = arg0;
+      location = arg0;
 
       if (typeof arg1 !== 'function') {
         throw new Error(ERROR.MISSING_CALLBACK);
@@ -134,7 +125,7 @@ class Radar {
       throw new Error(ERROR.PARAMETERS);
     }
 
-    Context.getContext(position)
+    Context.getContext(location)
       .then((response) => {
         callback(null, response.context, response);
       })

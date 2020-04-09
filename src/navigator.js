@@ -21,10 +21,8 @@ class Navigator {
         },
         // error callback
         (err) => {
-          if (err && err.code) {
-            if (err.code === 1) {
-              return reject(ERROR.PERMISSIONS);
-            }
+          if (err && err.code && err.code === 1) {
+            return reject(ERROR.PERMISSIONS);
           }
           return reject(ERROR.LOCATION);
         }
