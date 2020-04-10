@@ -24,8 +24,10 @@ class Geocoding {
     return Http.request('GET', 'v1/geocode/reverse', params);
   }
 
-  static async ipGeocode() {
-    return Http.request('GET', 'v1/geocode/ip', {});
+  static async ipGeocode(geocodeOptions={}) {
+    const { ip } = geocodeOptions;
+
+    return Http.request('GET', 'v1/geocode/ip', { ip });
   }
 }
 

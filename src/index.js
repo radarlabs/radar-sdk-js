@@ -229,12 +229,30 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static ipGeocode(callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+  static ipGeocode(arg0, arg1) {
+    if (!arg0) {
+      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
-    Geocoding.ipGeocode()
+    let callback;
+    let geocodeOptions;
+
+    if (typeof arg0 === 'function') {
+      callback = arg0;
+
+    } else if (typeof arg0 === 'object') {
+      geocodeOptions = arg0;
+
+      if (typeof arg1 !== 'function') {
+        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+      }
+      callback = arg1;
+
+    } else {
+      throw new Error(STATUS.ERROR_PARAMETERS);
+    }
+
+    Geocoding.ipGeocode(geocodeOptions)
       .then((response) => {
         callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
