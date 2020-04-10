@@ -207,7 +207,7 @@ describe('Radar', () => {
       });
     });
 
-    describe('Unkown', () => {
+    describe('Unknown', () => {
       it('should return the unknown error and empty object', (done) => {
         trackStub.returns(Promise.reject({ error: 'invalid error' }));
 
