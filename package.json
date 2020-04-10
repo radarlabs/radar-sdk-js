@@ -3,7 +3,7 @@
   "description": "Web JavaScript SDK for Radar, the location context platform",
   "homepage": "https://radar.io",
   "license": "Apache-2.0",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "main": "dist/index.js",
   "module": "src/index.js",
   "files": [
