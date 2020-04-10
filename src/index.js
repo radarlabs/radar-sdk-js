@@ -11,6 +11,26 @@ import Track from './api/track';
 import SDK_VERSION from './version';
 import STATUS from './status';
 
+const handleError = (callback) => {
+  return (err) => {
+
+    // Radar Error
+    if (typeof err === 'string') {
+      callback(err, {});
+      return;
+    }
+
+    // Http Error
+    if (typeof err === 'object' && err.httpError) {
+      callback(err.httpError, { response: err.response });
+      return;
+    }
+
+    // Unknown
+    callback(STATUS.ERROR_UNKNOWN, {});
+  };
+};
+
 class Radar {
   static get VERSION() {
     return SDK_VERSION;
@@ -68,7 +88,7 @@ class Radar {
       .then((location) => {
         callback(null, { location, status: STATUS.SUCCESS });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static trackOnce(arg0, arg1) {
@@ -96,9 +116,10 @@ class Radar {
           user: response.user,
           events: response.events,
           status: STATUS.SUCCESS,
-        }, response);
+          response,
+        });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static getContext(arg0, arg1) {
@@ -126,9 +147,9 @@ class Radar {
 
     Context.getContext(location)
       .then((response) => {
-        callback(null, { context: response.context, status: STATUS.SUCCESS }, response);
+        callback(null, { context: response.context, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static searchPlaces(searchOptions, callback) {
@@ -138,9 +159,9 @@ class Radar {
 
     Search.searchPlaces(searchOptions)
       .then((response) => {
-        callback(null, { places: response.places, status: STATUS.SUCCESS }, response);
+        callback(null, { places: response.places, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static searchGeofences(searchOptions, callback) {
@@ -150,9 +171,9 @@ class Radar {
 
     Search.searchGeofences(searchOptions)
       .then((response) => {
-        callback(null, { geofences: response.geofences, status: STATUS.SUCCESS }, response);
+        callback(null, { geofences: response.geofences, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static autocomplete(searchOptions, callback) {
@@ -162,9 +183,9 @@ class Radar {
 
     Search.autocomplete(searchOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static geocode(geocodeOptions, callback) {
@@ -174,9 +195,9 @@ class Radar {
 
     Geocoding.geocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
+        callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static reverseGeocode(arg0, arg1) {
@@ -204,9 +225,9 @@ class Radar {
 
     Geocoding.reverseGeocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static ipGeocode(callback) {
@@ -216,9 +237,9 @@ class Radar {
 
     Geocoding.ipGeocode()
       .then((response) => {
-        callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
+        callback(null, { address: response.address, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static getDistance(routingOptions, callback) {
@@ -228,9 +249,9 @@ class Radar {
 
     Routing.getDistanceToDestination(routingOptions)
       .then((response) => {
-        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
+        callback(null, { routes: response.routes, status: STATUS.SUCCESS, response });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 }
 

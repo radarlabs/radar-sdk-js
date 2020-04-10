@@ -84,7 +84,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
+          expect(e.httpError).to.equal(STATUS.ERROR_BAD_REQUEST);
         }
       });
 
@@ -96,7 +96,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_BAD_REQUEST);
+          expect(e.httpError).to.equal(STATUS.ERROR_BAD_REQUEST);
         }
       });
 
@@ -108,7 +108,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_UNAUTHORIZED);
+          expect(e.httpError).to.equal(STATUS.ERROR_UNAUTHORIZED);
         }
       });
 
@@ -120,7 +120,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_PAYMENT_REQUIRED);
+          expect(e.httpError).to.equal(STATUS.ERROR_PAYMENT_REQUIRED);
         }
       });
 
@@ -132,7 +132,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_FORBIDDEN);
+          expect(e.httpError).to.equal(STATUS.ERROR_FORBIDDEN);
         }
       });
 
@@ -144,7 +144,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_NOT_FOUND);
+          expect(e.httpError).to.equal(STATUS.ERROR_NOT_FOUND);
         }
       });
 
@@ -156,7 +156,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_RATE_LIMIT);
+          expect(e.httpError).to.equal(STATUS.ERROR_RATE_LIMIT);
         }
       });
 
@@ -168,7 +168,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_SERVER);
+          expect(e.httpError).to.equal(STATUS.ERROR_SERVER);
         }
       });
 
@@ -180,7 +180,7 @@ describe('Http', () => {
         try {
           await httpRequest;
         } catch (e) {
-          expect(e).to.equal(STATUS.ERROR_UNKNOWN);
+          expect(e.httpError).to.equal(STATUS.ERROR_UNKNOWN);
         }
       });
 

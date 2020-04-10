@@ -101,8 +101,9 @@
 
         Radar.initialize(publishableKey);
 
-        Radar.trackOnce(function(err, { location, user, events, response }) {
-          console.log(err, location, user, events);
+        Radar.trackOnce(function(err, { status, location, user, events, response }) {
+
+          console.log({ err, location, user, events, response });
 
           $('input,button').prop('disabled', false);
           $('.loader').addClass('d-none');
@@ -114,7 +115,7 @@
             return;
           }
 
-          $('#status').html(formatCode(response.meta));
+          $('#status').html(status);
 
           $('#location').html(formatCode({
             accuracy: location.accuracy,
