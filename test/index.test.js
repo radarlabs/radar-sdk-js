@@ -182,8 +182,8 @@ describe('Radar', () => {
         Track.trackOnce.restore();
       });
 
-    describe('Radar error', (done) => {
-      it('should return the error enum and empty object', () => {
+    describe('Radar error', () => {
+      it('should return the error enum and empty object', (done) => {
         trackStub.returns(Promise.reject(STATUS.ERROR_LOCATION));
 
         Radar.trackOnce((err, obj) => {
@@ -199,9 +199,10 @@ describe('Radar', () => {
         const response = { meta: { code: 400 } };
         trackStub.returns(Promise.reject({ httpError: STATUS.ERROR_BAD_REQUEST, response }));
 
-        Radar.trackOnce((err, obj) => {
+        Radar.trackOnce((err, obj, res) => {
           expect(err).to.equal(STATUS.ERROR_BAD_REQUEST);
-          expect(obj).to.deep.equal({ response });
+          expect(obj).to.deep.equal({});
+          expect(res).to.deep.equal(response);
           done();
         });
       });

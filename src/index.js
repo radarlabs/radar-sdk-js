@@ -22,7 +22,7 @@ const handleError = (callback) => {
 
     // Http Error
     if (typeof err === 'object' && err.httpError) {
-      callback(err.httpError, { response: err.response });
+      callback(err.httpError, {}, err.response);
       return;
     }
 
@@ -116,8 +116,7 @@ class Radar {
           user: response.user,
           events: response.events,
           status: STATUS.SUCCESS,
-          response,
-        });
+        }, response);
       })
       .catch(handleError(callback));
   }
@@ -147,7 +146,7 @@ class Radar {
 
     Context.getContext(location)
       .then((response) => {
-        callback(null, { context: response.context, status: STATUS.SUCCESS, response });
+        callback(null, { context: response.context, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -159,7 +158,7 @@ class Radar {
 
     Search.searchPlaces(searchOptions)
       .then((response) => {
-        callback(null, { places: response.places, status: STATUS.SUCCESS, response });
+        callback(null, { places: response.places, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -171,7 +170,7 @@ class Radar {
 
     Search.searchGeofences(searchOptions)
       .then((response) => {
-        callback(null, { geofences: response.geofences, status: STATUS.SUCCESS, response });
+        callback(null, { geofences: response.geofences, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -183,7 +182,7 @@ class Radar {
 
     Search.autocomplete(searchOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS, response });
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -195,7 +194,7 @@ class Radar {
 
     Geocoding.geocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS, response });
+        callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -225,7 +224,7 @@ class Radar {
 
     Geocoding.reverseGeocode(geocodeOptions)
       .then((response) => {
-        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS, response });
+        callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -237,7 +236,7 @@ class Radar {
 
     Geocoding.ipGeocode()
       .then((response) => {
-        callback(null, { address: response.address, status: STATUS.SUCCESS, response });
+        callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -249,7 +248,7 @@ class Radar {
 
     Routing.getDistanceToDestination(routingOptions)
       .then((response) => {
-        callback(null, { routes: response.routes, status: STATUS.SUCCESS, response });
+        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
