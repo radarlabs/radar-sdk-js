@@ -11,6 +11,26 @@ import Track from './api/track';
 import SDK_VERSION from './version';
 import STATUS from './status';
 
+const handleError = (callback) => {
+  return (err) => {
+
+    // Radar Error
+    if (typeof err === 'string') {
+      callback(err, {});
+      return;
+    }
+
+    // Http Error
+    if (typeof err === 'object' && err.httpError) {
+      callback(err.httpError, {}, err.response);
+      return;
+    }
+
+    // Unknown
+    callback(STATUS.ERROR_UNKNOWN, {});
+  };
+};
+
 class Radar {
   static get VERSION() {
     return SDK_VERSION;
@@ -68,7 +88,7 @@ class Radar {
       .then((location) => {
         callback(null, { location, status: STATUS.SUCCESS });
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static trackOnce(arg0, arg1) {
@@ -98,7 +118,7 @@ class Radar {
           status: STATUS.SUCCESS,
         }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static getContext(arg0, arg1) {
@@ -128,7 +148,7 @@ class Radar {
       .then((response) => {
         callback(null, { context: response.context, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static searchPlaces(searchOptions, callback) {
@@ -140,7 +160,7 @@ class Radar {
       .then((response) => {
         callback(null, { places: response.places, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static searchGeofences(searchOptions, callback) {
@@ -152,7 +172,7 @@ class Radar {
       .then((response) => {
         callback(null, { geofences: response.geofences, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static autocomplete(searchOptions, callback) {
@@ -164,7 +184,7 @@ class Radar {
       .then((response) => {
         callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static geocode(geocodeOptions, callback) {
@@ -176,7 +196,7 @@ class Radar {
       .then((response) => {
         callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static reverseGeocode(arg0, arg1) {
@@ -206,7 +226,7 @@ class Radar {
       .then((response) => {
         callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static ipGeocode(callback) {
@@ -218,7 +238,7 @@ class Radar {
       .then((response) => {
         callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 
   static getDistance(routingOptions, callback) {
@@ -230,7 +250,7 @@ class Radar {
       .then((response) => {
         callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
       })
-      .catch(callback);
+      .catch(handleError(callback));
   }
 }
 

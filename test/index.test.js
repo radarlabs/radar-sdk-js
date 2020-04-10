@@ -171,6 +171,56 @@ describe('Radar', () => {
     });
   });
 
+  context('api errors', () => {
+      let trackStub;
+
+      beforeEach(() => {
+        trackStub = sinon.stub(Track, 'trackOnce');
+      });
+
+      afterEach(() => {
+        Track.trackOnce.restore();
+      });
+
+    describe('Radar error', () => {
+      it('should return the error enum and empty object', (done) => {
+        trackStub.returns(Promise.reject(STATUS.ERROR_LOCATION));
+
+        Radar.trackOnce((err, obj) => {
+          expect(err).to.equal(STATUS.ERROR_LOCATION);
+          expect(obj).to.deep.equal({});
+          done();
+        });
+      });
+    });
+
+    describe('Http Error', () => {
+      it('should return the error enum and response object', (done) => {
+        const response = { meta: { code: 400 } };
+        trackStub.returns(Promise.reject({ httpError: STATUS.ERROR_BAD_REQUEST, response }));
+
+        Radar.trackOnce((err, obj, res) => {
+          expect(err).to.equal(STATUS.ERROR_BAD_REQUEST);
+          expect(obj).to.deep.equal({});
+          expect(res).to.deep.equal(response);
+          done();
+        });
+      });
+    });
+
+    describe('Unknown', () => {
+      it('should return the unknown error and empty object', (done) => {
+        trackStub.returns(Promise.reject({ error: 'invalid error' }));
+
+        Radar.trackOnce((err, obj) => {
+          expect(err).to.equal(STATUS.ERROR_UNKNOWN);
+          expect(obj).to.deep.equal({});
+          done();
+        });
+      });
+    });
+  });
+
   context('getLocation', () => {
     let navigatorStub;
 
@@ -182,19 +232,21 @@ describe('Radar', () => {
       Navigator.getCurrentPosition.restore();
     });
 
-    it('should throw an error if no callback present', () => {
+    it('should throw an error if no callback present', (done) => {
       try {
         Radar.getLocation();
       } catch (e) {
         expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
+        done();
       }
     });
 
-    it('should propagate the err if not successful', () => {
-      navigatorStub.rejects(STATUS.ERROR_LOCATION);
+    it('should propagate the err if not successful', (done) => {
+      navigatorStub.returns(Promise.reject(STATUS.ERROR_LOCATION));
 
       Radar.getLocation((err) => {
-        expect(err.toString()).to.equal(STATUS.ERROR_LOCATION);
+        expect(err).to.equal(STATUS.ERROR_LOCATION);
+        done();
       });
     });
 

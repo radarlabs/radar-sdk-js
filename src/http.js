@@ -50,28 +50,39 @@ class Http {
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
       xhr.onload = () => {
-        if (xhr.status == 200) {
-          try {
-            resolve(JSON.parse(xhr.response));
-          } catch (e) {
-            reject(STATUS.ERROR_SERVER);
-          }
-        } else if (xhr.status === 400) {
-          reject(STATUS.ERROR_BAD_REQUEST);
-        } else if (xhr.status === 401) {
-          reject(STATUS.ERROR_UNAUTHORIZED);
-        } else if (xhr.status === 402) {
-          reject(STATUS.ERROR_PAYMENT_REQUIRED);
-        } else if (xhr.status === 403) {
-          reject(STATUS.ERROR_FORBIDDEN);
-        } else if (xhr.status === 404) {
-          reject(STATUS.ERROR_NOT_FOUND);
-        } else if (xhr.status === 429) {
-          reject(STATUS.ERROR_RATE_LIMIT);
-        } else if (500 <= xhr.status && xhr.status < 600) {
+        let response;
+        try {
+          response = JSON.parse(xhr.response);
+        } catch (e) {
           reject(STATUS.ERROR_SERVER);
+        }
+
+        if (xhr.status == 200) {
+          resolve(response);
+
+        } else if (xhr.status === 400) {
+          reject({ httpError: STATUS.ERROR_BAD_REQUEST, response });
+
+        } else if (xhr.status === 401) {
+          reject({ httpError: STATUS.ERROR_UNAUTHORIZED, response });
+
+        } else if (xhr.status === 402) {
+          reject({ httpError: STATUS.ERROR_PAYMENT_REQUIRED, response });
+
+        } else if (xhr.status === 403) {
+          reject({ httpError: STATUS.ERROR_FORBIDDEN, response });
+
+        } else if (xhr.status === 404) {
+          reject({ httpError: STATUS.ERROR_NOT_FOUND, response });
+
+        } else if (xhr.status === 429) {
+          reject({ httpError: STATUS.ERROR_RATE_LIMIT, response });
+
+        } else if (500 <= xhr.status && xhr.status < 600) {
+          reject({ httpError: STATUS.ERROR_SERVER, response });
+
         } else {
-          reject(STATUS.ERROR_UNKNOWN);
+          reject({ httpError: STATUS.ERROR_UNKNOWN, response });
         }
       }
 
