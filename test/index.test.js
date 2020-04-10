@@ -563,18 +563,38 @@ describe('Radar', () => {
       Geocoding.ipGeocode.restore();
     });
 
-    it('should throw an error if no callback provided', () => {
+    it('should throw an error if invalid arguments', () => {
       try {
         Radar.ipGeocode();
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
+      }
+      try {
+        Radar.ipGeocode(true);
+      } catch (e) {
+        expect(e.message).to.equal('ERROR_PARAMETERS');
+      }
+      try {
+        Radar.ipGeocode({}, false);
       } catch (e) {
         expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
       }
     });
 
-    it('should call ipGeocode', (done) => {
+    it('should call ipGeocode if the first arg is a callback', (done) => {
       geocodeStub.resolves({ address: 'matching-address' });
 
       Radar.ipGeocode((err, { address }) => {
+        expect(err).to.equal(null);
+        expect(address).to.equal('matching-address');
+        done();
+      });
+    });
+
+    it('should call ipGeocode is the first arg is an object', (done) => {
+      geocodeStub.resolves({ address: 'matching-address' });
+
+      Radar.ipGeocode({ ip: 'mock-ip-address' }, (err, { address }) => {
         expect(err).to.equal(null);
         expect(address).to.equal('matching-address');
         done();
