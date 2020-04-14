@@ -13,7 +13,7 @@
 In an HTML page, include the SDK using a `<script>` tag:
 
 ```html
-<script src="https://js.radar.io/v3.0.0-beta.3/radar.min.js" integrity="sha384-BrcCIrAYTxU2V3dylO9KlfxWBg1bBml+fTdDaGxmvny5Bb6oaFR0Hw0dMXYpVDc9" crossorigin="anonymous"></script>
+<script src="https://js.radar.io/v3.0.0-beta.4/radar.min.js" integrity="sha384-NLSzGc8WqjQHUlTze1Rp8e+5cjI0KJ8wyU9W+ClJj/ceW8ZFyyX26axTM2pSKyU0" crossorigin="anonymous"></script>
 ```
 
 In a web app, install the package from npm, then import the module:
