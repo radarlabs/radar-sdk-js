@@ -59,12 +59,7 @@ class Radar {
       return;
     }
 
-    const sanitizedUserId = String(userId).trim();
-    if (sanitizedUserId.length === 0 || sanitizedUserId.length > 256) {
-      Cookie.deleteCookie(Cookie.USER_ID);
-      return;
-    }
-    Cookie.setCookie(Cookie.USER_ID, sanitizedUserId);
+    Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
   static setDescription(description) {
@@ -73,12 +68,7 @@ class Radar {
       return;
     }
 
-    const sanitizedDescription = String(description).trim();
-    if (sanitizedDescription.length === 0 || sanitizedDescription.length > 256) {
-      Cookie.deleteCookie(Cookie.DESCRIPTION);
-      return;
-    }
-    Cookie.setCookie(Cookie.DESCRIPTION, sanitizedDescription);
+    Cookie.setCookie(Cookie.DESCRIPTION, String(description).trim());
   }
 
   static setMetadata(metadata) {

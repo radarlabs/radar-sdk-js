@@ -109,24 +109,6 @@ describe('Radar', () => {
       });
     });
 
-    context('userId invalid', () => {
-      describe('userId length is 0', () => {
-        it('should delete userId from cookie', () => {
-          Radar.setUserId("");
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.USER_ID);
-        });
-      });
-
-      describe('userId length is > 256', () => {
-        it('should delete userId from cookie', () => {
-          // generate string of 257 chars
-          const userId = [...Array(257)].map(() => 'x').join('');
-          Radar.setUserId(userId);
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.USER_ID);
-        });
-      });
-    });
-
     context('userId given', () => {
       it('should save userId in cookie', () => {
         const userId = 'abc123';
@@ -141,24 +123,6 @@ describe('Radar', () => {
       it('should delete description from cookie', () => {
         Radar.setDescription();
         expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
-      });
-    });
-
-    context('description invalid', () => {
-      describe('description length is 0', () => {
-        it('should delete description from cookie', () => {
-          Radar.setDescription("");
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
-        });
-      });
-
-      describe('description length is > 256', () => {
-        it('should delete description from cookie', () => {
-          // generate string of 257 chars
-          const description = [...Array(257)].map(() => 'x').join('');
-          Radar.setDescription(description);
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
-        });
       });
     });
 
