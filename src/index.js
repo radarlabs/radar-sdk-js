@@ -87,7 +87,7 @@ class Radar {
       return;
     }
 
-    metadata = JSON.stringify(metadata).trim();
+    metadata = JSON.stringify(metadata);
     Cookie.setCookie(Cookie.METADATA, metadata);
   }
 
