@@ -17,7 +17,10 @@ class Track {
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
-    const metadata = JSON.parse(Cookie.getCookie(Cookie.metadata));
+    let metadata = Cookie.getCookie(Cookie.METADATA);
+    if (metadata) {
+      metadata = JSON.parse(metadata);
+    }
     const _id = userId || deviceId;
 
     const body = {

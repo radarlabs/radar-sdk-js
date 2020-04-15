@@ -24,6 +24,7 @@ describe('Track', () => {
   const userId = 'user-id';
   const description = 'description';
   const deviceId = 'device-id';
+  const metadata = {};
 
   const location = { latitude, longitude, accuracy };
 
@@ -60,8 +61,20 @@ describe('Track', () => {
     });
 
     describe('location permissions approved', () => {
-      it('should return a track response', () => {
+      it('should return a track response with metadata', () => {
         navigatorStub.resolves(location);
+        getCookieStub.withArgs(Cookie.METADATA).returns(JSON.stringify(metadata));
+        httpStub.resolves({ meta: {}, user: {}, events: {} });
+
+        return Track.trackOnce()
+          .then((response) => {
+            expect(response).to.deep.equal(trackResponse);
+          });
+        });
+
+      it('should return a track response without metadata', () => {
+        navigatorStub.resolves(location);
+        getCookieStub.withArgs(Cookie.METADATA).returns(null);
         httpStub.resolves({ meta: {}, user: {}, events: {} });
 
         return Track.trackOnce()
