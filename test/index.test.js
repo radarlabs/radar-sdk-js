@@ -179,16 +179,6 @@ describe('Radar', () => {
       });
     });
 
-    context('metadata legnth is > 256', () => {
-      it('should delete metadata from cookie', () => {
-        // generate string of 257 chars
-        const value = [...Array(257)].map(() => 'x').join('');
-        const metadata = { x: value };
-        Radar.setMetadata(metadata);
-        expect(Cookie.deleteCookie).to.be.calledWith(Cookie.METADATA);
-      });
-    });
-
     context('metadata given', () => {
       it('should save metadata in cookie', () => {
         const metadata = { meta: 'mock-metadata' };

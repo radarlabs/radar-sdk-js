@@ -88,9 +88,6 @@ class Radar {
     }
 
     metadata = JSON.stringify(metadata).trim();
-    if (metadata.length === 0 || metadata.length > 256) {
-      Cookie.deleteCookie(Cookie.METADATA);
-    }
     Cookie.setCookie(Cookie.METADATA, metadata);
   }
 
