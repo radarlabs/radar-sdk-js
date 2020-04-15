@@ -59,12 +59,7 @@ class Radar {
       return;
     }
 
-    userId = String(userId).trim();
-    if (userId.length === 0 || userId.length > 256) {
-      Cookie.deleteCookie(Cookie.USER_ID);
-      return;
-    }
-    Cookie.setCookie(Cookie.USER_ID, userId);
+    Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
   static setDescription(description) {
@@ -73,19 +68,19 @@ class Radar {
       return;
     }
 
-    description = String(description).trim();
-    if (description.length === 0 || description.length > 256) {
-      Cookie.deleteCookie(Cookie.DESCRIPTION);
-      return;
-    }
-    Cookie.setCookie(Cookie.DESCRIPTION, description);
+    Cookie.setCookie(Cookie.DESCRIPTION, String(description).trim());
   }
 
-  static getLocation(callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
+  static setMetadata(metadata) {
+    if (!metadata) {
+      Cookie.deleteCookie(Cookie.METADATA);
+      return;
     }
 
+    Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
+  }
+
+  static getLocation(callback=defaultCallback) {
     Navigator.getCurrentPosition()
       .then((location) => {
         callback(null, { location, status: STATUS.SUCCESS });

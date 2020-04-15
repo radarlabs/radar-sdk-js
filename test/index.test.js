@@ -109,24 +109,6 @@ describe('Radar', () => {
       });
     });
 
-    context('userId invalid', () => {
-      describe('userId length is 0', () => {
-        it('should delete userId from cookie', () => {
-          Radar.setUserId("");
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.USER_ID);
-        });
-      });
-
-      describe('userId length is > 256', () => {
-        it('should delete userId from cookie', () => {
-          // generate string of 257 chars
-          const userId = [...Array(257)].map(() => 'x').join('');
-          Radar.setUserId(userId);
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.USER_ID);
-        });
-      });
-    });
-
     context('userId given', () => {
       it('should save userId in cookie', () => {
         const userId = 'abc123';
@@ -144,29 +126,28 @@ describe('Radar', () => {
       });
     });
 
-    context('description invalid', () => {
-      describe('description length is 0', () => {
-        it('should delete description from cookie', () => {
-          Radar.setDescription("");
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
-        });
-      });
-
-      describe('description length is > 256', () => {
-        it('should delete description from cookie', () => {
-          // generate string of 257 chars
-          const description = [...Array(257)].map(() => 'x').join('');
-          Radar.setDescription(description);
-          expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
-        });
-      });
-    });
-
     context('description given', () => {
       it('should save description in cookie', () => {
         const description = 'abc123';
         Radar.setDescription(description);
         expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DESCRIPTION, description);
+      });
+    });
+  });
+
+  describe('setMetadata', () => {
+    context('no metadata given', () => {
+      it('should delete metadata from cookie', () => {
+        Radar.setMetadata();
+        expect(Cookie.deleteCookie).to.be.calledWith(Cookie.METADATA);
+      });
+    });
+
+    context('metadata given', () => {
+      it('should save metadata in cookie', () => {
+        const metadata = { meta: 'mock-metadata' };
+        Radar.setMetadata(metadata);
+        expect(Cookie.setCookie).to.be.calledWith(Cookie.METADATA, JSON.stringify(metadata));
       });
     });
   });

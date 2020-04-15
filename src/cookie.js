@@ -7,6 +7,9 @@ class Cookie {
   static get DEVICE_ID() {
     return 'radar-deviceId';
   }
+  static get METADATA() {
+    return 'radar-metadata';
+  }
   static get HOST() {
     return 'radar-host';
   }
