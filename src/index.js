@@ -81,6 +81,19 @@ class Radar {
     Cookie.setCookie(Cookie.DESCRIPTION, description);
   }
 
+  static setMetadata(metadata) {
+    if (!metadata) {
+      Cookie.deleteCookie(Cookie.METADATA);
+      return;
+    }
+
+    metadata = JSON.stringify(metadata).trim();
+    if (metadata.length === 0 || metadata.length > 256) {
+      Cookie.deleteCookie(Cookie.METADATA);
+    }
+    Cookie.setCookie(Cookie.METADATA, metadata);
+  }
+
   static getLocation(callback) {
     if (!callback) {
       throw new Error(STATUS.ERROR_MISSING_CALLBACK);

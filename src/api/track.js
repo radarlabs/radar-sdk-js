@@ -17,6 +17,7 @@ class Track {
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
+    const metadata = JSON.parse(Cookie.getCookie(Cookie.metadata));
     const _id = userId || deviceId;
 
     const body = {
@@ -27,6 +28,7 @@ class Track {
       foreground: true,
       latitude,
       longitude,
+      metadata,
       sdkVersion: SDK_VERSION,
       stopped: true,
       userId,
