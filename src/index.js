@@ -59,12 +59,12 @@ class Radar {
       return;
     }
 
-    userId = String(userId).trim();
-    if (userId.length === 0 || userId.length > 256) {
+    const sanitizedUserId = String(userId).trim();
+    if (sanitizedUserId.length === 0 || sanitizedUserId.length > 256) {
       Cookie.deleteCookie(Cookie.USER_ID);
       return;
     }
-    Cookie.setCookie(Cookie.USER_ID, userId);
+    Cookie.setCookie(Cookie.USER_ID, sanitizedUserId);
   }
 
   static setDescription(description) {
@@ -73,12 +73,12 @@ class Radar {
       return;
     }
 
-    description = String(description).trim();
-    if (description.length === 0 || description.length > 256) {
+    const sanitizedDescription = String(description).trim();
+    if (sanitizedDescription.length === 0 || sanitizedDescription.length > 256) {
       Cookie.deleteCookie(Cookie.DESCRIPTION);
       return;
     }
-    Cookie.setCookie(Cookie.DESCRIPTION, description);
+    Cookie.setCookie(Cookie.DESCRIPTION, sanitizedDescription);
   }
 
   static setMetadata(metadata) {
@@ -87,15 +87,10 @@ class Radar {
       return;
     }
 
-    metadata = JSON.stringify(metadata);
-    Cookie.setCookie(Cookie.METADATA, metadata);
+    Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
   }
 
-  static getLocation(callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static getLocation(callback=defaultCallback) {
     Navigator.getCurrentPosition()
       .then((location) => {
         callback(null, { location, status: STATUS.SUCCESS });
