@@ -11,6 +11,8 @@ import Track from './api/track';
 import SDK_VERSION from './version';
 import STATUS from './status';
 
+const defaultCallback = () => {};
+
 const handleError = (callback) => {
   return (err) => {
 
@@ -91,26 +93,20 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static trackOnce(arg0, arg1) {
+  static trackOnce(arg0, arg1=defaultCallback) {
     let callback;
     let location;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (typeof arg0 === 'object') {
+    } else {
       location = arg0;
       callback = arg1;
-
-    } else if (arg0) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Track.trackOnce(location)
       .then((response) => {
-        if (!callback) {
-          return;
-        }
         callback(null, {
           location: response.location,
           user: response.user,
@@ -121,27 +117,16 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static getContext(arg0, arg1) {
-    if (!arg0) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static getContext(arg0, arg1=defaultCallback) {
     let callback;
     let location;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (typeof arg0 === 'object') {
-      location = arg0;
-
-      if (typeof arg1 !== 'function') {
-        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-      }
-      callback = arg1;
-
     } else {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      location = arg0;
+      callback = arg1;
     }
 
     Context.getContext(location)
@@ -151,11 +136,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static searchPlaces(searchOptions, callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static searchPlaces(searchOptions, callback=defaultCallback) {
     Search.searchPlaces(searchOptions)
       .then((response) => {
         callback(null, { places: response.places, status: STATUS.SUCCESS }, response);
@@ -163,11 +144,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static searchGeofences(searchOptions, callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static searchGeofences(searchOptions, callback=defaultCallback) {
     Search.searchGeofences(searchOptions)
       .then((response) => {
         callback(null, { geofences: response.geofences, status: STATUS.SUCCESS }, response);
@@ -175,11 +152,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static autocomplete(searchOptions, callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static autocomplete(searchOptions, callback=defaultCallback) {
     Search.autocomplete(searchOptions)
       .then((response) => {
         callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
@@ -187,11 +160,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static geocode(geocodeOptions, callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static geocode(geocodeOptions, callback=defaultCallback) {
     Geocoding.geocode(geocodeOptions)
       .then((response) => {
         callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
@@ -199,27 +168,16 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static reverseGeocode(arg0, arg1) {
-    if (!arg0) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
-    }
-
+  static reverseGeocode(arg0, arg1=defaultCallback) {
     let callback;
     let geocodeOptions;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
 
-    } else if (typeof arg0 === 'object') {
-      geocodeOptions = arg0;
-
-      if (typeof arg1 !== 'function') {
-        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-      }
-      callback = arg1;
-
     } else {
-      throw new Error(STATUS.ERROR_PARAMETERS);
+      geocodeOptions = arg0;
+      callback = arg1;
     }
 
     Geocoding.reverseGeocode(geocodeOptions)
@@ -229,11 +187,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static ipGeocode(arg0, arg1) {
-    if (!arg0) {
-      throw new Error(STATUS.ERROR_PARAMETERS);
-    }
-
+  static ipGeocode(arg0, arg1=defaultCallback) {
     let callback;
     let geocodeOptions;
 
@@ -242,14 +196,7 @@ class Radar {
 
     } else if (typeof arg0 === 'object') {
       geocodeOptions = arg0;
-
-      if (typeof arg1 !== 'function') {
-        throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-      }
       callback = arg1;
-
-    } else {
-      throw new Error(STATUS.ERROR_PARAMETERS);
     }
 
     Geocoding.ipGeocode(geocodeOptions)
@@ -259,11 +206,7 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static getDistance(routingOptions, callback) {
-    if (!callback) {
-      throw new Error(STATUS.ERROR_MISSING_CALLBACK);
-    }
-
+  static getDistance(routingOptions, callback=defaultCallback) {
     Routing.getDistanceToDestination(routingOptions)
       .then((response) => {
         callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);

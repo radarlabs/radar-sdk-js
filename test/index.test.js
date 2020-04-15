@@ -232,15 +232,6 @@ describe('Radar', () => {
       Navigator.getCurrentPosition.restore();
     });
 
-    it('should throw an error if no callback present', (done) => {
-      try {
-        Radar.getLocation();
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-        done();
-      }
-    });
-
     it('should propagate the err if not successful', (done) => {
       navigatorStub.returns(Promise.reject(STATUS.ERROR_LOCATION));
 
@@ -272,14 +263,6 @@ describe('Radar', () => {
 
     afterEach(() => {
       Track.trackOnce.restore();
-    });
-
-    it('should throw an error on invalid params', () => {
-      try {
-        Radar.trackOnce(3);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
     });
 
     it('should call trackOnce if the first arg is a callback', (done) => {
@@ -336,27 +319,6 @@ describe('Radar', () => {
       Context.getContext.restore();
     });
 
-    it('should throw an error on invalid params', () => {
-      try {
-        Radar.getContext(3);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
-    });
-
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.getContext();
-      } catch (e) {
-        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
-      }
-      try {
-        Radar.getContext({});
-      } catch (e) {
-        expect(e.message).to.equal(STATUS.ERROR_MISSING_CALLBACK);
-      }
-    });
-
     it('should call getContext if the first arg is a callback', (done) => {
       contextStub.resolves({
         context: 'matching-context'
@@ -393,14 +355,6 @@ describe('Radar', () => {
       Search.searchPlaces.restore();
     });
 
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.searchPlaces({});
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
-    });
-
     it('should call searchPlaces', (done) => {
       searchStub.resolves({ places: 'matching-places' });
 
@@ -421,14 +375,6 @@ describe('Radar', () => {
 
     afterEach(() => {
       Search.searchGeofences.restore();
-    });
-
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.searchGeofences({});
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
     });
 
     it('should call searchGeofences', (done) => {
@@ -453,14 +399,6 @@ describe('Radar', () => {
       Search.autocomplete.restore();
     });
 
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.autocomplete({});
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
-    });
-
     it('should call autocomplete', (done) => {
       searchStub.resolves({ addresses: 'matching-addresses' });
 
@@ -483,14 +421,6 @@ describe('Radar', () => {
       Geocoding.geocode.restore();
     });
 
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.geocode({ query: query });
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
-    });
-
     it('should call geocode', (done) => {
       geocodeStub.resolves({ addresses: 'matching-addresses' });
 
@@ -511,24 +441,6 @@ describe('Radar', () => {
 
     afterEach(() => {
       Geocoding.reverseGeocode.restore();
-    });
-
-    it('should throw an error if invalid arguments', () => {
-      try {
-        Radar.reverseGeocode();
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
-      try {
-        Radar.reverseGeocode(true);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
-      try {
-        Radar.reverseGeocode({}, false);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
     });
 
     it('should call reverseGeocode if the first arg is a callback', (done) => {
@@ -563,24 +475,6 @@ describe('Radar', () => {
       Geocoding.ipGeocode.restore();
     });
 
-    it('should throw an error if invalid arguments', () => {
-      try {
-        Radar.ipGeocode();
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
-      try {
-        Radar.ipGeocode(true);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_PARAMETERS');
-      }
-      try {
-        Radar.ipGeocode({}, false);
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
-    });
-
     it('should call ipGeocode if the first arg is a callback', (done) => {
       geocodeStub.resolves({ address: 'matching-address' });
 
@@ -611,14 +505,6 @@ describe('Radar', () => {
 
     afterEach(() => {
       Routing.getDistanceToDestination.restore();
-    });
-
-    it('should throw an error if no callback provided', () => {
-      try {
-        Radar.getDistance({});
-      } catch (e) {
-        expect(e.message).to.equal('ERROR_MISSING_CALLBACK');
-      }
     });
 
     it('should call getDistanceToDestination', (done) => {
