@@ -18,10 +18,10 @@ class Track {
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
     let metadata = Cookie.getCookie(Cookie.METADATA);
+
     if (metadata) {
       metadata = JSON.parse(metadata);
     }
-    const _id = userId || deviceId;
 
     const body = {
       accuracy,
@@ -37,7 +37,8 @@ class Track {
       userId,
     };
 
-    const response = await Http.request('PUT', `v1/users/${_id}`, body);
+    const response = await Http.request('POST', `v1/track`, body);
+
     response.location = location;
 
     return response;
