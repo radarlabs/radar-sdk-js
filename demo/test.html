@@ -101,9 +101,12 @@
 
         Radar.initialize(publishableKey);
 
-        Radar.trackOnce(function(err, { status, location, user, events }, response) {
+        Radar.trackOnce(function(err, responseObj, response) {
+          const location = responseObj.location;
+          const user = responseObj.user;
+          const events = responseObj.events;
 
-          console.log({ err, location, user, events, response });
+          console.log(err, location, user, events, response);
 
           $('input,button').prop('disabled', false);
           $('.loader').addClass('d-none');
