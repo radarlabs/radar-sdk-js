@@ -29,6 +29,7 @@ class Track {
       deviceId,
       deviceType: 'Web',
       foreground: true,
+      installId: deviceId,
       latitude,
       longitude,
       metadata,
