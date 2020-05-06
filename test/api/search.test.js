@@ -141,6 +141,19 @@ describe('Search', () => {
           });
       });
     });
+    
+    describe('navigator is disabled', () => {
+      it('should have near undefined and return an autocomplete response', () => {
+        httpStub.resolves(autocompleteResponse);
+        
+        const disableNavigator = true;
+        return Search.autocomplete({ query, disableNavigator })
+          .then((response) => {
+            sinon.assert.calledWith(httpStub, 'GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
+            expect(response).to.equal(autocompleteResponse);
+          });
+      });
+    });
 
     describe('location is given', () => {
       it('should return an autocomplete response', () => {
