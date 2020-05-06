@@ -71,11 +71,14 @@ class Search {
   }
 
 
-  static async autocomplete(searchOptions={}) {
+  static async autocomplete(searchOptions={ }) {
     // NOTE: I'm not sure how caching works with getCurrentPosition,
     // but this could be problematic here if needs to compute each time.
     // We could add a cache: true flag to retreive previous value
-    if (!searchOptions.near) {
+
+    // use navigator if near is not provided
+    // if disableNavigator is set, near will be undefined and server will use geoIP
+    if (!searchOptions.near && !searchOptions.disableNavigator) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       searchOptions.near = { latitude, longitude };
     }
@@ -86,7 +89,9 @@ class Search {
       limit,
     } = searchOptions;
 
-    near = `${near.latitude},${near.longitude}`;
+    if (near?.latitude && near?.longitude) {
+      near = `${near.latitude},${near.longitude}`;
+    }
 
     const params = {
       query,
