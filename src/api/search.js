@@ -71,7 +71,7 @@ class Search {
   }
 
 
-  static async autocomplete(searchOptions={ }) {
+  static async autocomplete(searchOptions={}) {
     // NOTE: I'm not sure how caching works with getCurrentPosition,
     // but this could be problematic here if needs to compute each time.
     // We could add a cache: true flag to retreive previous value
