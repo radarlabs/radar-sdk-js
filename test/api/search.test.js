@@ -149,7 +149,7 @@ describe('Search', () => {
         const disableNavigator = true;
         return Search.autocomplete({ query, disableNavigator })
           .then((response) => {
-            sinon.assert.calledWith(httpStub, 'GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
