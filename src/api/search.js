@@ -76,9 +76,10 @@ class Search {
     // but this could be problematic here if needs to compute each time.
     // We could add a cache: true flag to retreive previous value
 
-    // use navigator if near is not provided
-    // if disableNavigator is set, near will be undefined and server will use geoIP
-    if (!searchOptions.near && !searchOptions.disableNavigator) {
+    // if useNavigator false, near will be undefined and server will use geoIP
+    const useNavigator = searchOptions.useNavigator === undefined || searchOptions.useNavigator;
+
+    if (!searchOptions.near && useNavigator) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       searchOptions.near = { latitude, longitude };
     }

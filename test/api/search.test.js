@@ -146,8 +146,8 @@ describe('Search', () => {
       it('should have near undefined and return an autocomplete response', () => {
         httpStub.resolves(autocompleteResponse);
         
-        const disableNavigator = true;
-        return Search.autocomplete({ query, disableNavigator })
+        const useNavigator = false;
+        return Search.autocomplete({ query, useNavigator })
           .then((response) => {
             expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
             expect(response).to.equal(autocompleteResponse);
