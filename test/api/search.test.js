@@ -118,31 +118,19 @@ describe('Search', () => {
   });
 
   context('autocomplete', () => {
-    describe('location permissions denied', () => {
-      it('should propagate the navigator error', () => {
-        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
-
-        return Search.autocomplete()
-          .catch((err) => {
-            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
-            expect(httpStub).to.have.callCount(0);
-          });
-      });
-    });
-
-    describe('location permissions approved', () => {
-      it('should return an autocomplete response', () => {
-        navigatorStub.resolves({ latitude, longitude });
+    describe('near is not provided', () => {
+      it('should have near undefined and return an autocomplete response', () => {
         httpStub.resolves(autocompleteResponse);
 
         return Search.autocomplete({ query })
           .then((response) => {
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
     });
 
-    describe('location is given', () => {
+    describe('near is provided', () => {
       it('should return an autocomplete response', () => {
         httpStub.resolves(autocompleteResponse);
 
@@ -150,6 +138,7 @@ describe('Search', () => {
 
         return Search.autocomplete({ near, query, limit })
           .then((response) => {
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50 });
             expect(response).to.equal(autocompleteResponse);
           });
       });
