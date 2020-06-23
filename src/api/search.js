@@ -51,6 +51,7 @@ class Search {
       near,
       radius,
       tags,
+      metadata,
       limit,
     } = searchOptions;
 
@@ -66,6 +67,14 @@ class Search {
       tags,
       limit,
     };
+
+    if (metadata) {
+      Object.keys(metadata).forEach((k) => {
+        const key = `metadata[${k}]`;
+        const value = metadata[k];
+        params[key] = value;
+      });
+    }
 
     return Http.request('GET', 'v1/search/geofences', params);
   }
