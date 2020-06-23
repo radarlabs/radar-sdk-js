@@ -22,6 +22,7 @@ describe('Search', () => {
   const categories = ['coffe-shop'];
   const groups = ['airport'];
   const tags = ['geofence-tag'];
+  const metadata = {'geofence-metadata-key': 'geofence-metadata-value'};
   const limit = 50;
   const query = 'mock-query';
 
@@ -109,7 +110,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        return Search.searchGeofences({ near, radius, chains, tags, limit })
+        return Search.searchGeofences({ near, radius, chains, tags, metadata, limit })
           .then((response) => {
             expect(response).to.equal(geofencesResponse);
           });
