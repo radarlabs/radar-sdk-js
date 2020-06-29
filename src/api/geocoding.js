@@ -3,9 +3,9 @@ import Navigator from '../navigator';
 
 class Geocoding {
   static async geocode(geocodeOptions={}) {
-    const { query } = geocodeOptions;
+    const { query, layers } = geocodeOptions;
 
-    return Http.request('GET', 'v1/geocode/forward', { query });
+    return Http.request('GET', 'v1/geocode/forward', { query, layers });
   }
 
   static async reverseGeocode(geocodeOptions={}) {
@@ -15,10 +15,11 @@ class Geocoding {
       geocodeOptions.longitude = longitude;
     }
 
-    const { latitude, longitude } = geocodeOptions;
+    const { latitude, longitude, layers } = geocodeOptions;
 
     const params = {
       coordinates: `${latitude},${longitude}`,
+      layers,
     };
 
     return Http.request('GET', 'v1/geocode/reverse', params);
