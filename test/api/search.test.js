@@ -19,10 +19,11 @@ describe('Search', () => {
 
   const radius = 100;
   const chains = ['dunkin', 'sbucks'];
-  const categories = ['coffe-shop'];
+  const categories = ['coffee-shop'];
   const groups = ['airport'];
   const tags = ['geofence-tag'];
   const metadata = {'geofence-metadata-key': 'geofence-metadata-value'};
+  const layers = ['venue', 'address'];
   const limit = 50;
   const query = 'mock-query';
 
@@ -125,7 +126,7 @@ describe('Search', () => {
 
         return Search.autocomplete({ query })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
@@ -137,9 +138,9 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        return Search.autocomplete({ near, query, limit })
+        return Search.autocomplete({ near, query, limit, layers })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50 });
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'] });
             expect(response).to.equal(autocompleteResponse);
           });
       });
