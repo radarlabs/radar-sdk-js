@@ -87,6 +87,7 @@ class Search {
       query,
       near,
       limit,
+      layers,
     } = searchOptions;
 
     if (near?.latitude && near?.longitude) {
@@ -97,6 +98,7 @@ class Search {
       query,
       near,
       limit,
+      layers,
     };
 
     return Http.request('GET', 'v1/search/autocomplete', params);
