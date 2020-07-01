@@ -21,7 +21,7 @@
     "build:iife": "rollup -c rollup-iife.config.js",
     "build:iife-min": "rollup -c rollup-iife-min.config.js",
     "report-coverage": "./node_modules/.bin/codecov",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') echo VERSION: $PACKAGE_VERSION && git tag $PACKAGE_VERSION && git push --tags &&  for i in dist/*; do aws s3 cp $i s3://js.radar.io/$PACKAGE_VERSION/; done && echo do not forget to update README"
+    "postpublish": "PACKAGE_VERSION=v$(cat package.json | jq -j .version); echo VERSION: $PACKAGE_VERSION; git tag $PACKAGE_VERSION && git push --tags && for i in dist/radar*; do aws s3 cp $i s3://js.radar.io/$PACKAGE_VERSION/; done && echo do not forget to update README"
   },
   "dependencies": {},
   "devDependencies": {
