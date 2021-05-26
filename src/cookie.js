@@ -19,6 +19,9 @@ class Cookie {
   static get USER_ID () {
     return 'radar-userId';
   }
+  static get CUSTOM_HEADERS () {
+    return 'radar-custom-headers';
+  }
 
 // parse cookie string to return value at {key}
   static getCookie(key) {

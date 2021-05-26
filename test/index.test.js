@@ -118,6 +118,23 @@ describe('Radar', () => {
     });
   });
 
+  describe('setDeviceId', () => {
+    context('no deviceId given', () => {
+      it('should delete deviceId from cookie', () => {
+        Radar.setDeviceId();
+        expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DEVICE_ID);
+      });
+    });
+
+    context('deviceId given', () => {
+      it('should save deviceId in cookie', () => {
+        const deviceId = 'a0a0a0';
+        Radar.setDeviceId(deviceId);
+        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DEVICE_ID, deviceId);
+      });
+    });
+  });
+
   describe('setDescription', () => {
     context('no description given', () => {
       it('should delete description from cookie', () => {
@@ -148,6 +165,23 @@ describe('Radar', () => {
         const metadata = { meta: 'mock-metadata' };
         Radar.setMetadata(metadata);
         expect(Cookie.setCookie).to.be.calledWith(Cookie.METADATA, JSON.stringify(metadata));
+      });
+    });
+  });
+
+  describe('setRequestHeaders', () => {
+    context('no headers given', () => {
+      it('should delete metadata from cookie', () => {
+        Radar.setRequestHeaders();
+        expect(Cookie.deleteCookie).to.be.calledWith(Cookie.CUSTOM_HEADERS);
+      });
+    });
+
+    context('headers given', () => {
+      it('should save metadata in cookie', () => {
+        const headers = { 'X-Boolean': true, 'X-String': 'string', 'X-Number': 2 };
+        Radar.setRequestHeaders(headers);
+        expect(Cookie.setCookie).to.be.calledWith(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
       });
     });
   });

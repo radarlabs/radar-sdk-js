@@ -62,6 +62,15 @@ class Radar {
     Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
+  static setDeviceId(deviceId) {
+    if (!deviceId) {
+      Cookie.deleteCookie(Cookie.DEVICE_ID);
+      return;
+    }
+
+    Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+  }
+
   static setDescription(description) {
     if (!description) {
       Cookie.deleteCookie(Cookie.DESCRIPTION);
@@ -80,6 +89,15 @@ class Radar {
     Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
   }
 
+  static setRequestHeaders(headers={}) {
+    if (!Object.keys(headers).length) {
+      Cookie.deleteCookie(Cookie.CUSTOM_HEADERS);
+      return;
+    }
+
+    Cookie.setCookie(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
+  }
+
   static getLocation(callback=defaultCallback) {
     Navigator.getCurrentPosition()
       .then((location) => {
@@ -94,7 +112,6 @@ class Radar {
 
     if (typeof arg0 === 'function') {
       callback = arg0;
-
     } else {
       location = arg0;
       callback = arg1;
