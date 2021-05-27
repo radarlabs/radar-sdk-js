@@ -2,10 +2,11 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 
 import Cookie from '../src/cookie';
-import SDK_VERSION from '../src/version';
-import STATUS from '../src/status';
-
 import Http from '../src/http';
+import Radar from '../src/index';
+import STATUS from '../src/status';
+import SDK_VERSION from '../src/version';
+
 
 describe('Http', () => {
   let getCookieStub;
@@ -266,6 +267,32 @@ describe('Http', () => {
 
       expect(request.url).to.not.contain('?');
       expect(response.meta.code).to.equal(200);
+    });
+  });
+
+  context('custom headers', () => {
+    it('should include headers in request', async () => {
+
+      const customHeaders = {
+        'X-String': 'string',
+        'X-Test': 'true',
+      };
+
+      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      getCookieStub.withArgs(Cookie.CUSTOM_HEADERS).returns(JSON.stringify(customHeaders));
+
+      const data = { query: '20 Jay Street' };
+      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
+
+      setTimeout(() => {
+        request.respond(200, {}, successResponse);
+      });
+      const response = await httpRequest;
+
+      expect(response.meta.code).to.equal(200);
+      expect(request.requestHeaders['X-Radar-Device-Type']).to.equal('Web');
+      expect(request.requestHeaders['X-String']).to.equal('string');
+      expect(request.requestHeaders['X-Test']).to.equal('true');
     });
   });
 });

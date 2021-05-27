@@ -83,5 +83,28 @@ describe('Track', () => {
           });
         });
     });
+
+    describe('tripOptions set', () => {
+      it('should include tripOptions in track request', () => {
+        const tripOptions = {
+          externalId: 'trip-options-test-1',
+          destinationGeofenceTag: 'store',
+          destinationGefocenExternalId: '123',
+          mode: 'car',
+        }
+        navigatorStub.resolves(location);
+        getCookieStub.withArgs(Cookie.TRIP_OPTIONS).returns(JSON.stringify(tripOptions));
+        httpStub.resolves({ meta: {}, user: {}, events: {} });
+
+        return Track.trackOnce()
+          .then((response) => {
+            expect(response).to.deep.equal(trackResponse);
+            const trackArgs = httpStub.getCall(0).args;
+            expect(trackArgs[0]).to.equal('POST');
+            expect(trackArgs[1]).to.equal('v1/track');
+            expect(trackArgs[2].tripOptions).to.deep.equal(tripOptions);
+          });
+        });
+    });
   });
 });
