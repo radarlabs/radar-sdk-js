@@ -51,8 +51,9 @@ class Radar {
     Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
   }
 
-  static setHost(host) {
+  static setHost(host, trackEndpoint) {
     Cookie.setCookie(Cookie.HOST, host, true);
+    Cookie.setCookie(Cookie.trackEndpoint, trackEndpoint);
   }
 
   static setUserId(userId) {
