@@ -7,7 +7,7 @@ const { expect } = chai;
 
 import Http from '../../src/http';
 
-import Trips from '../../src/api/Trips';
+import Trips from '../../src/api/trips';
 
 import { TRIP_STATUS } from '../../src/constants';
 
