@@ -19,11 +19,14 @@ class Cookie {
   static get USER_ID () {
     return 'radar-userId';
   }
+  static get TRIP_OPTIONS () {
+    return 'radar-trip-options';
+  }
   static get CUSTOM_HEADERS () {
     return 'radar-custom-headers';
   }
 
-// parse cookie string to return value at {key}
+  // parse cookie string to return value at {key}
   static getCookie(key) {
     if (!document || document.cookie === undefined) {
       return null;
