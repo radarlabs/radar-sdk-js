@@ -17,12 +17,17 @@ class Track {
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
-    let metadata = Cookie.getCookie(Cookie.METADATA);
 
+    let metadata = Cookie.getCookie(Cookie.METADATA);
     if (metadata) {
       metadata = JSON.parse(metadata);
     }
 
+    let tripOptions = Cookie.getCookie(Cookie.TRIP_OPTIONS);
+    if (tripOptions) {
+      tripOptions = JSON.parse(tripOptions);
+    }
+  
     const body = {
       accuracy,
       description,
@@ -36,6 +41,7 @@ class Track {
       sdkVersion: SDK_VERSION,
       stopped: true,
       userId,
+      tripOptions,
     };
 
     const response = await Http.request('POST', `v1/track`, body);
