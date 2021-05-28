@@ -1,9 +1,8 @@
 import Http from '../http';
-import { TRIP_STATUS } from '../constants';
 
 class Trips {
 
-  static async updateTrip(tripOptions={}, status = TRIP_STATUS.UNKNOWN) {
+  static async updateTrip(tripOptions={}, status) {
 
     const {
       externalId,
