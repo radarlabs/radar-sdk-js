@@ -49,12 +49,13 @@ describe('Cookie', () => {
 
       expect(document.cookie).to.not.be.undefined;
 
-      const [cookie, path, expires] = document.cookie.split(';');
+      const [cookie, path, samesite, expires] = document.cookie.split(';');
       const [key, value] = cookie.split('=');
 
       expect(key).to.equal('hello');
       expect(value).to.equal('world');
       expect(path).to.equal('path=/');
+      expect(samesite).to.equal('samesite=strict');
       expect(new Date(expires.split('='))).to.be.greaterThan(new Date());
     });
 
