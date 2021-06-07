@@ -54,7 +54,8 @@ class Cookie {
     date.setFullYear(date.getFullYear() + 10);
 
     const expires = `expires=${date.toGMTString()}`;
-    document.cookie = `${key}=${value};path=/;${expires}`;
+    const sameSite = 'samesite=strict';
+    document.cookie = `${key}=${value};path=/;${sameSite};${expires}`;
   }
 
   // delete cookie with {key}
