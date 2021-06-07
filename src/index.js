@@ -11,7 +11,7 @@ import Trips from './api/trips';
 // consts
 import SDK_VERSION from './version';
 import STATUS from './status';
-import { TRIP_STATUS } from './constants';
+import { TRIP_STATUS } from './tripStatus';
 
 const defaultCallback = () => {};
 

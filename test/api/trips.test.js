@@ -9,7 +9,7 @@ import Http from '../../src/http';
 
 import Trips from '../../src/api/trips';
 
-import { TRIP_STATUS } from '../../src/constants';
+import { TRIP_STATUS } from '../../src/tripStatus';
 
 describe('Trips', () => {
   let httpStub;
