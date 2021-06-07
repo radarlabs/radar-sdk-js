@@ -44,11 +44,21 @@ class Http {
         return;
       }
 
+      // set headers
       xhr.setRequestHeader('Authorization', publishableKey);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
+      // set custom headers if present
+      const customHeaders = Cookie.getCookie(Cookie.CUSTOM_HEADERS);
+      if (customHeaders) {
+        const headers = JSON.parse(customHeaders);
+        Object.keys(headers).forEach((header) => {
+          xhr.setRequestHeader(header, headers[header]);
+        });
+      }
+    
       xhr.onload = () => {
         let response;
         try {

@@ -19,8 +19,17 @@ class Cookie {
   static get USER_ID () {
     return 'radar-userId';
   }
+  static get TRIP_OPTIONS () {
+    return 'radar-trip-options';
+  }
+  static get CUSTOM_HEADERS () {
+    return 'radar-custom-headers';
+  }
+  static get TRACK_ENDPOINT () {
+    return 'radar-track-endpoint';
+  }
 
-// parse cookie string to return value at {key}
+  // parse cookie string to return value at {key}
   static getCookie(key) {
     if (!document || document.cookie === undefined) {
       return null;
@@ -45,7 +54,8 @@ class Cookie {
     date.setFullYear(date.getFullYear() + 10);
 
     const expires = `expires=${date.toGMTString()}`;
-    document.cookie = `${key}=${value};path=/;${expires}`;
+    const sameSite = 'samesite=strict';
+    document.cookie = `${key}=${value};path=/;${sameSite};${expires}`;
   }
 
   // delete cookie with {key}

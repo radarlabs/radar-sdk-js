@@ -6,10 +6,12 @@ import Geocoding from './api/geocoding';
 import Routing from './api/routing';
 import Search from './api/search';
 import Track from './api/track';
+import Trips from './api/trips';
 
 // consts
 import SDK_VERSION from './version';
 import STATUS from './status';
+import { TRIP_STATUS } from './tripStatus';
 
 const defaultCallback = () => {};
 
@@ -49,8 +51,9 @@ class Radar {
     Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
   }
 
-  static setHost(host) {
+  static setHost(host, trackEndpoint) {
     Cookie.setCookie(Cookie.HOST, host, true);
+    Cookie.setCookie(Cookie.TRACK_ENDPOINT, trackEndpoint);
   }
 
   static setUserId(userId) {
@@ -60,6 +63,15 @@ class Radar {
     }
 
     Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
+  }
+
+  static setDeviceId(deviceId) {
+    if (!deviceId) {
+      Cookie.deleteCookie(Cookie.DEVICE_ID);
+      return;
+    }
+
+    Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
   }
 
   static setDescription(description) {
@@ -80,6 +92,15 @@ class Radar {
     Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
   }
 
+  static setRequestHeaders(headers={}) {
+    if (!Object.keys(headers).length) {
+      Cookie.deleteCookie(Cookie.CUSTOM_HEADERS);
+      return;
+    }
+
+    Cookie.setCookie(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
+  }
+
   static getLocation(callback=defaultCallback) {
     Navigator.getCurrentPosition()
       .then((location) => {
@@ -94,7 +115,6 @@ class Radar {
 
     if (typeof arg0 === 'function') {
       callback = arg0;
-
     } else {
       location = arg0;
       callback = arg1;
@@ -129,6 +149,61 @@ class Radar {
         callback(null, { context: response.context, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
+  }
+
+  static startTrip(tripOptions, callback=defaultCallback) {
+    Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
+      .then((response) => {
+        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
+
+        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static updateTrip(tripOptions, status, callback=defaultCallback) {
+    Trips.updateTrip(tripOptions, status)
+      .then((response) => {
+        // set cookie
+        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
+
+        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static completeTrip(callback=defaultCallback) {
+    const tripOptions = Radar.getTripOptions();
+
+    Trips.updateTrip(tripOptions, TRIP_STATUS.COMPLETED)
+      .then((response) => {
+        // clear tripOptions
+        Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
+
+        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static cancelTrip(callback=defaultCallback) {
+    const tripOptions = Radar.getTripOptions();
+
+    Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELLED)
+      .then((response) => {
+        // clear tripOptions
+        Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
+
+        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static getTripOptions() {
+    let tripOptions = Cookie.getCookie(Cookie.TRIP_OPTIONS);
+    if (tripOptions) {
+      tripOptions = JSON.parse(tripOptions);
+    }
+    return tripOptions;
   }
 
   static searchPlaces(searchOptions, callback=defaultCallback) {

@@ -31,10 +31,29 @@
       </div>
     </div>
 
-    <div class="p-3">
+    <div class="pl-3 pt-3">
       <form id="track-once" class="form-inline mb-0">
         <input id="publishable-key" class="form-control mr-sm-2" type="text" name="publishable-key" placeholder="Enter Publishable Key" style="width: 500px;"/>
         <button id="track-btn" class="btn btn-primary">Call Track Once</button>
+      </form>
+    </div>
+
+    <div class="pl-3 pt-3">
+      <a href="javascript:void(0)" id="show-trip-options">Show trip options</a>
+      <form id="trip-form" class="form mb-0 d-none">
+        <input id="trip-id" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Id" style="width: 400px;"/>
+        <select id="trip-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
+          <option key="" disabled>Select Mode</option>
+          <option key="car">car</option>
+          <option key="foot">foot</option>
+          <option key="bike">bike</option>
+          <option key="truck">truck</option>
+          <option key="motorbike">motorbike</option>
+        </select>
+        <input id="trip-destination-tag" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence Tag" style="width: 400px;"/>
+        <input id="trip-destination-externalId" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence External Id" style="width: 400px;"/>
+        <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
+        <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
       </form>
     </div>
 
@@ -135,6 +154,46 @@
 
           $('.results').removeClass('d-none');
         });
+      });
+
+      $("#trip-start-btn").click(function(e) {
+        e.preventDefault();
+        let externalId = $('#trip-id').val();
+        let mode = $('#trip-mode').val();
+        let destinationGeofenceTag = $('#trip-destination-tag').val();
+        let destinationGeofenceExternalId = $('#trip-destination-externalId').val();
+
+        const tripOptions = {
+          externalId,
+          mode,
+          destinationGeofenceTag,
+          destinationGeofenceExternalId,
+        }
+
+        Radar.startTrip(tripOptions, function(err, responseObj, response) {
+          const trip = responseObj.trip;
+          console.log(err, trip, response);
+        });
+      });
+
+      $("#trip-complete-btn").click(function(e) {
+        e.preventDefault();
+
+        Radar.completeTrip(function(err, responseObj, response) {
+          const trip = responseObj.trip;
+          console.log(err, trip, response);
+        });
+      });
+
+      $("#show-trip-options").click(function(e) {
+        e.preventDefault();
+        if ($("#trip-form").hasClass("d-none")) {
+          $('#show-trip-options').text('Hide trip options');
+          $('#trip-form').removeClass('d-none');
+        } else {
+          $('#show-trip-options').text('Show trip options');
+          $('#trip-form').addClass('d-none');
+        }
       });
 
       function formatCode(object) {
