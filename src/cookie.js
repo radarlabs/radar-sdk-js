@@ -25,8 +25,8 @@ class Cookie {
   static get CUSTOM_HEADERS () {
     return 'radar-custom-headers';
   }
-  static get TRACK_ENDPOINT () {
-    return 'radar-track-endpoint';
+  static get BASE_API_PATH () {
+    return 'radar-base-api-path';
   }
 
   // parse cookie string to return value at {key}

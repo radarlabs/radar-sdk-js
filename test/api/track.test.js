@@ -38,6 +38,7 @@ describe('Track', () => {
 
     getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
     getCookieStub.withArgs(Cookie.DESCRIPTION).returns(description);
+    getCookieStub.withArgs(Cookie.BASE_API_PATH).returns(null);
   });
 
   afterEach(() => {

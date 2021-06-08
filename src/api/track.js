@@ -44,7 +44,8 @@ class Track {
       tripOptions,
     };
 
-    const trackEndpoint = Cookie.getCookie(Cookie.TRACK_ENDPOINT) || 'v1/track';
+    const basePath = Cookie.getCookie(Cookie.BASE_API_PATH) || 'v1';
+    const trackEndpoint = `${basePath}/track`;
 
     const response = await Http.request('POST', trackEndpoint, body);
 
