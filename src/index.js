@@ -156,7 +156,7 @@ class Radar {
       .then((response) => {
         Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -167,7 +167,7 @@ class Radar {
         // set cookie
         Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -180,7 +180,7 @@ class Radar {
         // clear tripOptions
         Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -193,7 +193,7 @@ class Radar {
         // clear tripOptions
         Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
