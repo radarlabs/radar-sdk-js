@@ -19,6 +19,9 @@ class Cookie {
   static get USER_ID () {
     return 'radar-userId';
   }
+  static get INSTALL_ID () {
+    return 'radar-installId';
+  }
   static get TRIP_OPTIONS () {
     return 'radar-trip-options';
   }

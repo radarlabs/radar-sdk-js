@@ -65,13 +65,18 @@ class Radar {
     Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
-  static setDeviceId(deviceId) {
-    if (!deviceId) {
+  static setDeviceId(deviceId, installId) {
+    if (deviceId) {
+      Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+    } else {
       Cookie.deleteCookie(Cookie.DEVICE_ID);
-      return;
     }
-
-    Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+    
+    if (installId) {
+      Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
+    } else {
+      Cookie.deleteCookie(Cookie.DEVICE_ID);
+    }
   }
 
   static setDescription(description) {

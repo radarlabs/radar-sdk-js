@@ -16,6 +16,7 @@ class Track {
 
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
+    const installId = Cookie.getCookie(Cookie.INSTALL_ID) || deviceId;
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
 
     let metadata = Cookie.getCookie(Cookie.METADATA);
@@ -34,7 +35,7 @@ class Track {
       deviceId,
       deviceType: 'Web',
       foreground: true,
-      installId: deviceId,
+      installId,
       latitude,
       longitude,
       metadata,
