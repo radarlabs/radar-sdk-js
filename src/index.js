@@ -75,7 +75,7 @@ class Radar {
     if (installId) {
       Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
     } else {
-      Cookie.deleteCookie(Cookie.DEVICE_ID);
+      Cookie.deleteCookie(Cookie.INSTALL_ID);
     }
   }
 
