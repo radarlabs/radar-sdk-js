@@ -193,7 +193,7 @@ class Radar {
   static cancelTrip(callback=defaultCallback) {
     const tripOptions = Radar.getTripOptions();
 
-    Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELLED)
+    Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELED)
       .then((response) => {
         // clear tripOptions
         Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
