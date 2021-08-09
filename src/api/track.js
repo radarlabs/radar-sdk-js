@@ -17,7 +17,7 @@ class Track {
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
     const installId = Cookie.getCookie(Cookie.INSTALL_ID) || deviceId;
-    const deviceType = Cookie.getCookie(Cookie.DEVICE_TYPE) || 'web';
+    const deviceType = Cookie.getCookie(Cookie.DEVICE_TYPE) || 'Web';
     const description = Cookie.getCookie(Cookie.DESCRIPTION);
 
     let metadata = Cookie.getCookie(Cookie.METADATA);

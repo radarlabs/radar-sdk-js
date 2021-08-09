@@ -79,15 +79,6 @@ class Radar {
     }
   }
 
-  static setDeviceType(deviceType) {
-    if (!deviceType) {
-      Cookie.deleteCookie(Cookie.DEVICE_TYPE);
-      return;
-    }
-
-    Cookie.setCookie(Cookie.DEVICE_TYPE, String(deviceType).trim());
-  }
-
   static setDescription(description) {
     if (!description) {
       Cookie.deleteCookie(Cookie.DESCRIPTION);
