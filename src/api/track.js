@@ -7,12 +7,15 @@ import Navigator from '../navigator';
 import SDK_VERSION from '../version';
 
 class Track {
-  static async trackOnce(location={}) {
-    if (!location.latitude || !location.longitude) {
-      location = await Navigator.getCurrentPosition();
-    }
+  static async trackOnce(params={}) {
+    let { latitude, longitude, accuracy } = params;
 
-    const { latitude, longitude, accuracy } = location;
+    if (!latitude || !longitude) {
+      const deviceLocation = await Navigator.getCurrentPosition();
+      latitude = deviceLocation.latitude;
+      longitude = deviceLocation.longitude;
+      accuracy = deviceLocation.accuracy;
+    }
 
     const deviceId = Device.getId();
     const userId = Cookie.getCookie(Cookie.USER_ID);
@@ -30,12 +33,8 @@ class Track {
       tripOptions = JSON.parse(tripOptions);
     }
 
-    let nearbyBeacons = Cookie.getCookie(Cookie.NEARBY_BEACONS);
-    if (nearbyBeacons) {
-      nearbyBeacons = JSON.parse(nearbyBeacons);
-    }
-
     const body = {
+      ...params,
       accuracy,
       description,
       deviceId,
@@ -49,15 +48,13 @@ class Track {
       stopped: true,
       userId,
       tripOptions,
-      nearbyBeacons,
     };
 
     const basePath = Cookie.getCookie(Cookie.BASE_API_PATH) || 'v1';
     const trackEndpoint = `${basePath}/track`;
 
     const response = await Http.request('POST', trackEndpoint, body);
-
-    response.location = location;
+    response.location = { latitude, longitude, accuracy };
 
     return response;
   }
