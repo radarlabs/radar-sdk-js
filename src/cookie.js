@@ -28,6 +28,9 @@ class Cookie {
   static get TRIP_OPTIONS () {
     return 'radar-trip-options';
   }
+  static get NEARBY_BEACONS () {
+    return 'radar-nearby-beacons';
+  }
   static get CUSTOM_HEADERS () {
     return 'radar-custom-headers';
   }

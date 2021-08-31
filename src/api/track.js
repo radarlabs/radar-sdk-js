@@ -29,7 +29,12 @@ class Track {
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }
-  
+
+    let nearbyBeacons = Cookie.getCookie(Cookie.NEARBY_BEACONS);
+    if (nearbyBeacons) {
+      nearbyBeacons = JSON.parse(nearbyBeacons);
+    }
+
     const body = {
       accuracy,
       description,
@@ -44,6 +49,7 @@ class Track {
       stopped: true,
       userId,
       tripOptions,
+      nearbyBeacons,
     };
 
     const basePath = Cookie.getCookie(Cookie.BASE_API_PATH) || 'v1';
