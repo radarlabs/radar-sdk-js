@@ -61,6 +61,30 @@
       <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
       <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#007bff">
         <g fill="none" fill-rule="evenodd" stroke-width="2">
+  <div class="pl-3 pt-3">
+    <a href="javascript:void(0)" id="show-matrix-options">Show Matrix API options</a>
+    <form id="matrix-form" class="form mb-0 d-none">
+      <input id="matrix-origins" class="form-control mr-sm-2 mb-1" type="text"
+        placeholder="Enter pipe-delimited origin coordinates (latitude0,longitude0|latitude1,longitude1|....)"
+        style="width: 400px;" />
+      <input id="matrix-destinations" class="form-control mr-sm-2 mb-1" type="text"
+        placeholder="Enter pipe-delimited destination coordinates (latitude0,longitude0|latitude1,longitude1|....)"
+        style="width: 400px;" />
+      <select id="matrix-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
+        <option key="" disabled>Select Mode</option>
+        <option key="car">car</option>
+        <option key="foot">foot</option>
+        <option key="bike">bike</option>
+      </select>
+      <select id="matrix-units" class="form-control mr-sm-2 mb-1" style="width: 400px;">
+        <option key="" disabled>Select Units</option>
+        <option key="metric">metric</option>
+        <option key="imperial">imperial</option>
+      </select> 
+      <button id="matrix-run-btn" class="btn btn-primary">Perform Request</button>
+    </form>
+  </div>
+
         <circle cx="22" cy="22" r="1">
           <animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
           <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
@@ -75,8 +99,15 @@
 
     <div class="error p-3 d-none">
       <div id="error-message" class="alert alert-danger" role="alert">
+  <div class="matrix-responses p-3 d-none">
+    <div>
+      <h3>Matrix Response</h3>
+      <div class="matrix-response">
+        <pre><code id="matrix"></code></pre>
       </div>
     </div>
+  </div>
+
 
     <div class="results p-3 d-none">
       <div>
@@ -194,10 +225,40 @@
           $('#show-trip-options').text('Show trip options');
           $('#trip-form').addClass('d-none');
         }
+    $("#matrix-run-btn").click(function (e) {
+      $('.matrix-responses').addClass('d-none');
+      e.preventDefault();
+      let origins = $('#matrix-origins').val();
+      let destinations = $('#matrix-destinations').val();
+      let mode = $('#matrix-mode').val();
+      let units = $('#matrix-units').val();
+
+      const matrixOptions = {
+        origins,
+        destinations,
+        mode,
+        units,
+      }
+
+      Radar.getMatrix(matrixOptions, function (err, responseObj, response) {
+        const trip = responseObj.trip;
+        $('#matrix').html(formatCode(response));
+
+        $('.matrix-responses').removeClass('d-none');
+        console.log(err, trip, response);
       });
+    });
 
       function formatCode(object) {
         return JSON.stringify(object, null, '  ');
+    $("#show-matrix-options").click(function (e) {
+      e.preventDefault();
+      if ($("#matrix-form").hasClass("d-none")) {
+        $('#show-matrix-options').text('Hide Matrix API options');
+        $('#matrix-form').removeClass('d-none');
+      } else {
+        $('#show-matrix-options').text('Show Matrix API options');
+        $('#matrix-form').addClass('d-none');
       }
     </script>
   </body>
