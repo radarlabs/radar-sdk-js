@@ -11,23 +11,21 @@ class Matrix {
     let {
       origins,
       destinations,
-      modes,
+      mode,
       units,
     } = routingOptions;
 
     origins = origins;
+    mode = mode;
 
     if (destinations) {
       destinations = destinations;
-    }
-    if (modes) {
-      modes = modes.join(',');
     }
 
     const params = {
       origins,
       destinations,
-      modes,
+      mode,
       units,
     };
 
