@@ -286,7 +286,6 @@ class Radar {
   }
 
   static getMatrix(routingOptions, callback=defaultCallback) {
-    console.log("index.js routing options are " + JSON.stringify(routingOptions));
     Matrix.getMatrixDistances(routingOptions)
       .then((response) => {
         callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
