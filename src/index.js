@@ -4,6 +4,7 @@ import Navigator from './navigator';
 import Context from './api/context';
 import Geocoding from './api/geocoding';
 import Routing from './api/routing';
+import Matrix from './api/matrix';
 import Search from './api/search';
 import Track from './api/track';
 import Trips from './api/trips';
@@ -278,6 +279,15 @@ class Radar {
 
   static getDistance(routingOptions, callback=defaultCallback) {
     Routing.getDistanceToDestination(routingOptions)
+      .then((response) => {
+        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static getMatrix(routingOptions, callback=defaultCallback) {
+    console.log("index.js routing options are " + JSON.stringify(routingOptions));
+    Matrix.getMatrixDistances(routingOptions)
       .then((response) => {
         callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
       })
