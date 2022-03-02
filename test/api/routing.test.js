@@ -33,6 +33,11 @@ describe('Routing', () => {
 
   const routingResponse = { meta: {}, routes: {} };
 
+  const matrixMode = 'car';
+  const matrixOrigin = '40.70390,-73.98690';
+  const matrixDestination = '40.70390,-73.98690|40.73237,-73.94884';
+  const matrixResponse = { meta: {}, routes: {} };
+
   beforeEach(() => {
     navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     httpStub = sinon.stub(Http, 'request');
@@ -82,30 +87,6 @@ describe('Routing', () => {
       });
     });
   });
-});
-
-describe('Matrix', () => {
-  let httpStub;
-  let navigatorStub;
-
-  const origin = '40.73237,-73.94884';
-
-  const destination = '40.70390,-73.98690|40.73237,-73.94884';
-
-  const mode = 'car';
-  const units = 'imperial';
-
-  const routingResponse = { meta: {}, routes: {} };
-
-  beforeEach(() => {
-    navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
-    httpStub = sinon.stub(Http, 'request');
-  });
-
-  afterEach(() => {
-    Navigator.getCurrentPosition.restore();
-    Http.request.restore();
-  });
 
   context('getMatrixDistances', () => {
     describe('location permissions denied', () => {
@@ -123,24 +104,24 @@ describe('Matrix', () => {
     describe('location permissions approved', () => {
       describe('no args given', () => {
         it('should return a routing response', () => {
-          navigatorStub.resolves(origin);
-          httpStub.resolves(routingResponse);
+          navigatorStub.resolves(matrixOrigin);
+          httpStub.resolves(matrixResponse);
 
           return Matrix.getMatrixDistances()
             .then((response) => {
-              expect(response).to.equal(routingResponse);
+              expect(response).to.equal(matrixResponse);
             });
         });
       });
 
       describe('all args given', () => {
         it('should return a routing response', () => {
-          navigatorStub.resolves(origin);
-          httpStub.resolves(routingResponse);
+          navigatorStub.resolves(matrixOrigin);
+          httpStub.resolves(matrixResponse);
 
-          return Matrix.getMatrixDistances({ destination, mode, units })
+          return Matrix.getMatrixDistances({ matrixDestination, matrixMode, units })
             .then((response) => {
-              expect(response).to.equal(routingResponse);
+              expect(response).to.equal(matrixResponse);
             });
         });
       });
