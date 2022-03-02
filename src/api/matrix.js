@@ -15,13 +15,6 @@ class Matrix {
       units,
     } = routingOptions;
 
-    origins = origins;
-    mode = mode;
-
-    if (destinations) {
-      destinations = destinations;
-    }
-
     const params = {
       origins,
       destinations,
