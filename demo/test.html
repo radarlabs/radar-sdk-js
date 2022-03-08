@@ -1,287 +1,204 @@
 <html>
+  <head>
+    <title>Radar | Test SDK Script</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
 
-<head>
-  <title>Radar | Test SDK Script</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+    <script src="../dist/radar.js"></script>
 
-  <script src="../dist/radar.js"></script>
+    <style>
+      .links .btn.active {
+        background-color: #545b62;
+        border-color: #4e555b;
+      }
 
-  <style>
-    .links .btn.active {
-      background-color: #545b62;
-      border-color: #4e555b;
-    }
+      .result {
+        background-color: #f7f7f9;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+      }
 
-    .result {
-      background-color: #f7f7f9;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-    }
-
-    pre {
-      margin: 0;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="links pl-3 pt-3">
-    <div class="btn-group" role="group" aria-label="Basic example">
-      <a href='/' role="button" class="std-link btn btn-secondary">radar.js</a>
-      <a href='/?min' role="button" class="min-link btn btn-secondary">radar.min.js</a>
+      pre {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="links pl-3 pt-3">
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='/' role="button" class="std-link btn btn-secondary">radar.js</a>
+        <a href='/?min' role="button" class="min-link btn btn-secondary">radar.min.js</a>
+      </div>
     </div>
-  </div>
 
-  <div class="pl-3 pt-3">
-    <form id="track-once" class="form-inline mb-0">
-      <input id="publishable-key" class="form-control mr-sm-2" type="text" name="publishable-key"
-        placeholder="Enter Publishable Key" style="width: 500px;" />
-      <button id="track-btn" class="btn btn-primary">Call Track Once</button>
-    </form>
-  </div>
+    <div class="pl-3 pt-3">
+      <form id="track-once" class="form-inline mb-0">
+        <input id="publishable-key" class="form-control mr-sm-2" type="text" name="publishable-key" placeholder="Enter Publishable Key" style="width: 500px;"/>
+        <button id="track-btn" class="btn btn-primary">Call Track Once</button>
+      </form>
+    </div>
 
-  <div class="pl-3 pt-3">
-    <a href="javascript:void(0)" id="show-trip-options">Show trip options</a>
-    <form id="trip-form" class="form mb-0 d-none">
-      <input id="trip-id" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Id"
-        style="width: 400px;" />
-      <select id="trip-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
-        <option key="" disabled>Select Mode</option>
-        <option key="car">car</option>
-        <option key="foot">foot</option>
-        <option key="bike">bike</option>
-        <option key="truck">truck</option>
-        <option key="motorbike">motorbike</option>
-      </select>
-      <input id="trip-destination-tag" class="form-control mr-sm-2 mb-1" type="text"
-        placeholder="Enter Destination Geofence Tag" style="width: 400px;" />
-      <input id="trip-destination-externalId" class="form-control mr-sm-2 mb-1" type="text"
-        placeholder="Enter Destination Geofence External Id" style="width: 400px;" />
-      <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
-      <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
-    </form>
-  </div>
+    <div class="pl-3 pt-3">
+      <a href="javascript:void(0)" id="show-trip-options">Show trip options</a>
+      <form id="trip-form" class="form mb-0 d-none">
+        <input id="trip-id" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Id" style="width: 400px;"/>
+        <select id="trip-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
+          <option key="" disabled>Select Mode</option>
+          <option key="car">car</option>
+          <option key="foot">foot</option>
+          <option key="bike">bike</option>
+          <option key="truck">truck</option>
+          <option key="motorbike">motorbike</option>
+        </select>
+        <input id="trip-destination-tag" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence Tag" style="width: 400px;"/>
+        <input id="trip-destination-externalId" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence External Id" style="width: 400px;"/>
+        <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
+        <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
+      </form>
+    </div>
 
-  <div class="pl-3 pt-3">
-    <a href="javascript:void(0)" id="show-matrix-options">Show Matrix API options</a>
-    <form id="matrix-form" class="form mb-0 d-none">
-      <input id="matrix-origins" class="form-control mr-sm-2 mb-1" type="text"
-        placeholder="Enter pipe-delimited origin coordinates (latitude0,longitude0|latitude1,longitude1|....)"
-        style="width: 400px;" />
-      <input id="matrix-destinations" class="form-control mr-sm-2 mb-1" type="text"
-        placeholder="Enter pipe-delimited destination coordinates (latitude0,longitude0|latitude1,longitude1|....)"
-        style="width: 400px;" />
-      <select id="matrix-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
-        <option key="" disabled>Select Mode</option>
-        <option key="car">car</option>
-        <option key="foot">foot</option>
-        <option key="bike">bike</option>
-      </select>
-      <select id="matrix-units" class="form-control mr-sm-2 mb-1" style="width: 400px;">
-        <option key="" disabled>Select Units</option>
-        <option key="metric">metric</option>
-        <option key="imperial">imperial</option>
-      </select> 
-      <button id="matrix-run-btn" class="btn btn-primary">Perform Request</button>
-    </form>
-  </div>
-
-  <div class="loader pl-3 d-none">
-    <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
-    <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#007bff">
-      <g fill="none" fill-rule="evenodd" stroke-width="2">
+    <div class="loader pl-3 d-none">
+      <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
+      <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#007bff">
+        <g fill="none" fill-rule="evenodd" stroke-width="2">
         <circle cx="22" cy="22" r="1">
-          <animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1"
-            keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1"
-            keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
+          <animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
+          <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
         </circle>
         <circle cx="22" cy="22" r="1">
-          <animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1"
-            keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline"
-            keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
+          <animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
+          <animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
         </circle>
-      </g>
-    </svg>
-  </div>
-
-  <div class="matrix-responses p-3 d-none">
-    <div>
-      <h3>Matrix Response</h3>
-      <div class="matrix-response">
-        <pre><code id="matrix"></code></pre>
-      </div>
+        </g>
+      </svg>
     </div>
-  </div>
 
-  <div class="error p-3 d-none">
-    <div id="error-message" class="alert alert-danger" role="alert">
-    </div>
-  </div>
-
-  <div class="results p-3 d-none">
-    <div>
-      <h3>Status</h3>
-      <div class="result">
-        <pre><code id="status"></code></pre>
+    <div class="error p-3 d-none">
+      <div id="error-message" class="alert alert-danger" role="alert">
       </div>
     </div>
 
-    <div class="mt-4">
-      <h3>Location</h3>
-      <div class="result">
-        <pre><code id="location"></code></pre>
+    <div class="results p-3 d-none">
+      <div>
+        <h3>Status</h3>
+        <div class="result">
+          <pre><code id="status"></code></pre>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3>Location</h3>
+        <div class="result">
+          <pre><code id="location"></code></pre>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3>User</h3>
+        <div class="result">
+          <pre><code id="user"></code></pre>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3>Events</h3>
+        <div class="result">
+          <pre><code id="events"></code></pre>
+        </div>
       </div>
     </div>
 
-    <div class="mt-4">
-      <h3>User</h3>
-      <div class="result">
-        <pre><code id="user"></code></pre>
-      </div>
-    </div>
+    <script>
+      $('#track-once').on('submit', function(e) {
+        e.preventDefault();
+        $('input,button').prop('disabled', true);
+        $('.loader').removeClass('d-none');
+        $('.error').addClass('d-none');
+        $('.results').addClass('d-none');
 
-    <div class="mt-4">
-      <h3>Events</h3>
-      <div class="result">
-        <pre><code id="events"></code></pre>
-      </div>
-    </div>
-  </div>
+        let publishableKey = $('#publishable-key').val();
 
-  <script>
-    $('#track-once').on('submit', function (e) {
-      e.preventDefault();
-      $('input,button').prop('disabled', true);
-      $('.loader').removeClass('d-none');
-      $('.error').addClass('d-none');
-      $('.results').addClass('d-none');
+        Radar.initialize(publishableKey);
 
-      let publishableKey = $('#publishable-key').val();
+        Radar.trackOnce(function(err, responseObj, response) {
+          const location = responseObj.location;
+          const user = responseObj.user;
+          const events = responseObj.events;
 
-      Radar.initialize(publishableKey);
+          console.log(err, location, user, events, response);
 
-      Radar.trackOnce(function (err, responseObj, response) {
-        const location = responseObj.location;
-        const user = responseObj.user;
-        const events = responseObj.events;
+          $('input,button').prop('disabled', false);
+          $('.loader').addClass('d-none');
 
-        console.log(err, location, user, events, response);
+          if (err) {
+            console.error(err);
+            $('#error-message').html(err);
+            $('.error').removeClass('d-none');
+            return;
+          }
 
-        $('input,button').prop('disabled', false);
-        $('.loader').addClass('d-none');
+          $('#status').html(status);
 
-        if (err) {
-          console.error(err);
-          $('#error-message').html(err);
-          $('.error').removeClass('d-none');
-          return;
+          $('#location').html(formatCode({
+            accuracy: location.accuracy,
+            altitude: location.altitude,
+            altitudeAccuracy: location.altitudeAccuracy,
+            heading: location.heading,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            speed: location.speed,
+          }));
+
+          $('#user').html(formatCode(user));
+          $('#events').html(formatCode(events));
+
+          $('.results').removeClass('d-none');
+        });
+      });
+
+      $("#trip-start-btn").click(function(e) {
+        e.preventDefault();
+        let externalId = $('#trip-id').val();
+        let mode = $('#trip-mode').val();
+        let destinationGeofenceTag = $('#trip-destination-tag').val();
+        let destinationGeofenceExternalId = $('#trip-destination-externalId').val();
+
+        const tripOptions = {
+          externalId,
+          mode,
+          destinationGeofenceTag,
+          destinationGeofenceExternalId,
         }
 
-        $('#status').html(status);
-
-        $('#location').html(formatCode({
-          accuracy: location.accuracy,
-          altitude: location.altitude,
-          altitudeAccuracy: location.altitudeAccuracy,
-          heading: location.heading,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          speed: location.speed,
-        }));
-
-        $('#user').html(formatCode(user));
-        $('#events').html(formatCode(events));
-
-        $('.results').removeClass('d-none');
+        Radar.startTrip(tripOptions, function(err, responseObj, response) {
+          const trip = responseObj.trip;
+          console.log(err, trip, response);
+        });
       });
-    });
 
-    $("#trip-start-btn").click(function (e) {
-      e.preventDefault();
-      let externalId = $('#trip-id').val();
-      let mode = $('#trip-mode').val();
-      let destinationGeofenceTag = $('#trip-destination-tag').val();
-      let destinationGeofenceExternalId = $('#trip-destination-externalId').val();
+      $("#trip-complete-btn").click(function(e) {
+        e.preventDefault();
 
-      const tripOptions = {
-        externalId,
-        mode,
-        destinationGeofenceTag,
-        destinationGeofenceExternalId,
-      }
-
-      Radar.startTrip(tripOptions, function (err, responseObj, response) {
-        const trip = responseObj.trip;
-        console.log(err, trip, response);
+        Radar.completeTrip(function(err, responseObj, response) {
+          const trip = responseObj.trip;
+          console.log(err, trip, response);
+        });
       });
-    });
 
-    $("#trip-complete-btn").click(function (e) {
-      e.preventDefault();
-
-      Radar.completeTrip(function (err, responseObj, response) {
-        const trip = responseObj.trip;
-        console.log(err, trip, response);
+      $("#show-trip-options").click(function(e) {
+        e.preventDefault();
+        if ($("#trip-form").hasClass("d-none")) {
+          $('#show-trip-options').text('Hide trip options');
+          $('#trip-form').removeClass('d-none');
+        } else {
+          $('#show-trip-options').text('Show trip options');
+          $('#trip-form').addClass('d-none');
+        }
       });
-    });
 
-    
-
-    $("#show-trip-options").click(function (e) {
-      e.preventDefault();
-      if ($("#trip-form").hasClass("d-none")) {
-        $('#show-trip-options').text('Hide trip options');
-        $('#trip-form').removeClass('d-none');
-      } else {
-        $('#show-trip-options').text('Show trip options');
-        $('#trip-form').addClass('d-none');
+      function formatCode(object) {
+        return JSON.stringify(object, null, '  ');
       }
-    });
-
-    $("#matrix-run-btn").click(function (e) {
-      $('.matrix-responses').addClass('d-none');
-      e.preventDefault();
-      let origins = $('#matrix-origins').val();
-      let destinations = $('#matrix-destinations').val();
-      let mode = $('#matrix-mode').val();
-      let units = $('#matrix-units').val();
-
-      const matrixOptions = {
-        origins,
-        destinations,
-        mode,
-        units,
-      }
-
-      Radar.getMatrix(matrixOptions, function (err, responseObj, response) {
-        const trip = responseObj.trip;
-        $('#matrix').html(formatCode(response));
-
-        $('.matrix-responses').removeClass('d-none');
-        console.log(err, trip, response);
-      });
-    });
-
-    $("#show-matrix-options").click(function (e) {
-      e.preventDefault();
-      if ($("#matrix-form").hasClass("d-none")) {
-        $('#show-matrix-options').text('Hide Matrix API options');
-        $('#matrix-form').removeClass('d-none');
-      } else {
-        $('#show-matrix-options').text('Show Matrix API options');
-        $('#matrix-form').addClass('d-none');
-      }
-    });
-
-    function formatCode(object) {
-      return JSON.stringify(object, null, '  ');
-    }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>
