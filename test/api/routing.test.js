@@ -127,6 +127,7 @@ describe('Routing', () => {
           httpStub.resolves(matrixResponse);
 
           return Matrix.getMatrixDistances({ matrixOrigin, matrixDestination, matrixMode, units })
+          return Matrix.getMatrixDistances({ origins: matrixOrigin, destinations: matrixDestination, mode: matrixMode, units })
             .then((response) => {
               expect(response).to.equal(matrixResponse);
             });
