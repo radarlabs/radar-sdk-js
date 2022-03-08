@@ -5,7 +5,7 @@ class Matrix {
   static async getMatrixDistances(routingOptions={}) {
     if (!routingOptions.origins) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
-      routingOptions.origins = [{ latitude, longitude }, { latitude, longitude }];
+      routingOptions.origins = [{ latitude, longitude }];
     }
 
     let {
