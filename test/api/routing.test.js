@@ -34,8 +34,15 @@ describe('Routing', () => {
   const routingResponse = { meta: {}, routes: {} };
 
   const matrixMode = 'car';
-  const matrixOrigin = '40.70390,-73.98690';
-  const matrixDestination = '40.70390,-73.98690|40.73237,-73.94884';
+  // const matrixOrigin = [{
+  //   latitude: 40.70390, longitude: }];
+  const matrixOrigin = [{ 
+    latitude: 40.70390, 
+    longitude: -73.98690}];
+  const matrixDestination = [
+    {latitude: 40.70390, longitude: -73.98690},
+    {latitude: 40.73237, longitude: -73.94884}
+  ];
   const matrixResponse = { meta: {}, routes: {} };
 
   beforeEach(() => {
@@ -104,7 +111,7 @@ describe('Routing', () => {
     describe('location permissions approved', () => {
       describe('no args given', () => {
         it('should return a routing response', () => {
-          navigatorStub.resolves(matrixOrigin);
+          navigatorStub.resolves(origin);
           httpStub.resolves(matrixResponse);
 
           return Matrix.getMatrixDistances()
@@ -119,7 +126,7 @@ describe('Routing', () => {
           navigatorStub.resolves(matrixOrigin);
           httpStub.resolves(matrixResponse);
 
-          return Matrix.getMatrixDistances({ matrixDestination, matrixMode, units })
+          return Matrix.getMatrixDistances({ matrixOrigin, matrixDestination, matrixMode, units })
             .then((response) => {
               expect(response).to.equal(matrixResponse);
             });
