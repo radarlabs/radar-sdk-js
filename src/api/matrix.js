@@ -15,11 +15,13 @@ class Matrix {
       units,
     } = routingOptions;
 
-    origins = origins || [];
-    origins = origins.map(origin => { return `${origin.latitude}, ${origin.longitude}` }).join('|');
+    origins = (origins || [])
+      .map(origin => `${origin.latitude},${origin.longitude}`)
+      .join('|');
 
-    destinations = destinations || [];
-    destinations.map(destination => { return `${destination.latitude}, ${destination.longitude}` }).join('|');
+    destinations = (destinations || [])
+      .map(destination => `${destination.latitude},${destination.longitude}`)
+      .join('|');
 
     const params = {
       origins,
