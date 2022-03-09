@@ -36,7 +36,8 @@ describe('Routing', () => {
   const matrixMode = 'car';
   const matrixOrigin = [{ 
     latitude: 40.70390, 
-    longitude: -73.98690}];
+    longitude: -73.98690
+  }];
   const matrixDestination = [
     {latitude: 40.70390, longitude: -73.98690},
     {latitude: 40.73237, longitude: -73.94884}
