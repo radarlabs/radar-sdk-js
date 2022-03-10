@@ -12,7 +12,6 @@ import Navigator from '../../src/navigator';
 import STATUS from '../../src/status';
 
 import Routing from '../../src/api/routing';
-import Matrix from '../../src/api/matrix';
 
 describe('Routing', () => {
   let httpStub;
@@ -99,7 +98,7 @@ describe('Routing', () => {
       it('should throw a navigation error', () => {
         navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
 
-        return Matrix.getMatrixDistances()
+        return Routing.getMatrixDistances()
           .catch((err) => {
             expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
             expect(httpStub).to.have.callCount(0);
@@ -113,7 +112,7 @@ describe('Routing', () => {
           navigatorStub.resolves(origin);
           httpStub.resolves(matrixResponse);
 
-          return Matrix.getMatrixDistances()
+          return Routing.getMatrixDistances()
             .then((response) => {
               expect(response).to.equal(matrixResponse);
             });
@@ -125,7 +124,7 @@ describe('Routing', () => {
           navigatorStub.resolves(matrixOrigin);
           httpStub.resolves(matrixResponse);
 
-          return Matrix.getMatrixDistances({ origins: matrixOrigin, destinations: matrixDestination, mode: matrixMode, units })
+          return Routing.getMatrixDistances({ origins: matrixOrigin, destinations: matrixDestination, mode: matrixMode, units })
             .then((response) => {
               expect(response).to.equal(matrixResponse);
             });
