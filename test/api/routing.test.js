@@ -41,7 +41,7 @@ describe('Routing', () => {
     {latitude: 40.70390, longitude: -73.98690},
     {latitude: 40.73237, longitude: -73.94884}
   ];
-  const matrixResponse = { meta: {}, routes: {} };
+  const matrixResponse = { meta: {}, origins: {}, destinations: {}, matrix: {} };
 
   beforeEach(() => {
     navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
