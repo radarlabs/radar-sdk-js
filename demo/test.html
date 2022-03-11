@@ -106,6 +106,13 @@
           <pre><code id="events"></code></pre>
         </div>
       </div>
+
+      <div class="mt-4">
+        <h3>Matrix</h3>
+        <div class="result">
+          <pre><code id="matrix"></code></pre>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -153,6 +160,29 @@
           $('#events').html(formatCode(events));
 
           $('.results').removeClass('d-none');
+
+          // test matrix api
+          Radar.getMatrix(
+            {
+              origins: [
+                { latitude: '40.78382', longitude: '-73.97536' }
+              ],
+              destinations: [
+                { latitude: '40.70390', longitude: '-73.98670' },
+                { latitude: '40.68943', longitude: '-73.96901' }
+              ],
+              mode: 'car'
+            },
+            function(err, res) {
+              if (err) {
+                console.error(err);
+                $('#error-message').html(err);
+                $('.error').removeClass('d-none');
+                return;
+              }
+              $('#matrix').html(formatCode(res));
+            }
+          );
         });
       });
 
