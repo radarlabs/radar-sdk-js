@@ -33,7 +33,6 @@ describe('Routing', () => {
   const routingResponse = { meta: {}, routes: {} };
 
   const matrixMode = 'car';
-
   const matrixOrigin = [{ 
     latitude: 40.70390, 
     longitude: -73.98690
