@@ -7,6 +7,9 @@ class Cookie {
   static get DEVICE_ID() {
     return 'radar-deviceId';
   }
+  static get DEVICE_TYPE() {
+    return 'radar-deviceType';
+  }
   static get METADATA() {
     return 'radar-metadata';
   }
@@ -19,14 +22,17 @@ class Cookie {
   static get USER_ID () {
     return 'radar-userId';
   }
+  static get INSTALL_ID () {
+    return 'radar-installId';
+  }
   static get TRIP_OPTIONS () {
     return 'radar-trip-options';
   }
   static get CUSTOM_HEADERS () {
     return 'radar-custom-headers';
   }
-  static get TRACK_ENDPOINT () {
-    return 'radar-track-endpoint';
+  static get BASE_API_PATH () {
+    return 'radar-base-api-path';
   }
 
   // parse cookie string to return value at {key}

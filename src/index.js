@@ -51,9 +51,9 @@ class Radar {
     Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
   }
 
-  static setHost(host, trackEndpoint) {
+  static setHost(host, baseApiPath) {
     Cookie.setCookie(Cookie.HOST, host, true);
-    Cookie.setCookie(Cookie.TRACK_ENDPOINT, trackEndpoint);
+    Cookie.setCookie(Cookie.BASE_API_PATH, baseApiPath);
   }
 
   static setUserId(userId) {
@@ -65,13 +65,18 @@ class Radar {
     Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
-  static setDeviceId(deviceId) {
-    if (!deviceId) {
+  static setDeviceId(deviceId, installId) {
+    if (deviceId) {
+      Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+    } else {
       Cookie.deleteCookie(Cookie.DEVICE_ID);
-      return;
     }
-
-    Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+    
+    if (installId) {
+      Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
+    } else {
+      Cookie.deleteCookie(Cookie.INSTALL_ID);
+    }
   }
 
   static setDescription(description) {
@@ -156,7 +161,7 @@ class Radar {
       .then((response) => {
         Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -167,7 +172,7 @@ class Radar {
         // set cookie
         Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -180,7 +185,7 @@ class Radar {
         // clear tripOptions
         Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -188,12 +193,12 @@ class Radar {
   static cancelTrip(callback=defaultCallback) {
     const tripOptions = Radar.getTripOptions();
 
-    Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELLED)
+    Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELED)
       .then((response) => {
         // clear tripOptions
         Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
 
-        callback(null, { trip: response.trip, status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
@@ -278,6 +283,14 @@ class Radar {
 
   static getDistance(routingOptions, callback=defaultCallback) {
     Routing.getDistanceToDestination(routingOptions)
+      .then((response) => {
+        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static getMatrix(routingOptions, callback=defaultCallback) {
+    Routing.getMatrixDistances(routingOptions)
       .then((response) => {
         callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
       })

@@ -32,6 +32,17 @@ describe('Routing', () => {
 
   const routingResponse = { meta: {}, routes: {} };
 
+  const matrixMode = 'car';
+  const matrixOrigin = [{ 
+    latitude: 40.70390, 
+    longitude: -73.98690
+  }];
+  const matrixDestination = [
+    {latitude: 40.70390, longitude: -73.98690},
+    {latitude: 40.73237, longitude: -73.94884}
+  ];
+  const matrixResponse = { meta: {}, routes: {} };
+
   beforeEach(() => {
     navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     httpStub = sinon.stub(Http, 'request');
@@ -76,6 +87,46 @@ describe('Routing', () => {
           return Routing.getDistanceToDestination({ destination, modes, units })
             .then((response) => {
               expect(response).to.equal(routingResponse);
+            });
+        });
+      });
+    });
+  });
+
+  context('getMatrixDistances', () => {
+    describe('location permissions denied', () => {
+      it('should throw a navigation error', () => {
+        navigatorStub.rejects(STATUS.ERROR_PERMISSIONS);
+
+        return Routing.getMatrixDistances()
+          .catch((err) => {
+            expect(err.toString()).to.eq(STATUS.ERROR_PERMISSIONS);
+            expect(httpStub).to.have.callCount(0);
+          });
+      });
+    });
+
+    describe('location permissions approved', () => {
+      describe('no args given', () => {
+        it('should return a routing response', () => {
+          navigatorStub.resolves(origin);
+          httpStub.resolves(matrixResponse);
+
+          return Routing.getMatrixDistances()
+            .then((response) => {
+              expect(response).to.equal(matrixResponse);
+            });
+        });
+      });
+
+      describe('all args given', () => {
+        it('should return a routing response', () => {
+          navigatorStub.resolves(matrixOrigin);
+          httpStub.resolves(matrixResponse);
+
+          return Routing.getMatrixDistances({ origins: matrixOrigin, destinations: matrixDestination, mode: matrixMode, units })
+            .then((response) => {
+              expect(response).to.equal(matrixResponse);
             });
         });
       });

@@ -4,6 +4,6 @@ export const TRIP_STATUS = {
   ARRIVED: "arrived",
   COMPLETED: "completed",
   EXPIRED: "expired",
-  CANCELLED: "cancelled",
+  CANCELED: "canceled",
   UNKNOWN: undefined,
 };

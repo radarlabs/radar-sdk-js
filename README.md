@@ -12,6 +12,13 @@ See the Radar overview documentation [here](https://radar.io/documentation).
 
 Then, see the Radar web SDK documentation [here](https://radar.io/documentation/sdk/web).
 
+## Running locally
+
+1. Clone the repo
+2. `npm install`
+3. To run the SDK in a browser, run `npm run build && node demo/server.js`, which should open a tab in your browser of choice. Modify the `/src/index.html` file as needed
+4. To run tests, run `npm run test`
+
 ## Support
 
 Have questions? We're here to help! Email us at [support@radar.io](mailto:support@radar.io).
