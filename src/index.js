@@ -292,7 +292,7 @@ class Radar {
   static getMatrix(routingOptions, callback=defaultCallback) {
     Routing.getMatrixDistances(routingOptions)
       .then((response) => {
-        callback(null, { routes: response.routes, status: STATUS.SUCCESS }, response);
+        callback(null, { origins: response.origins, destinations: response.destinations, matrix: response.matrix, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
