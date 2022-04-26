@@ -24,6 +24,7 @@ describe('Search', () => {
   const tags = ['geofence-tag'];
   const metadata = {'geofence-metadata-key': 'geofence-metadata-value'};
   const layers = ['venue', 'address'];
+  const country = 'US';
   const limit = 50;
   const query = 'mock-query';
 
@@ -120,27 +121,27 @@ describe('Search', () => {
   });
 
   context('autocomplete', () => {
-    describe('near is not provided', () => {
-      it('should have near undefined and return an autocomplete response', () => {
+    describe('params are not provided', () => {
+      it('should have undefined params and return an autocomplete response', () => {
         httpStub.resolves(autocompleteResponse);
 
         return Search.autocomplete({ query })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
     });
 
-    describe('near is provided', () => {
+    describe('params are provided', () => {
       it('should return an autocomplete response', () => {
         httpStub.resolves(autocompleteResponse);
 
         const near = { latitude, longitude };
 
-        return Search.autocomplete({ near, query, limit, layers })
+        return Search.autocomplete({ near, query, limit, layers, country })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'] });
+            expect(Http.request).to.have.been.calledWith('GET', 'v1/search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country });
             expect(response).to.equal(autocompleteResponse);
           });
       });
