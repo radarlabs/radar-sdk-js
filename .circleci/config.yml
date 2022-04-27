@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:12.22.7
+      - image: cimg/node:12.22.12  # April 2022
     steps:
       - checkout
       - run:
