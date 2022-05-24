@@ -13,6 +13,7 @@ class Routing {
       destination,
       modes,
       units,
+      geometry,
     } = routingOptions;
 
     origin = `${origin.latitude},${origin.longitude}`;
@@ -29,6 +30,7 @@ class Routing {
       destination,
       modes,
       units,
+      geometry,
     };
 
     return Http.request('GET', 'v1/route/distance', params);
@@ -45,6 +47,7 @@ class Routing {
       destinations,
       mode,
       units,
+      geometry,
     } = routingOptions;
 
     origins = (origins || [])
@@ -60,6 +63,7 @@ class Routing {
       destinations,
       mode,
       units,
+      geometry,
     };
 
     return Http.request('GET', 'v1/route/matrix', params);
