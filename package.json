@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "version": "3.2.1",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "files": [
     "dist",
     "src",
@@ -13,11 +14,12 @@
   "scripts": {
     "prepare": "npm run build",
     "prebuild": "rimraf dist",
-    "build": "npm-run-all --parallel build:*",
+    "build": "npm-run-all --parallel build:* && cp index.d.ts ./dist/index.d.ts",
     "test": "nyc --reporter=lcov --reporter=text mocha ./test/** --require @babel/register",
     "test:watch": "npm run test -- -w",
     "demo": "npm run build && node demo/server.js",
     "build:cjs": "rollup -c rollup-cjs.config.js",
+    "build:es": "rollup -c rollup-es.config.js",
     "build:iife": "rollup -c rollup-iife.config.js",
     "build:iife-min": "rollup -c rollup-iife-min.config.js",
     "report-coverage": "./node_modules/.bin/codecov"
