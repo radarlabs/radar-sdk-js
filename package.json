@@ -4,8 +4,10 @@
   "homepage": "https://radar.io",
   "license": "Apache-2.0",
   "version": "3.2.1",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "main": "dist/index",
+  "type": "module",
+  "module": "dist/index.esm.js",
+  "umd": "dist/index/min.js",
   "files": [
     "dist",
     "src",
@@ -19,7 +21,7 @@
     "test:watch": "npm run test -- -w",
     "demo": "npm run build && node demo/server.js",
     "build:cjs": "rollup -c rollup-cjs.config.js",
-    "build:es": "rollup -c rollup-es.config.js",
+    "build:esm": "rollup -c rollup-esm.config.js",
     "build:iife": "rollup -c rollup-iife.config.js",
     "build:iife-min": "rollup -c rollup-iife-min.config.js",
     "report-coverage": "./node_modules/.bin/codecov"

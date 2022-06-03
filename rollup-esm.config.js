@@ -1,13 +1,11 @@
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
 
 export default {
   input: 'src/index.js',
   output: {
-    file: 'dist/index.es.js',
-    format: 'es',
-    name: 'Radar',
+    file: 'dist/index.esm.js',
+    format : 'esm'
   },
   plugins: [
     resolve(),
@@ -18,14 +16,12 @@ export default {
         [
           "@babel/env",
           {
-            "modules": false,
-            "useBuiltIns": "usage",
-            "corejs": 3,
-            "targets": "ie 11"
+            "targets": {
+              'browsers': ['Chrome >=70']
+          },
           }
         ]
       ]
     }),
-    commonjs(),
   ],
 };
