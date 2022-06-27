@@ -59,10 +59,10 @@ class Cookie {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 10);
 
-    const expires = `expires=${date.toGMTString()}`;
-    const sameSite = 'samesite=strict';
-    const secure = 'secure=true';
-    const httpOnly = 'httpOnly=true';
+    const expires = `Expires=${date.toGMTString()}`;
+    const sameSite = 'SameSite=Strict';
+    const secure = 'Secure=true';
+    const httpOnly = 'HttpOnly=true';
     document.cookie = `${key}=${value};path=/;${sameSite};${expires};${secure};${httpOnly}`;
   }
 
