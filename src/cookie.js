@@ -61,7 +61,9 @@ class Cookie {
 
     const expires = `expires=${date.toGMTString()}`;
     const sameSite = 'samesite=strict';
-    document.cookie = `${key}=${value};path=/;${sameSite};${expires}`;
+    const secure = 'secure=true';
+    const httpOnly = 'httpOnly=true';
+    document.cookie = `${key}=${value};path=/;${sameSite};${expires};${secure};${httpOnly}`;
   }
 
   // delete cookie with {key}
