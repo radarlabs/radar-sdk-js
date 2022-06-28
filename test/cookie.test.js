@@ -55,7 +55,7 @@ describe('Cookie', () => {
       expect(key).to.equal('hello');
       expect(value).to.equal('world');
       expect(path).to.equal('path=/');
-      expect(samesite).to.equal('samesite=strict');
+      expect(samesite).to.equal('SameSite=Strict');
       expect(new Date(expires.split('='))).to.be.greaterThan(new Date());
     });
 
