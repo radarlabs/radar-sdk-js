@@ -1,0 +1,27 @@
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened]
+
+jobs:
+  create_ticket_job:
+    name: Create Shortcut Ticket for Dependabot Alerts
+    if: contains(github.event.pull_request.user.login, 'dependabot') || contains(github.event.pull_request.body, 'dependabot') || contains(github.event.pull_request.head.ref, 'dependabot')
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create Shortcut Tickets for Dependabot Alerts
+        id: dependabot
+        uses: radarlabs/shortcut-ticket-gh-action@v1.2
+        env:
+          SHORTCUT_TOKEN: ${{ secrets.CLUBHOUSE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROJECT_ID: 5255
+          ALERT_TYPE: dependabot
+          PULL_REQUEST: ${{ toJson(github.event.pull_request) }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      
+      - name: Did the ticket get created?
+        run: |
+          echo "Ticket created: ${{ steps.dependabot.outputs.tickets }}"
