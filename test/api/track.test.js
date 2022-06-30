@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import Cookie from '../../src/cookie';
+import SessionStorage from '../../src/sessionStorage';
 import Device from '../../src/device';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
@@ -16,7 +16,7 @@ import Track from '../../src/api/track';
 import { latitude, longitude } from '../common';
 
 describe('Track', () => {
-  let getCookieStub;
+  let getSessionStorageStub;
   let httpStub;
   let navigatorStub;
 
@@ -31,18 +31,18 @@ describe('Track', () => {
   const trackResponse = { meta: {}, user: {}, events: {}, location };
 
   beforeEach(() => {
-    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    getSessionStorageStub = sinon.stub(SessionStorage, 'getSessionStorage');
     httpStub = sinon.stub(Http, 'request');
     navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
     sinon.stub(Device, 'getId').returns(deviceId);
 
-    getCookieStub.withArgs(Cookie.USER_ID).returns(userId);
-    getCookieStub.withArgs(Cookie.DESCRIPTION).returns(description);
-    getCookieStub.withArgs(Cookie.BASE_API_PATH).returns(null);
+    getSessionStorageStub.withArgs(SessionStorage.USER_ID).returns(userId);
+    getSessionStorageStub.withArgs(SessionStorage.DESCRIPTION).returns(description);
+    getSessionStorageStub.withArgs(SessionStorage.BASE_API_PATH).returns(null);
   });
 
   afterEach(() => {
-    Cookie.getCookie.restore();
+    SessionStorage.getSessionStorage.restore();
     Http.request.restore();
     Navigator.getCurrentPosition.restore();
     Device.getId.restore();
@@ -64,7 +64,7 @@ describe('Track', () => {
     describe('location permissions approved', () => {
       it('should return a track response with metadata', () => {
         navigatorStub.resolves(location);
-        getCookieStub.withArgs(Cookie.METADATA).returns(JSON.stringify(metadata));
+        getSessionStorageStub.withArgs(SessionStorage.METADATA).returns(JSON.stringify(metadata));
         httpStub.resolves({ meta: {}, user: {}, events: {} });
 
         return Track.trackOnce()
@@ -75,7 +75,7 @@ describe('Track', () => {
 
       it('should return a track response without metadata', () => {
         navigatorStub.resolves(location);
-        getCookieStub.withArgs(Cookie.METADATA).returns(null);
+        getSessionStorageStub.withArgs(SessionStorage.METADATA).returns(null);
         httpStub.resolves({ meta: {}, user: {}, events: {} });
 
         return Track.trackOnce()
@@ -94,7 +94,7 @@ describe('Track', () => {
           mode: 'car',
         }
         navigatorStub.resolves(location);
-        getCookieStub.withArgs(Cookie.TRIP_OPTIONS).returns(JSON.stringify(tripOptions));
+        getSessionStorageStub.withArgs(SessionStorage.TRIP_OPTIONS).returns(JSON.stringify(tripOptions));
         httpStub.resolves({ meta: {}, user: {}, events: {} });
 
         return Track.trackOnce()

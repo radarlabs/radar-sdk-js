@@ -1,4 +1,4 @@
-import Cookie from '../cookie';
+import SessionStorage from '../sessionStorage';
 import Http from '../http';
 
 class Trips {
@@ -22,7 +22,7 @@ class Trips {
       metadata,
     };
 
-    const basePath = Cookie.getCookie(Cookie.BASE_API_PATH) || 'v1';
+    const basePath = SessionStorage.getSessionStorage(SessionStorage.BASE_API_PATH) || 'v1';
     return Http.request('PATCH', `${basePath}/trips/${externalId}`, params);
   }
 }

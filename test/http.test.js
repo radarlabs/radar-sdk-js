@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-import Cookie from '../src/cookie';
+import SessionStorage from '../src/sessionStorage';
 import Http from '../src/http';
 import Radar from '../src/index';
 import STATUS from '../src/status';
@@ -9,7 +9,7 @@ import SDK_VERSION from '../src/version';
 
 
 describe('Http', () => {
-  let getCookieStub;
+  let getSessionStorageStub;
 
   let request;
 
@@ -24,12 +24,12 @@ describe('Http', () => {
       request = xhrRequest;
     };
 
-    getCookieStub = sinon.stub(Cookie, 'getCookie');
+    getSessionStorageStub = sinon.stub(SessionStorage, 'getSessionStorage');
   });
 
   afterEach(() => {
     global.XMLHttpRequest.restore();
-    Cookie.getCookie.restore();
+    SessionStorage.getSessionStorage.restore();
   });
 
   context('http requests', () => {
@@ -37,7 +37,7 @@ describe('Http', () => {
     let httpRequest;
 
     beforeEach(() => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      getSessionStorageStub.withArgs(SessionStorage.PUBLISHABLE_KEY).returns(publishableKey);
       httpRequest = Http.request('PUT', 'v1/users/userId', { valid: true, invalid: undefined });
     });
 
@@ -210,7 +210,7 @@ describe('Http', () => {
       });
 
       it('should return a publishable key error if not set', async () => {
-        getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(null);
+        getSessionStorageStub.withArgs(SessionStorage.PUBLISHABLE_KEY).returns(null);
 
         try {
           await Http.request('PUT', 'v1/users/userId', {});
@@ -238,7 +238,7 @@ describe('Http', () => {
     const data = { query: '20 Jay Street' };
 
     it('should inject GET parameters into the url querystring', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      getSessionStorageStub.withArgs(SessionStorage.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
 
@@ -255,7 +255,7 @@ describe('Http', () => {
     });
 
     it('should not append querystring of no params', async () => {
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
+      getSessionStorageStub.withArgs(SessionStorage.PUBLISHABLE_KEY).returns(publishableKey);
 
       const httpRequest = Http.request('GET', 'v1/geocode/forward', {});
 
@@ -278,8 +278,8 @@ describe('Http', () => {
         'X-Test': 'true',
       };
 
-      getCookieStub.withArgs(Cookie.PUBLISHABLE_KEY).returns(publishableKey);
-      getCookieStub.withArgs(Cookie.CUSTOM_HEADERS).returns(JSON.stringify(customHeaders));
+      getSessionStorageStub.withArgs(SessionStorage.PUBLISHABLE_KEY).returns(publishableKey);
+      getSessionStorageStub.withArgs(SessionStorage.CUSTOM_HEADERS).returns(JSON.stringify(customHeaders));
 
       const data = { query: '20 Jay Street' };
       const httpRequest = Http.request('GET', 'v1/geocode/forward', data);

@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import Cookie from '../src/cookie';
+import SessionStorage from '../src/sessionStorage';
 import Navigator from '../src/navigator';
 
 import Context from '../src/api/context';
@@ -44,15 +44,15 @@ describe('Radar', () => {
   const units = 'imperial';
 
   beforeEach(() => {
-    sinon.stub(Cookie, 'deleteCookie');
-    sinon.stub(Cookie, 'setCookie');
-    sinon.stub(Cookie, 'getCookie');
+    sinon.stub(SessionStorage, 'deleteSessionStorage');
+    sinon.stub(SessionStorage, 'setSessionStorage');
+    sinon.stub(SessionStorage, 'getSessionStorage');
   });
 
   afterEach(() => {
-    Cookie.deleteCookie.restore();
-    Cookie.getCookie.restore();
-    Cookie.setCookie.restore();
+    SessionStorage.deleteSessionStorage.restore();
+    SessionStorage.getSessionStorage.restore();
+    SessionStorage.setSessionStorage.restore();
   });
 
   describe('VERSION', () => {
@@ -86,102 +86,102 @@ describe('Radar', () => {
     context('called with publishable key', () => {
       const publishableKey = 'test-key';
 
-      it('should save publishable key to cookie', () => {
+      it('should save publishable key to sessionStorage', () => {
         Radar.initialize(publishableKey);
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.PUBLISHABLE_KEY, publishableKey);
+        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.PUBLISHABLE_KEY, publishableKey);
       });
     });
   });
 
   describe('setHost', () => {
-    it('should save the host to cookie', () => {
+    it('should save the host to sessionStorage', () => {
       const host = 'http://fakehost.com';
       Radar.setHost(host);
-      expect(Cookie.setCookie).to.have.been.calledWith(Cookie.HOST, host);
+      expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.HOST, host);
     });
   });
 
   describe('setUserId', () => {
     context('no userId given', () => {
-      it('should delete userId from cookie', () => {
+      it('should delete userId from sessionStorage', () => {
         Radar.setUserId();
-        expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.USER_ID);
+        expect(SessionStorage.deleteSessionStorage).to.have.been.calledWith(SessionStorage.USER_ID);
       });
     });
 
     context('userId given', () => {
-      it('should save userId in cookie', () => {
+      it('should save userId in sessionStorage', () => {
         const userId = 'abc123';
         Radar.setUserId(userId);
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.USER_ID, userId);
+        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.USER_ID, userId);
       });
     });
   });
 
   describe('setDeviceId', () => {
     context('no deviceId given', () => {
-      it('should delete deviceId from cookie', () => {
+      it('should delete deviceId from sessionStorage', () => {
         Radar.setDeviceId();
-        expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DEVICE_ID);
+        expect(SessionStorage.deleteSessionStorage).to.have.been.calledWith(SessionStorage.DEVICE_ID);
       });
     });
 
     context('deviceId given', () => {
-      it('should save deviceId in cookie', () => {
+      it('should save deviceId in sessionStorage', () => {
         const deviceId = 'a0a0a0';
         Radar.setDeviceId(deviceId);
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DEVICE_ID, deviceId);
+        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.DEVICE_ID, deviceId);
       });
     });
   });
 
   describe('setDescription', () => {
     context('no description given', () => {
-      it('should delete description from cookie', () => {
+      it('should delete description from sessionStorage', () => {
         Radar.setDescription();
-        expect(Cookie.deleteCookie).to.have.been.calledWith(Cookie.DESCRIPTION);
+        expect(SessionStorage.deleteSessionStorage).to.have.been.calledWith(SessionStorage.DESCRIPTION);
       });
     });
 
     context('description given', () => {
-      it('should save description in cookie', () => {
+      it('should save description in sessionStorage', () => {
         const description = 'abc123';
         Radar.setDescription(description);
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DESCRIPTION, description);
+        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.DESCRIPTION, description);
       });
     });
   });
 
   describe('setMetadata', () => {
     context('no metadata given', () => {
-      it('should delete metadata from cookie', () => {
+      it('should delete metadata from sessionStorage', () => {
         Radar.setMetadata();
-        expect(Cookie.deleteCookie).to.be.calledWith(Cookie.METADATA);
+        expect(SessionStorage.deleteSessionStorage).to.be.calledWith(SessionStorage.METADATA);
       });
     });
 
     context('metadata given', () => {
-      it('should save metadata in cookie', () => {
+      it('should save metadata in sessionStorage', () => {
         const metadata = { meta: 'mock-metadata' };
         Radar.setMetadata(metadata);
-        expect(Cookie.setCookie).to.be.calledWith(Cookie.METADATA, JSON.stringify(metadata));
+        expect(SessionStorage.setSessionStorage).to.be.calledWith(SessionStorage.METADATA, JSON.stringify(metadata));
       });
     });
   });
 
   describe('setRequestHeaders', () => {
     context('no headers given', () => {
-      it('should delete metadata from cookie', () => {
+      it('should delete metadata from sessionStorage', () => {
         Radar.setRequestHeaders();
-        expect(Cookie.deleteCookie).to.be.calledWith(Cookie.CUSTOM_HEADERS);
+        expect(SessionStorage.deleteSessionStorage).to.be.calledWith(SessionStorage.CUSTOM_HEADERS);
       });
     });
 
     context('headers given', () => {
-      it('should save metadata in cookie', () => {
+      it('should save metadata in sessionStorage', () => {
         const headers = { 'X-Boolean': true, 'X-String': 'string', 'X-Number': 2 };
         Radar.setRequestHeaders(headers);
-        expect(Cookie.setCookie).to.be.calledWith(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
+        expect(SessionStorage.setSessionStorage).to.be.calledWith(SessionStorage.CUSTOM_HEADERS, JSON.stringify(headers));
       });
     });
   });
