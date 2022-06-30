@@ -1,3 +1,4 @@
+import Cookie from './cookie';
 import SessionStorage from './sessionStorage';
 
 const generateUUID = () => {
@@ -13,7 +14,7 @@ const generateUUID = () => {
 class Device {
   static getId() {
     // use existing deviceId if present
-    const deviceId = SessionStorage.getSessionStorage(SessionStorage.DEVICE_ID);
+    const deviceId = Cookie.getCookie(Cookie.DEVICE_ID);
     if (deviceId) {
       return deviceId;
     }
@@ -21,6 +22,7 @@ class Device {
     // generate new deviceId
     const uuid = generateUUID();
     SessionStorage.setSessionStorage(SessionStorage.DEVICE_ID, uuid);
+    // Cookie.setCookie(Cookie.DEVICE_ID, uuid);
     return uuid;
   }
 }

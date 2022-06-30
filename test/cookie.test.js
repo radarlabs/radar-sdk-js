@@ -1,43 +1,38 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-import SessionStorage from '../src/sessionStorage';
 
-describe('SessionStorage', () => {
-  describe('getSessionStorage', () => {
-    let document;
-    // SessionStorage.setSessionStorage('hello', 'world');
-    // SessionStorage.setSessionStorage('foo', 'bar');
-    // SessionStorage.setSessionStorage('bar', 'baz');
+import Cookie from '../src/cookie';
+
+describe('Cookie', () => {
+  describe('getCookie', () => {
+    const cookie = 'foo=bar;hello=world;bar=baz';
+
     beforeEach(() => {
-      SessionStorage.setSessionStorage('hello', 'world');
-      SessionStorage.setSessionStorage('foo', 'bar');
-      SessionStorage.setSessionStorage('bar', 'baz');
-      document = sinon.spy();
-      global.document = document;
+      global.document = { cookie };
     });
 
     afterEach(() => {
       global.document = undefined;
     });
 
-    it('should return value of sessionStorage from a given key', () => {
-      const value = global.document.sessionStorage.getSessionStorage('hello');
+    it('should return value of cookie from a given key', () => {
+      const value = Cookie.getCookie('hello');
       expect(value).to.equal('world');
     });
 
     it('should return null if key not found', () => {
-      const value = global.document.sessionStorage.getSessionStorage('unknown');
+      const value = Cookie.getCookie('unknown');
       expect(value).to.be.null;
     });
 
-    it('should return null if sessionStorage key is undefined', () => {
-      global.document.sessionStorage = undefined;
-      const value = global.document.sessionStorage.getSessionStorage('foo');
+    it('should return null if cookie is undefined', () => {
+      global.document.cookie = undefined;
+      const value = Cookie.getCookie('foo');
       expect(value).to.be.null;
     });
   });
 
-  describe('setSessionStorage', () => {
+  describe('setCookie', () => {
 
     let document;
     beforeEach(() => {
@@ -49,35 +44,47 @@ describe('SessionStorage', () => {
       global.document = undefined;
     });
 
-    it('should write the key and value to the browsers sessionStorage', () => {
-      global.document.sessionStorage.setSessionStorage('hello', 'world');
+    it('should write the key and value to the browsers cookies, and set expiration in future', () => {
+      Cookie.setCookie('hello', 'world');
 
-      expect(document.sessionStorage).to.not.be.undefined;
-      const value = document.sessionStorage.getSessionStorage('hello');
+      expect(document.cookie).to.not.be.undefined;
+
+      const [cookie, path, samesite, expires] = document.cookie.split(';');
+      const [key, value] = cookie.split('=');
+
+      expect(key).to.equal('hello');
       expect(value).to.equal('world');
+      expect(path).to.equal('path=/');
+      expect(samesite).to.equal('samesite=strict');
+      expect(new Date(expires.split('='))).to.be.greaterThan(new Date());
     });
 
-    it('should not set sessionStorage if value is not a string', () => {
-      document.sessionStorage.setSessionStorage('foo', { hello: 'world' });
-      expect(document.sessionStorage).to.be.undefined;
+    it('should not set cookie if value is not a string', () => {
+      Cookie.setCookie('foo', { hello: 'world' });
+      expect(document.cookie).to.be.undefined;
     });
   });
 
-  describe('deleteSessionStorage', () => {
-    let document;
+  describe('deleteCookie', () => {
+    const cookie = 'foo=bar;';
+
     beforeEach(() => {
-      document = sinon.spy();
-      document.sessionStorage.setSessionStorage('foo', 'bar');
-      global.document = document;
+      global.document = { cookie };
     });
 
     afterEach(() => {
       global.document = undefined;
     });
 
-    it('should clear session storage', () => {
-      document.sessionStorage.clearSessionStorage();
-      expect(document.sessionStorage).to.be.undefined;
+    it('should set an expiration date on cookie in the past', () => {
+      Cookie.deleteCookie('foo');
+      expect(global.document.cookie).to.eq('foo=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/');
+    });
+
+    it('should not set anything if cookie is undefined', () => {
+      global.document.cookie = undefined;
+      Cookie.deleteCookie('foo');
+      expect(global.document.cookie).to.be.undefined;
     });
   });
 });

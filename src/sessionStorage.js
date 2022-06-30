@@ -36,30 +36,30 @@ class SessionStorage {
     }
 
     static setSessionStorage(key, value) {
-        if (!document || !document.sessionStorage === undefined || typeof value !== 'string'){
+        if (!document || !sessionStorage === undefined || typeof value !== 'string'){
             return;
         }
 
-        document.sessionStorage.setItem(key, value);
+        sessionStorage.setItem(key, value);
         
     }
 
     static getSessionStorage(key) {
-        if (!document || !document.sessionStorage === undefined) {
+        if (!document || !sessionStorage === undefined) {
             return null;
         }
 
-        const value = document.sessionStorage.getItem(key);
+        const value = sessionStorage.getItem(key);
 
         return value ? value !== undefined : null;
     }
 
     static deleteSessionStorage(key) {
-        if (!document || !document.sessionStorage === undefined) {
+        if (!document || !sessionStorage === undefined) {
             return;
         }
 
-        document.sessionStorage.removeItem(key);
+        sessionStorage.removeItem(key);
     }
 
     static clearSessionStorage(){
@@ -67,7 +67,7 @@ class SessionStorage {
             return;
         }
 
-        document.sessionStorage.clear();
+        sessionStorage.clear();
     }
 }
 
