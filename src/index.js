@@ -6,6 +6,7 @@ import Routing from './api/routing';
 import Search from './api/search';
 import Track from './api/track';
 import Trips from './api/trips';
+import SessionStorage from './sessionStorage';
 
 // consts
 import SDK_VERSION from './version';
