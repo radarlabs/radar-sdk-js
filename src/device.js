@@ -1,4 +1,4 @@
-import Cookie from './cookie';
+import SessionStorage from './sessionStorage';
 
 const generateUUID = () => {
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
@@ -13,14 +13,14 @@ const generateUUID = () => {
 class Device {
   static getId() {
     // use existing deviceId if present
-    const deviceId = Cookie.getCookie(Cookie.DEVICE_ID);
+    const deviceId = SessionStorage.getSessionStorage(SessionStorage.DEVICE_ID);
     if (deviceId) {
       return deviceId;
     }
 
     // generate new deviceId
     const uuid = generateUUID();
-    Cookie.setCookie(Cookie.DEVICE_ID, uuid);
+    SessionStorage.setSessionStorage(SessionStorage.DEVICE_ID, uuid);
     return uuid;
   }
 }

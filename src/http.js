@@ -1,4 +1,4 @@
-import Cookie from './cookie';
+import SessionStorage from './sessionStorage';
 
 // consts
 import API_HOST from './api_host';
@@ -38,7 +38,7 @@ class Http {
 
       xhr.open(method, url, true);
 
-      const publishableKey = Cookie.getCookie(Cookie.PUBLISHABLE_KEY);
+      const publishableKey = SessionStorage.getSessionStorage(SessionStorage.PUBLISHABLE_KEY);
       if (!publishableKey) {
         reject(STATUS.ERROR_PUBLISHABLE_KEY);
         return;
@@ -51,7 +51,7 @@ class Http {
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
       // set custom headers if present
-      const customHeaders = Cookie.getCookie(Cookie.CUSTOM_HEADERS);
+      const customHeaders = SessionStorage.getSessionStorage(SessionStorage.CUSTOM_HEADERS);
       if (customHeaders) {
         const headers = JSON.parse(customHeaders);
         Object.keys(headers).forEach((header) => {

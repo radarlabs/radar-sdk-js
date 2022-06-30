@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import Cookie from '../src/cookie';
+import SessionStorage from '../src/sessionStorage';
 import Device from '../src/device';
 
 describe('Device', () => {
@@ -13,20 +13,20 @@ describe('Device', () => {
     context('deviceId has not been set', () => {
 
       before(() => {
-        sinon.stub(Cookie, 'getCookie');
-        sinon.stub(Cookie, 'setCookie');
+        sinon.stub(SessionStorage, 'getSessionStorage');
+        sinon.stub(SessionStorage, 'setSessionStorage');
       });
 
       after(() => {
-        Cookie.getCookie.restore();
-        Cookie.setCookie.restore();
+        SessionStorage.getSessionStorage.restore();
+        SessionStorage.setSessionStorage.restore();
       });
 
-      it('should generate a new deviceId in cookie, and return the value', () => {
+      it('should generate a new deviceId in sessionStorage, and return the value', () => {
         const deviceId = Device.getId();
 
-        expect(Cookie.setCookie).to.have.been.called;
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DEVICE_ID, deviceId);
+        expect(SessionStorage.setSessionStorage).to.have.been.called;
+        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.DEVICE_ID, deviceId);
       });
     });
 
@@ -34,16 +34,16 @@ describe('Device', () => {
       const deviceId = "abc-123";
 
       before(() => {
-        sinon.stub(Cookie, 'getCookie').callsFake(() => {
+        sinon.stub(SessionStorage, 'getSessionStorage').callsFake(() => {
           return deviceId;
         });
       });
 
       after(() => {
-        Cookie.getCookie.restore();
+        SessionStorage.getSessionStorage.restore();
       });
 
-      it('should return the deviceId stored saved in the cookie', () => {
+      it('should return the deviceId stored saved in the sessionStorage', () => {
         expect(Device.getId()).to.equal(deviceId);
       });
     });

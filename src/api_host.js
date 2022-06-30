@@ -1,10 +1,10 @@
-import Cookie from './cookie';
+import SessionStorage from './sessionStorage';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 
 class API_HOST {
   static getHost() {
-    return Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    return SessionStorage.getSessionStorage(SessionStorage.HOST) || DEFAULT_HOST;
   }
 }
 

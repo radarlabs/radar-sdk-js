@@ -1,4 +1,3 @@
-import Cookie from './cookie';
 import Navigator from './navigator';
 
 import Context from './api/context';
@@ -48,62 +47,59 @@ class Radar {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
     }
-    Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
+    SessionStorage.setSessionStorage(SessionStorage.PUBLISHABLE_KEY, publishableKey);
   }
 
   static setHost(host, baseApiPath) {
-    Cookie.setCookie(Cookie.HOST, host, true);
-    Cookie.setCookie(Cookie.BASE_API_PATH, baseApiPath);
+    SessionStorage.setSessionStorage(SessionStorage.HOST, host);
+    SessionStorage.setSessionStorage(SessionStorage.BASE_API_PATH, baseApiPath);
   }
 
   static setUserId(userId) {
     if (!userId) {
-      Cookie.deleteCookie(Cookie.USER_ID);
+      SessionStorage.deleteSessionStorage(SessionStorage.USER_ID);
       return;
     }
-
-    Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
+    SessionStorage.setSessionStorage(SessionStorage.USER_ID, String(userId).trim());
   }
 
   static setDeviceId(deviceId, installId) {
     if (deviceId) {
-      Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+      SessionStorage.setSessionStorage(SessionStorage.DEVICE_ID, String(deviceId).trim());
     } else {
-      Cookie.deleteCookie(Cookie.DEVICE_ID);
+      SessionStorage.deleteSessionStorage(SessionStorage.DEVICE_ID);
     }
     
     if (installId) {
-      Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
+      SessionStorage.setSessionStorage(SessionStorage.INSTALL_ID, String(installId).trim());
     } else {
-      Cookie.deleteCookie(Cookie.INSTALL_ID);
+      SessionStorage.deleteSessionStorage(SessionStorage.INSTALL_ID);
     }
   }
 
   static setDescription(description) {
     if (!description) {
-      Cookie.deleteCookie(Cookie.DESCRIPTION);
+      SessionStorage.deleteSessionStorage(SessionStorage.DESCRIPTION);
       return;
     }
-
-    Cookie.setCookie(Cookie.DESCRIPTION, String(description).trim());
+    SessionStorage.setSessionStorage(SessionStorage.DESCRIPTION, String(description).trim());
   }
 
   static setMetadata(metadata) {
     if (!metadata) {
-      Cookie.deleteCookie(Cookie.METADATA);
+      SessionStorage.deleteSessionStorage(SessionStorage.METADATA);
       return;
     }
 
-    Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
+    SessionStorage.setSessionStorage(SessionStorage.METADATA, JSON.stringify(metadata));
   }
 
   static setRequestHeaders(headers={}) {
     if (!Object.keys(headers).length) {
-      Cookie.deleteCookie(Cookie.CUSTOM_HEADERS);
+      SessionStorage.deleteSessionStorage(SessionStorage.CUSTOM_HEADERS);
       return;
     }
-
-    Cookie.setCookie(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
+    SessionStorage.setSessionStorage(SessionStorage.CUSTOM_HEADERS, JSON.stringify(headers));
   }
 
   static getLocation(callback=defaultCallback) {
@@ -159,8 +155,7 @@ class Radar {
   static startTrip(tripOptions, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
       .then((response) => {
-        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
-
+        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -169,9 +164,8 @@ class Radar {
   static updateTrip(tripOptions, status, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, status)
       .then((response) => {
-        // set cookie
-        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
-
+        // set sessionstorage
+        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -183,7 +177,7 @@ class Radar {
     Trips.updateTrip(tripOptions, TRIP_STATUS.COMPLETED)
       .then((response) => {
         // clear tripOptions
-        Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
+        SessionStorage.deleteSessionStorage(SessionStorage.TRIP_OPTIONS);
 
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
@@ -196,15 +190,14 @@ class Radar {
     Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELED)
       .then((response) => {
         // clear tripOptions
-        Cookie.deleteCookie(Cookie.TRIP_OPTIONS);
-
+        SessionStorage.deleteSessionStorage(SessionStorage.TRIP_OPTIONS);
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
 
   static getTripOptions() {
-    let tripOptions = Cookie.getCookie(Cookie.TRIP_OPTIONS);
+    let tripOptions = SessionStorage.getSessionStorage(SessionStorage.TRIP_OPTIONS);
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }
