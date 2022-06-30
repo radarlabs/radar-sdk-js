@@ -12,7 +12,6 @@ import Trips from './api/trips';
 import SDK_VERSION from './version';
 import STATUS from './status';
 import { TRIP_STATUS } from './tripStatus';
-import SessionStorage from './sessionStorage';
 
 const defaultCallback = () => {};
 
@@ -49,74 +48,62 @@ class Radar {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
     }
-    SessionStorage.setSessionStorage(SessionStorage.PUBLISHABLE_KEY, publishableKey);
-    // Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
+    Cookie.setCookie(Cookie.PUBLISHABLE_KEY, publishableKey);
   }
 
   static setHost(host, baseApiPath) {
-    SessionStorage.setSessionStorage(SessionStorage.HOST, host);
-    SessionStorage.setSessionStorage(SessionStorage.BASE_API_PATH, baseApiPath);
-    // Cookie.setCookie(Cookie.HOST, host, true);
-    // Cookie.setCookie(Cookie.BASE_API_PATH, baseApiPath);
+    Cookie.setCookie(Cookie.HOST, host, true);
+    Cookie.setCookie(Cookie.BASE_API_PATH, baseApiPath);
   }
 
   static setUserId(userId) {
     if (!userId) {
-      SessionStorage.deleteSessionStorage(SessionStorage.USER_ID);
-      // Cookie.deleteCookie(Cookie.USER_ID);
+      Cookie.deleteCookie(Cookie.USER_ID);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.USER_ID, String(userId).trim());
-    // Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
+
+    Cookie.setCookie(Cookie.USER_ID, String(userId).trim());
   }
 
   static setDeviceId(deviceId, installId) {
     if (deviceId) {
-      SessionStorage.setSessionStorage(SessionStorage.DEVICE_ID, String(deviceId).trim());
-      // Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
+      Cookie.setCookie(Cookie.DEVICE_ID, String(deviceId).trim());
     } else {
-      SessionStorage.deleteSessionStorage(SessionStorage.DEVICE_ID);
-      // Cookie.deleteCookie(Cookie.DEVICE_ID);
+      Cookie.deleteCookie(Cookie.DEVICE_ID);
     }
     
     if (installId) {
-      SessionStorage.setSessionStorage(SessionStorage.INSTALL_ID, String(installId).trim());
-      // Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
+      Cookie.setCookie(Cookie.INSTALL_ID, String(installId).trim());
     } else {
-      SessionStorage.deleteSessionStorage(SessionStorage.INSTALL_ID);
-      // Cookie.deleteCookie(Cookie.INSTALL_ID);
+      Cookie.deleteCookie(Cookie.INSTALL_ID);
     }
   }
 
   static setDescription(description) {
     if (!description) {
-      SessionStorage.deleteSessionStorage(SessionStorage.DESCRIPTION);
-      // Cookie.deleteCookie(Cookie.DESCRIPTION);
+      Cookie.deleteCookie(Cookie.DESCRIPTION);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.DESCRIPTION, String(description).trim());
-    // Cookie.setCookie(Cookie.DESCRIPTION, String(description).trim());
+
+    Cookie.setCookie(Cookie.DESCRIPTION, String(description).trim());
   }
 
   static setMetadata(metadata) {
     if (!metadata) {
-      SessionStorage.deleteSessionStorage(SessionStorage.METADATA);
-      // Cookie.deleteCookie(Cookie.METADATA);
+      Cookie.deleteCookie(Cookie.METADATA);
       return;
     }
 
-    SessionStorage.setSessionStorage(SessionStorage.METADATA, JSON.stringify(metadata));
-    // Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
+    Cookie.setCookie(Cookie.METADATA, JSON.stringify(metadata));
   }
 
   static setRequestHeaders(headers={}) {
     if (!Object.keys(headers).length) {
-      SessionStorage.deleteSessionStorage(SessionStorage.CUSTOM_HEADERS);
-      // Cookie.deleteCookie(Cookie.CUSTOM_HEADERS);
+      Cookie.deleteCookie(Cookie.CUSTOM_HEADERS);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.CUSTOM_HEADERS, JSON.stringify(headers));
-    // Cookie.setCookie(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
+
+    Cookie.setCookie(Cookie.CUSTOM_HEADERS, JSON.stringify(headers));
   }
 
   static getLocation(callback=defaultCallback) {
@@ -172,8 +159,7 @@ class Radar {
   static startTrip(tripOptions, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
       .then((response) => {
-        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
-        // Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
@@ -184,8 +170,7 @@ class Radar {
     Trips.updateTrip(tripOptions, status)
       .then((response) => {
         // set cookie
-        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
-        // Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Cookie.setCookie(Cookie.TRIP_OPTIONS, JSON.stringify(tripOptions));
 
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
