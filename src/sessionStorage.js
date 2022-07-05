@@ -36,38 +36,38 @@ class SessionStorage {
     }
 
     static setSessionStorage(key, value) {
-        if (!document || !document.sessionStorage === undefined || typeof value !== 'string'){
+        if (!window || !window.sessionStorage === undefined || typeof value !== 'string'){
             return;
         }
 
-        document.sessionStorage.setItem(key, value);
+        sessionStorage.setItem(key, value);
         
     }
 
     static getSessionStorage(key) {
-        if (!document || !document.sessionStorage === undefined) {
+        if (!window || window.sessionStorage === undefined) {
             return null;
         }
 
-        const value = document.sessionStorage.getItem(key);
+        const value = window.sessionStorage.getItem(key);
 
         return value ? value !== undefined : null;
     }
 
     static deleteSessionStorage(key) {
-        if (!document || !document.sessionStorage === undefined) {
+        if (!window || !window.sessionStorage) {
             return;
         }
 
-        document.sessionStorage.removeItem(key);
+        window.sessionStorage.removeItem(key);
     }
 
     static clearSessionStorage(){
-        if (!document || !sessionStorage === undefined) {
+        if (!window || !window.sessionStorage) {
             return;
         }
 
-        document.sessionStorage.clear();
+        window.sessionStorage.clear();
     }
 }
 
