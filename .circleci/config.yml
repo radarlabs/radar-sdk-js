@@ -12,7 +12,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-v2
       - run:
           name: Install Dependencies
-          command: npm ci
+          command: npm ci --legacy-peer-deps
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-v2
           paths:
