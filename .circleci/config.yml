@@ -9,12 +9,12 @@ jobs:
           name: Update npm
           command: 'npm install -g npm@latest'
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-v2
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
           command: npm ci
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-v2
+          key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
       - run:
