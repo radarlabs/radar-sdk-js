@@ -1,4 +1,4 @@
-import SessionStorage from './sessionStorage';
+import Storage from './storage';
 
 // consts
 import API_HOST from './api_host';
@@ -38,7 +38,7 @@ class Http {
 
       xhr.open(method, url, true);
 
-      const publishableKey = SessionStorage.getSessionStorage(SessionStorage.PUBLISHABLE_KEY);
+      const publishableKey = Storage.getItem(Storage.PUBLISHABLE_KEY);
       if (!publishableKey) {
         reject(STATUS.ERROR_PUBLISHABLE_KEY);
         return;
@@ -51,14 +51,14 @@ class Http {
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
       // set custom headers if present
-      const customHeaders = SessionStorage.getSessionStorage(SessionStorage.CUSTOM_HEADERS);
+      const customHeaders = Storage.getItem(Storage.CUSTOM_HEADERS);
       if (customHeaders) {
         const headers = JSON.parse(customHeaders);
         Object.keys(headers).forEach((header) => {
           xhr.setRequestHeader(header, headers[header]);
         });
       }
-    
+
       xhr.onload = () => {
         let response;
         try {

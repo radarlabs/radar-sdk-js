@@ -6,7 +6,7 @@ import Routing from './api/routing';
 import Search from './api/search';
 import Track from './api/track';
 import Trips from './api/trips';
-import SessionStorage from './sessionStorage';
+import Storage from './storage';
 
 // consts
 import SDK_VERSION from './version';
@@ -48,59 +48,59 @@ class Radar {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
     }
-    SessionStorage.setSessionStorage(SessionStorage.PUBLISHABLE_KEY, publishableKey);
+    Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
   }
 
   static setHost(host, baseApiPath) {
-    SessionStorage.setSessionStorage(SessionStorage.HOST, host);
-    SessionStorage.setSessionStorage(SessionStorage.BASE_API_PATH, baseApiPath);
+    Storage.setItem(Storage.HOST, host);
+    Storage.setItem(Storage.BASE_API_PATH, baseApiPath);
   }
 
   static setUserId(userId) {
     if (!userId) {
-      SessionStorage.deleteSessionStorage(SessionStorage.USER_ID);
+      Storage.removeItem(Storage.USER_ID);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.USER_ID, String(userId).trim());
+    Storage.setItem(Storage.USER_ID, String(userId).trim());
   }
 
   static setDeviceId(deviceId, installId) {
     if (deviceId) {
-      SessionStorage.setSessionStorage(SessionStorage.DEVICE_ID, String(deviceId).trim());
+      Storage.setItem(Storage.DEVICE_ID, String(deviceId).trim());
     } else {
-      SessionStorage.deleteSessionStorage(SessionStorage.DEVICE_ID);
+      Storage.removeItem(Storage.DEVICE_ID);
     }
-    
+
     if (installId) {
-      SessionStorage.setSessionStorage(SessionStorage.INSTALL_ID, String(installId).trim());
+      Storage.setItem(Storage.INSTALL_ID, String(installId).trim());
     } else {
-      SessionStorage.deleteSessionStorage(SessionStorage.INSTALL_ID);
+      Storage.removeItem(Storage.INSTALL_ID);
     }
   }
 
   static setDescription(description) {
     if (!description) {
-      SessionStorage.deleteSessionStorage(SessionStorage.DESCRIPTION);
+      Storage.removeItem(Storage.DESCRIPTION);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.DESCRIPTION, String(description).trim());
+    Storage.setItem(Storage.DESCRIPTION, String(description).trim());
   }
 
   static setMetadata(metadata) {
     if (!metadata) {
-      SessionStorage.deleteSessionStorage(SessionStorage.METADATA);
+      Storage.removeItem(Storage.METADATA);
       return;
     }
 
-    SessionStorage.setSessionStorage(SessionStorage.METADATA, JSON.stringify(metadata));
+    Storage.setItem(Storage.METADATA, JSON.stringify(metadata));
   }
 
   static setRequestHeaders(headers={}) {
     if (!Object.keys(headers).length) {
-      SessionStorage.deleteSessionStorage(SessionStorage.CUSTOM_HEADERS);
+      Storage.removeItem(Storage.CUSTOM_HEADERS);
       return;
     }
-    SessionStorage.setSessionStorage(SessionStorage.CUSTOM_HEADERS, JSON.stringify(headers));
+    Storage.setItem(Storage.CUSTOM_HEADERS, JSON.stringify(headers));
   }
 
   static getLocation(callback=defaultCallback) {
@@ -156,7 +156,7 @@ class Radar {
   static startTrip(tripOptions, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
       .then((response) => {
-        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -166,7 +166,7 @@ class Radar {
     Trips.updateTrip(tripOptions, status)
       .then((response) => {
         // set sessionstorage
-        SessionStorage.setSessionStorage(SessionStorage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -178,7 +178,7 @@ class Radar {
     Trips.updateTrip(tripOptions, TRIP_STATUS.COMPLETED)
       .then((response) => {
         // clear tripOptions
-        SessionStorage.deleteSessionStorage(SessionStorage.TRIP_OPTIONS);
+        Storage.removeItem(Storage.TRIP_OPTIONS);
 
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
@@ -191,14 +191,14 @@ class Radar {
     Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELED)
       .then((response) => {
         // clear tripOptions
-        SessionStorage.deleteSessionStorage(SessionStorage.TRIP_OPTIONS);
+        Storage.removeItem(Storage.TRIP_OPTIONS);
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
 
   static getTripOptions() {
-    let tripOptions = SessionStorage.getSessionStorage(SessionStorage.TRIP_OPTIONS);
+    let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }

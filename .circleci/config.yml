@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:16.15  # April 2022
+      - image: cimg/node:16.15
     steps:
       - checkout
       - run:
@@ -12,7 +12,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-v2
       - run:
           name: Install Dependencies
-          command: npm ci --legacy-peer-deps
+          command: npm ci
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-v2
           paths:

@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import SessionStorage from '../src/sessionStorage';
+import Storage from '../src/storage';
 import Device from '../src/device';
 
 describe('Device', () => {
@@ -13,20 +13,20 @@ describe('Device', () => {
     context('deviceId has not been set', () => {
 
       before(() => {
-        sinon.stub(SessionStorage, 'getSessionStorage');
-        sinon.stub(SessionStorage, 'setSessionStorage');
+        sinon.stub(Storage, 'getItem');
+        sinon.stub(Storage, 'setItem');
       });
 
       after(() => {
-        SessionStorage.getSessionStorage.restore();
-        SessionStorage.setSessionStorage.restore();
+        Storage.getItem.restore();
+        Storage.setItem.restore();
       });
 
-      it('should generate a new deviceId in sessionStorage, and return the value', () => {
+      it('should generate a new deviceId in storage, and return the value', () => {
         const deviceId = Device.getId();
 
-        expect(SessionStorage.setSessionStorage).to.have.been.called;
-        expect(SessionStorage.setSessionStorage).to.have.been.calledWith(SessionStorage.DEVICE_ID, deviceId);
+        expect(Storage.setItem).to.have.been.called;
+        expect(Storage.setItem).to.have.been.calledWith(Storage.DEVICE_ID, deviceId);
       });
     });
 
@@ -34,16 +34,16 @@ describe('Device', () => {
       const deviceId = "abc-123";
 
       before(() => {
-        sinon.stub(SessionStorage, 'getSessionStorage').callsFake(() => {
+        sinon.stub(Storage, 'getItem').callsFake(() => {
           return deviceId;
         });
       });
 
       after(() => {
-        SessionStorage.getSessionStorage.restore();
+        Storage.getItem.restore();
       });
 
-      it('should return the deviceId stored saved in the sessionStorage', () => {
+      it('should return the deviceId stored saved in the storage', () => {
         expect(Device.getId()).to.equal(deviceId);
       });
     });

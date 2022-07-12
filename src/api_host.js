@@ -1,10 +1,10 @@
-import SessionStorage from './sessionStorage';
+import Storage from './storage';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 
 class API_HOST {
   static getHost() {
-    return SessionStorage.getSessionStorage(SessionStorage.HOST) || DEFAULT_HOST;
+    return Storage.getItem(Storage.HOST) || DEFAULT_HOST;
   }
 }
 

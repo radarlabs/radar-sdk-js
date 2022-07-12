@@ -1,4 +1,4 @@
-import SessionStorage from '../sessionStorage';
+import Storage from '../storage';
 import Device from '../device';
 import Http from '../http';
 import Navigator from '../navigator';
@@ -18,17 +18,17 @@ class Track {
     }
 
     const deviceId = Device.getId();
-    const userId = SessionStorage.getSessionStorage(SessionStorage.USER_ID);
-    const installId = SessionStorage.getSessionStorage(SessionStorage.INSTALL_ID) || deviceId;
-    const deviceType = SessionStorage.getSessionStorage(SessionStorage.DEVICE_TYPE) || 'Web';
-    const description = SessionStorage.getSessionStorage(SessionStorage.DESCRIPTION);
+    const userId = Storage.getItem(Storage.USER_ID);
+    const installId = Storage.getItem(Storage.INSTALL_ID) || deviceId;
+    const deviceType = Storage.getItem(Storage.DEVICE_TYPE) || 'Web';
+    const description = Storage.getItem(Storage.DESCRIPTION);
 
-    let metadata = SessionStorage.getSessionStorage(SessionStorage.METADATA);
+    let metadata = Storage.getItem(Storage.METADATA);
     if (metadata) {
       metadata = JSON.parse(metadata);
     }
 
-    let tripOptions = SessionStorage.getSessionStorage(SessionStorage.TRIP_OPTIONS);
+    let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }
@@ -50,7 +50,7 @@ class Track {
       tripOptions,
     };
 
-    const basePath = SessionStorage.getSessionStorage(SessionStorage.BASE_API_PATH) || 'v1';
+    const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
     const trackEndpoint = `${basePath}/track`;
 
     const response = await Http.request('POST', trackEndpoint, body);
