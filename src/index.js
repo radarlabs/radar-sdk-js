@@ -78,6 +78,14 @@ class Radar {
     }
   }
 
+  static setDeviceType(deviceType) {
+    if (deviceType) {
+      Storage.setItem(Storage.DEVICE_TYPE, String(deviceType).trim());
+    } else {
+      Storage.removeItem(Storage.DEVICE_TYPE);
+    }
+  }
+
   static setDescription(description) {
     if (!description) {
       Storage.removeItem(Storage.DESCRIPTION);
@@ -156,7 +164,7 @@ class Radar {
   static startTrip(tripOptions, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
       .then((response) => {
-        Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Radar.setTripOptions(tripOptions);
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -165,8 +173,7 @@ class Radar {
   static updateTrip(tripOptions, status, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, status)
       .then((response) => {
-        // set sessionstorage
-        Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+        Radar.setTripOptions(tripOptions);
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -195,6 +202,13 @@ class Radar {
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
+  }
+
+  static setTripOptions(tripOptions) {
+    if (!tripOptions) {
+      return;
+    }
+    Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
   }
 
   static getTripOptions() {
