@@ -2,17 +2,14 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:12.22.12  # April 2022
+      - image: cimg/node:16.15
     steps:
       - checkout
-      - run:
-          name: Update npm
-          command: 'npm install -g npm@latest'
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
-          command: npm install
+          command: npm ci --force
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:

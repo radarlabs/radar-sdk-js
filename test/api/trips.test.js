@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import Cookie from '../../src/cookie';
+import Storage from '../../src/storage';
 import Http from '../../src/http';
 
 import Trips from '../../src/api/trips';
@@ -14,17 +14,17 @@ import { TRIP_STATUS } from '../../src/tripStatus';
 
 describe('Trips', () => {
   let httpStub;
-  let getCookieStub;
+  let getItemStub;
 
   beforeEach(() => {
     httpStub = sinon.stub(Http, 'request');
-    getCookieStub = sinon.stub(Cookie, 'getCookie');
-    getCookieStub.withArgs(Cookie.BASE_API_PATH).returns(null);
+    getItemStub = sinon.stub(Storage, 'getItem');
+    getItemStub.withArgs(Storage.BASE_API_PATH).returns(null);
   });
 
   afterEach(() => {
     Http.request.restore();
-    Cookie.getCookie.restore();
+    Storage.getItem.restore();
   });
 
   context('updateTrip', () => {

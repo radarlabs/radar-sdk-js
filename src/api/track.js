@@ -1,4 +1,4 @@
-import Cookie from '../cookie';
+import Storage from '../storage';
 import Device from '../device';
 import Http from '../http';
 import Navigator from '../navigator';
@@ -18,17 +18,17 @@ class Track {
     }
 
     const deviceId = Device.getId();
-    const userId = Cookie.getCookie(Cookie.USER_ID);
-    const installId = Cookie.getCookie(Cookie.INSTALL_ID) || deviceId;
-    const deviceType = Cookie.getCookie(Cookie.DEVICE_TYPE) || 'Web';
-    const description = Cookie.getCookie(Cookie.DESCRIPTION);
+    const userId = Storage.getItem(Storage.USER_ID);
+    const installId = Storage.getItem(Storage.INSTALL_ID) || deviceId;
+    const deviceType = Storage.getItem(Storage.DEVICE_TYPE) || 'Web';
+    const description = Storage.getItem(Storage.DESCRIPTION);
 
-    let metadata = Cookie.getCookie(Cookie.METADATA);
+    let metadata = Storage.getItem(Storage.METADATA);
     if (metadata) {
       metadata = JSON.parse(metadata);
     }
 
-    let tripOptions = Cookie.getCookie(Cookie.TRIP_OPTIONS);
+    let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }
@@ -50,7 +50,7 @@ class Track {
       tripOptions,
     };
 
-    const basePath = Cookie.getCookie(Cookie.BASE_API_PATH) || 'v1';
+    const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
     const trackEndpoint = `${basePath}/track`;
 
     const response = await Http.request('POST', trackEndpoint, body);

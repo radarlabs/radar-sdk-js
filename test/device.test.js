@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { expect } = chai;
 
-import Cookie from '../src/cookie';
+import Storage from '../src/storage';
 import Device from '../src/device';
 
 describe('Device', () => {
@@ -13,20 +13,20 @@ describe('Device', () => {
     context('deviceId has not been set', () => {
 
       before(() => {
-        sinon.stub(Cookie, 'getCookie');
-        sinon.stub(Cookie, 'setCookie');
+        sinon.stub(Storage, 'getItem');
+        sinon.stub(Storage, 'setItem');
       });
 
       after(() => {
-        Cookie.getCookie.restore();
-        Cookie.setCookie.restore();
+        Storage.getItem.restore();
+        Storage.setItem.restore();
       });
 
-      it('should generate a new deviceId in cookie, and return the value', () => {
+      it('should generate a new deviceId in storage, and return the value', () => {
         const deviceId = Device.getId();
 
-        expect(Cookie.setCookie).to.have.been.called;
-        expect(Cookie.setCookie).to.have.been.calledWith(Cookie.DEVICE_ID, deviceId);
+        expect(Storage.setItem).to.have.been.called;
+        expect(Storage.setItem).to.have.been.calledWith(Storage.DEVICE_ID, deviceId);
       });
     });
 
@@ -34,16 +34,16 @@ describe('Device', () => {
       const deviceId = "abc-123";
 
       before(() => {
-        sinon.stub(Cookie, 'getCookie').callsFake(() => {
+        sinon.stub(Storage, 'getItem').callsFake(() => {
           return deviceId;
         });
       });
 
       after(() => {
-        Cookie.getCookie.restore();
+        Storage.getItem.restore();
       });
 
-      it('should return the deviceId stored saved in the cookie', () => {
+      it('should return the deviceId stored saved in the storage', () => {
         expect(Device.getId()).to.equal(deviceId);
       });
     });

@@ -1,10 +1,10 @@
-import Cookie from './cookie';
+import Storage from './storage';
 
 const DEFAULT_HOST = 'https://api.radar.io';
 
 class API_HOST {
   static getHost() {
-    return Cookie.getCookie(Cookie.HOST) || DEFAULT_HOST;
+    return Storage.getItem(Storage.HOST) || DEFAULT_HOST;
   }
 }
 
