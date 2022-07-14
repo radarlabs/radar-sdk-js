@@ -184,9 +184,7 @@ class Radar {
 
     Trips.updateTrip(tripOptions, TRIP_STATUS.COMPLETED)
       .then((response) => {
-        // clear tripOptions
-        Storage.removeItem(Storage.TRIP_OPTIONS);
-
+        Radar.clearTripOptions();
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -197,8 +195,7 @@ class Radar {
 
     Trips.updateTrip(tripOptions, TRIP_STATUS.CANCELED)
       .then((response) => {
-        // clear tripOptions
-        Storage.removeItem(Storage.TRIP_OPTIONS);
+        Radar.clearTripOptions();
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -206,9 +203,14 @@ class Radar {
 
   static setTripOptions(tripOptions) {
     if (!tripOptions) {
+      Radar.clearTripOptions();
       return;
     }
     Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+  }
+
+  static clearTripOptions() {
+    Storage.removeItem(Storage.TRIP_OPTIONS);
   }
 
   static getTripOptions() {
