@@ -37,6 +37,7 @@ describe('Trips', () => {
           destinationGeofenceTag: 'store',
           destinationGeofenceExternalId: '123',
           mode: 'car',
+          approachingThreshold: 3,
         };
 
         return Trips.updateTrip(tripOptions)
@@ -49,6 +50,7 @@ describe('Trips', () => {
               metadata: undefined,
               mode: 'car',
               status: TRIP_STATUS.UNKNOWN,
+              approachingThreshold: 3,
            });
           });
       });
@@ -64,6 +66,7 @@ describe('Trips', () => {
           destinationGeofenceExternalId: '123',
           mode: 'car',
           metadata: { car: 'red jeep' },
+          approachingThreshold: 3,
         };
 
         const status = TRIP_STATUS.STARTED;
@@ -78,6 +81,7 @@ describe('Trips', () => {
               metadata: { car: 'red jeep' },
               mode: 'car',
               status: TRIP_STATUS.STARTED,
+              approachingThreshold: 3,
            });
           });
       });
