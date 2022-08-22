@@ -52,6 +52,7 @@
         </select>
         <input id="trip-destination-tag" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence Tag" style="width: 400px;"/>
         <input id="trip-destination-externalId" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence External Id" style="width: 400px;"/>
+        <input id="trip-approaching-threshold" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Approaching Threshold" style="width: 400px;"/>
         <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
         <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
       </form>
@@ -192,12 +193,14 @@
         let mode = $('#trip-mode').val();
         let destinationGeofenceTag = $('#trip-destination-tag').val();
         let destinationGeofenceExternalId = $('#trip-destination-externalId').val();
+        let approachingThreshold = $('#trip-approaching-threshold').val();
 
         const tripOptions = {
           externalId,
           mode,
           destinationGeofenceTag,
           destinationGeofenceExternalId,
+          approachingThreshold,
         }
 
         Radar.startTrip(tripOptions, function(err, responseObj, response) {

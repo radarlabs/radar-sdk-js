@@ -11,6 +11,7 @@ class Trips {
       destinationGeofenceExternalId,
       mode,
       metadata,
+      approachingThreshold,
     } = tripOptions;
 
     const params = {
@@ -20,6 +21,7 @@ class Trips {
       destinationGeofenceExternalId,
       mode,
       metadata,
+      approachingThreshold,
     };
 
     const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';

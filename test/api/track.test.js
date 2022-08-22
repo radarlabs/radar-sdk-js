@@ -92,7 +92,8 @@ describe('Track', () => {
           destinationGeofenceTag: 'store',
           destinationGefocenExternalId: '123',
           mode: 'car',
-        }
+          approachingThreshold: 3,
+        };
         navigatorStub.resolves(location);
         getItemStub.withArgs(Storage.TRIP_OPTIONS).returns(JSON.stringify(tripOptions));
         httpStub.resolves({ meta: {}, user: {}, events: {} });
