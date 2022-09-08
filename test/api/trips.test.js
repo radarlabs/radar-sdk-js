@@ -16,15 +16,64 @@ describe('Trips', () => {
   let httpStub;
   let getItemStub;
 
+  const userId = 'user-id';
+
   beforeEach(() => {
     httpStub = sinon.stub(Http, 'request');
     getItemStub = sinon.stub(Storage, 'getItem');
     getItemStub.withArgs(Storage.BASE_API_PATH).returns(null);
+    getItemStub.withArgs(Storage.USER_ID).returns(userId);
   });
 
   afterEach(() => {
     Http.request.restore();
     Storage.getItem.restore();
+  });
+
+  context('startTrip', () => {
+    describe('called without tripOptions', () => {
+      it('should include tripOptions each set to unknown', () => {
+        return Trips.startTrip()
+          .then(() => {
+            expect(httpStub).to.have.callCount(1);
+            expect(httpStub).to.have.been.calledWith('POST', 'v1/trips', {
+              userId,
+              destinationGeofenceTag: undefined,
+              destinationGeofenceExternalId: undefined,
+              externalId: undefined,
+              metadata: undefined,
+              mode: undefined,
+              approachingThreshold: undefined,
+           });
+          });
+      });
+
+      it('should include tripOptions', () => {
+        const externalId = 'trip-abc-123';
+        const tripOptions = {
+          externalId,
+          destinationGeofenceTag: 'store',
+          destinationGeofenceExternalId: '123',
+          mode: 'car',
+          metadata: { car: 'red jeep' },
+          approachingThreshold: 3,
+        };
+
+        return Trips.startTrip(tripOptions)
+          .then(() => {
+            expect(httpStub).to.have.callCount(1);
+            expect(httpStub).to.have.been.calledWith('POST', 'v1/trips', {
+              userId,
+              destinationGeofenceTag: 'store',
+              destinationGeofenceExternalId: '123',
+              externalId,
+              metadata: { car: 'red jeep' },
+              mode: 'car',
+              approachingThreshold: 3,
+           });
+          });
+      });
+    });
   });
 
   context('updateTrip', () => {
@@ -43,7 +92,8 @@ describe('Trips', () => {
         return Trips.updateTrip(tripOptions)
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}`, {
+            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}/update`, {
+              userId,
               destinationGeofenceTag: 'store',
               destinationGeofenceExternalId: '123',
               externalId,
@@ -74,7 +124,8 @@ describe('Trips', () => {
         return Trips.updateTrip(tripOptions, status)
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}`, {
+            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}/update`, {
+              userId,
               destinationGeofenceTag: 'store',
               destinationGeofenceExternalId: '123',
               externalId,

@@ -1,4 +1,5 @@
 export const TRIP_STATUS = {
+  PENDING: "pending",
   STARTED: "started",
   APPROACHING: "approaching",
   ARRIVED: "arrived",
