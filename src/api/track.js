@@ -28,11 +28,6 @@ class Track {
       metadata = JSON.parse(metadata);
     }
 
-    let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
-    if (tripOptions) {
-      tripOptions = JSON.parse(tripOptions);
-    }
-
     const body = {
       ...params,
       accuracy,
@@ -47,7 +42,6 @@ class Track {
       sdkVersion: SDK_VERSION,
       stopped: true,
       userId,
-      tripOptions,
     };
 
     const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
