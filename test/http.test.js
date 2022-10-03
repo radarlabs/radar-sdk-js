@@ -37,7 +37,7 @@ describe('Http', () => {
 
     beforeEach(() => {
       getItemStub.withArgs(Storage.PUBLISHABLE_KEY).returns(publishableKey);
-      httpRequest = Http.request('PUT', 'v1/users/userId', { valid: true, invalid: undefined });
+      httpRequest = Http.request('PUT', 'users/userId', { valid: true, invalid: undefined });
     });
 
     describe('success', () => {
@@ -212,7 +212,7 @@ describe('Http', () => {
         getItemStub.withArgs(Storage.PUBLISHABLE_KEY).returns(null);
 
         try {
-          await Http.request('PUT', 'v1/users/userId', {});
+          await Http.request('PUT', 'users/userId', {});
         } catch (e) {
           expect(e).to.equal(STATUS.ERROR_PUBLISHABLE_KEY);
         }
@@ -239,7 +239,7 @@ describe('Http', () => {
     it('should inject GET parameters into the url querystring', async () => {
       getItemStub.withArgs(Storage.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
+      const httpRequest = Http.request('GET', 'geocode/forward', data);
 
       setTimeout(() => {
         request.respond(200, {}, successResponse);
@@ -256,7 +256,7 @@ describe('Http', () => {
     it('should not append querystring of no params', async () => {
       getItemStub.withArgs(Storage.PUBLISHABLE_KEY).returns(publishableKey);
 
-      const httpRequest = Http.request('GET', 'v1/geocode/forward', {});
+      const httpRequest = Http.request('GET', 'geocode/forward', {});
 
       setTimeout(() => {
         request.respond(200, {}, successResponse);
@@ -281,7 +281,7 @@ describe('Http', () => {
       getItemStub.withArgs(Storage.CUSTOM_HEADERS).returns(JSON.stringify(customHeaders));
 
       const data = { query: '20 Jay Street' };
-      const httpRequest = Http.request('GET', 'v1/geocode/forward', data);
+      const httpRequest = Http.request('GET', 'geocode/forward', data);
 
       setTimeout(() => {
         request.respond(200, {}, successResponse);

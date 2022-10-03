@@ -23,8 +23,7 @@ class Trips {
       approachingThreshold,
     };
 
-    const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
-    return Http.request('POST', `${basePath}/trips`, params);
+    return Http.request('POST', `trips`, params);
   }
 
   static async updateTrip(tripOptions={}, status) {
@@ -49,8 +48,7 @@ class Trips {
       approachingThreshold,
     };
 
-    const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
-    return Http.request('PATCH', `${basePath}/trips/${externalId}/update`, params);
+    return Http.request('PATCH', `trips/${externalId}/update`, params);
   }
 }
 

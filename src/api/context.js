@@ -13,7 +13,7 @@ class Context {
       coordinates: `${latitude},${longitude}`,
     };
 
-    return Http.request('GET', `v1/context`, params);
+    return Http.request('GET', `context`, params);
   }
 }
 

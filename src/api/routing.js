@@ -33,7 +33,7 @@ class Routing {
       geometry,
     };
 
-    return Http.request('GET', 'v1/route/distance', params);
+    return Http.request('GET', 'route/distance', params);
   }
 
   static async getMatrixDistances(routingOptions={}) {
@@ -66,7 +66,7 @@ class Routing {
       geometry,
     };
 
-    return Http.request('GET', 'v1/route/matrix', params);
+    return Http.request('GET', 'route/matrix', params);
   }
 }
 

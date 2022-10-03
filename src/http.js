@@ -10,8 +10,9 @@ class Http {
     return new Promise((resolve, reject) => {
 
       const xhr = new XMLHttpRequest();
+      const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
 
-      let url = `${API_HOST.getHost()}/${path}`;
+      let url = `${API_HOST.getHost()}/${basePath}/${path}`;
 
       // remove undefined values
       let body = {};
