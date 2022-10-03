@@ -38,7 +38,7 @@ class Search {
       limit,
     };
 
-    return Http.request('GET', 'v1/search/places', params);
+    return Http.request('GET', 'search/places', params);
   }
 
   static async searchGeofences(searchOptions={}) {
@@ -76,7 +76,7 @@ class Search {
       });
     }
 
-    return Http.request('GET', 'v1/search/geofences', params);
+    return Http.request('GET', 'search/geofences', params);
   }
 
 
@@ -103,7 +103,7 @@ class Search {
       country,
     };
 
-    return Http.request('GET', 'v1/search/autocomplete', params);
+    return Http.request('GET', 'search/autocomplete', params);
   }
 }
 

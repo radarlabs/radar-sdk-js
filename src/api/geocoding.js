@@ -5,7 +5,7 @@ class Geocoding {
   static async geocode(geocodeOptions={}) {
     const { query, layers, country } = geocodeOptions;
 
-    return Http.request('GET', 'v1/geocode/forward', { query, layers, country });
+    return Http.request('GET', 'geocode/forward', { query, layers, country });
   }
 
   static async reverseGeocode(geocodeOptions={}) {
@@ -22,13 +22,13 @@ class Geocoding {
       layers,
     };
 
-    return Http.request('GET', 'v1/geocode/reverse', params);
+    return Http.request('GET', 'geocode/reverse', params);
   }
 
   static async ipGeocode(geocodeOptions={}) {
     const { ip } = geocodeOptions;
 
-    return Http.request('GET', 'v1/geocode/ip', { ip });
+    return Http.request('GET', 'geocode/ip', { ip });
   }
 }
 

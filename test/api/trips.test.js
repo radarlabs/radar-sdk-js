@@ -36,7 +36,7 @@ describe('Trips', () => {
         return Trips.startTrip()
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('POST', 'v1/trips', {
+            expect(httpStub).to.have.been.calledWith('POST', 'trips', {
               userId,
               destinationGeofenceTag: undefined,
               destinationGeofenceExternalId: undefined,
@@ -62,7 +62,7 @@ describe('Trips', () => {
         return Trips.startTrip(tripOptions)
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('POST', 'v1/trips', {
+            expect(httpStub).to.have.been.calledWith('POST', 'trips', {
               userId,
               destinationGeofenceTag: 'store',
               destinationGeofenceExternalId: '123',
@@ -92,7 +92,7 @@ describe('Trips', () => {
         return Trips.updateTrip(tripOptions)
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}/update`, {
+            expect(httpStub).to.have.been.calledWith('PATCH', `trips/${externalId}/update`, {
               userId,
               destinationGeofenceTag: 'store',
               destinationGeofenceExternalId: '123',
@@ -124,7 +124,7 @@ describe('Trips', () => {
         return Trips.updateTrip(tripOptions, status)
           .then(() => {
             expect(httpStub).to.have.callCount(1);
-            expect(httpStub).to.have.been.calledWith('PATCH', `v1/trips/${externalId}/update`, {
+            expect(httpStub).to.have.been.calledWith('PATCH', `trips/${externalId}/update`, {
               userId,
               destinationGeofenceTag: 'store',
               destinationGeofenceExternalId: '123',

@@ -44,10 +44,7 @@ class Track {
       userId,
     };
 
-    const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
-    const trackEndpoint = `${basePath}/track`;
-
-    const response = await Http.request('POST', trackEndpoint, body);
+    const response = await Http.request('POST', 'track', body);
     response.location = { latitude, longitude, accuracy };
 
     return response;
