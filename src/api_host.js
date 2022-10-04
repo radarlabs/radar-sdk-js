@@ -1,6 +1,7 @@
 import Storage from './storage';
 
-const DEFAULT_HOST = 'https://api.radar.io';
+export const DEFAULT_HOST = 'https://api.radar.io';
+export const API_VERSION = 'v1';
 
 class API_HOST {
   static getHost() {

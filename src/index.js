@@ -12,6 +12,7 @@ import Storage from './storage';
 import SDK_VERSION from './version';
 import STATUS from './status';
 import { TRIP_STATUS } from './tripStatus';
+import { API_VERSION } from './api_host';
 
 const defaultCallback = () => {};
 
@@ -51,7 +52,7 @@ class Radar {
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
   }
 
-  static setHost(host, baseApiPath) {
+  static setHost(host, baseApiPath = API_VERSION) {
     Storage.setItem(Storage.HOST, host);
     Storage.setItem(Storage.BASE_API_PATH, baseApiPath);
   }

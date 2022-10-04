@@ -1,7 +1,7 @@
 import Storage from './storage';
 
 // consts
-import API_HOST from './api_host';
+import API_HOST, { API_VERSION } from './api_host';
 import SDK_VERSION from './version';
 import STATUS from './status';
 
@@ -10,7 +10,7 @@ class Http {
     return new Promise((resolve, reject) => {
 
       const xhr = new XMLHttpRequest();
-      const basePath = Storage.getItem(Storage.BASE_API_PATH) || 'v1';
+      const basePath = Storage.getItem(Storage.BASE_API_PATH) || API_VERSION;
 
       let url = `${API_HOST.getHost()}/${basePath}/${path}`;
 
