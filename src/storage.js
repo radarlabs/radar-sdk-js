@@ -44,6 +44,9 @@ class Storage {
         if (!storage) {
             return;
         }
+        if (value === undefined || value === null) {
+            return;
+        }
         sessionStorage.setItem(key, value);
     }
 
