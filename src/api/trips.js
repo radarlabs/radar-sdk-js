@@ -1,8 +1,33 @@
 import Http from '../http';
+import Storage from '../storage';
 
 class Trips {
+  static async startTrip(tripOptions={}) {
+    const userId = Storage.getItem(Storage.USER_ID);
+    const {
+      externalId,
+      destinationGeofenceTag,
+      destinationGeofenceExternalId,
+      mode,
+      metadata,
+      approachingThreshold,
+    } = tripOptions;
+
+    const params = {
+      userId,
+      externalId,
+      destinationGeofenceTag,
+      destinationGeofenceExternalId,
+      mode,
+      metadata,
+      approachingThreshold,
+    };
+
+    return Http.request('POST', `trips`, params);
+  }
 
   static async updateTrip(tripOptions={}, status) {
+    const userId = Storage.getItem(Storage.USER_ID);
 
     const {
       externalId,
@@ -14,6 +39,7 @@ class Trips {
     } = tripOptions;
 
     const params = {
+      userId,
       externalId,
       status,
       destinationGeofenceTag,
@@ -23,7 +49,7 @@ class Trips {
       approachingThreshold,
     };
 
-    return Http.request('PATCH', `trips/${externalId}`, params);
+    return Http.request('PATCH', `trips/${externalId}/update`, params);
   }
 }
 
