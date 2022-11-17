@@ -24,7 +24,6 @@ describe('Events', () => {
     const customEventData = {customEventType, customEventMetadata}
 
     afterEach(() => {
-    Navigator.getCurrentPosition.restore();
     Http.request.restore();
     });
 
@@ -38,4 +37,4 @@ describe('Events', () => {
             });
         });
     });
-}
+});

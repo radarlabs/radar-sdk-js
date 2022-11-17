@@ -120,7 +120,6 @@
           <pre><code id="matrix"></code></pre>
         </div>
       </div>
-
     </div>
 
     <script>
@@ -232,8 +231,8 @@
         e.preventDefault();
 
         Radar.completeTrip(function(err, responseObj, response) {
-          const status = responseObj.status;
-          console.log(err, status, response);
+          const trip = responseObj.trip;
+          console.log(err, trip, response);
         });
       });
 
