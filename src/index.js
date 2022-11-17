@@ -6,6 +6,7 @@ import Routing from './api/routing';
 import Search from './api/search';
 import Track from './api/track';
 import Trips from './api/trips';
+import Events from './api/events';
 import Storage from './storage';
 
 // consts
@@ -306,6 +307,14 @@ class Radar {
         callback(null, { origins: response.origins, destinations: response.destinations, matrix: response.matrix, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
+  }
+
+  static sendEvent(eventData, callback=defaultCallback) {
+    Events.sendEvent(eventData)
+    .then((response) => {
+      callback(null, { event: response.event, status: STATUS.SUCCESS, }, response);
+    })
+    .catch(handleError(callback));
   }
 }
 
