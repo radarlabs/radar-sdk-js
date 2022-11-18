@@ -311,10 +311,10 @@ class Radar {
 
   static sendEvent(eventData, callback=defaultCallback) {
     Events.sendEvent(eventData)
-    .then((response) => {
-      callback(null, { event: response.event, status: STATUS.SUCCESS, }, response);
-    })
-    .catch(handleError(callback));
+      .then((response) => {
+        callback(null, { event: response.event, status: STATUS.SUCCESS, }, response);
+      })
+      .catch(handleError(callback));
   }
 }
 

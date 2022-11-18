@@ -24,7 +24,7 @@ describe('Events', () => {
     const customEventData = {customEventType, customEventMetadata}
 
     afterEach(() => {
-    Http.request.restore();
+        Http.request.restore();
     });
 
     context('events', () => {

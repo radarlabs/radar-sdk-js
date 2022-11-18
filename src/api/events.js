@@ -9,7 +9,7 @@ class Events {
     const deviceId = Device.getId();
     const userId = Storage.getItem(Storage.USER_ID);
 
-    return Http.request('POST','events', { type, metadata, deviceId, userId })
+    return Http.request('POST', 'events', { type, metadata, deviceId, userId })
   }
 }
 
