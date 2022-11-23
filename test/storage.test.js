@@ -4,13 +4,13 @@ import Storage from '../src/storage';
 global.window = {}
 import 'mock-local-storage'
 window.localStorage = global.localStorage;
+window.sessionStorage = global.sessionStorage;
 
 describe('Storage', () => {
   describe('getItem', () => {
     beforeEach(() => {
       Storage.setItem('hello','world');
       Storage.setItem('foo', 'bar');
-      Storage.setItem('bar', 'baz');
     });
 
     afterEach(() => {
@@ -22,7 +22,7 @@ describe('Storage', () => {
     });
 
     it('should return null if key not found', () => {
-      expect(Storage.getItem('foo'), 'bar');
+      expect(Storage.getItem('bar'), null);
     });
 
     it('should return null if localStorage key is undefined', () => {
@@ -40,8 +40,56 @@ describe('Storage', () => {
     it('should write the key and value to the browsers localStorage', () => {
       Storage.setItem('hello', 'world');
       expect(Storage.getItem('hello')).to.equal('world');
-      const fake = Storage.getItem('nonexistant');
-      expect(fake).to.be.null;
+    });
+
+    it('should return null if the value provided is null', () => {
+      Storage.setItem('hello', null);
+      const unset = Storage.getItem('hello');
+      expect(unset).to.be.null;
+    });
+  });
+
+  describe('SessionStorage', () => {
+    describe('getSessionItem', () => {
+      beforeEach(() => {
+        Storage.setSessionItem('hello','world');
+        Storage.setSessionItem('foo', 'bar');
+      });
+  
+      afterEach(() => {
+        Storage.clearSessionStorage();
+      });
+  
+      it('should return value of sessionStorage from a given key', () => {
+        expect(Storage.getSessionItem('hello'), 'world');
+      });
+  
+      it('should return null if key not found', () => {
+        expect(Storage.getSessionItem('bar'), null);
+      });
+  
+      it('should return null if sessionStorage key is undefined', () => {
+        Storage.clearSessionStorage();
+        expect(Storage.getSessionItem('foo')).to.be.null;
+      });
+    });
+  
+    describe('setSessionItem', () => {
+  
+      afterEach(() => {
+        Storage.clearSessionStorage();
+      });
+  
+      it('should write the key and value to the browsers sessionStorage', () => {
+        Storage.setSessionItem('hello', 'world');
+        expect(Storage.getSessionItem('hello')).to.equal('world');
+      });
+
+      it('should return null if the value provided is null', () => {
+        Storage.setSessionItem('hello', null);
+        const unset = Storage.getSessionItem('hello');
+        expect(unset).to.be.null;
+      });
     });
   });
 

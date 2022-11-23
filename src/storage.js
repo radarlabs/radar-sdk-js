@@ -34,9 +34,16 @@ class Storage {
     static get BASE_API_PATH() {
         return 'radar-base-api-path';
     }
+    static get SESSION_ID() {
+        return 'radar-sessionId';
+    }
 
     static getStorage() {
         return (window && window.localStorage) || undefined;
+    }
+
+    static getSessionStorage() {
+        return (window && window.sessionStorage) || undefined;
     }
 
     static setItem(key, value) {
@@ -77,6 +84,38 @@ class Storage {
             return null;
         }
         storage.clear();
+    }
+
+    static clearSessionStorage() {
+        const storage = this.getSessionStorage();
+        if (!storage) {
+            return null;
+        }
+        storage.clear();
+    }
+
+    static setSessionItem(key, value) {
+        const storage = this.getSessionStorage();
+        if (!storage) {
+            return;
+        }
+        if (value === undefined || value === null) {
+            return;
+        }
+        storage.setItem(key, value);
+    }
+
+    static getSessionItem(key) {
+        const storage = this.getSessionStorage();
+        if (!storage) {
+            return null;
+        }
+    
+        const value = storage.getItem(key);
+        if (value !== undefined && value !== null) {
+            return value;
+        }
+        return null;
     }
 }
 
