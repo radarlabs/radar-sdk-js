@@ -3,7 +3,7 @@ import Storage from '../src/storage';
 
 global.window = {}
 import 'mock-local-storage'
-window.sessionStorage = global.sessionStorage;
+window.localStorage = global.localStorage;
 
 describe('Storage', () => {
   describe('getItem', () => {
@@ -17,7 +17,7 @@ describe('Storage', () => {
       Storage.clear();
     });
 
-    it('should return value of sessionStorage from a given key', () => {
+    it('should return value of localStorage from a given key', () => {
       expect(Storage.getItem('hello'), 'world');
     });
 
@@ -25,7 +25,7 @@ describe('Storage', () => {
       expect(Storage.getItem('foo'), 'bar');
     });
 
-    it('should return null if sessionStorage key is undefined', () => {
+    it('should return null if localStorage key is undefined', () => {
       Storage.clear();
       expect(Storage.getItem('foo')).to.be.null;
     });
@@ -37,7 +37,7 @@ describe('Storage', () => {
       Storage.clear();
     });
 
-    it('should write the key and value to the browsers sessionStorage', () => {
+    it('should write the key and value to the browsers localStorage', () => {
       Storage.setItem('hello', 'world');
       expect(Storage.getItem('hello')).to.equal('world');
       const fake = Storage.getItem('nonexistant');
@@ -50,13 +50,13 @@ describe('Storage', () => {
       Storage.setItem('hello', 'world');
     });
 
-    it('should delete session Storage', () => {
+    it('should delete local Storage', () => {
       expect(Storage.getItem('hello')).to.equal('world');
       Storage.removeItem('hello');
       expect(Storage.getItem('hello')).to.be.null;
     })
 
-    it('should clear session storage', () => {
+    it('should clear local storage', () => {
       expect(Storage.getItem('hello')).to.equal('world');
       Storage.clear();
       expect(Storage.getItem('hello')).to.be.null;
