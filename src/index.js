@@ -13,6 +13,7 @@ import SDK_VERSION from './version';
 import STATUS from './status';
 import { TRIP_STATUS } from './tripStatus';
 import { API_VERSION } from './api_host';
+import Config from './api/config';
 
 const defaultCallback = () => {};
 
@@ -50,6 +51,7 @@ class Radar {
       console.error('Radar "initialize" was called without a publishable key');
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
+    Config.getConfig()
   }
 
   static setHost(host, baseApiPath = API_VERSION) {

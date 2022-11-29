@@ -3,7 +3,7 @@ import Storage from './storage';
 class Session {
     static getId() {
         // use existing sessionId if present
-        const sessionId = Storage.getItem(Storage.SESSION_ID);
+        const sessionId = Storage.getSessionItem(Storage.SESSION_ID);
         if (sessionId) {
           return sessionId;
         }
