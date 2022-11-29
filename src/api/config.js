@@ -3,6 +3,7 @@ import Session from '../session'
 import Navigator from '../navigator';
 import Storage from '../storage';
 import Device from '../device';
+
 class Config {
   static async getConfig() {
 

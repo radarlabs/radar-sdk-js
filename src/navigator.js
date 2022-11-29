@@ -32,9 +32,11 @@ class Navigator {
 
   static getPermissionsStatus() {
     return new Promise((resolve, reject) => {
+
       if (!navigator || !navigator.permissions) {
         return reject(STATUS.ERROR_PERMISSIONS);
       }
+      
       navigator.permissions.query({ name: 'geolocation' })
         .then((permissionsStatus) => {
           let locationAuthorization = "NOT_DETERMINED";

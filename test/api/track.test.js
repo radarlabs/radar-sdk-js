@@ -34,7 +34,6 @@ describe('Track', () => {
     getItemStub = sinon.stub(Storage, 'getItem');
     httpStub = sinon.stub(Http, 'request');
     navigatorStub = sinon.stub(Navigator, 'getCurrentPosition');
-    sinon.stub(Device, 'getId').returns(deviceId);
 
     getItemStub.withArgs(Storage.USER_ID).returns(userId);
     getItemStub.withArgs(Storage.DESCRIPTION).returns(description);
@@ -45,7 +44,6 @@ describe('Track', () => {
     Storage.getItem.restore();
     Http.request.restore();
     Navigator.getCurrentPosition.restore();
-    Device.getId.restore();
   });
 
   context('trackOnce', () => {

@@ -111,4 +111,15 @@ describe('Storage', () => {
     });
   });
 
+  describe('clearSessionStorage', () => {
+    beforeEach(() => {
+      Storage.setSessionItem('hello', 'world');
+    });
+
+    it('should clear local Storage', () => {
+      expect(Storage.getSessionItem('hello')).to.equal('world');
+      Storage.clearSessionStorage();
+      expect(Storage.getSessionItem('hello')).to.be.null;
+    })
+  });
 });

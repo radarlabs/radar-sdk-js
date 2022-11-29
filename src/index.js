@@ -49,9 +49,10 @@ class Radar {
   static initialize(publishableKey) {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
+      return;
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
-    Config.getConfig()
+    Config.getConfig().catch((e)=> console.log(e))
   }
 
   static setHost(host, baseApiPath = API_VERSION) {

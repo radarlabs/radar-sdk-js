@@ -68,13 +68,18 @@ describe('Radar', () => {
   });
 
   describe('initialize', () => {
+    let navigatorStub;
+
     context('no publishable key given', () => {
       before(() => {
         sinon.stub(console, 'error');
+        navigatorStub = sinon.stub(Navigator, 'getPermissionsStatus');
       });
 
       after(() => {
         console.error.restore();
+        Navigator.getPermissionsStatus.restore();
+        global.navigator = undefined;
       });
 
       it('should print a warning to the console', () => {
@@ -87,6 +92,8 @@ describe('Radar', () => {
       const publishableKey = 'test-key';
 
       it('should save publishable key to storage', () => {
+        global.navigator = {};
+        // navigatorStub.resolves("GRANTED_FOREGROUND");
         Radar.initialize(publishableKey);
         expect(Storage.setItem).to.have.been.calledWith(Storage.PUBLISHABLE_KEY, publishableKey);
       });

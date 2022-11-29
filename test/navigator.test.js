@@ -8,83 +8,120 @@ import Navigator from '../src/navigator';
 import STATUS from '../src/status';
 
 describe('Navigator', () => {
-  afterEach(() => {
-    global.navigator = undefined;
+  describe('getCurrentPosition', () => {
+    afterEach(() => {
+      global.navigator = undefined;
+    });
+
+    it('should report a location error if geolocation is not available', () => {
+      global.navigator = {};
+
+      return Navigator.getCurrentPosition()
+        .catch((e) => {
+          expect(e).to.equal(STATUS.ERROR_LOCATION);
+        });
+    });
+
+    it('should report a location error if position coordinates are not available', () => {
+      const geolocation = {
+        getCurrentPosition: (onSuccess) => {
+          onSuccess(null);
+        },
+      };
+      global.navigator = { geolocation };
+
+      return Navigator.getCurrentPosition()
+        .catch((e) => {
+          expect(e).to.equal(STATUS.ERROR_LOCATION);
+        });
+    });
+
+    it('should report a permissions error if the user denies location permissions', () => {
+      const geolocation = {
+        getCurrentPosition: (onSuccess, onError) => {
+          onError({ code: 1 });
+        },
+      };
+      global.navigator = { geolocation };
+
+      return Navigator.getCurrentPosition()
+        .catch((e) => {
+          expect(e).to.equal(STATUS.ERROR_PERMISSIONS);
+        });
+    });
+
+    it('should report a location error if the device errors out fetching location', () => {
+      const geolocation = {
+        getCurrentPosition: (onSuccess, onError) => {
+          onError({ code: 2 });
+        },
+      };
+      global.navigator = { geolocation };
+
+      return Navigator.getCurrentPosition()
+        .catch((e) => {
+          expect(e).to.equal(STATUS.ERROR_LOCATION);
+        });
+    });
+
+    it('should succeed to get a position', () => {
+      const latitude = 40.7041895;
+      const longitude = -73.9867797;
+      const accuracy = 1;
+
+      const position = {
+        coords: { accuracy, latitude, longitude },
+      };
+
+      const geolocation = {
+        getCurrentPosition: (onSuccess) => {
+          onSuccess(position);
+        },
+      };
+
+      global.navigator = { geolocation };
+
+      return Navigator.getCurrentPosition()
+        .then((location) => {
+          expect(location.latitude).to.equal(latitude);
+          expect(location.longitude).to.equal(longitude);
+          expect(location.accuracy).to.equal(accuracy);
+        });
+    });
   });
+  describe('getPermissionsStatus', () => {
 
-  it('should report a location error if geolocation is not available', () => {
-    global.navigator = {};
+    afterEach(() => {
+      global.navigator = undefined;
+    });
 
-    return Navigator.getCurrentPosition()
-      .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
-      });
-  });
+    // it('should succeed to return permissions authorization if navigator permissions are available', () => {
+    //   const locationAuthorizationStatus = "GRANTED_FOREGROUND";
 
-  it('should report a location error if position coordinates are not available', () => {
-    const geolocation = {
-      getCurrentPosition: (onSuccess) => {
-        onSuccess(null);
-      },
-    };
-    global.navigator = { geolocation };
+    //   const query = {
+    //       getPermissionsStatus: (onSuccess) => {
+    //         onSuccess(locationAuthorizationStatus);
+    //       },
+    //   }
 
-    return Navigator.getCurrentPosition()
-      .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
-      });
-  });
+    //   global.navigator = {};
 
-  it('should report a permissions error if the user denies location permissions', () => {
-    const geolocation = {
-      getCurrentPosition: (onSuccess, onError) => {
-        onError({ code: 1 });
-      },
-    };
-    global.navigator = { geolocation };
+    //   global.navigator.permissions = { query };
 
-    return Navigator.getCurrentPosition()
-      .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_PERMISSIONS);
-      });
-  });
+    //   return Navigator.getPermissionsStatus()
+    //   .then((locationAuthorization) => {
+    //     expect(locationAuthorization).to.equal(locationAuthorizationStatus);
+    //   });
+    // });
 
-  it('should report a location error if the device errors out fetching location', () => {
-    const geolocation = {
-      getCurrentPosition: (onSuccess, onError) => {
-        onError({ code: 2 });
-      },
-    };
-    global.navigator = { geolocation };
+    it('should report a permissions error if navigator permissions are not available', () => {
+      
+      global.navigator = {};
 
-    return Navigator.getCurrentPosition()
-      .catch((e) => {
-        expect(e).to.equal(STATUS.ERROR_LOCATION);
-      });
-  });
-
-  it('should succeed', () => {
-    const latitude = 40.7041895;
-    const longitude = -73.9867797;
-    const accuracy = 1;
-
-    const position = {
-      coords: { accuracy, latitude, longitude },
-    };
-
-    const geolocation = {
-      getCurrentPosition: (onSuccess) => {
-        onSuccess(position);
-      },
-    };
-
-    global.navigator = { geolocation };
-
-    return Navigator.getCurrentPosition()
-      .then((location) => {
-        expect(location.latitude).to.equal(latitude);
-        expect(location.longitude).to.equal(longitude);
-        expect(location.accuracy).to.equal(accuracy);
-      });
+      return Navigator.getPermissionsStatus()
+        .catch((e) => {
+          expect(e).to.equal(STATUS.ERROR_PERMISSIONS);
+        });
+    });
   });
 });
