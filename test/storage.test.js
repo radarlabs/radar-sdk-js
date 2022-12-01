@@ -22,7 +22,7 @@ describe('Storage', () => {
     });
 
     it('should return null if key not found', () => {
-      expect(Storage.getItem('foo'), 'bar');
+      expect(Storage.getItem('baz')).to.be.null;
     });
 
     it('should return null if localStorage key is undefined', () => {
