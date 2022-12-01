@@ -93,7 +93,6 @@ describe('Radar', () => {
 
       it('should save publishable key to storage', () => {
         global.navigator = {};
-        // navigatorStub.resolves("GRANTED_FOREGROUND");
         Radar.initialize(publishableKey);
         expect(Storage.setItem).to.have.been.calledWith(Storage.PUBLISHABLE_KEY, publishableKey);
       });

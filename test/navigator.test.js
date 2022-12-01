@@ -95,24 +95,22 @@ describe('Navigator', () => {
       global.navigator = undefined;
     });
 
-    // it('should succeed to return permissions authorization if navigator permissions are available', () => {
-    //   const locationAuthorizationStatus = "GRANTED_FOREGROUND";
+    it('should succeed to return permissions authorization if navigator permissions are available', () => {
+      const locationAuthorizationStatus = "GRANTED_FOREGROUND";
 
-    //   const query = {
-    //       getPermissionsStatus: (onSuccess) => {
-    //         onSuccess(locationAuthorizationStatus);
-    //       },
-    //   }
+      const permissions = {
+        query: () => Promise.resolve({state:"granted"}),
+      }
 
-    //   global.navigator = {};
+      // global.navigator = {};
 
-    //   global.navigator.permissions = { query };
+      global.navigator = { permissions };
 
-    //   return Navigator.getPermissionsStatus()
-    //   .then((locationAuthorization) => {
-    //     expect(locationAuthorization).to.equal(locationAuthorizationStatus);
-    //   });
-    // });
+      return Navigator.getPermissionsStatus()
+      .then((locationAuthorization) => {
+        expect(locationAuthorization).to.equal(locationAuthorizationStatus);
+      });
+    });
 
     it('should report a permissions error if navigator permissions are not available', () => {
       

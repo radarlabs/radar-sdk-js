@@ -22,8 +22,6 @@ describe('Config', () => {
   const deviceId = 'device-id';
   const sessionId = Math.round(Date.now()/1000).toString();
 
-  // const deviceConfig = { installId, locationAuthorization, sessionId };
-
   const configResponse = { meta: {}};
 
   beforeEach(() => {

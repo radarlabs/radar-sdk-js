@@ -54,7 +54,6 @@ class Navigator {
               break;
           }
           return resolve(locationAuthorization)
-          // return locationAuthorization;
         })
     })
   }
