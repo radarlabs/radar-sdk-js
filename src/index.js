@@ -166,8 +166,7 @@ class Radar {
     Trips.startTrip(tripOptions)
       .then((response) => {
         Radar.setTripOptions(tripOptions);
-        // default events to `[]` for backwards compatibility
-        callback(null, { trip: response.trip, events: response.events || [], status: STATUS.SUCCESS }, response);
+        callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }

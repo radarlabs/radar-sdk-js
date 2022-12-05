@@ -31,7 +31,7 @@ class Track {
     let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
-      tripOptions.v2 = true;
+      tripOptions.version = '2';
     }
 
     const body = {
