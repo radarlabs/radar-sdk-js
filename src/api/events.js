@@ -4,7 +4,7 @@ import Device from '../device';
 
 class Events {
   static async sendEvent(eventData={}) {
-    const { type, metadata } = eventData;
+    const { type, metadata, createdAt } = eventData;
 
     const deviceId = Device.getId();
     const userId = Storage.getItem(Storage.USER_ID);
