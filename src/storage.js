@@ -36,7 +36,7 @@ class Storage {
     }
 
     static getStorage() {
-        return (window && window.sessionStorage) || undefined;
+        return (window && window.localStorage) || undefined;
     }
 
     static setItem(key, value) {
@@ -47,7 +47,7 @@ class Storage {
         if (value === undefined || value === null) {
             return;
         }
-        sessionStorage.setItem(key, value);
+        storage.setItem(key, value);
     }
 
     static getItem(key) {
