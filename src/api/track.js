@@ -11,12 +11,12 @@ class Track {
     let { latitude, longitude, accuracy } = params;
 
     let useCacheLocation = false
-    let timeToLive = Storage.getItem(Storage.LOCATION_TIME_TO_LIVE)
+    let timeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE))
     let cachedTimeString = Storage.getItem(Storage.LAST_LOCATION_TIME)
 
     if(timeToLive && cachedTimeString){
-      let cachedTime = new Date(cachedTimeString).getTime()
-      useCacheLocation = Date.now() < cachedTime + timeToLive * 60 && (!latitude || !longitude) 
+      let cachedTime = parseInt(cachedTimeString)
+      useCacheLocation = Date.now() < cachedTime + timeToLive * 60 * 1000 && (!latitude || !longitude)
     }
 
     if(useCacheLocation){

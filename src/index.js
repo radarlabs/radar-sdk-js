@@ -51,7 +51,6 @@ class Radar {
       console.error('Radar "initialize" was called without a publishable key');
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
-
     if(options){
       let {timeToLive} = options
 
