@@ -52,10 +52,10 @@ class Radar {
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
     if(options){
-      let {timeToLive} = options
+      let {locationTimeToLive} = options
 
-      if(timeToLive && typeof(timeToLive) === 'number'){
-        Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, timeToLive)
+      if(locationTimeToLive && typeof(locationTimeToLive) === 'number'){
+        Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, locationTimeToLive)
       }
     }
   }
