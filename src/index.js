@@ -19,7 +19,7 @@ const defaultCallback = () => {};
 
 const handleError = (callback) => {
   return (err) => {
-    
+
     // Radar Error
     if (typeof err === 'string') {
       callback(err, {});
