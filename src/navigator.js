@@ -1,4 +1,5 @@
 import STATUS from './status';
+import Storage from './storage';
 
 class Navigator {
   static getCurrentPosition() {
@@ -6,6 +7,21 @@ class Navigator {
 
       if (!navigator || !navigator.geolocation) {
         return reject(STATUS.ERROR_LOCATION);
+      }
+
+      let locationTimeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE))
+      let cachedTimeString = Storage.getItem(Storage.LAST_LOCATION_TIME)
+      debugger;
+      if(locationTimeToLive && cachedTimeString){
+        let cachedTime = parseInt(cachedTimeString)
+        if(Date.now() < cachedTime + locationTimeToLive * 60 * 1000){
+          let latitude = Storage.getItem(Storage.LATITUDE)
+          let longitude = Storage.getItem(Storage.LONGITUDE)
+          let accuracy = Storage.getItem(Storage.ACCURACY)
+          if(latitude && longitude && accuracy){
+            return resolve({ latitude, longitude, accuracy });
+          }
+        }
       }
 
       navigator.geolocation.getCurrentPosition(
@@ -16,6 +32,11 @@ class Navigator {
           }
 
           const { latitude, longitude, accuracy } = position.coords;
+
+          Storage.setItem(Storage.LAST_LOCATION_TIME, Date.now())
+          Storage.setItem(Storage.LATITUDE, latitude)
+          Storage.setItem(Storage.LONGITUDE, longitude)
+          Storage.setItem(Storage.ACCURACY, accuracy)
 
           return resolve({ latitude, longitude, accuracy });
         },
