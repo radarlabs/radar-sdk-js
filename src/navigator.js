@@ -11,7 +11,6 @@ class Navigator {
 
       let locationTimeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE))
       let cachedTimeString = Storage.getItem(Storage.LAST_LOCATION_TIME)
-      debugger;
       if(locationTimeToLive && cachedTimeString){
         let cachedTime = parseInt(cachedTimeString)
         if(Date.now() < cachedTime + locationTimeToLive * 60 * 1000){
