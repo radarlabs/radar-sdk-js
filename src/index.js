@@ -19,7 +19,7 @@ const defaultCallback = () => {};
 
 const handleError = (callback) => {
   return (err) => {
-
+    
     // Radar Error
     if (typeof err === 'string') {
       callback(err, {});
@@ -46,11 +46,19 @@ class Radar {
     return STATUS;
   }
 
-  static initialize(publishableKey) {
+  static initialize(publishableKey, options={}) {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
+
+    if(options){
+      let {timeToLive} = options
+
+      if(timeToLive && typeof(timeToLive) === 'number'){
+        Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, timeToLive)
+      }
+    }
   }
 
   static setHost(host, baseApiPath = API_VERSION) {
