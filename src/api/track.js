@@ -10,20 +10,28 @@ class Track {
   static async trackOnce(params={}) {
     let { latitude, longitude, accuracy } = params;
 
-    // What do I do about accuracy
     let useCacheLocation = false
     let cachedTimeString = Storage.getItem(Storage.LAST_LOCATION_TIME)
 
     if(timeToLive && cachedTimeString){
       let cachedTime = new Date(cachedTimeString).getTime()
-      useCacheLocation = Date.now() < cachedTime + timeToLive * 60
+      useCacheLocation = Date.now() < cachedTime + timeToLive * 60 && (!latitude || !longitude) 
     }
 
-    if ((!latitude || !longitude) && !useCacheLocation) {
+    if(useCacheLocation){
+      latitude = Storage.getItem(Storage.LATITUDE)
+      longitude = Storage.getItem(Storage.LONGITUDE)
+      accuracy = Storage.getItem(Storage.ACCURACY)
+    } else if ((!latitude || !longitude)) {
       const deviceLocation = await Navigator.getCurrentPosition();
       latitude = deviceLocation.latitude;
       longitude = deviceLocation.longitude;
       accuracy = deviceLocation.accuracy;
+
+      Storage.setItem(Storage.LAST_LOCATION_TIME, Date.now())
+      Storage.setItem(Storage.LATITUDE, latitude)
+      Storage.setItem(Storage.LONGITUDE, longitude)
+      Storage.setItem(Storage.ACCURACY, accuracy)
     }
 
     const deviceId = Device.getId();
