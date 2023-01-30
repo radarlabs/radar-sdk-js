@@ -9,17 +9,21 @@ class Navigator {
         return reject(STATUS.ERROR_LOCATION);
       }
 
-      let locationTimeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE))
-      let cachedTimeString = Storage.getItem(Storage.LAST_LOCATION_TIME)
-      if(locationTimeToLive && cachedTimeString){
-        let cachedTime = parseInt(cachedTimeString)
-        if(Date.now() < cachedTime + locationTimeToLive * 60 * 1000){
-          let latitude = Storage.getItem(Storage.LATITUDE)
-          let longitude = Storage.getItem(Storage.LONGITUDE)
-          let accuracy = Storage.getItem(Storage.ACCURACY)
-          if(latitude && longitude && accuracy){
-            return resolve({ latitude, longitude, accuracy });
+      let locationTimeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE));
+
+      if (locationTimeToLive) {
+        try {
+          const lastLocation = JSON.parse(Storage.getItem(Storage.LAST_LOCATION));
+          const { latitude, longitude, accuracy, updatedAt } = lastLocation;
+
+          if(Date.now() < updatedAt + locationTimeToLive * 60 * 1000){
+            // check expiration stuff goes here
+            if(latitude && longitude && accuracy){
+              return resolve({ latitude, longitude, accuracy });
+            }
           }
+        } catch (e) {
+          console.warn('Radar SDK: could not load cached location.');
         }
       }
 
@@ -32,10 +36,10 @@ class Navigator {
 
           const { latitude, longitude, accuracy } = position.coords;
 
-          Storage.setItem(Storage.LAST_LOCATION_TIME, Date.now())
-          Storage.setItem(Storage.LATITUDE, latitude)
-          Storage.setItem(Storage.LONGITUDE, longitude)
-          Storage.setItem(Storage.ACCURACY, accuracy)
+          if (locationTimeToLive) {
+            const lastLocation = { latitude, longitude, accuracy, updatedAt: Date.now() };
+            Storage.setItem(Storage.LAST_LOCATION, JSON.stringify(lastLocation));
+          }
 
           return resolve({ latitude, longitude, accuracy });
         },

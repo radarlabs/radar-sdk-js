@@ -51,11 +51,17 @@ class Radar {
       console.error('Radar "initialize" was called without a publishable key');
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
-    if(options){
-      let {locationTimeToLive} = options
 
-      if(locationTimeToLive && typeof(locationTimeToLive) === 'number'){
-        Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, locationTimeToLive)
+    if(Object.keys(options).length === 0){
+      const {locationTimeToLive} = options
+
+      if (locationTimeToLive) {
+        const number = Number(locationTimeToLive);
+        if (Number.isNaN(number)) {
+          console.warn('Radar SDK: invalid number for option "locationTimeToLive"');
+        } else {
+          Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, locationTimeToLive);
+        }
       }
     }
   }

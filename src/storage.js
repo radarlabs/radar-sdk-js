@@ -34,20 +34,11 @@ class Storage {
     static get BASE_API_PATH() {
         return 'radar-base-api-path';
     }
-    static get LAST_LOCATION_TIME(){
-        return 'radar-last-location-time'
-    }
     static get LOCATION_TIME_TO_LIVE(){
         return 'radar-location-time-to-live'
     }
-    static get LATITUDE() {
-        return 'radar-user-latitude'
-    }
-    static get LONGITUDE() {
-        return 'radar-user-longitude'
-    }
-    static get ACCURACY(){
-        return 'radar-accuracy'
+    static get LAST_LOCATION(){
+        return 'radar-last-location';
     }
 
     static getStorage() {
