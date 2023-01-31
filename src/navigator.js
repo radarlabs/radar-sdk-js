@@ -9,15 +9,12 @@ class Navigator {
         return reject(STATUS.ERROR_LOCATION);
       }
 
-      let locationTimeToLive = parseFloat(Storage.getItem(Storage.LOCATION_TIME_TO_LIVE));
-
-      if (locationTimeToLive) {
+      const cacheLocationMinutes = parseFloat(Storage.getItem(Storage.CACHE_LOCATION_MINUTES));
+      if (cacheLocationMinutes) {
         try {
           const lastLocation = JSON.parse(Storage.getItem(Storage.LAST_LOCATION));
-          const { latitude, longitude, accuracy, updatedAt } = lastLocation;
-
-          if(Date.now() < updatedAt + locationTimeToLive * 60 * 1000){
-            // check expiration stuff goes here
+          const { latitude, longitude, accuracy } = lastLocation;
+          if (Date.now() < parseInt(lastLocation.expiresAt)) {            // check expiration stuff goes here
             if(latitude && longitude && accuracy){
               return resolve({ latitude, longitude, accuracy });
             }
@@ -36,8 +33,11 @@ class Navigator {
 
           const { latitude, longitude, accuracy } = position.coords;
 
-          if (locationTimeToLive) {
-            const lastLocation = { latitude, longitude, accuracy, updatedAt: Date.now() };
+          if (cacheLocationMinutes) {
+            const updatedAt = Date.now();
+            const expiresAt = updatedAt + (cacheLocationMinutes * 60 * 1000); // convert to ms
+
+            const lastLocation = { latitude, longitude, accuracy, updatedAt, expiresAt };
             Storage.setItem(Storage.LAST_LOCATION, JSON.stringify(lastLocation));
           }
 

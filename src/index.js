@@ -52,16 +52,15 @@ class Radar {
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
 
-    if(Object.keys(options).length === 0){
-      const {locationTimeToLive} = options
 
-      if (locationTimeToLive) {
-        const number = Number(locationTimeToLive);
-        if (Number.isNaN(number)) {
-          console.warn('Radar SDK: invalid number for option "locationTimeToLive"');
-        } else {
-          Storage.setItem(Storage.LOCATION_TIME_TO_LIVE, locationTimeToLive);
-        }
+    const {cacheLocationMinutes} = options
+
+    if (cacheLocationMinutes) {
+      const number = Number(cacheLocationMinutes);
+      if (Number.isNaN(number)) {
+        console.warn('Radar SDK: invalid number for option "cacheLocationMinutes"');
+      } else {
+        Storage.setItem(Storage.CACHE_LOCATION_MINUTES, cacheLocationMinutes);
       }
     }
   }

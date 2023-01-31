@@ -34,8 +34,8 @@ class Storage {
     static get BASE_API_PATH() {
         return 'radar-base-api-path';
     }
-    static get LOCATION_TIME_TO_LIVE(){
-        return 'radar-location-time-to-live'
+    static get CACHE_LOCATION_MINUTES(){
+        return 'radar-cache-location-minutes'
     }
     static get LAST_LOCATION(){
         return 'radar-last-location';
