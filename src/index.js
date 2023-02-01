@@ -52,8 +52,7 @@ class Radar {
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
 
-
-    const {cacheLocationMinutes} = options
+    const { cacheLocationMinutes } = options;
 
     if (cacheLocationMinutes) {
       const number = Number(cacheLocationMinutes);
@@ -62,6 +61,8 @@ class Radar {
       } else {
         Storage.setItem(Storage.CACHE_LOCATION_MINUTES, cacheLocationMinutes);
       }
+    }else{
+      Storage.removeItem(Storage.CACHE_LOCATION_MINUTES);
     }
   }
 

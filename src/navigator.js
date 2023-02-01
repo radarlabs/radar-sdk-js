@@ -13,10 +13,12 @@ class Navigator {
       if (cacheLocationMinutes) {
         try {
           const lastLocation = JSON.parse(Storage.getItem(Storage.LAST_LOCATION));
-          const { latitude, longitude, accuracy } = lastLocation;
-          if (Date.now() < parseInt(lastLocation.expiresAt)) {            // check expiration stuff goes here
-            if(latitude && longitude && accuracy){
-              return resolve({ latitude, longitude, accuracy });
+          if(lastLocation){
+            const { latitude, longitude, accuracy } = lastLocation;
+            if (Date.now() < parseInt(lastLocation.expiresAt)) {            // check expiration stuff goes here
+              if(latitude && longitude && accuracy){
+                return resolve({ latitude, longitude, accuracy });
+              }
             }
           }
         } catch (e) {
