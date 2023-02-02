@@ -14,7 +14,7 @@ class Routing {
       modes,
       units,
       geometry,
-      geometryPoints
+      geometryPoints,
     } = routingOptions;
 
     origin = `${origin.latitude},${origin.longitude}`;
@@ -22,12 +22,9 @@ class Routing {
     if (destination) {
       destination = `${destination.latitude},${destination.longitude}`;
     }
+
     if (modes) {
       modes = modes.join(',');
-    }
-
-    if (geometryPoints > 1) {
-      geometryPoints = geometryPoints
     }
 
     const params = {
