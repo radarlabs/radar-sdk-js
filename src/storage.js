@@ -34,6 +34,12 @@ class Storage {
     static get BASE_API_PATH() {
         return 'radar-base-api-path';
     }
+    static get CACHE_LOCATION_MINUTES() {
+        return 'radar-cache-location-minutes'
+    }
+    static get LAST_LOCATION() {
+        return 'radar-last-location';
+    }
 
     static getStorage() {
         return (window && window.localStorage) || undefined;

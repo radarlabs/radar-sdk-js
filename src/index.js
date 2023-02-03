@@ -46,14 +46,27 @@ class Radar {
     return STATUS;
   }
 
-  static initialize(publishableKey) {
+  static initialize(publishableKey, options={}) {
     if (!publishableKey) {
       console.error('Radar "initialize" was called without a publishable key');
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
+
+    const { cacheLocationMinutes } = options;
+
+    if (cacheLocationMinutes) {
+      const number = Number(cacheLocationMinutes);
+      if (Number.isNaN(number)) {
+        console.warn('Radar SDK: invalid number for option "cacheLocationMinutes"');
+      } else {
+        Storage.setItem(Storage.CACHE_LOCATION_MINUTES, cacheLocationMinutes);
+      }
+    } else {
+      Storage.removeItem(Storage.CACHE_LOCATION_MINUTES);
+    }
   }
 
-  static setHost(host, baseApiPath = API_VERSION) {
+  static setHost(host, baseApiPath=API_VERSION) {
     Storage.setItem(Storage.HOST, host);
     Storage.setItem(Storage.BASE_API_PATH, baseApiPath);
   }
@@ -150,7 +163,6 @@ class Radar {
 
     if (typeof arg0 === 'function') {
       callback = arg0;
-
     } else {
       location = arg0;
       callback = arg1;
@@ -280,7 +292,6 @@ class Radar {
 
     if (typeof arg0 === 'function') {
       callback = arg0;
-
     } else if (typeof arg0 === 'object') {
       geocodeOptions = arg0;
       callback = arg1;
