@@ -14,6 +14,7 @@ class Routing {
       modes,
       units,
       geometry,
+      geometryPoints,
     } = routingOptions;
 
     origin = `${origin.latitude},${origin.longitude}`;
@@ -21,6 +22,7 @@ class Routing {
     if (destination) {
       destination = `${destination.latitude},${destination.longitude}`;
     }
+
     if (modes) {
       modes = modes.join(',');
     }
@@ -31,6 +33,7 @@ class Routing {
       modes,
       units,
       geometry,
+      geometryPoints
     };
 
     return Http.request('GET', 'route/distance', params);
