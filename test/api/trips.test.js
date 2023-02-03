@@ -44,6 +44,7 @@ describe('Trips', () => {
               metadata: undefined,
               mode: undefined,
               approachingThreshold: undefined,
+              scheduledArrivalAt: undefined,
            });
           });
       });
@@ -52,6 +53,7 @@ describe('Trips', () => {
     describe('called with tripOptions', () => {
       it('should include tripOptions', () => {
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -59,6 +61,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         return Trips.startTrip(tripOptions)
@@ -67,6 +70,7 @@ describe('Trips', () => {
             expect(httpStub).to.have.been.calledWith('POST', 'trips', {
               userId,
               ...tripOptions,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
            });
           });
       });
@@ -75,6 +79,7 @@ describe('Trips', () => {
     describe('called with userId set', () => {
       it('should include userId', () => {
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -82,6 +87,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         return Trips.startTrip(tripOptions)
@@ -90,6 +96,7 @@ describe('Trips', () => {
             expect(httpStub).to.have.been.calledWith('POST', 'trips', {
               userId,
               ...tripOptions,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
            });
           });
       });
@@ -100,6 +107,7 @@ describe('Trips', () => {
         getItemStub.withArgs(Storage.USER_ID).returns(undefined);
 
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -107,6 +115,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         return Trips.startTrip(tripOptions)
@@ -115,6 +124,33 @@ describe('Trips', () => {
             expect(httpStub).to.have.been.calledWith('POST', 'trips', {
               userId: undefined,
               ...tripOptions,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
+           });
+          });
+      });
+    });
+
+    describe('called with an invalid date for scheduledArrivalAt', () => {
+      it('should have scheduledArrivalAt set to undefined', () => {
+        const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = '123456';
+        const tripOptions = {
+          userId,
+          externalId,
+          destinationGeofenceTag: 'store',
+          destinationGeofenceExternalId: '123',
+          mode: 'car',
+          metadata: { car: 'red jeep' },
+          approachingThreshold: 3,
+          scheduledArrivalAt,
+        };
+
+        return Trips.startTrip(tripOptions)
+          .then(() => {
+            expect(httpStub).to.have.callCount(1);
+            expect(httpStub).to.have.been.calledWith('POST', 'trips', {
+              ...tripOptions,
+              scheduledArrivalAt: undefined,
            });
           });
       });
@@ -125,12 +161,14 @@ describe('Trips', () => {
     describe('called without status', () => {
       it('should include status unknown', () => {
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
           destinationGeofenceExternalId: '123',
           mode: 'car',
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         return Trips.updateTrip(tripOptions)
@@ -145,6 +183,7 @@ describe('Trips', () => {
               mode: 'car',
               status: TRIP_STATUS.UNKNOWN,
               approachingThreshold: 3,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
            });
           });
       });
@@ -153,6 +192,7 @@ describe('Trips', () => {
     describe('called with status', () => {
       it('should include status', () => {
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -160,6 +200,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         const status = TRIP_STATUS.STARTED;
@@ -176,6 +217,7 @@ describe('Trips', () => {
               mode: 'car',
               status: TRIP_STATUS.STARTED,
               approachingThreshold: 3,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
            });
           });
       });
@@ -184,6 +226,7 @@ describe('Trips', () => {
     describe('called with userId set', () => {
       it('should include userId', () => {
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -191,6 +234,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         const status = TRIP_STATUS.STARTED;
@@ -202,6 +246,7 @@ describe('Trips', () => {
               ...tripOptions,
               userId,
               status: TRIP_STATUS.STARTED,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
            });
           });
       });
@@ -212,6 +257,7 @@ describe('Trips', () => {
         getItemStub.withArgs(Storage.USER_ID).returns(undefined);
 
         const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = new Date();
         const tripOptions = {
           externalId,
           destinationGeofenceTag: 'store',
@@ -219,6 +265,7 @@ describe('Trips', () => {
           mode: 'car',
           metadata: { car: 'red jeep' },
           approachingThreshold: 3,
+          scheduledArrivalAt,
         };
 
         const status = TRIP_STATUS.STARTED;
@@ -230,6 +277,36 @@ describe('Trips', () => {
               ...tripOptions,
               userId: undefined,
               status: TRIP_STATUS.STARTED,
+              scheduledArrivalAt: scheduledArrivalAt.toJSON(),
+           });
+          });
+      });
+    });
+
+    describe('called with an invalid date for scheduledArrivalAt', () => {
+      it('should have scheduledArrivalAt set to undefined', () => {
+        const externalId = 'trip-abc-123';
+        const scheduledArrivalAt = '123456';
+        const tripOptions = {
+          userId,
+          externalId,
+          destinationGeofenceTag: 'store',
+          destinationGeofenceExternalId: '123',
+          mode: 'car',
+          metadata: { car: 'red jeep' },
+          approachingThreshold: 3,
+          scheduledArrivalAt,
+        };
+
+        const status = TRIP_STATUS.STARTED;
+
+        return Trips.updateTrip(tripOptions, status)
+          .then(() => {
+            expect(httpStub).to.have.callCount(1);
+            expect(httpStub).to.have.been.calledWith('PATCH', `trips/${externalId}/update`, {
+              ...tripOptions,
+              status: TRIP_STATUS.STARTED,
+              scheduledArrivalAt: undefined,
            });
           });
       });
