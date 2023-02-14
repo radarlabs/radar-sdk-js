@@ -104,7 +104,7 @@ describe('Track', () => {
             const trackArgs = httpStub.getCall(0).args;
             expect(trackArgs[0]).to.equal('POST');
             expect(trackArgs[1]).to.equal('track');
-            expect(trackArgs[2].tripOptions).to.deep.equal(tripOptions);
+            expect(trackArgs[2].tripOptions).to.deep.equal({ ...tripOptions, version: '2' });
           });
         });
     });

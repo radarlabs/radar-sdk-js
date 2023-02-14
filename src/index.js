@@ -176,7 +176,7 @@ class Radar {
   }
 
   static startTrip(tripOptions, callback=defaultCallback) {
-    Trips.updateTrip(tripOptions, TRIP_STATUS.STARTED)
+    Trips.startTrip(tripOptions)
       .then((response) => {
         Radar.setTripOptions(tripOptions);
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
