@@ -259,8 +259,8 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static geocode(geocodeOptions, callback=defaultCallback) {
-    Geocoding.geocode(geocodeOptions)
+  static geocode(callback=defaultCallback) {
+    Geocoding.geocode()
       .then((response) => {
         callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
       })
@@ -286,18 +286,14 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static ipGeocode(arg0, arg1=defaultCallback) {
+  static ipGeocode(arg0=defaultCallback) {
     let callback;
-    let geocodeOptions;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
-    } else if (typeof arg0 === 'object') {
-      geocodeOptions = arg0;
-      callback = arg1;
     }
 
-    Geocoding.ipGeocode(geocodeOptions)
+    Geocoding.ipGeocode()
       .then((response) => {
         callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
