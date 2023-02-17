@@ -259,8 +259,8 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static geocode(callback=defaultCallback) {
-    Geocoding.geocode()
+  static geocode(geocodeOptions, callback=defaultCallback) {
+    Geocoding.geocode(geocodeOptions)
       .then((response) => {
         callback(null, { addresses: response.addresses, staus: STATUS.SUCCESS }, response);
       })
