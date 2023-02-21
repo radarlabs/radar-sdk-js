@@ -506,16 +506,6 @@ describe('Radar', () => {
         done();
       });
     });
-
-    it('should call ipGeocode is the first arg is an object', (done) => {
-      geocodeStub.resolves({ address: 'matching-address' });
-
-      Radar.ipGeocode({ ip: 'mock-ip-address' }, (err, { address }) => {
-        expect(err).to.equal(null);
-        expect(address).to.equal('matching-address');
-        done();
-      });
-    });
   });
 
   context('getDistance', () => {

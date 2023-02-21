@@ -288,16 +288,15 @@ class Radar {
 
   static ipGeocode(arg0, arg1=defaultCallback) {
     let callback;
-    let geocodeOptions;
 
     if (typeof arg0 === 'function') {
       callback = arg0;
     } else if (typeof arg0 === 'object') {
-      geocodeOptions = arg0;
+      console.warn('Radar SDK: ipGeocode parameters have been deprecated.');
       callback = arg1;
     }
 
-    Geocoding.ipGeocode(geocodeOptions)
+    Geocoding.ipGeocode()
       .then((response) => {
         callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
