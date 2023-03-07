@@ -26,7 +26,7 @@ class Geocoding {
   }
 
   static async ipGeocode() {
-    return Http.request('GET', 'geocode/ip');
+    return Http.request('GET', 'geocode/ip', {});
   }
 }
 
