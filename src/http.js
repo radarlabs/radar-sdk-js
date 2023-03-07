@@ -6,7 +6,7 @@ import SDK_VERSION from './version';
 import STATUS from './status';
 
 class Http {
-  static request(method, path, data) {
+  static request(method, path, data={}) {
     return new Promise((resolve, reject) => {
 
       const xhr = new XMLHttpRequest();
