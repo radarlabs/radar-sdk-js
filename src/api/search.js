@@ -88,7 +88,8 @@ class Search {
       near,
       limit,
       layers,
-      country,
+      country, // deprecated, recommended to use countryCode
+      countryCode, 
       expandUnits, // optional
     } = searchOptions;
 
@@ -102,6 +103,7 @@ class Search {
       limit,
       layers,
       country,
+      countryCode,
       expandUnits,
     };
 

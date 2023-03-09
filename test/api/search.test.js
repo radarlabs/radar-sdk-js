@@ -24,7 +24,7 @@ describe('Search', () => {
   const tags = ['geofence-tag'];
   const metadata = {'geofence-metadata-key': 'geofence-metadata-value'};
   const layers = ['venue', 'address'];
-  const country = 'US';
+  const countryCode = 'US';
   const limit = 50;
   const query = 'mock-query';
 
@@ -127,7 +127,7 @@ describe('Search', () => {
 
         return Search.autocomplete({ query })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined, expandUnits: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined, countryCode: undefined, expandUnits: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
@@ -139,9 +139,9 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        return Search.autocomplete({ near, query, limit, layers, country })
+        return Search.autocomplete({ near, query, limit, layers, countryCode })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country, expandUnits: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], countryCode, country: undefined, expandUnits: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
@@ -152,9 +152,9 @@ describe('Search', () => {
         const near = { latitude, longitude };
         const expandUnits = true;
 
-        return Search.autocomplete({ near, query, limit, layers, country, expandUnits })
+        return Search.autocomplete({ near, query, limit, layers, countryCode, expandUnits })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country, expandUnits: true });
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], countryCode, country: undefined, expandUnits: true });
             expect(response).to.equal(autocompleteResponse);
           });
       });
