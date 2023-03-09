@@ -127,7 +127,7 @@ describe('Search', () => {
 
         return Search.autocomplete({ query })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined });
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined, expandUnits: undefined });
             expect(response).to.equal(autocompleteResponse);
           });
       });
@@ -141,7 +141,20 @@ describe('Search', () => {
 
         return Search.autocomplete({ near, query, limit, layers, country })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country });
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country, expandUnits: undefined });
+            expect(response).to.equal(autocompleteResponse);
+          });
+      });
+
+      it('should return an autocomplete response, with expandUnits', () => {
+        httpStub.resolves(autocompleteResponse);
+
+        const near = { latitude, longitude };
+        const expandUnits = true;
+
+        return Search.autocomplete({ near, query, limit, layers, country, expandUnits })
+          .then((response) => {
+            expect(Http.request).to.have.been.calledWith('GET', 'search/autocomplete', { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['venue', 'address'], country, expandUnits: true });
             expect(response).to.equal(autocompleteResponse);
           });
       });

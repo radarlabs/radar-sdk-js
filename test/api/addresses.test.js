@@ -37,7 +37,7 @@ describe('Addresses', () => {
 
         return Addresses.validateAddress({ number, street })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: undefined, state: undefined, city: undefined, number: '841', postalCode: undefined, street: undefined, unit: undefined});
+            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: undefined, state: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined});
             expect(response).to.equal(autocompleteResponse);
           });
       });
