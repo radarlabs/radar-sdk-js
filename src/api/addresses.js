@@ -3,8 +3,8 @@ import Http from '../http';
 class Addresses {
   static async validateAddress(addressOptions={}) {
     const {
-      country,
-      state,
+      countryCode,
+      stateCode,
       city,
       number,
       postalCode,
@@ -13,8 +13,8 @@ class Addresses {
     } = addressOptions;
 
     const params = {
-      country,
-      state,
+      countryCode,
+      stateCode,
       city,
       number,
       postalCode,

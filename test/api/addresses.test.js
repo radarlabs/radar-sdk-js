@@ -12,8 +12,8 @@ import Addresses from '../../src/api/addresses';
 describe('Addresses', () => {
   let httpStub;
 
-  const country = 'US';
-  const state = 'NY';
+  const countryCode = 'US';
+  const stateCode = 'NY';
   const city = 'New York';
   const number = '841';
   const postalCode = '10010';
@@ -37,7 +37,7 @@ describe('Addresses', () => {
 
         return Addresses.validateAddress({ number, street })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: undefined, state: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined});
+            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: undefined, stateCode: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined});
             expect(response).to.equal(validateResponse);
           });
       });
@@ -48,8 +48,8 @@ describe('Addresses', () => {
         httpStub.resolves(validateResponse);
 
         const options = {
-          country,
-          state,
+          countryCode,
+          stateCode,
           city,
           number,
           postalCode,
@@ -59,7 +59,7 @@ describe('Addresses', () => {
 
         return Addresses.validateAddress(options)
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: 'US', state: 'NY', city: 'New York', number: '841', postalCode: '10010', street: 'Broadway', unit: '7'});
+            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: 'US', stateCode: 'NY', city: 'New York', number: '841', postalCode: '10010', street: 'Broadway', unit: '7'});
             expect(response).to.equal(validateResponse);
           });
       });
