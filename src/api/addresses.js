@@ -2,7 +2,7 @@ import Http from '../http';
 
 class Addresses {
   static async validateAddress(addressOptions={}) {
-    let {
+    const {
       country,
       state,
       city,
