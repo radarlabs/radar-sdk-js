@@ -20,7 +20,7 @@ describe('Addresses', () => {
   const street = 'Broadway';
   const unit = '7';
 
-  const autocompleteResponse = { meta: {}, address: {} };
+  const validateResponse = { meta: {}, address: {} };
 
   beforeEach(() => {
     httpStub = sinon.stub(Http, 'request');
@@ -33,19 +33,19 @@ describe('Addresses', () => {
   context('validateAddress', () => {
     describe('params are not provided', () => {
       it('should have undefined params and return an autocomplete response', () => {
-        httpStub.resolves(autocompleteResponse);
+        httpStub.resolves(validateResponse);
 
         return Addresses.validateAddress({ number, street })
           .then((response) => {
             expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: undefined, state: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined});
-            expect(response).to.equal(autocompleteResponse);
+            expect(response).to.equal(validateResponse);
           });
       });
     });
 
     describe('params are provided', () => {
       it('should return an autocomplete response', () => {
-        httpStub.resolves(autocompleteResponse);
+        httpStub.resolves(validateResponse);
 
         const options = {
           country,
@@ -60,7 +60,7 @@ describe('Addresses', () => {
         return Addresses.validateAddress(options)
           .then((response) => {
             expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { country: 'US', state: 'NY', city: 'New York', number: '841', postalCode: '10010', street: 'Broadway', unit: '7'});
-            expect(response).to.equal(autocompleteResponse);
+            expect(response).to.equal(validateResponse);
           });
       });
     });
