@@ -1,5 +1,6 @@
 import Navigator from './navigator';
 
+import Addresses from './api/addresses';
 import Context from './api/context';
 import Geocoding from './api/geocoding';
 import Routing from './api/routing';
@@ -255,6 +256,14 @@ class Radar {
     Search.autocomplete(searchOptions)
       .then((response) => {
         callback(null, { addresses: response.addresses, status: STATUS.SUCCESS }, response);
+      })
+      .catch(handleError(callback));
+  }
+
+  static validateAddress(addressOptions, callback=defaultCallback) {
+    Addresses.validateAddress(addressOptions)
+      .then((response) => {
+        callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
