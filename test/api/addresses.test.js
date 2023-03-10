@@ -20,7 +20,7 @@ describe('Addresses', () => {
   const street = 'Broadway';
   const unit = '7';
 
-  const validateResponse = { meta: {}, address: {} };
+  const validateResponse = { meta: {}, address: {}, result: {} };
 
   beforeEach(() => {
     httpStub = sinon.stub(Http, 'request');

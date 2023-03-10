@@ -263,7 +263,7 @@ class Radar {
   static validateAddress(addressOptions, callback=defaultCallback) {
     Addresses.validateAddress(addressOptions)
       .then((response) => {
-        callback(null, { address: response.address, status: STATUS.SUCCESS }, response);
+        callback(null, { address: response.address, result: response.result, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
   }
