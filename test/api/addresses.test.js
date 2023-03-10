@@ -15,10 +15,11 @@ describe('Addresses', () => {
   const countryCode = 'US';
   const stateCode = 'NY';
   const city = 'New York';
-  const number = '841';
   const postalCode = '10010';
+  const number = '841';
   const street = 'Broadway';
   const unit = '7';
+  const addressLabel = '841 Broadway Unit 7';
 
   const validateResponse = { meta: {}, address: {}, result: {} };
 
@@ -37,14 +38,14 @@ describe('Addresses', () => {
 
         return Addresses.validateAddress({ number, street })
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: undefined, stateCode: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined});
+            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: undefined, stateCode: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined, addressLabel: undefined });
             expect(response).to.equal(validateResponse);
           });
       });
     });
 
     describe('params are provided', () => {
-      it('should return an autocomplete response', () => {
+      it('number, street, unit provided should return an autocomplete response', () => {
         httpStub.resolves(validateResponse);
 
         const options = {
@@ -54,15 +55,37 @@ describe('Addresses', () => {
           number,
           postalCode,
           street,
-          unit
+          unit,
+          // addressLabel,
         }
 
         return Addresses.validateAddress(options)
           .then((response) => {
-            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: 'US', stateCode: 'NY', city: 'New York', number: '841', postalCode: '10010', street: 'Broadway', unit: '7'});
+            expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: 'US', stateCode: 'NY', city: 'New York', postalCode: '10010', number: '841', street: 'Broadway', unit: '7', addressLabel: undefined});
             expect(response).to.equal(validateResponse);
           });
       });
+    });
+
+    it('addressLabel provided should return an autocomplete response', () => {
+      httpStub.resolves(validateResponse);
+
+      const options = {
+        countryCode,
+        stateCode,
+        city,
+        postalCode,
+        // number,
+        // street,
+        // unit,
+        addressLabel,
+      }
+
+      return Addresses.validateAddress(options)
+        .then((response) => {
+          expect(Http.request).to.have.been.calledWith('GET', 'addresses/validate', { countryCode: 'US', stateCode: 'NY', city: 'New York',  postalCode: '10010', addressLabel: '841 Broadway Unit 7', number: undefined, street: undefined, unit: undefined });
+          expect(response).to.equal(validateResponse);
+        });
     });
   });
 });

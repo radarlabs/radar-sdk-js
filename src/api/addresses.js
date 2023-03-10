@@ -9,7 +9,8 @@ class Addresses {
       number,
       postalCode,
       street,
-      unit // optional
+      unit,
+      addressLabel,
     } = addressOptions;
 
     const params = {
@@ -19,7 +20,8 @@ class Addresses {
       number,
       postalCode,
       street,
-      unit
+      unit,
+      addressLabel,
     };
 
     return Http.request('GET', 'addresses/validate', params);
