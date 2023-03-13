@@ -88,7 +88,9 @@ class Search {
       near,
       limit,
       layers,
-      country,
+      country, // deprecated, recommended to use countryCode
+      countryCode, 
+      expandUnits, // optional
     } = searchOptions;
 
     if (near?.latitude && near?.longitude) {
@@ -101,6 +103,8 @@ class Search {
       limit,
       layers,
       country,
+      countryCode,
+      expandUnits,
     };
 
     return Http.request('GET', 'search/autocomplete', params);
