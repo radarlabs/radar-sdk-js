@@ -40,13 +40,13 @@
 
     <div class="pl-3 pt-3">
       <form id="conversion-event" class="form-inline mb-0">
-        <button id="conversion-event-btn" class="btn btn-primary">Send Conversion Event</button>
+        <button id="log-conversion-event-btn" class="btn btn-primary">Send Conversion Event</button>
       </form>
     </div>
 
     <div class="pl-3 pt-3">
       <form id="conversion-event" class="form-inline mb-0">
-        <button id="conversion-revenue-event-btn" class="btn btn-primary">Send Conversion Revenue Event</button>
+        <button id="log-conversion-revenue-event-btn" class="btn btn-primary">Send Conversion Revenue Event</button>
       </form>
     </div>
 
@@ -221,7 +221,7 @@
         });
       });
 
-      $("#conversion-event-btn").click(function(e) {
+      $("#log-conversion-event-btn").click(function(e) {
         e.preventDefault();
         const conversionEventData = {
           "name": "button_click",
@@ -233,7 +233,7 @@
         });
       });
 
-      $("#conversion-revenue-event-btn").click(function(e) {
+      $("#log-conversion-revenue-event-btn").click(function(e) {
         e.preventDefault();
         const conversionEventData = {
           "name": "purchase_click",
