@@ -6,7 +6,6 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 import Http from '../../src/http';
-import STATUS from '../../src/status';
 
 import Events from '../../src/api/events';
 
@@ -19,9 +18,12 @@ describe('Events', () => {
         httpStub = sinon.stub(Http, 'request');
     });
 
-    const customEventType = 'app_open';
-    const customEventMetadata = {'source':'organic'};
-    const customEventData = {customEventType, customEventMetadata}
+    const name = 'opened_app';
+    const metadata = {'source':'organic'};
+    const conversionEventData = { name, metadata };
+
+    const revenue = 10;
+    const revenueConversionEventData = { name, metadata, revenue };
 
     afterEach(() => {
         Http.request.restore();
@@ -31,10 +33,19 @@ describe('Events', () => {
         it('should return an event', () => {
           httpStub.resolves(eventResponse);
     
-          return Events.sendEvent({ customEventData })
+          return Events.logConversion({ conversionEventData })
             .then((response) => {
               expect(response).to.equal(eventResponse);
             });
         });
+
+        it('should return a revenue event', () => {
+            httpStub.resolves(eventResponse);
+      
+            return Events.logConversion({ revenueConversionEventData })
+              .then((response) => {
+                expect(response).to.equal(eventResponse);
+              });
+          });
     });
 });

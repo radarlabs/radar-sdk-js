@@ -39,8 +39,14 @@
     </div>
 
     <div class="pl-3 pt-3">
-      <form id="custom-event" class="form-inline mb-0">
-        <button id="custom-event-btn" class="btn btn-primary">Send Custom Event</button>
+      <form id="conversion-event" class="form-inline mb-0">
+        <button id="conversion-event-btn" class="btn btn-primary">Send Conversion Event</button>
+      </form>
+    </div>
+
+    <div class="pl-3 pt-3">
+      <form id="conversion-event" class="form-inline mb-0">
+        <button id="conversion-revenue-event-btn" class="btn btn-primary">Send Conversion Revenue Event</button>
       </form>
     </div>
 
@@ -215,13 +221,27 @@
         });
       });
 
-      $("#custom-event-btn").click(function(e) {
+      $("#conversion-event-btn").click(function(e) {
         e.preventDefault();
-        const customEventData = {
-          "type": "button_click",
+        const conversionEventData = {
+          "name": "button_click",
           "metadata": {"page":"test"}
         }
-        Radar.sendEvent(customEventData, function(err, responseObj, response) {
+        Radar.logConversion(conversionEventData, function(err, responseObj, response) {
+          const event = responseObj.event;
+          console.log(err, event, response);
+        });
+      });
+
+      $("#conversion-revenue-event-btn").click(function(e) {
+        e.preventDefault();
+        const conversionEventData = {
+          "name": "purchase_click",
+          "revenue": 10,
+          "metadata": {"page":"test"}
+        }
+        console.log('here')
+        Radar.logConversion(conversionEventData, function(err, responseObj, response) {
           const event = responseObj.event;
           console.log(err, event, response);
         });
