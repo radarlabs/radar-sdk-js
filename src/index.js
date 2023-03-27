@@ -328,8 +328,8 @@ class Radar {
       .catch(handleError(callback));
   }
 
-  static sendEvent(eventData, callback=defaultCallback) {
-    Events.sendEvent(eventData)
+  static logConversion(eventData, callback=defaultCallback) {
+    Events.logConversion(eventData)
       .then((response) => {
         callback(null, { event: response.event, status: STATUS.SUCCESS, }, response);
       })

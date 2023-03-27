@@ -3,13 +3,18 @@ import Storage from '../storage';
 import Device from '../device';
 
 class Events {
-  static async sendEvent(eventData={}) {
-    const { type, metadata, createdAt } = eventData;
+  static async logConversion(eventData={}) {
+    let { name, metadata, createdAt, revenue } = eventData;
 
     const deviceId = Device.getId();
     const userId = Storage.getItem(Storage.USER_ID);
+    const installId = Storage.getItem(Storage.INSTALL_ID);
 
-    return Http.request('POST', 'events', { type, metadata, deviceId, userId, createdAt })
+    if (revenue) {
+      metadata = { ...metadata, revenue };
+    }
+
+    return Http.request('POST', 'events', { type: name, metadata, deviceId, userId, installId, createdAt })
   }
 }
 
