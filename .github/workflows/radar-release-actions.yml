@@ -17,10 +17,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: jakejarvis/s3-sync-action@master
-      env:
-        AWS_S3_BUCKET: js.radar.com
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'us-east-1'
-        SOURCE_DIR: 'dist/'      # optional: defaults to entire repository
-        DEST_DIR: ${{ github.ref }}
+        env:
+          AWS_S3_BUCKET: js.radar.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: 'dist/'      # optional: defaults to entire repository
+          DEST_DIR: ${{ github.ref }}
