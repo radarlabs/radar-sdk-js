@@ -14,13 +14,16 @@
     "prepare": "npm run build",
     "prebuild": "rimraf dist",
     "build": "npm-run-all --parallel build:*",
+    "check-latest-tag": "node ./scripts/check-tag.js",
+    "check-beta-tag": "node ./scripts/check-beta-tag.js",
     "test": "nyc --reporter=lcov --reporter=text mocha ./test/** --require @babel/register",
     "test:watch": "npm run test -- -w",
     "demo": "npm run build && node demo/server.js",
     "build:cjs": "rollup -c rollup-cjs.config.js",
     "build:iife": "rollup -c rollup-iife.config.js",
     "build:iife-min": "rollup -c rollup-iife-min.config.js",
-    "report-coverage": "./node_modules/.bin/codecov"
+    "report-coverage": "./node_modules/.bin/codecov",
+    "bump-version": "node ./scripts/bump-version.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
