@@ -18,21 +18,29 @@ describe('VERSION', () => {
   });
 
   // additional checks if running as part of a release
-  if (RELEASE_TAG) {
+  context('cutting a release', () => {
     it('it should start with a "v"', () => {
-      expect(RELEASE_TAG.startsWith('v')).to.eq(true);
+      if (RELEASE_TAG) {
+        expect(RELEASE_TAG.startsWith('v')).to.eq(true);
+      }
     });
 
     it('should match version in ./src/version.js', () => {
-      expect(RELEASE_TAG.slice(1)).to.eq(VERSION);
+      if (RELEASE_TAG) {
+        expect(RELEASE_TAG.slice(1)).to.eq(VERSION);
+      }
     });
 
     it('should match version in package.json', () => {
-      expect(RELEASE_TAG.slice(1)).to.eq(packageJSON.version);
+      if (RELEASE_TAG) {
+        expect(RELEASE_TAG.slice(1)).to.eq(packageJSON.version);
+      }
     });
 
     it('should match version in package-lock.json', () => {
-      expect(RELEASE_TAG.slice(1)).to.eq(packageLockJSON.version);
+      if (RELEASE_TAG) {
+        expect(RELEASE_TAG.slice(1)).to.eq(packageLockJSON.version);
+      }
     });
-  }
+  });
 });
