@@ -13,6 +13,8 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
+      - run: npm run build
+      - run: npm run test
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -22,5 +24,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
-          SOURCE_DIR: 'dist/'      # optional: defaults to entire repository
-          DEST_DIR: ${{ github.ref }}
+          SOURCE_DIR: 'dist/'
+          DEST_DIR: ${{ github.ref }} # the release tag
