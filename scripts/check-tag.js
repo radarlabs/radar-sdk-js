@@ -3,6 +3,7 @@ const packageJSON = require('../package.json');
 const packageLockJSON = require('../package-lock.json');
 
 let tagVersion = process.env.GITHUB_REF || '';
+console.log('Checking tag:', tagVersion);
 if (!tagVersion.startsWith('v')) {
   console.error('Tag must start with "v"');
   process.exit(1);
