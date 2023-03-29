@@ -8,7 +8,7 @@ if (!tagVersion.startsWith('v')) {
   console.error('Tag must start with "v"');
   process.exit(1);
 }
-tagVersion = tagVersion.slice(1);
+tagVersion = tagVersion.slice(1); // remove "v"
 
 const fileVersion = fs.readFileSync('./src/version.js')
   .toString()
