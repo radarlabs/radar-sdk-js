@@ -6,7 +6,7 @@ import packageJSON from '../package.json';
 import packageLockJSON from '../package-lock.json';
 import VERSION from '../src/version';
 
-const RELEASE_TAG = process.env.GITHUB_REF;
+const RELEASE_TAG = process.env.GITHUB_REF_NAME;
 
 describe('VERSION', () => {
   it('should match version in package.json', () => {

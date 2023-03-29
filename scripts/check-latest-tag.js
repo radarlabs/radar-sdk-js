@@ -2,7 +2,7 @@ const fs = require('fs');
 const packageJSON = require('../package.json');
 const packageLockJSON = require('../package-lock.json');
 
-let tagVersion = process.env.GITHUB_REF || '';
+let tagVersion = process.env.GITHUB_REF_NAME || '';
 console.log('Checking tag:', tagVersion);
 
 if (!tagVersion.startsWith('v')) {

@@ -26,4 +26,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'dist/'
-          DEST_DIR: ${{ github.ref }} # the release tag
+          DEST_DIR: ${{ github.ref_name }} # the release tag
