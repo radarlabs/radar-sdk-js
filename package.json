@@ -11,10 +11,10 @@
     "README.md"
   ],
   "scripts": {
-    "prepare": "npm run check-tag && npm run build",
+    "prepare": "npm run build",
     "prebuild": "rimraf dist",
+    "prepublishOnly": "node ./scripts/check-tag.js",
     "build": "npm-run-all --parallel build:*",
-    "check-tag": "node ./scripts/check-tag.js",
     "test": "nyc --reporter=lcov --reporter=text mocha ./test/** --require @babel/register",
     "test:watch": "npm run test -- -w",
     "demo": "npm run build && node demo/server.js",
