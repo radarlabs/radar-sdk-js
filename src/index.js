@@ -335,6 +335,15 @@ class Radar {
       })
       .catch(handleError(callback));
   }
+
+  // DEPRECATED
+  static sendEvent(eventData, callback=defaultCallback) {
+    Events.sendEvent(eventData)
+      .then((response) => {
+        callback(null, { event: response.event, status: STATUS.SUCCESS, }, response);
+      })
+      .catch(handleError(callback));
+  }
 }
 
 export default Radar;

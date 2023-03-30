@@ -10,42 +10,57 @@ import Http from '../../src/http';
 import Events from '../../src/api/events';
 
 describe('Events', () => {
-    let httpStub;
+  let httpStub;
 
-    const eventResponse = { meta: {}, event: {} };
+  const eventResponse = { meta: {}, event: {} };
 
-    beforeEach(() => {
-        httpStub = sinon.stub(Http, 'request');
-    });
+  beforeEach(() => {
+    httpStub = sinon.stub(Http, 'request');
+  });
 
-    const name = 'opened_app';
-    const metadata = {'source':'organic'};
-    const conversionEventData = { name, metadata };
+  const name = 'opened_app';
+  const metadata = {'source':'organic'};
+  const conversionEventData = { name, metadata };
 
-    const revenue = 10;
-    const revenueConversionEventData = { name, metadata, revenue };
+  const revenue = 10;
+  const revenueConversionEventData = { name, metadata, revenue };
 
-    afterEach(() => {
-        Http.request.restore();
-    });
+  afterEach(() => {
+    Http.request.restore();
+  });
 
-    context('events', () => {
-        it('should return an event', () => {
-          httpStub.resolves(eventResponse);
-    
-          return Events.logConversion({ conversionEventData })
-            .then((response) => {
-              expect(response).to.equal(eventResponse);
-            });
+  context('logConversion', () => {
+    it('should return an event', () => {
+      httpStub.resolves(eventResponse);
+
+      return Events.logConversion({ conversionEventData })
+        .then((response) => {
+          expect(response).to.equal(eventResponse);
         });
-
-        it('should return a revenue event', () => {
-            httpStub.resolves(eventResponse);
-      
-            return Events.logConversion({ revenueConversionEventData })
-              .then((response) => {
-                expect(response).to.equal(eventResponse);
-              });
-          });
     });
+
+    it('should return a revenue event', () => {
+      httpStub.resolves(eventResponse);
+
+      return Events.logConversion({ revenueConversionEventData })
+        .then((response) => {
+          expect(response).to.equal(eventResponse);
+        });
+    });
+  });
+
+  context('sendEvent', () => {
+    it('should send custom event', () => {
+      return Events.sendEvent({ ...conversionEventData, name: 'unused', type: 'my_custom_event' })
+        .then(() => {
+          const [requestMethod, endpoint, args] = httpStub.lastCall.args;
+
+          expect(requestMethod).to.equal('POST');
+          expect(endpoint).to.equal('events');
+
+          expect(args.type).to.equal('my_custom_event');
+          expect(args.name).to.equal(undefined); // should not be sent in request
+        });
+    });
+  });
 });

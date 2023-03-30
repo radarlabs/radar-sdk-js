@@ -16,6 +16,15 @@ class Events {
 
     return Http.request('POST', 'events', { type: name, metadata, deviceId, userId, installId, createdAt })
   }
+
+  // DEPRECATED - use logConversion
+  static async sendEvent(eventData={}) {
+    console.warn('Radar SDK: "sendEvent" is deprecated and will be removed in a future version. Use "logConversion" insetad.');
+
+    // rename type -> name
+    eventData.name = eventData.type;
+    return Events.logConversion(eventData)
+  }
 }
 
 export default Events;
