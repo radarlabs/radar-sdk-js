@@ -12,14 +12,14 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "MAJOR_VERSION=$(echo ${{ github.ref_name }} | cut -d '.' -f 1)" >> $GITHUB_ENV
       - run: npm ci --force
       - run: npm run build
       - run: npm run test
       - run: npm run check-latest-tag
       - run: npm publish
-      - run: echo "MAJOR_VERSION=$(echo ${{ github.ref_name }} | cut -d '.' -f 1)" >> $GITHUB_ENV
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: js.radar.com
