@@ -17,6 +17,7 @@ jobs:
       - run: npm run test
       - run: npm run check-latest-tag
       - run: npm publish
+      - run: echo "MAJOR_VERSION=$(echo ${{ github.ref_name }} | cut -d '.' -f 1)" >> $GITHUB_ENV
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: jakejarvis/s3-sync-action@master
@@ -34,4 +35,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'dist/'
-          DEST_DIR: $(echo ${{ github.ref_name }} | cut -d '.' -f 1) # major version
+          DEST_DIR: ${{ env.MAJOR_VERSION }} # release latest major version
