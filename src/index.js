@@ -179,7 +179,29 @@ class Radar {
   static startTrip(tripOptions, callback=defaultCallback) {
     Trips.startTrip(tripOptions)
       .then((response) => {
+
+        tripOptions.externalId = trip.externalId;
+        tripOptions.destinationGeofenceTag = trip.destinationGeofenceTag;
+        tripOptions.destinationGeofenceExternalId = trip.destinationGeofenceExternalId;
+        tripOptions.mode = trip.mode;
+
+        if(trip.userId){
+          tripOptions.userId = trip.userId;
+        }
+
+        if( trip.metadata ){
+          tripOptions.metadata = trip.metadata;
+        }
+
+        if( trip.approachingThreshold ){
+          tripOptions.approachingThreshold = trip.approachingThreshold;
+        }
+        if( trip.scheduledArrivalAt ){
+          tripOptions.scheduledArrivalAt = trip.scheduledArrivalAt;
+        }
+
         Radar.setTripOptions(tripOptions);
+
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -188,7 +210,30 @@ class Radar {
   static updateTrip(tripOptions, status, callback=defaultCallback) {
     Trips.updateTrip(tripOptions, status)
       .then((response) => {
+
+        
+        tripOptions.externalId = trip.externalId;
+        tripOptions.destinationGeofenceTag = trip.destinationGeofenceTag;
+        tripOptions.destinationGeofenceExternalId = trip.destinationGeofenceExternalId;
+        tripOptions.mode = trip.mode;
+
+        if(trip.userId){
+          tripOptions.userId = trip.userId;
+        }
+
+        if( trip.metadata ){
+          tripOptions.metadata = trip.metadata;
+        }
+
+        if( trip.approachingThreshold ){
+          tripOptions.approachingThreshold = trip.approachingThreshold;
+        }
+        if( trip.scheduledArrivalAt ){
+          tripOptions.scheduledArrivalAt = trip.scheduledArrivalAt;
+        }
+  
         Radar.setTripOptions(tripOptions);
+
         callback(null, { trip: response.trip, events: response.events, status: STATUS.SUCCESS }, response);
       })
       .catch(handleError(callback));
@@ -221,6 +266,7 @@ class Radar {
       Radar.clearTripOptions();
       return;
     }
+    //Required to be set for /track
     if(!tripOptions.mode){
       tripOptions.mode = "car";
     }
