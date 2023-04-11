@@ -221,6 +221,9 @@ class Radar {
       Radar.clearTripOptions();
       return;
     }
+    if(!tripOptions.mode){
+      tripOptions.mode = "car";
+    }
     Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
   }
 
