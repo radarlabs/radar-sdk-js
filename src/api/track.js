@@ -7,7 +7,7 @@ import Navigator from '../navigator';
 import SDK_VERSION from '../version';
 
 class Track {
-  static async trackOnce(params={}) {
+  static async trackOnce(params={}, verified=false) {
     let { latitude, longitude, accuracy } = params;
 
     if (!latitude || !longitude) {
@@ -51,7 +51,7 @@ class Track {
       tripOptions,
     };
 
-    const response = await Http.request('POST', 'track', body);
+    const response = await Http.request('POST', 'track', body, verified);
     response.location = { latitude, longitude, accuracy };
 
     return response;

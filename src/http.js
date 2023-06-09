@@ -6,13 +6,14 @@ import SDK_VERSION from './version';
 import STATUS from './status';
 
 class Http {
-  static request(method, path, data={}) {
+  static request(method, path, data={}, verified=false) {
     return new Promise((resolve, reject) => {
 
       const xhr = new XMLHttpRequest();
       const basePath = Storage.getItem(Storage.BASE_API_PATH) || API_VERSION;
 
-      let url = `${API_HOST.getHost()}/${basePath}/${path}`;
+      const host = verified ? API_HOST.getVerifiedHost() : API_HOST.getHost();
+      let url = `${host}/${basePath}/${path}`;
 
       // remove undefined values
       let body = {};

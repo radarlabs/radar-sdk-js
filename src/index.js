@@ -158,6 +158,29 @@ class Radar {
       .catch(handleError(callback));
   }
 
+  static trackVerified(arg0, arg1=defaultCallback) {
+    let callback;
+    let location;
+
+    if (typeof arg0 === 'function') {
+      callback = arg0;
+    } else {
+      location = arg0;
+      callback = arg1;
+    }
+
+    Track.trackOnce(location, true)
+      .then((response) => {
+        callback(null, {
+          location: response.location,
+          user: response.user,
+          events: response.events,
+          status: STATUS.SUCCESS,
+        }, response);
+      })
+      .catch(handleError(callback));
+  }
+
   static getContext(arg0, arg1=defaultCallback) {
     let callback;
     let location;

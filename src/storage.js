@@ -16,6 +16,9 @@ class Storage {
     static get HOST() {
         return 'radar-host';
     }
+    static get VERIFIED_HOST() {
+        return 'radar-verifiedHost';
+    }
     static get PUBLISHABLE_KEY() {
         return 'radar-publishableKey';
     }
