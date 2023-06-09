@@ -49,6 +49,7 @@ class Track {
       stopped: true,
       userId,
       tripOptions,
+      verified,
     };
 
     const response = await Http.request('POST', 'track', body, verified);
