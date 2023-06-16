@@ -33,7 +33,8 @@
 
 ## 🚀 Installation and Usage
 
-**With npm:**
+**With npm:** <br />
+
 Add the `radar-sdk-js` package
 ```bash
 # with npm
@@ -51,7 +52,8 @@ import Radar from 'radar-sdk-js';
 Radar.initialize('prj_test_pk_...', { /* options */ });
 ```
 
-**In your html:**
+**In your html:** <br />
+
 Add the following script in your `html` file
 ```html
 <script src="https://js.radar.com/v4.0.0-beta.1/radar.min.js"></script>
