@@ -14,11 +14,11 @@
   <a href="https://www.npmjs.com/package/radar-sdk-js"><img src="https://img.shields.io/npm/v/radar-sdk-js.svg" alt="npm"></a>
   <a href="https://app.circleci.com/pipelines/github/radarlabs/radar-sdk-js"><img src="https://img.shields.io/circleci/project/github/radarlabs/radar-sdk-js/master.svg" alt="CircleCI branch"></a>
   <a href="http://npm-stat.com/charts.html?package=radar-sdk-js"><img src="https://img.shields.io/npm/dm/radar-sdk-js.svg?style=flat-square" alt="NPM downloads"></a>
-  <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-blue" alt="License"></a>
 </p>
 
 <p align="center">
-  🛰️ <a href="https://radar.com">Radar</a> is location data infrastructure. You can use Radar SDKs and APIs to add location context to your apps with just a view lines of code. ⚡
+  ⚡ <a href="https://radar.com">Radar</a> is location infrastructure. Use Radar SDKs and APIs to add location context to your apps with just a view lines of code. ⚡
 </p>
 
 🔥 Try it! 🔥
@@ -51,7 +51,7 @@ import Radar from 'radar-sdk-js';
 Radar.initialize('prj_test_pk_...', { /* options */ });
 ```
 
-** In your html:**
+**In your html:**
 Add the following script in your `html` file
 ```html
 <script src="https://js.radar.com/v4.0.0-beta.1/radar.min.js"></script>
@@ -69,7 +69,7 @@ See more examples and usage in the Radar web SDK documentation [here](https://ra
 
 ## 🔗 Other links
 * [Contributing](#)
-* [Migrating from 3.x to 4.x]
+* [Migrating from 3.x to 4.x](#)
 
 ## 📫 Support
 
