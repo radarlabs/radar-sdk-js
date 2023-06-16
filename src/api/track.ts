@@ -7,6 +7,8 @@ import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
 
+import TripsAPI from './trips';
+
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
 class TrackAPI {
@@ -43,7 +45,7 @@ class TrackAPI {
     let metadata = params.metadata || Storage.getJSON(Storage.METADATA);
 
     // trips
-    let tripOptions = params.tripOptions || Storage.getJSON(Storage.TRIP_OPTIONS);
+    let tripOptions = params.tripOptions || TripsAPI.getTripOptions();
     if (tripOptions) {
       tripOptions.version = '2';
     }

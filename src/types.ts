@@ -47,7 +47,7 @@ export interface RadarTripOptions {
   scheduledArrivalAt?: Date;
   approachingThreshold?: number;
   metadata?: RadarMetadata;
-  version?: number;
+  version?: string;
 }
 
 export type RadarMetadata = Record<string, string | number | boolean>;

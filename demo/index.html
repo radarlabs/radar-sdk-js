@@ -4,8 +4,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
 
-    <script src="../dist/radar.js"></script>
-
     <style>
       .links .btn.active {
         background-color: #545b62;
@@ -26,8 +24,8 @@
   <body>
     <div class="links pl-3 pt-3">
       <div class="btn-group" role="group" aria-label="Basic example">
-        <a href='/' role="button" class="std-link btn btn-secondary">radar.js</a>
-        <a href='/?min' role="button" class="min-link btn btn-secondary">radar.min.js</a>
+        <a id="std-link" href='/' role="button" class="std-link btn btn-secondary">radar.js</a>
+        <a id="min-link" href='/?min' role="button" class="min-link btn btn-secondary">radar.min.js</a>
       </div>
     </div>
 
@@ -52,7 +50,7 @@
 
     <div class="pl-3 pt-3">
       <a href="javascript:void(0)" id="show-trip-options">Show trip options</a>
-      <form id="trip-form" class="form mb-0 d-none">
+      <div id="trip-form" class="form mb-0 d-none">
         <input id="trip-id" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Id" style="width: 400px;"/>
         <select id="trip-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
           <option key="" disabled>Select Mode</option>
@@ -67,7 +65,7 @@
         <input id="trip-approaching-threshold" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Approaching Threshold" style="width: 400px;"/>
         <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
         <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
-      </form>
+      </div>
     </div>
 
     <div class="loader pl-3 d-none">
@@ -129,7 +127,34 @@
     </div>
 
     <script>
-      $('#track-once').on('submit', function(e) {
+      // get existing publishable key
+      const publishableKey = localStorage.getItem('publishableKey');
+
+      // dynamically add js or minified script based on query param
+      const useMin = window.location.search.includes('?min');
+      const radarScript = document.createElement('script');
+      radarScript.type = 'text/javascript';
+      radarScript.src = useMin ? '/dist/radar.iife.min.js' : '/dist/radar.iife.js';
+      radarScript.onload = () => {
+        console.log('Using', useMin ? 'minified' : 'non-minified', 'Radar SDK');
+        if (publishableKey) {
+          Radar.initialize(publishableKey, { debug: true });
+        }
+      }
+      document.head.appendChild(radarScript);
+
+      $(document).ready(() => {
+        if (publishableKey) {
+          $('#publishable-key').val(publishableKey);
+        }
+        if (useMin) {
+          $('#min-link').addClass('active');
+        } else {
+          $('#std-link').addClass('active');
+        }
+      });
+
+      $('#track-once').on('submit', (e) => {
         e.preventDefault();
         $('input,button').prop('disabled', true);
         $('.loader').removeClass('d-none');
@@ -138,68 +163,64 @@
 
         let publishableKey = $('#publishable-key').val();
 
-        Radar.initialize(publishableKey);
+        // initialize SDK
+        Radar.initialize(publishableKey, { debug: true });
 
-        Radar.trackOnce(function(err, responseObj, response) {
-          const location = responseObj.location;
-          const user = responseObj.user;
-          const events = responseObj.events;
+        Radar.trackOnce()
+          .then(({ location, user, events, response }) => {
+            localStorage.setItem('publishableKey', publishableKey); // save key
 
-          console.log(err, location, user, events, response);
+            console.log('TRACK ONCE', { location, user, events, response });
 
-          $('input,button').prop('disabled', false);
-          $('.loader').addClass('d-none');
+            $('input,button').prop('disabled', false);
+            $('.loader').addClass('d-none');
+            $('#status').html(status);
 
-          if (err) {
-            console.error(err);
-            $('#error-message').html(err);
-            $('.error').removeClass('d-none');
-            return;
-          }
+            $('#location').html(formatCode({
+              accuracy: location.accuracy,
+              altitude: location.altitude,
+              altitudeAccuracy: location.altitudeAccuracy,
+              heading: location.heading,
+              latitude: location.latitude,
+              longitude: location.longitude,
+              speed: location.speed,
+            }));
 
-          $('#status').html(status);
+            $('#user').html(formatCode(user));
+            $('#events').html(formatCode(events));
 
-          $('#location').html(formatCode({
-            accuracy: location.accuracy,
-            altitude: location.altitude,
-            altitudeAccuracy: location.altitudeAccuracy,
-            heading: location.heading,
-            latitude: location.latitude,
-            longitude: location.longitude,
-            speed: location.speed,
-          }));
+            $('.results').removeClass('d-none');
 
-          $('#user').html(formatCode(user));
-          $('#events').html(formatCode(events));
-
-          $('.results').removeClass('d-none');
-
-          // test matrix api
-          Radar.getMatrix(
-            {
-              origins: [
-                { latitude: '40.78382', longitude: '-73.97536' }
-              ],
-              destinations: [
-                { latitude: '40.70390', longitude: '-73.98670' },
-                { latitude: '40.68943', longitude: '-73.96901' }
-              ],
-              mode: 'car'
-            },
-            function(err, res) {
-              if (err) {
-                console.error(err);
+            Radar.matrix(
+              {
+                origins: [
+                  { latitude: '40.78382', longitude: '-73.97536' }
+                ],
+                destinations: [
+                  { latitude: '40.70390', longitude: '-73.98670' },
+                  { latitude: '40.68943', longitude: '-73.96901' }
+                ],
+                mode: 'car'
+              })
+              .then((res) => {
+                console.log('MATRIX', res);
+                $('#matrix').html(formatCode(res));
+              })
+              .catch((err) => {
+                console.error('MATRIX ERROR', err);
                 $('#error-message').html(err);
                 $('.error').removeClass('d-none');
-                return;
-              }
-              $('#matrix').html(formatCode(res));
-            }
-          );
-        });
+              });
+          })
+          .catch((err) => {
+            console.error('TRACK ONCE ERROR', err);
+            $('#error-message').html(err);
+            $('.error').removeClass('d-none');
+          });
       });
 
-      $("#trip-start-btn").click(function(e) {
+      $("#trip-start-btn").click((e) => {
+        console.log('TRIP START CLICKED');
         e.preventDefault();
         let externalId = $('#trip-id').val();
         let mode = $('#trip-mode').val();
@@ -215,10 +236,10 @@
           approachingThreshold,
         }
 
-        Radar.startTrip(tripOptions, function(err, responseObj, response) {
-          const trip = responseObj.trip;
-          console.log(err, trip, response);
-        });
+        console.log('RADAR START TRIP');
+        Radar.startTrip(tripOptions)
+          .then((res) => console.log('START TRIP', res))
+          .catch((err) => console.error('START TRIP ERROR', err));
       });
 
       $("#log-conversion-event-btn").click(function(e) {
@@ -227,10 +248,9 @@
           "name": "button_click",
           "metadata": {"page":"test"}
         }
-        Radar.logConversion(conversionEventData, function(err, responseObj, response) {
-          const event = responseObj.event;
-          console.log(err, event, response);
-        });
+        Radar.logConversion(conversionEventData)
+          .then((res) => console.log('LOG CONVERSION', res))
+          .catch((err) => console.error('LOG CONVERSION ERROR', err));
       });
 
       $("#log-conversion-revenue-event-btn").click(function(e) {
@@ -240,19 +260,17 @@
           "revenue": 10,
           "metadata": {"page":"test"}
         }
-        Radar.logConversion(conversionEventData, function(err, responseObj, response) {
-          const event = responseObj.event;
-          console.log(err, event, response);
-        });
+        Radar.logConversion(conversionEventData)
+          .then((res) => console.log('LOG RENUVE CONVERSION', res))
+          .catch((err) => console.error('LOG RENUVE CONVERSION ERROR', err));
       });
 
       $("#trip-complete-btn").click(function(e) {
         e.preventDefault();
 
-        Radar.completeTrip(function(err, responseObj, response) {
-          const trip = responseObj.trip;
-          console.log(err, trip, response);
-        });
+        Radar.completeTrip()
+          .then((res) => console.log('COMPLETE TRIP', res))
+          .catch((err) => console.error('COMPLETE TRIP ERROR', err));
       });
 
       $("#show-trip-options").click(function(e) {

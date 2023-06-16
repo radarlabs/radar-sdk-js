@@ -36,7 +36,7 @@ class ConversionsAPI {
       data.createdAt = (new Date()).toISOString();
     }
 
-    const response: any = Http.request({
+    const response: any = await Http.request({
       method: 'POST',
       path: 'events',
       data,

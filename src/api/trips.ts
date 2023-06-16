@@ -14,7 +14,9 @@ class TripsAPI {
       TripsAPI.clearTripOptions();
       return;
     }
-    Storage.setItem(Storage.TRIP_OPTIONS, JSON.stringify(tripOptions));
+    const tripOptionsString = JSON.stringify(tripOptions);
+    Logger.debug(`Saving trip options: ${tripOptionsString}`);
+    Storage.setItem(Storage.TRIP_OPTIONS, tripOptionsString);
   }
 
   static getTripOptions(): RadarTripOptions {
@@ -73,6 +75,9 @@ class TripsAPI {
       path: 'trips',
       data,
     });
+
+    // save trip options
+    TripsAPI.setTripOptions(tripOptions);
 
     const tripRes = {
       trip: response.trip,

@@ -20,10 +20,6 @@ interface HttpResponse {
   data: any;
 }
 
-// defaults
-const API_HOST = 'https://api.radar.io';
-const API_VERSION = 'v1';
-
 class Http {
   static async request({
     method,
@@ -45,8 +41,8 @@ class Http {
       }
 
       // setup request URL
-      const host = options.host || API_HOST;
-      const version = options.version || API_VERSION;
+      const host = options.host;
+      const version = options.version;
       let url = `${host}/${version}/${path}`;
 
       // remove undefined values from request data

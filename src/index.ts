@@ -58,7 +58,8 @@ class Radar {
     // store settings in global config
     const live = isLiveKey(publishableKey);
     const logLevel = live ? 'error' : 'warn';
-    const radarOptions = Object.assign({},
+    const radarOptions = Object.assign(
+      Config.defaultOptions,
       {
         publishableKey,
         live,
