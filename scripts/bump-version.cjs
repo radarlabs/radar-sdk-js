@@ -1,7 +1,7 @@
 const fs = require('fs');
 const package = require('../package.json');
 const lockfile = require('../package-lock.json');
-const srcfile = fs.readFileSync('./src/version.js').toString();
+const srcfile = fs.readFileSync('./src/version.ts').toString();
 
 const current = package.version;
 let version = process.argv[2];
