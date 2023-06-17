@@ -12,7 +12,7 @@ const PERMISSION_ERROR_MESSAGES: any = {
   3: 'Timeout.',
 };
 
-const DEFAULT_LOCATION_OPTIONS = {
+const DEFAULT_POSITION_OPTIONS: PositionOptions = {
   maximumAge: 0,
   timeout: 1000 * 30, // 30 seconds
   enableHighAccuracy: true,
@@ -45,6 +45,19 @@ class Navigator {
         }
       }
 
+      const positionOptions = Object.assign({}, DEFAULT_POSITION_OPTIONS);
+      if (options.locationMaximumAge !== undefined) {
+        positionOptions.maximumAge = options.locationMaximumAge;
+      }
+      if (options.locationTimeout !== undefined) {
+        positionOptions.timeout = options.locationTimeout;
+      }
+      if (options.enableHighAccuracy !== undefined) {
+        positionOptions.enableHighAccuracy = options.enableHighAccuracy;
+      }
+
+      Logger.info(`Using geolocation options: ${JSON.stringify(positionOptions)}`);
+
       // get current location from browser
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -66,14 +79,14 @@ class Navigator {
 
           return resolve({ latitude, longitude, accuracy });
         },
-        (err) => { // location call failed or user did not grant permission
+        (err: GeolocationPositionError) => { // location call failed or user did not grant permission
           if (err && err.code) {
             const message = PERMISSION_ERROR_MESSAGES[err.code.toString()] || 'unknown';
             return reject(new RadarLocationPermissionsError(message));
           }
           return reject(new RadarLocationError('Could not determine location.'));
         },
-        DEFAULT_LOCATION_OPTIONS,
+        positionOptions,
       );
     });
   }

@@ -24,6 +24,9 @@ export interface RadarOptions {
   host?: string;
   version?: string;
   cacheLocationMinutes?: number;
+  locationMaximumAge?: number;
+  locationTimeout?: number;
+  enableHighAccuracy?: boolean;
   getRequestHeaders?: () => {};
   debug?: boolean;
 };
