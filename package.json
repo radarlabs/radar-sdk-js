@@ -1,12 +1,18 @@
 {
   "name": "radar-sdk-js",
-  "version": "4.0.0-beta.5",
+  "version": "4.0.0-beta.6",
   "description": "",
   "type": "module",
   "module": "dist/radar.js",
   "types": "dist/index.d.ts",
   "build": "rollup -c",
   "prepublish": "npm run build",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICESNSE"
+  ],
   "scripts": {
     "build": "rollup -c",
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
