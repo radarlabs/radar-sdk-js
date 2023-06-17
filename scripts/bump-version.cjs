@@ -18,8 +18,8 @@ if (!version) {
   console.log('No version provided, incrementing minor version to:', version);
 }
 
-// update src/version.js
-fs.writeFileSync('./src/version.js', srcfile.replace(current, version));
+// update src/version.ts
+fs.writeFileSync('./src/version.ts', srcfile.replace(current, version));
 
 // update package.json
 package.version = version;
