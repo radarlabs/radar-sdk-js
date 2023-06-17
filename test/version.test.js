@@ -25,7 +25,7 @@ describe('VERSION', () => {
       }
     });
 
-    it('should match version in ./src/version.js', () => {
+    it('should match version in ./src/version.ts', () => {
       if (RELEASE_TAG) {
         expect(RELEASE_TAG.slice(1)).to.eq(VERSION);
       }

@@ -15,7 +15,7 @@ if (!tagVersion.includes('-beta')) {
 }
 tagVersion = tagVersion.slice(1); // remove "v"
 
-const fileVersion = fs.readFileSync('./src/version.js')
+const fileVersion = fs.readFileSync('./src/version.ts')
   .toString()
   .replace('export default', '')
   .replaceAll('\'', '')
@@ -23,7 +23,7 @@ const fileVersion = fs.readFileSync('./src/version.js')
   .trim();
 
 if (tagVersion !== fileVersion) {
-  console.error('VERSION MISMATCH - version does not match ./src/version.js');
+  console.error('VERSION MISMATCH - version does not match ./src/version.ts');
   process.exit(1);
 }
 if (tagVersion !== packageJSON.version) {
