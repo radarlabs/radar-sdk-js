@@ -26,7 +26,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
-          SOURCE_DIR: 'dist/'
+          SOURCE_DIR: 'cdn/'
           DEST_DIR: ${{ github.ref_name }} # release tag
       - uses: jakejarvis/s3-sync-action@master
         env:
@@ -34,5 +34,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
-          SOURCE_DIR: 'dist/'
+          SOURCE_DIR: 'cdn/'
           DEST_DIR: ${{ env.MAJOR_VERSION }} # release latest major version

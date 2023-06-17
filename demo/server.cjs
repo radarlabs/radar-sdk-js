@@ -16,7 +16,7 @@ const params = {
 	port: 9001,
 	host: "0.0.0.0",
 	root: "./demo", // Set root directory that's being served. Defaults to cwd.
-	mount: [['/dist', path.join(__dirname, '../dist')]], // server dist files under "/dist" path
+	mount: [['/dist', path.join(__dirname, '../cdn')]], // server dist files under "/dist" path
 	logLevel: 2, // 0 = errors only, 1 = some, 2 = lots
 };
 
