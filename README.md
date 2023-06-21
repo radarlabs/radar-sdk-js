@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  ⚡ Use Radar SDKs and APIs to add location context to your apps with just a view lines of code. ⚡
+  ⚡ Use Radar SDKs and APIs to add location context to your apps with just a few lines of code. ⚡
 </p>
 
 🔥 Try it! 🔥
