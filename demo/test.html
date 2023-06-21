@@ -138,7 +138,7 @@
 
         let publishableKey = $('#publishable-key').val();
 
-        Radar.initialize(publishableKey);
+        Radar.initialize(publishableKey, { enableHighAccuracy });
 
         Radar.trackOnce(function(err, responseObj, response) {
           const location = responseObj.location;

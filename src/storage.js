@@ -37,6 +37,9 @@ class Storage {
     static get CACHE_LOCATION_MINUTES() {
         return 'radar-cache-location-minutes'
     }
+    static get ENABLE_HIGH_ACCURACY() {
+        return 'radar-enable-high-accuracy'
+    }
     static get LAST_LOCATION() {
         return 'radar-last-location';
     }

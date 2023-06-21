@@ -3,6 +3,8 @@ const http = require('http');
 const path = require('path');
 const opn = require('opn');
 
+const PORT = 8081;
+
 http.createServer(function(req, res){
 
   const route = req.url.split('?')[0];
@@ -48,11 +50,11 @@ http.createServer(function(req, res){
       res.end();
     }
   }
-}).listen(8080);
+}).listen(PORT);
 
 setTimeout(() => {
-  console.log('Server is running on Port: 8080');
+  console.log(`Server is running on Port: ${PORT}`);
 
-  opn('http://localhost:8080')
+  opn(`http://localhost:${PORT}`)
     .catch(() => {});
 });

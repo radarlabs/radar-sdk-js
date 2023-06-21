@@ -26,6 +26,14 @@ class Navigator {
         }
       }
 
+      const enableHighAccuracy = Storage.getItem(Storage.ENABLE_HIGH_ACCURACY);
+
+      const positionOptions = {
+        maximumAge: 0,
+        timeout: 1000 * 30, // 30 seconds
+        enableHighAccuracy: Boolean(enableHighAccuracy),
+      };
+
       navigator.geolocation.getCurrentPosition(
         // success callback
         (position) => {
@@ -51,7 +59,8 @@ class Navigator {
             return reject(STATUS.ERROR_PERMISSIONS);
           }
           return reject(STATUS.ERROR_LOCATION);
-        }
+        },
+        positionOptions
       );
     });
   }

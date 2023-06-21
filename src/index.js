@@ -53,7 +53,7 @@ class Radar {
     }
     Storage.setItem(Storage.PUBLISHABLE_KEY, publishableKey);
 
-    const { cacheLocationMinutes } = options;
+    const { cacheLocationMinutes, enableHighAccuracy } = options;
 
     if (cacheLocationMinutes) {
       const number = Number(cacheLocationMinutes);
@@ -64,6 +64,12 @@ class Radar {
       }
     } else {
       Storage.removeItem(Storage.CACHE_LOCATION_MINUTES);
+    }
+
+    if (enableHighAccuracy) {
+      Storage.setItem(Storage.ENABLE_HIGH_ACCURACY, true);
+    } else {
+      Storage.removeItem(Storage.ENABLE_HIGH_ACCURACY);
     }
   }
 
