@@ -1,292 +1,167 @@
 <html>
   <head>
-    <title>Radar | Test SDK Script</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+    <title>Radar | JS SDK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="./style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
+    <link href="https://js.radar.com/v4.0.0/radar.css" rel="stylesheet">
 
-    <style>
-      .links .btn.active {
-        background-color: #545b62;
-        border-color: #4e555b;
-      }
-
-      .result {
-        background-color: #f7f7f9;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-      }
-
-      pre {
-        margin: 0;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" crossorigin="anonymous"></script>
+    <script src="https://js.radar.com/v4.0.0/radar.js"></script>
   </head>
   <body>
-    <div class="links pl-3 pt-3">
-      <div class="btn-group" role="group" aria-label="Basic example">
-        <a id="std-link" href='/' role="button" class="std-link btn btn-secondary">radar.js</a>
-        <a id="min-link" href='/?min' role="button" class="min-link btn btn-secondary">radar.min.js</a>
-      </div>
-    </div>
+    <main>
+      <div class="container">
+        <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+          <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+            <span class="fs-5 fw-semibold">Radar JS SDK</span>
+          </a>
+          <ul class="list-unstyled ps-0">
+            <li class="mb-1">
+              <div class="mb-3">
+                <input id="publishableKey" class="form-control form-control-sm mb-1" data-bs-placement="bottom" data-bs-title="Set your publishable key" type="text" placeholder="Publishable key" />
+                <p style="font-size: 10px;">From your <a href="https://radar.com/dashboard/settings#api-keys-form">settings page</a></p>
+              </div>
 
-    <div class="pl-3 pt-3">
-      <form id="track-once" class="form-inline mb-0">
-        <input id="publishable-key" class="form-control mr-sm-2" type="text" name="publishable-key" placeholder="Enter Publishable Key" style="width: 500px;"/>
-        <button id="track-btn" class="btn btn-primary">Call Track Once</button>
-      </form>
-    </div>
-
-    <div class="pl-3 pt-3">
-      <form id="conversion-event" class="form-inline mb-0">
-        <button id="log-conversion-event-btn" class="btn btn-primary">Send Conversion Event</button>
-      </form>
-    </div>
-
-    <div class="pl-3 pt-3">
-      <form id="conversion-event" class="form-inline mb-0">
-        <button id="log-conversion-revenue-event-btn" class="btn btn-primary">Send Conversion Revenue Event</button>
-      </form>
-    </div>
-
-    <div class="pl-3 pt-3">
-      <a href="javascript:void(0)" id="show-trip-options">Show trip options</a>
-      <div id="trip-form" class="form mb-0 d-none">
-        <input id="trip-id" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Id" style="width: 400px;"/>
-        <select id="trip-mode" class="form-control mr-sm-2 mb-1" style="width: 400px;">
-          <option key="" disabled>Select Mode</option>
-          <option key="car">car</option>
-          <option key="foot">foot</option>
-          <option key="bike">bike</option>
-          <option key="truck">truck</option>
-          <option key="motorbike">motorbike</option>
-        </select>
-        <input id="trip-destination-tag" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence Tag" style="width: 400px;"/>
-        <input id="trip-destination-externalId" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Destination Geofence External Id" style="width: 400px;"/>
-        <input id="trip-approaching-threshold" class="form-control mr-sm-2 mb-1" type="text" placeholder="Enter Trip Approaching Threshold" style="width: 400px;"/>
-        <button id="trip-start-btn" class="btn btn-primary">Start Trip</button>
-        <button id="trip-complete-btn" class="btn btn-primary">Complete Trip</button>
-      </div>
-    </div>
-
-    <div class="loader pl-3 d-none">
-      <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
-      <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#007bff">
-        <g fill="none" fill-rule="evenodd" stroke-width="2">
-        <circle cx="22" cy="22" r="1">
-          <animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="1">
-          <animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
-        </circle>
-        </g>
-      </svg>
-    </div>
-
-    <div class="error p-3 d-none">
-      <div id="error-message" class="alert alert-danger" role="alert">
-      </div>
-    </div>
-
-    <div class="results p-3 d-none">
-      <div>
-        <h3>Status</h3>
-        <div class="result">
-          <pre><code id="status"></code></pre>
+              <button class="btn btn-toggle align-items-center rounded">
+                Maps UI
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="#" class="link-dark rounded active">Display a map</a></li>
+                  <li><a href="#" class="link-dark rounded">Add a marker</a></li>
+                  <li><a href="#" class="link-dark rounded">Add an autocomplete input</a></li>
+                  <li><a href="#" class="link-dark rounded">Create a store locator</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button class="btn btn-toggle align-items-center rounded">
+                Maps APIs
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="#" class="link-dark rounded">Forward geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">Reverse geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">IP geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">Autocomplete</a></li>
+                  <li><a href="#" class="link-dark rounded">Search places</a></li>
+                  <li><a href="#" class="link-dark rounded">Distance</a></li>
+                  <li><a href="#" class="link-dark rounded">Validate address</a></li>
+                  <li class="border-top my-3"></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button class="btn btn-toggle align-items-center rounded">
+                Geofencing
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="#" class="link-dark rounded">Track a user</a></li>
+                  <li><a href="#" class="link-dark rounded">Start a trip</a></li>
+                  <li><a href="#" class="link-dark rounded">Get context</a></li>
+                  <li><a href="#" class="link-dark rounded">Log a conversion</a></li>
+                  <li class="border-top my-3"></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
         </div>
-      </div>
 
-      <div class="mt-4">
-        <h3>Location</h3>
-        <div class="result">
-          <pre><code id="location"></code></pre>
-        </div>
-      </div>
+        <div class="content flex-grow-1 p-4">
+          <h1 class="mb-4">Display a map</h1>
+          <div id="error-alert" class="alert alert-danger fade show" role="alert">
+            <strong>Error</strong> Something went wrong. Check the developer console for details.
+          </div>
 
-      <div class="mt-4">
-        <h3>User</h3>
-        <div class="result">
-          <pre><code id="user"></code></pre>
-        </div>
-      </div>
+          <p>Initialize a new map with the Radar SDK and your publishable key, and render it on the page.</p>
 
-      <div class="mt-4">
-        <h3>Events</h3>
-        <div class="result">
-          <pre><code id="events"></code></pre>
-        </div>
-      </div>
+          <div>
+            <div id="map" style="width: 100%; height: 500px;"></div>
+          </div>
 
-      <div class="mt-4">
-        <h3>Matrix</h3>
-        <div class="result">
-          <pre><code id="matrix"></code></pre>
-        </div>
-      </div>
-    </div>
+          <div>
+            <pre>
+              <code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v4.0.0/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v4.0.0/radar.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
 
-    <script>
-      // get existing publishable key
-      const publishableKey = localStorage.getItem('publishableKey');
+  &lt;body&gt;
+    &lt;div id="map-container"&gt;
+      &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+    &lt;/div&gt;
 
-      // dynamically add js or minified script based on query param
-      const useMin = window.location.search.includes('?min');
-      const radarScript = document.createElement('script');
-      radarScript.type = 'text/javascript';
-      radarScript.src = useMin ? '/dist/radar.iife.min.js' : '/dist/radar.iife.js';
-      radarScript.onload = () => {
-        console.log('Using', useMin ? 'minified' : 'non-minified', 'Radar SDK');
-        if (publishableKey) {
-          Radar.initialize(publishableKey, { debug: true });
-        }
-      }
-      document.head.appendChild(radarScript);
+    &lt;script type="text/javascript"&gt;
+      Radar.initialize('prj_test_pk_...');
 
-      $(document).ready(() => {
-        if (publishableKey) {
-          $('#publishable-key').val(publishableKey);
-        }
-        if (useMin) {
-          $('#min-link').addClass('active');
-        } else {
-          $('#std-link').addClass('active');
-        }
+      Radar.ui.map({
+        container: 'map',
       });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+            </pre>
+          </div>
+        </div>
 
-      $('#track-once').on('submit', (e) => {
-        e.preventDefault();
-        $('input,button').prop('disabled', true);
-        $('.loader').removeClass('d-none');
-        $('.error').addClass('d-none');
-        $('.results').addClass('d-none');
+        <script>
+          hljs.highlightAll();
 
-        let publishableKey = $('#publishable-key').val();
+          let map;
+          const init = (publishableKey) => {
+            $('#error-alert').hide();
 
-        // initialize SDK
-        Radar.initialize(publishableKey, { debug: true });
+            Radar.initialize(publishableKey, { debug: true });
 
-        Radar.trackOnce()
-          .then(({ location, user, events, response }) => {
-            localStorage.setItem('publishableKey', publishableKey); // save key
+            // prevent duplicate maps
+            if (map) {
+              map.remove();
+            }
 
-            console.log('TRACK ONCE', { location, user, events, response });
+            map = Radar.ui.map({
+              container: 'map',
+            });
+            console.log('MAP', map);
 
-            $('input,button').prop('disabled', false);
-            $('.loader').addClass('d-none');
-            $('#status').html(status);
+            map.on('error', (err) => {
+              console.error(err);
+              $('#error-alert').show();
+            });
+          };
 
-            $('#location').html(formatCode({
-              accuracy: location.accuracy,
-              altitude: location.altitude,
-              altitudeAccuracy: location.altitudeAccuracy,
-              heading: location.heading,
-              latitude: location.latitude,
-              longitude: location.longitude,
-              speed: location.speed,
-            }));
 
-            $('#user').html(formatCode(user));
-            $('#events').html(formatCode(events));
-
-            $('.results').removeClass('d-none');
-
-            Radar.matrix(
-              {
-                origins: [
-                  { latitude: '40.78382', longitude: '-73.97536' }
-                ],
-                destinations: [
-                  { latitude: '40.70390', longitude: '-73.98670' },
-                  { latitude: '40.68943', longitude: '-73.96901' }
-                ],
-                mode: 'car'
-              })
-              .then((res) => {
-                console.log('MATRIX', res);
-                $('#matrix').html(formatCode(res));
-              })
-              .catch((err) => {
-                console.error('MATRIX ERROR', err);
-                $('#error-message').html(err);
-                $('.error').removeClass('d-none');
-              });
-          })
-          .catch((err) => {
-            console.error('TRACK ONCE ERROR', err);
-            $('#error-message').html(err);
-            $('.error').removeClass('d-none');
+          // listen for api key changes
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              window.localStorage.setItem('radar-sdk-publishable-key', publishableKey);
+              init(publishableKey);
+            }
           });
-      });
 
-      $("#trip-start-btn").click((e) => {
-        console.log('TRIP START CLICKED');
-        e.preventDefault();
-        let externalId = $('#trip-id').val();
-        let mode = $('#trip-mode').val();
-        let destinationGeofenceTag = $('#trip-destination-tag').val();
-        let destinationGeofenceExternalId = $('#trip-destination-externalId').val();
-        let approachingThreshold = $('#trip-approaching-threshold').val();
-
-        const tripOptions = {
-          externalId,
-          mode,
-          destinationGeofenceTag,
-          destinationGeofenceExternalId,
-          approachingThreshold,
-        }
-
-        console.log('RADAR START TRIP');
-        Radar.startTrip(tripOptions)
-          .then((res) => console.log('START TRIP', res))
-          .catch((err) => console.error('START TRIP ERROR', err));
-      });
-
-      $("#log-conversion-event-btn").click(function(e) {
-        e.preventDefault();
-        const conversionEventData = {
-          "name": "button_click",
-          "metadata": {"page":"test"}
-        }
-        Radar.logConversion(conversionEventData)
-          .then((res) => console.log('LOG CONVERSION', res))
-          .catch((err) => console.error('LOG CONVERSION ERROR', err));
-      });
-
-      $("#log-conversion-revenue-event-btn").click(function(e) {
-        e.preventDefault();
-        const conversionEventData = {
-          "name": "purchase_click",
-          "revenue": 10,
-          "metadata": {"page":"test"}
-        }
-        Radar.logConversion(conversionEventData)
-          .then((res) => console.log('LOG RENUVE CONVERSION', res))
-          .catch((err) => console.error('LOG RENUVE CONVERSION ERROR', err));
-      });
-
-      $("#trip-complete-btn").click(function(e) {
-        e.preventDefault();
-
-        Radar.completeTrip()
-          .then((res) => console.log('COMPLETE TRIP', res))
-          .catch((err) => console.error('COMPLETE TRIP ERROR', err));
-      });
-
-      $("#show-trip-options").click(function(e) {
-        e.preventDefault();
-        if ($("#trip-form").hasClass("d-none")) {
-          $('#show-trip-options').text('Hide trip options');
-          $('#trip-form').removeClass('d-none');
-        } else {
-          $('#show-trip-options').text('Show trip options');
-          $('#trip-form').addClass('d-none');
-        }
-      });
-
-      function formatCode(object) {
-        return JSON.stringify(object, null, '  ');
-      }
-    </script>
+          // check if key is saved in localstorage
+          const pk = window.localStorage.getItem('radar-sdk-publishable-key');
+          if (pk) {
+            $('#publishableKey').val(pk);
+            $('#publishableKey').trigger('change');
+          } else {
+            // show tooltip after 2s
+            setTimeout(() => {
+              const tooltip = new bootstrap.Tooltip($('#publishableKey'));
+              tooltip.show();
+              setTimeout(() => { tooltip.disable(); }, 3000);
+            }, 2000);
+          }
+        </script>
+      </div>
+    </main>
   </body>
 </html>

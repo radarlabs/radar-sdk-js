@@ -20,12 +20,14 @@
     "bump-version": "node ./scripts/bump-version.cjs",
     "test": "jest --collect-coverage",
     "test:watch": "jest --watch",
-    "demo": "node ./demo/server.cjs"
+    "demo": "npm run build && node ./demo/server.cjs"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@types/jest": "^29.5.1",
     "jest": "^29.5.0",
@@ -34,11 +36,14 @@
     "live-server": "^1.2.2",
     "mock-xmlhttprequest": "^8.2.0",
     "rollup": "^3.23.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@types/geojson": "^7946.0.10"
+    "@types/geojson": "^7946.0.10",
+    "maplibre-gl": "^2.4.0"
   }
 }

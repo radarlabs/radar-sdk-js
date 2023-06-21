@@ -14,6 +14,8 @@ import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
 
+import MapUI from './ui/map';
+
 import SDK_VERSION from './version';
 
 import type {
@@ -33,6 +35,9 @@ import type {
   RadarValidateAddressParams,
 } from './types';
 
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '../styles/radar.css';
+
 
 const isSecretKey = (key: string): boolean => (
   key.includes('_sk_')
@@ -44,6 +49,13 @@ const isLiveKey = (key: string): boolean => (
 class Radar {
   public static get VERSION() {
     return SDK_VERSION;
+  }
+
+  // "ui" namespace
+  public static get ui() {
+    return {
+      map: MapUI.initialize,
+    };
   }
 
   public static initialize(publishableKey: string, options: RadarOptions = {}) {

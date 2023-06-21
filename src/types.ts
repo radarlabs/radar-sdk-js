@@ -441,3 +441,8 @@ export interface RadarSearchGeofencesParams {
 export interface RadarSearchGeofencesResponse extends RadarResponse {
   geofences: RadarGeofence[];
 }
+
+export interface RadarMapOptions {
+  container: string | HTMLElement;
+  style?: string;
+}
