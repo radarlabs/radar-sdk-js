@@ -1,0 +1,84 @@
+        <div class="content flex-grow-1 p-4">
+          <h1 class="mb-4">Add a marker</h1>
+          <div id="error-alert" class="alert alert-danger fade show" role="alert">
+            <strong>Error</strong> Something went wrong. Check the developer console for details.
+          </div>
+
+          <p>Initialize a new map with the Radar SDK and add a marker to the map.</p>
+
+          <div class="callout">
+            Radar map objects are MapLibre GL JS references.
+            See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+          </div>
+
+          <div>
+            <div id="map" style="width: 100%; height: 500px;"></div>
+          </div>
+
+          <div>
+            <pre>
+              <code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v4.0.0/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v4.0.0/radar.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script type="text/javascript"&gt;
+      Radar.initialize('prj_test_pk_...');
+
+      const map = Radar.ui.map({
+        container: 'map',
+      });
+
+      const marker = Radar.ui.marker({ text: 'Radar HQ' })
+        .setLngLat([-73.9910078, 40.7342465])
+        .addTo(map);
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+            </pre>
+          </div>
+        </div>
+
+        <script>
+          let map;
+          const init = (publishableKey) => {
+            $('#error-alert').hide();
+
+            Radar.initialize(publishableKey, { debug: true });
+
+            // prevent duplicate maps
+            if (map) {
+              map.remove();
+            }
+
+            map = Radar.ui.map({
+              container: 'map',
+            });
+            console.log('MAP', map);
+
+            const marker = Radar.ui.marker({ text: 'Radar HQ' })
+              .setLngLat([-73.9910078, 40.7342465])
+              .addTo(map);
+
+            map.on('error', (err) => {
+              console.error(err);
+              $('#error-alert').show();
+            });
+          };
+
+
+          // initalize map on api key changes
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              init(publishableKey);
+            }
+          });
+        </script>

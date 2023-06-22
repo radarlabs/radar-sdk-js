@@ -54,7 +54,9 @@ class Radar {
   // "ui" namespace
   public static get ui() {
     return {
-      map: MapUI.initialize,
+      maplibregl: MapUI.getMapLibre(),
+      map: MapUI.createMap,
+      marker: MapUI.createMarker
     };
   }
 

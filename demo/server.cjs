@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require("child_process");
+const { spawn, exec } = require("child_process");
 const express = require('express');
 const { engine }  = require('express-handlebars');
 
@@ -17,7 +17,7 @@ fs.watch(path.join(__dirname, '../src'), { recursive: true }, (event, filename) 
 });
 
 // setup handlebars engine
-app.engine('.hbs', engine({ extname: '.hbs' }));
+app.engine('.hbs', engine({ extname: '.hbs', defaultLayout: 'main' }));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -35,10 +35,12 @@ app.use('/cdn', express.static('./cdn'));
 const views = fs.readdirSync(path.join(__dirname, 'views'));
 views.forEach((view) => {
   const name = path.basename(view).split('.hbs')[0];
+  const title = name.replace(/-/g, ' ');
 
   app.get(`/${name}`, (req, res) => {
     res.render(name, {
-      layout: false,
+      name,
+      title,
       js_file: '/cdn/radar.js',
       css_file: '/cdn/radar.css',
     });
@@ -53,4 +55,23 @@ app.get('/', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
+
+  const url = `http://localhost:${PORT}`;
+
+  switch (process.platform) {
+      // Windows
+    case 'win32':
+      exec(`start ${url}`);
+      break;
+      // macOS
+    case 'darwin':
+      exec(`open ${url}`);
+      break;
+      // Linux
+    case 'linux':
+      exec(`xdg-open ${url}`);
+      break;
+    default:
+      break;
+  }
 });

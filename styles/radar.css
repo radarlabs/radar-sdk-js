@@ -5,3 +5,7 @@
   width: 80px;
   height: 38px;
 }
+
+.maplibregl-marker:hover {
+  cursor: pointer;
+}

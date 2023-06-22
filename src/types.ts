@@ -446,3 +446,8 @@ export interface RadarMapOptions {
   container: string | HTMLElement;
   style?: string;
 }
+
+export interface RadarMarkerOptions {
+  color?: string;
+  text?: string;
+}

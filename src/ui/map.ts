@@ -3,7 +3,7 @@ import maplibregl from 'maplibre-gl';
 import Config from '../config';
 import Logger from '../logger';
 
-import type { RadarOptions, RadarMapOptions } from '../types';
+import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
@@ -18,12 +18,20 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
+const defaultMarkerOptions: Partial<maplibregl.MarkerOptions> = {
+  color: '#000257',
+};
+
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
 class MapUI {
-  public static initialize(mapOptions: RadarMapOptions): maplibregl.Map {
+  public static getMapLibre() {
+    return maplibregl;
+  }
+
+  public static createMap(mapOptions: RadarMapOptions): maplibregl.Map {
     const options = Config.get();
 
     const style = mapOptions.style || DEFAULT_STYLE;
@@ -63,6 +71,24 @@ class MapUI {
     // add location button
 
     return map;
+  }
+
+  public static createMarker(markerOptions: RadarMarkerOptions = {}): maplibregl.Marker {
+    const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
+
+    if (markerOptions.color) {
+      maplibreOptions.color = markerOptions.color;
+    }
+
+    const marker = new maplibregl.Marker(maplibreOptions);
+
+    // set popup text
+    if (markerOptions.text) {
+      const popup = new maplibregl.Popup({ offset: 35 }).setText(markerOptions.text);
+      marker.setPopup(popup);
+    }
+
+    return marker;
   }
 }
 
