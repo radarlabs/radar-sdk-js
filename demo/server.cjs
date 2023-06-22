@@ -1,70 +1,56 @@
 const fs = require('fs');
 const path = require('path');
-const { exec } = require("child_process");
-const liveServer = require('live-server');
+const { spawn } = require("child_process");
+const express = require('express');
+const { engine }  = require('express-handlebars');
 
+const app = express();
+const PORT = 9001;
+
+// rebuild packages if any source files change
 fs.watch(path.join(__dirname, '../src'), { recursive: true }, (event, filename) => {
-  console.log(event, 'detected', filename, '..rebuilding');
-  exec('npm run build', (err) => {
-    if (err) {
-      console.error(err);
-    }
+  console.log(event, 'detected in', filename, '..rebuilding');
+  const build = spawn('npm', ['run', 'build']);
+  build.stdout.on('data', (data) => console.log(data.toString()));
+  build.stderr.on('data', (data) => console.error(data.toString()));
+  build.on('exit', () => console.log('Done.'));
+});
+
+// setup handlebars engine
+app.engine('.hbs', engine({ extname: '.hbs' }));
+app.set('view engine', '.hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+// dont cache anything
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache');
+  next();
+});
+
+// serve static files
+app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use('/cdn', express.static('./cdn'));
+
+// create a route for each handelbars view
+const views = fs.readdirSync(path.join(__dirname, 'views'));
+views.forEach((view) => {
+  const name = path.basename(view).split('.hbs')[0];
+
+  app.get(`/${name}`, (req, res) => {
+    res.render(name, {
+      layout: false,
+      js_file: '/cdn/radar.js',
+      css_file: '/cdn/radar.css',
+    });
   });
 });
 
-// connect middleware to re-write script tags from the example repo that use
-// the global CDN (radar.js.com) to use the local development versions instead.
-const rewriteScript = (req, res, next) => {
-  let body = [];
-  const originalWrite = res.write;
-  const originalEnd = res.end;
+// default to "create-a-map"
+app.get('/', (req, res) => {
+  res.redirect('/display-a-map');
+});
 
-  res.write = function(chunk) {
-    body.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  };
-
-  // re-write response to swap out script tag
-  res.end = function(chunk, encoding) {
-    if (chunk) {
-      body.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    let responseBody = Buffer.concat(body).toString();
-
-    // replace global CDN scripts with local version for easier development
-    const lines = responseBody.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const match = line.match(/"https:\/\/js\.radar\.com(.*?)"/);
-      if (match) {
-        const script = match[0];
-        if (script.includes('.css')) {
-          lines[i] = line.replace(script, '"/cdn/radar.css"');
-        } else {
-          lines[i] = line.replace(script, '"/cdn/radar.js"');
-        }
-      }
-    }
-    responseBody = lines.join('\n');
-
-    const modifiedBuffer = Buffer.from(responseBody, encoding);
-    res.setHeader('Content-Length', Buffer.byteLength(modifiedBuffer));
-    res.setHeader('Cache-Control', 'no-cache');
-    res.write = originalWrite;
-    res.end = originalEnd;
-    res.end(modifiedBuffer, encoding);
-  };
-
-  next();
-};
-
-const params = {
-	port: 9001,
-	host: "0.0.0.0",
-	root: "./demo", // Set root directory that's being served. Defaults to cwd.
-	mount: [['/cdn', path.join(__dirname, '../cdn')]], // serve /cdn files under the development "/cdn" path
-	logLevel: 2, // 0 = errors only, 1 = some, 2 = lots
-  middleware: [rewriteScript],
-};
-
-// live-reloading server
-liveServer.start(params);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running at http://localhost:${PORT}`);
+});
