@@ -451,3 +451,26 @@ export interface RadarMarkerOptions {
   color?: string;
   text?: string;
 }
+
+export interface RadarAutocompleteUIOptions {
+  container: string | HTMLElement;
+  debounceMS?: number, // Debounce time in milliseconds
+  threshold?: number, // Minimum number of characters to trigger autocomplete
+  limit?: number, // Maximum number of autocomplete results
+  placeholder?: string, // Placeholder text for the input field
+  onSelection?: (selection: any) => void,
+  onResults?: (results: any[]) => void,
+  onError?: (error: any) => void,
+  layers?: RadarGeocodeLayer[];
+  disabled?: boolean,
+  width?: string | number;
+}
+
+export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
+  container: string | HTMLElement;
+  debounceMS: number, // Debounce time in milliseconds
+  threshold: number, // Minimum number of characters to trigger autocomplete
+  limit: number, // Maximum number of autocomplete results
+  placeholder: string, // Placeholder text for the input field
+  disabled: boolean,
+}

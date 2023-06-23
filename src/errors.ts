@@ -124,7 +124,6 @@ export class RadarServerError extends RadarError {
 }
 
 export class RadarTimeoutError extends RadarError {
-
   constructor() {
     super('Request timed out.');
     this.name = 'RadarTimeoutError';
@@ -140,5 +139,13 @@ export class RadarUnknownError extends RadarError {
     this.name = 'RadarUnknownError';
     this.response = response;
     this.status = 'ERROR_UNKNOWN';
+  }
+}
+
+export class RadarAutocompleteContainerNotFound extends RadarError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RadarAutocompleteContainerNotFound';
+    this.status = 'CONTAINER_NOT_FOUND';
   }
 }

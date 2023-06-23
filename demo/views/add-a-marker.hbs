@@ -1,6 +1,6 @@
         <div class="content flex-grow-1 p-4">
           <h1 class="mb-4">Add a marker</h1>
-          <div id="error-alert" class="alert alert-danger fade show" role="alert">
+          <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
             <strong>Error</strong> Something went wrong. Check the developer console for details.
           </div>
 
@@ -30,12 +30,15 @@
     &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
 
     &lt;script type="text/javascript"&gt;
-      Radar.initialize('prj_test_pk_...');
+      // initialize Radar SDK
+      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
+      // create map
       const map = Radar.ui.map({
         container: 'map',
       });
 
+      // create marker and add to map
       const marker = Radar.ui.marker({ text: 'Radar HQ' })
         .setLngLat([-73.9910078, 40.7342465])
         .addTo(map);
@@ -61,7 +64,6 @@
             map = Radar.ui.map({
               container: 'map',
             });
-            console.log('MAP', map);
 
             const marker = Radar.ui.marker({ text: 'Radar HQ' })
               .setLngLat([-73.9910078, 40.7342465])

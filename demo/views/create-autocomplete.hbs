@@ -1,13 +1,18 @@
 <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Display a map</h1>
+  <h1 class="mb-4">Address autocomplete</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
     <strong>Error</strong> Something went wrong. Check the developer console for details.
   </div>
 
-  <p>Initialize a new map with the Radar SDK and render on the page.</p>
+  <p>Create an autocomplete widget for searching an address.</p>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px;"></div>
+    <div id="autocomplete" style="width: 800px;"></div>
+  </div>
+
+  <div id="result-container" class="mt-4" style="display: none;">
+    <p class="mb-1"><b>Selected result</b></p>
+    <pre><code id="result" class="code-sample language-json"></code></pre>
   </div>
 
   <div class="mt-4">
@@ -21,13 +26,20 @@
   &lt;/head&gt;
 
   &lt;body&gt;
-    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+    &lt;div id="autocomplete"/&gt;
 
     &lt;script type="text/javascript"&gt;
+      // initialize Radar SDK
       Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
-      const map = Radar.ui.map({
-        container: 'map',
+
+      // create autocomplete widget
+      Radar.ui.autocomplete({
+        container: 'autocomplete',
+        onSelection: (result) => {
+          console.log(result);
+        },
+        width: '600px',
       });
     &lt;/script&gt;
   &lt;/body&gt;
@@ -37,25 +49,29 @@
 </div>
 
 <script>
-  let map;
-  const initialize = (publishableKey) => {
+  let autocomplete;
+  const init = (publishableKey) => {
     $('#error-alert').hide();
 
     Radar.initialize(publishableKey, { debug: true });
 
-    // prevent duplicate maps from rendering over each other
-    if (map) {
-      map.remove();
+    // prevent duplicate inputs
+    if (autocomplete) {
+      autocomplete.remove();
     }
 
-    map = Radar.ui.map({
-      container: 'map',
+    autocomplete = Radar.ui.autocomplete({
+      container: 'autocomplete',
+      onSelection: (result) => {
+        console.log(result);
+        $('#result').html(JSON.stringify(result, null, 2));
+        $('#result-container').show();
+        hljs.highlightAll();
+      },
+      width: '600px',
     });
 
-    map.on('error', (err) => {
-      console.error(err);
-      $('#error-alert').show();
-    });
+    console.log('AUTOCOMPLETE', autocomplete);
   };
 
 
@@ -63,7 +79,7 @@
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      initialize(publishableKey);
+      init(publishableKey);
     }
   });
 </script>
