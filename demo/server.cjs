@@ -4,6 +4,8 @@ const { spawn, exec } = require("child_process");
 const express = require('express');
 const { engine }  = require('express-handlebars');
 
+const sdk_version = require('../package.json').version;
+
 const app = express();
 const PORT = 9001;
 
@@ -41,6 +43,7 @@ views.forEach((view) => {
     res.render(name, {
       name,
       title,
+      sdk_version,
       js_file: '/cdn/radar.js',
       css_file: '/cdn/radar.css',
     });

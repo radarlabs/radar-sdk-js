@@ -26,4 +26,5 @@ npm-debug.log
 dist/
 cdn/
 coverage/
+site/
 .nyc_output/
