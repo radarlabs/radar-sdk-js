@@ -1,0 +1,196 @@
+<html>
+  <head>
+    <title>Radar JS SDK | add a marker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="./static/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
+    <link href="https://js.radar.com/v4.0.0-beta.8/radar.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" crossorigin="anonymous"></script>
+    <script src="https://js.radar.com/v4.0.0-beta.8/radar.min.js"></script>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+          <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+            <span class="fs-5 fw-semibold">Radar JS SDK</span>
+          </a>
+          <ul class="list-unstyled ps-0">
+            <li class="mb-1">
+              <div class="mb-3">
+                <input id="publishableKey" class="form-control form-control-sm mb-1" data-bs-placement="bottom" data-bs-title="Set your publishable key" type="text" placeholder="Publishable key" />
+                <p style="font-size: 10px;">From your <a href="https://radar.com/dashboard/settings#api-keys-form">settings page</a></p>
+              </div>
+
+              <button class="btn btn-toggle align-items-center rounded">
+                Maps UI
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="/display-a-map" class="link-dark rounded">Display a map</a></li>
+                  <li><a href="/add-a-marker" class="link-dark rounded">Add a marker</a></li>
+                  <li><a href="/create-autocomplete" class="link-dark rounded">Address autocomplete</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button class="btn btn-toggle align-items-center rounded">
+                Maps APIs
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="#" class="link-dark rounded">Forward geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">Reverse geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">IP geocode</a></li>
+                  <li><a href="#" class="link-dark rounded">Autocomplete</a></li>
+                  <li><a href="#" class="link-dark rounded">Search places</a></li>
+                  <li><a href="#" class="link-dark rounded">Distance</a></li>
+                  <li><a href="#" class="link-dark rounded">Validate address</a></li>
+                  <li class="border-top my-3"></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button class="btn btn-toggle align-items-center rounded">
+                Geofencing
+              </button>
+              <div class="collapse show" id="home-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li><a href="#" class="link-dark rounded">Track a user</a></li>
+                  <li><a href="#" class="link-dark rounded">Start a trip</a></li>
+                  <li><a href="#" class="link-dark rounded">Get context</a></li>
+                  <li><a href="#" class="link-dark rounded">Log a conversion</a></li>
+                  <li class="border-top my-3"></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+                <div class="content flex-grow-1 p-4">
+          <h1 class="mb-4">Add a marker</h1>
+          <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+            <strong>Error</strong> Something went wrong. Check the developer console for details.
+          </div>
+
+          <p>Initialize a new map with the Radar SDK and add a marker to the map.</p>
+
+          <div class="callout">
+            Radar map objects are MapLibre GL JS references.
+            See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+          </div>
+
+          <div>
+            <div id="map" style="width: 100%; height: 500px;"></div>
+          </div>
+
+          <div>
+            <pre>
+              <code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/4.0.0-beta.8/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/4.0.0-beta.8/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script type="text/javascript"&gt;
+      // initialize Radar SDK
+      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+      // create map
+      const map = Radar.ui.map({
+        container: 'map',
+      });
+
+      // create marker and add to map
+      const marker = Radar.ui.marker({ text: 'Radar HQ' })
+        .setLngLat([-73.9910078, 40.7342465])
+        .addTo(map);
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+            </pre>
+          </div>
+        </div>
+
+        <script>
+          let map;
+          const init = (publishableKey) => {
+            $('#error-alert').hide();
+
+            Radar.initialize(publishableKey, { debug: true });
+
+            // prevent duplicate maps
+            if (map) {
+              map.remove();
+            }
+
+            map = Radar.ui.map({
+              container: 'map',
+            });
+
+            const marker = Radar.ui.marker({ text: 'Radar HQ' })
+              .setLngLat([-73.9910078, 40.7342465])
+              .addTo(map);
+
+            map.on('error', (err) => {
+              console.error(err);
+              $('#error-alert').show();
+            });
+          };
+
+
+          // initalize map on api key changes
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              init(publishableKey);
+            }
+          });
+        </script>
+
+
+        <script>
+          // highlight active link
+          const currentPage = window.location.pathname;
+          const link = $(`a[href="${currentPage}"]`);
+          if (link) {
+            link.addClass('active');
+          }
+
+          hljs.highlightAll();
+
+          // check if key is saved in localstorage
+          const pk = window.localStorage.getItem('radar-sdk-publishable-key');
+          if (pk) {
+            $('#publishableKey').val(pk);
+            $('#publishableKey').trigger('change'); // update any listeners for key changes
+          } else {
+            // show tooltip after 2s
+            setTimeout(() => {
+              const tooltip = new bootstrap.Tooltip($('#publishableKey'));
+              tooltip.show();
+              setTimeout(() => { tooltip.disable(); }, 3000);
+            }, 2000);
+          }
+
+          // save publishable key changes in local storage
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              window.localStorage.setItem('radar-sdk-publishable-key', publishableKey);
+            }
+          });
+        </script>
+      </div>
+    </main>
+  </body>
+</html>
