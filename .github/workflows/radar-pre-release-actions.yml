@@ -27,7 +27,7 @@ jobs:
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'cdn/'
           DEST_DIR: ${{ github.ref_name }} # the release tag
-      - run: npm compile-site
+      - run: npm run compile-site
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
