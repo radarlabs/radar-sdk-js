@@ -6,4 +6,7 @@ export default {
     'jest-localstorage-mock',
     './test/mock-data/globals.js',
   ],
+  moduleNameMapper: {
+    "\\.css$": "<rootDir>/test/mock-data/styles.js"
+  },
 };

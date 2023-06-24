@@ -16,6 +16,11 @@ Object.defineProperty(window, 'navigator', {
   writable: true
 });
 
+Object.defineProperty(URL, 'createObjectURL', {
+  writable: true,
+  value: jest.fn()
+});
+
 // mock HTTP server
 const MockXhr = newMockXhr();
 window.XMLHttpRequest = MockXhr;
