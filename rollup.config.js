@@ -32,8 +32,10 @@ export default [
       {
         file: 'dist/radar.js',
         format: 'esm',
+        sourcemap: true,
       },
     ],
+    external: ['maplibre-gl'],
     plugins: [
       typescript(),
       nodeResolve(),

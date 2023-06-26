@@ -35,13 +35,15 @@
 
 **With npm:** <br />
 
-Add the `radar-sdk-js` package
+{% **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js). %}
+
+Add the `radar-sdk-js` and `maplibre-gl-js` package
 ```bash
 # with npm
-npm install --save radar-sdk-js
+npm install --save radar-sdk-js maplibre-gl-js@2.4.0
 
 # with yarn
-yarn add radar-sdk-js
+yarn add radar-sdk-js maplibre-gl-js@2.4.0
 ```
 
 Then import as an ES Module in your project
@@ -53,6 +55,8 @@ Radar.initialize('prj_test_pk_...', { /* options */ });
 ```
 
 **In your html:** <br />
+
+> The MapLibre dependency is not necessary to install when using installation with the script tag.
 
 Add the following script in your `html` file
 ```html
