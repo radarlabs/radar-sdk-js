@@ -35,7 +35,7 @@
 
 **With npm:** <br />
 
-{% **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js). %}
+> **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
 Add the `radar-sdk-js` and `maplibre-gl-js` package
 ```bash
@@ -69,6 +69,9 @@ Then initialize the Radar SDK
   Radar.initialize('prj_test_pk_...', { /* options */ });
 </script>
 ```
+
+## Quickstart
+TODO
 
 See more examples and usage in the Radar web SDK documentation [here](https://radar.com/documentation/sdk/web).
 
