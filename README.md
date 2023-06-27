@@ -33,7 +33,7 @@
 
 ## 🚀 Installation and Usage
 
-**With npm:** <br />
+### With npm:
 
 > **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
@@ -54,7 +54,7 @@ import Radar from 'radar-sdk-js';
 Radar.initialize('prj_test_pk_...', { /* options */ });
 ```
 
-**In your html:** <br />
+### In your html
 
 > The MapLibre dependency is not necessary to install when using installation with the script tag.
 
