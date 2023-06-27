@@ -37,7 +37,7 @@
 
 > **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
-Add the `radar-sdk-js` and `maplibre-gl-js` package
+Add the `radar-sdk-js` and `maplibre-gl-js` packages
 ```bash
 # with npm
 npm install --save radar-sdk-js maplibre-gl-js@2.4.0
