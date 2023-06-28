@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Radar JS SDK | display a map</title>
+    <title>Radar JS SDK | log a conversion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
@@ -73,22 +73,43 @@
         </div>
 
         <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Display a map</h1>
+  <h1 class="mb-4">Log a conversion</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
-    <strong>Error</strong> Something went wrong. Check the developer console for details.
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
   </div>
 
-  <p>Initialize a new map with the Radar SDK and render on the page.</p>
+  <p>Log a conversion to analyze alongside other location activity in your app</p>
 
-  <div class="callout">
-    Radar map objects are MapLibre GL JS references.
-    See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+  <div class="mt-5 mb-3 form-row">
+    <label for="name" class="col-form-label" style="width: 128px;">Name</label>
+    <div>
+      <input type="text" class="form-control" id="name" style="width: 250px;" placeholder="Required">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="revenue" class="col-form-label" style="width: 128px;">Revenue</label>
+    <div>
+      <input type="number" class="form-control" id="revenue" style="width: 250px;">
+    </div>
   </div>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
-    <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
-      <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+    <button id="log-conversion" type="button" class="btn btn-primary" disabled>Log conversion</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Response</h6>
+    <div class="mt-2">
+      <pre><code id="response" class="code-sample language-json"></code><pre>
     </div>
   </div>
 
@@ -105,11 +126,19 @@
   &lt;body&gt;
     &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
 
-    &lt;script type="text/javascript"&gt;
-      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+    &lt;script&gt;
+      $('#log-conversion').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
-      const map = Radar.ui.map({
-        container: 'map',
+        const conversionOptions = {
+          name: $('#name').val(),
+          userId: $('#user-id').val(),
+          revenue: $('#revenue').val(),
+        };
+
+        Radar.logConversion(options).then(({ event }) =&gt; {
+          console.log(event);
+        });
       });
     &lt;/script&gt;
   &lt;/body&gt;
@@ -119,36 +148,42 @@
 </div>
 
 <script>
-  let map;
-  const initialize = (publishableKey) => {
-    $('#error-alert').hide();
-    $('#map-warning').hide();
-    $('#map').show();
-
-    Radar.initialize(publishableKey, { debug: true });
-
-    // prevent duplicate maps from rendering over each other
-    if (map) {
-      map.remove();
-    }
-
-    map = Radar.ui.map({
-      container: 'map',
-    });
-
-    map.on('error', (err) => {
-      console.error(err);
-      $('#error-alert').show();
-    });
-  };
-
-
-  // initalize map on api key changes
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      initialize(publishableKey);
+      $('#log-conversion').prop('disabled', false);
     }
+  });
+
+  $('#log-conversion').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const options = {
+      name: $('#name').val(),
+      userId: $('#user-id').val(),
+      revenue: $('#revenue').val(),
+    };
+
+    Radar.logConversion(options)
+      .then((response) => {
+        console.log('CONVERSION RESPONSE', response);
+        $('#loader').hide();
+        $('#response-details').show();
+        $('#response').html(JSON.stringify(response.event, null, 2));
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error('CREATE TRIP ERROR:', err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
   });
 </script>
 

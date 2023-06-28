@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Radar JS SDK | display a map</title>
+    <title>Radar JS SDK | track a user</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
@@ -73,22 +73,55 @@
         </div>
 
         <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Display a map</h1>
+  <h1 class="mb-4">Track a user</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
-    <strong>Error</strong> Something went wrong. Check the developer console for details.
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
   </div>
 
-  <p>Initialize a new map with the Radar SDK and render on the page.</p>
+  <p>Use the device location to get contextual details about the user's current location, and display it on a map.</p>
 
-  <div class="callout">
-    Radar map objects are MapLibre GL JS references.
-    See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+  <div class="mt-5 mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-4 form-row">
+    <label for="desired-accuracy" class="col-form-label" style="width: 128px;">Desired accuracy</label>
+    <div>
+      <select id="desired-accuracy" class="form-select" style="width: 250px;">
+        <option value="high" selected>high</option>
+        <option value="medium">medium</option>
+        <option value="low">low</option>
+      </select>
+    </div>
   </div>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
-    <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
-      <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+    <button id="track-once" type="button" class="btn btn-primary" disabled>Call track once</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div>
+    <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Location</h6>
+    <div class="mt-2">
+      <pre><code id="location" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">User</h6>
+    <div class="mt-2">
+      <pre><code id="user" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Events</h6>
+    <div class="mt-2">
+      <pre><code id="events" class="code-sample language-json"></code><pre>
     </div>
   </div>
 
@@ -105,11 +138,26 @@
   &lt;body&gt;
     &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
 
-    &lt;script type="text/javascript"&gt;
-      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+    &lt;script&gt;
+      $('#track-once').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
-      const map = Radar.ui.map({
-        container: 'map',
+        Radar.trackOnce({ userId: 'test-user-id' })
+          .then(({ location, user, events }) =&gt; {
+            const map = Radar.ui.map({
+              container: 'map',
+            });
+            map.setCenter([location.longitude, location.latitude]);
+
+            const html = `
+              &lt;p&gt;${user.userId}&lt;/p&gt;
+              &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
+            `.trim();
+
+            const marker = Radar.ui.marker({ html })
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map);
+          });
       });
     &lt;/script&gt;
   &lt;/body&gt;
@@ -119,37 +167,65 @@
 </div>
 
 <script>
-  let map;
-  const initialize = (publishableKey) => {
-    $('#error-alert').hide();
-    $('#map-warning').hide();
-    $('#map').show();
-
-    Radar.initialize(publishableKey, { debug: true });
-
-    // prevent duplicate maps from rendering over each other
-    if (map) {
-      map.remove();
-    }
-
-    map = Radar.ui.map({
-      container: 'map',
-    });
-
-    map.on('error', (err) => {
-      console.error(err);
-      $('#error-alert').show();
-    });
-  };
-
-
-  // initalize map on api key changes
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      initialize(publishableKey);
+      $('#track-once').prop('disabled', false);
     }
   });
+
+  let map;
+  $('#track-once').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const userId = $('#user-id').val();
+    const desiredAccuracy = $('#desired-accuracy').val();
+    Radar.trackOnce({ userId, desiredAccuracy })
+      .then(({ location, user, events }) => {
+        console.log('TRACK RESPONSE', { location, user, events });
+        $('#loader').hide();
+
+        $('#map').show();
+        if (!map) {
+          map = Radar.ui.map({
+            container: 'map',
+          });
+        }
+        map.setCenter([location.longitude, location.latitude]);
+
+        if (map.getZoom() < 14) {
+          map.setZoom(14);
+        }
+
+        const html = `
+          <p>${user.userId}</p>
+          <p>${location.latitude},${location.longitude}</p>
+        `.trim();
+
+        const marker = Radar.ui.marker({ html })
+          .setLngLat([location.longitude, location.latitude])
+          .addTo(map);
+
+        $('#response-details').show();
+        $('#location').html(JSON.stringify(location, null, 2));
+        $('#user').html(JSON.stringify(user, null, 2));
+        $('#events').html(JSON.stringify(events, null, 2));
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error(err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
 </script>
 
 

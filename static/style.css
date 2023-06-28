@@ -105,3 +105,18 @@ code.code-sample {
     background-color: var(--bd-callout-bg, var(--bs-gray-100));
     border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300));
 }
+
+.callout.gray {
+  color: #212529;
+  background-color: var(--bs-gray-100);
+  border-left: 0.25rem solid var(--bs-gray-300);
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+}
+
+.form-row label {
+  margin-right: 16px;
+}
