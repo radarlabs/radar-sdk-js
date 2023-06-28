@@ -39,7 +39,11 @@ class TripsAPI {
       Logger.warn('tripOptions not set when calling "startTrip"');
     }
 
-    const userId = Storage.getItem(Storage.USER_ID);
+    const userId = tripOptions.userId || Storage.getItem(Storage.USER_ID);
+    if (userId && userId !== Storage.getItem(Storage.USER_ID)) {
+      // set as userId for tracking if provided
+      Storage.setItem(Storage.USER_ID, userId);
+    }
 
     const {
       externalId,

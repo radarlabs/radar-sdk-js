@@ -42,10 +42,10 @@ class TrackAPI {
     }
 
     // other info
-    let metadata = params.metadata || Storage.getJSON(Storage.METADATA);
+    const metadata = params.metadata || Storage.getJSON(Storage.METADATA);
 
     // trips
-    let tripOptions = params.tripOptions || TripsAPI.getTripOptions();
+    const tripOptions = params.tripOptions || TripsAPI.getTripOptions();
     if (tripOptions) {
       tripOptions.version = '2';
     }

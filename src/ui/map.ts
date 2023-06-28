@@ -82,9 +82,12 @@ class MapUI {
 
     const marker = new maplibregl.Marker(maplibreOptions);
 
-    // set popup text
+    // set popup text or HTML
     if (markerOptions.text) {
       const popup = new maplibregl.Popup({ offset: 35 }).setText(markerOptions.text);
+      marker.setPopup(popup);
+    } else if (markerOptions.html) {
+      const popup = new maplibregl.Popup({ offset: 35 }).setHTML(markerOptions.html);
       marker.setPopup(popup);
     }
 

@@ -43,6 +43,7 @@ export type RadarTravelMode =
   | 'truck';
 
 export interface RadarTripOptions {
+  userId?: string;
   externalId?: string;
   mode?: RadarTravelMode;
   destinationGeofenceTag?: string;
@@ -451,6 +452,7 @@ export interface RadarMapOptions {
 export interface RadarMarkerOptions {
   color?: string;
   text?: string;
+  html?: string;
 }
 
 export interface RadarAutocompleteUIOptions {

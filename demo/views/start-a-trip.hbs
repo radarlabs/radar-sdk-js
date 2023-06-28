@@ -1,0 +1,270 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Start a trip</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
+  </div>
+
+  <p>Start a trip to a destination and send the user's current location.</p>
+
+  <div class="mt-5 mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="mode" class="col-form-label" style="width: 128px;">Mode</label>
+    <div>
+      <select id="mode" class="form-select" style="width: 250px;">
+        <option value="car" selected>car</option>
+        <option value="bike">bike</option>
+        <option value="foot">foot</option>
+      </select>
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="external-id" class="col-form-label" style="width: 128px;">External ID</label>
+    <div>
+      <input type="text" class="form-control" id="external-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="dest-tag" class="col-form-label" style="width: 128px;">Destination tag</label>
+    <div>
+      <input type="text" class="form-control" id="dest-tag" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-4 form-row">
+    <label for="dest-id" class="col-form-label" style="width: 128px;">Destination ext ID</label>
+    <div>
+      <input type="text" class="form-control" id="dest-id" style="width: 250px;">
+    </div>
+  </div>
+
+  <div>
+    <button id="start-trip" type="button" class="btn btn-primary" disabled>Start trip</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div>
+    <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Trip</h6>
+    <div class="mt-2">
+      <pre><code id="trip" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Location</h6>
+    <div class="mt-2">
+      <pre><code id="location" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">User</h6>
+    <div class="mt-2">
+      <pre><code id="user" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Events</h6>
+    <div class="mt-2">
+      <pre><code id="events" class="code-sample language-json"></code><pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script&gt;
+      $('#start-trip').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+        const tripOptions = {
+          userId: $('#user-id').val(),
+          mode: $('#mode').val(),
+          externalId: $('#external-id').val(),
+          destinationGeofenceTag: $('#dest-tag').val(),
+          destinationGeofenceExternalId: $('#dest-id').val(),
+        };
+
+        Radar.startTrip(tripOptions).then((trip) => {
+          Radar.trackOnce().then(({ location, user, events }) => {
+            const map = Radar.ui.map({
+              container: 'map',
+            });
+
+            // create user marker
+            const userContent = `
+              &lt;p&gt;${user.userId}&lt;/p&gt;
+              &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
+            `.trim();
+
+            const userMarker = Radar.ui.marker({ html: userContent })
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map);
+
+            if (user &amp;&amp; user.trip &amp;&amp; user.trip.destinationLocation) {
+              // create destination marker
+              const destContent = `
+                &lt;p&gt;&lt;b&gt;${user.trip.destinationGeofenceTag}&lt;/b&gt;&lt;/p&gt;
+                &lt;p&gt;${user.trip.destinationGeofenceExternalId}&lt;/p&gt;
+              `.trim();
+
+              const destMarker = Radar.ui.marker({ html: destContent, color: '#FF6F00' })
+                .setLngLat(user.trip.destinationLocation.coordinates)
+                .addTo(map);
+
+              // fit map to user and destination
+              const bounds = new Radar.ui.maplibregl.LngLatBounds(
+                userMarker.getLngLat(),
+                destMarker.getLngLat(),
+              );
+              map.fitBounds(bounds, { padding: 50 });
+
+            } else {
+              // center map on users location
+              map.setCenter([location.longitude, location.latitude]);
+              map.setZoom(14);
+            }
+          });
+        });
+
+        Radar.trackOnce({ userId: 'test-user-id' })
+          .then(({ location, user, events }) =&gt; {
+            const map = Radar.ui.map({
+              container: 'map',
+            });
+            map.setCenter([location.longitude, location.latitude]);
+
+            const html = `
+              &lt;p&gt;${user.userId}&lt;/p&gt;
+              &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
+            `.trim();
+
+            const marker = Radar.ui.marker({ html })
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map);
+          });
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      $('#start-trip').prop('disabled', false);
+    }
+  });
+
+  let map;
+  $('#start-trip').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const tripOptions = {
+      userId: $('#user-id').val(),
+      mode: $('#mode').val(),
+      externalId: $('#external-id').val(),
+      destinationGeofenceTag: $('#dest-tag').val(),
+      destinationGeofenceExternalId: $('#dest-id').val(),
+    };
+
+    Radar.startTrip(tripOptions)
+      .then((trip) => {
+        console.log('TRIP RESPONSE', trip);
+
+        Radar.trackOnce()
+          .then(({ location, user, events }) => {
+            console.log('TRACK RESPONSE', { location, user, events });
+            $('#loader').hide();
+
+            // show map
+            $('#map').show();
+            if (!map) {
+              map = Radar.ui.map({
+                container: 'map',
+              });
+            }
+
+            // create markers
+            const userHtml = `
+              <p>${user.userId}</p>
+              <p>${location.latitude},${location.longitude}</p>
+            `.trim();
+
+            const userMarker = Radar.ui.marker({ html: userHtml })
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map);
+
+            let destMarker;
+            if (user && user.trip && user.trip.destinationLocation) {
+              const destHtml = `
+                <p><b>${user.trip.destinationGeofenceTag}</b></p>
+                <p>${user.trip.destinationGeofenceExternalId}</p>
+              `.trim();
+
+              destMarker = Radar.ui.marker({ html: destHtml, color: '#FF6F00' })
+                .setLngLat(user.trip.destinationLocation.coordinates)
+                .addTo(map);
+            }
+
+            // fit map to user and destination
+            if (userMarker && destMarker) {
+              const bounds = new Radar.ui.maplibregl.LngLatBounds(
+                userMarker.getLngLat(),
+                destMarker.getLngLat(),
+              );
+              map.fitBounds(bounds, { padding: 50 });
+            } else { // otherwise set at users location
+              map.setCenter([location.longitude, location.latitude]);
+              if (map.getZoom() < 14) {
+                map.setZoom(14);
+              }
+            }
+
+            $('#response-details').show();
+            $('#trip').html(JSON.stringify(user.trip, null, 2));
+            $('#location').html(JSON.stringify(location, null, 2));
+            $('#user').html(JSON.stringify(user, null, 2));
+            $('#events').html(JSON.stringify(events, null, 2));
+            hljs.highlightAll();
+          })
+          .catch((err) => {
+            console.error('TRACK ERROR:', err);
+            $('#loader').hide();
+            $('#error-alert').show();
+            $('#error-text').html(err.message);
+
+          });
+      })
+      .catch((err) => {
+        console.error('CREATE TRIP ERROR:', err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
+</script>
