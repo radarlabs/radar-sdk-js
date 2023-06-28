@@ -99,7 +99,7 @@
           destinationGeofenceExternalId: $('#dest-id').val(),
         };
 
-        Radar.startTrip(tripOptions).then((trip) => {
+        Radar.startTrip(tripOptions).then(({ trip }) => {
           Radar.trackOnce().then(({ location, user, events }) => {
             const map = Radar.ui.map({
               container: 'map',
@@ -140,23 +140,6 @@
             }
           });
         });
-
-        Radar.trackOnce({ userId: 'test-user-id' })
-          .then(({ location, user, events }) =&gt; {
-            const map = Radar.ui.map({
-              container: 'map',
-            });
-            map.setCenter([location.longitude, location.latitude]);
-
-            const html = `
-              &lt;p&gt;${user.userId}&lt;/p&gt;
-              &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
-            `.trim();
-
-            const marker = Radar.ui.marker({ html })
-              .setLngLat([location.longitude, location.latitude])
-              .addTo(map);
-          });
       });
     &lt;/script&gt;
   &lt;/body&gt;
