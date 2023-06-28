@@ -15,12 +15,12 @@ class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
 
-    let { latitude, longitude, accuracy } = params;
+    let { latitude, longitude, accuracy, desiredAccuracy } = params;
 
     // if latitude & longitude are not provided,
     // try and retrieve device location (will prompt for location permissions)
     if (!latitude || !longitude) {
-      const deviceLocation = await Navigator.getCurrentPosition();
+      const deviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy });
       latitude = deviceLocation.latitude;
       longitude = deviceLocation.longitude;
       accuracy = deviceLocation.accuracy;

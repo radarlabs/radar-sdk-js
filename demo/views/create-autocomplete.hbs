@@ -6,6 +6,10 @@
 
   <p>Create an autocomplete widget for searching an address.</p>
 
+  <div id="autocomplete-warning" class="callout gray">
+    Add publishable key to see autocomplete input
+  </div>
+
   <div>
     <div id="autocomplete" style="width: 800px;"></div>
   </div>
@@ -52,6 +56,7 @@
   let autocomplete;
   const init = (publishableKey) => {
     $('#error-alert').hide();
+    $('#autocomplete-warning').hide();
 
     Radar.initialize(publishableKey, { debug: true });
 

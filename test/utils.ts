@@ -10,16 +10,21 @@ export const nycOffice: NavigatorPosition = {
 
 // mock "approved" location permissions, and return the given position when
 // geolocation.getCurrentPosition is called
-export const enableLocation = (position: NavigatorPosition) => {
+export const enableLocation = (position: NavigatorPosition, callback?: any) => {
   const defaultFn = window.navigator.geolocation.getCurrentPosition;
 
   // stub out getCurrentPosition
-  window.navigator.geolocation.getCurrentPosition = ((success) => {
+  window.navigator.geolocation.getCurrentPosition = ((success, err, args) => {
     try {
       success({
         coords: position as GeolocationCoordinates,
         timestamp: Date.now(),
       });
+
+      // callback used for testing passed arguments
+      if (typeof callback === 'function') {
+        callback(args);
+      }
 
     } catch (err) {
       console.error(err);

@@ -5,6 +5,7 @@
   "type": "module",
   "module": "dist/radar.js",
   "types": "dist/index.d.ts",
+  "style": "dist/radar.css",
   "build": "rollup -c",
   "prepublish": "npm run build",
   "files": [

@@ -26,7 +26,7 @@ export interface RadarOptions {
   cacheLocationMinutes?: number;
   locationMaximumAge?: number;
   locationTimeout?: number;
-  enableHighAccuracy?: boolean;
+  desiredAccuracy?: 'high' | 'medium' | 'low';
   getRequestHeaders?: () => {};
   debug?: boolean;
 };
@@ -66,6 +66,7 @@ export interface RadarTrackParams {
   deviceType?: string;
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
+  desiredAccuracy?: 'high' | 'medium' | 'low';
 }
 
 export enum RadarEventConfidence {

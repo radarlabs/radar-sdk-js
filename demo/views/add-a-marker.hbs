@@ -12,7 +12,10 @@
           </div>
 
           <div>
-            <div id="map" style="width: 100%; height: 500px;"></div>
+            <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+            <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
+              <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+            </div>
           </div>
 
           <div>
@@ -53,6 +56,8 @@
           let map;
           const init = (publishableKey) => {
             $('#error-alert').hide();
+            $('#map-warning').hide();
+            $('#map').show();
 
             Radar.initialize(publishableKey, { debug: true });
 

@@ -38,7 +38,7 @@
             </li>
             <li class="mb-1">
               <button class="btn btn-toggle align-items-center rounded">
-                Maps APIs
+                Maps APIs <span class="badge bg-primary" style="font-size: 10px; top: 0; margin-left: 4px;">TODO</span>
               </button>
               <div class="collapse show" id="home-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
@@ -75,7 +75,7 @@
         <script>
           // highlight active link
           const currentPage = window.location.pathname;
-          const link = $(`a[href="${currentPage}"]`);
+          const link = $(`a[href=".${currentPage}"]`);
           if (link) {
             link.addClass('active');
           }

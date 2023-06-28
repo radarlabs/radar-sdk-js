@@ -5,6 +5,10 @@ import { RadarLocationError, RadarLocationPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
+interface PositionOptionOverrides {
+  desiredAccuracy?: string;
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
 const PERMISSION_ERROR_MESSAGES: any = {
   1: 'Permission denied.',
@@ -18,8 +22,13 @@ const DEFAULT_POSITION_OPTIONS: PositionOptions = {
   enableHighAccuracy: true,
 };
 
+// set "enableHighAccuracy" for navigator only when desiredAccuracy is "high"
+const useHighAccuracy = (desiredAccuracy?: string) => (
+  Boolean(desiredAccuracy === 'high')
+);
+
 class Navigator {
-  public static async getCurrentPosition(): Promise<NavigatorPosition> {
+  public static async getCurrentPosition(overrides: PositionOptionOverrides = {}): Promise<NavigatorPosition> {
     return new Promise((resolve, reject) => {
       const options = Config.get();
 
@@ -45,6 +54,7 @@ class Navigator {
         }
       }
 
+      // set options from config
       const positionOptions = Object.assign({}, DEFAULT_POSITION_OPTIONS);
       if (options.locationMaximumAge !== undefined) {
         positionOptions.maximumAge = options.locationMaximumAge;
@@ -52,8 +62,13 @@ class Navigator {
       if (options.locationTimeout !== undefined) {
         positionOptions.timeout = options.locationTimeout;
       }
-      if (options.enableHighAccuracy !== undefined) {
-        positionOptions.enableHighAccuracy = options.enableHighAccuracy;
+      if (options.desiredAccuracy !== undefined) {
+        positionOptions.enableHighAccuracy = useHighAccuracy(options.desiredAccuracy);
+      }
+
+      // set options from overrides
+      if (overrides.desiredAccuracy !== undefined) {
+        positionOptions.enableHighAccuracy = useHighAccuracy(overrides.desiredAccuracy);
       }
 
       Logger.info(`Using geolocation options: ${JSON.stringify(positionOptions)}`);

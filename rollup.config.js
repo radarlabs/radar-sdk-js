@@ -42,7 +42,7 @@ export default [
       commonjs(),
       json(),
       postcss({
-        extract: 'styles/radar.css',
+        extract: 'radar.css',
         minimize: true,
       }),
     ],
@@ -72,7 +72,7 @@ export default [
       json(),
       postcss({
         extract: 'radar.css',
-        minimize: false, // TODO: set to true before merging
+        minimize: true,
       }),
     ],
   }
