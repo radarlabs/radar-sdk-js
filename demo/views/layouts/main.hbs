@@ -126,7 +126,7 @@
           });
 
           // highlight active link
-          const currentPage = window.location.pathname.split('/')[1];
+          const currentPage = window.location.pathname.split('/').pop();
           const link = $(`a[href="./${currentPage}"]`);
           if (link) {
             link.addClass('active');
