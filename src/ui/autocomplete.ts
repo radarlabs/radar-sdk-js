@@ -312,21 +312,29 @@ class AutocompleteUI {
     const code = event.code !== undefined ? event.code : event.keyCode;
 
     switch (code) {
-      case 40: // Down arrow
+      // Next item
+      case 'Tab':
+      case 'ArrowDown':
+      case 40:
         event.preventDefault();
         this.goTo(this.highlightedIndex + 1);
         break;
-      case 38: // Up arrow
+
+      // Prev item
+      case 'ArrowUp':
+      case 38:
         event.preventDefault();
         this.goTo(this.highlightedIndex - 1);
         break;
-      case 13: // Enter
+
+      // Select
+      case 'Enter':
+      case 13:
         this.select(this.highlightedIndex);
         break;
-      case 9: // Tab
-        this.select(this.highlightedIndex);
-        break;
-        // Esc
+
+      // Close
+      case 'Esc':
       case 27:
         this.close();
         break;
@@ -335,6 +343,10 @@ class AutocompleteUI {
 
   public select(index: number) {
     const result = this.results[index];
+    if (!result) {
+      Logger.warn(`No autocomplete result found at index: ${index}`);
+      return;
+    }
 
     let inputValue;
     if (result.formattedAddress.includes(result.addressLabel)) {
