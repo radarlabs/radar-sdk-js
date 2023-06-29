@@ -25,38 +25,41 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   threshold: 3, // Minimum number of characters to trigger autocomplete
   limit: 8, // Maximum number of autocomplete results
   placeholder: 'Search address', // Placeholder text for the input field
+  responsive: true,
   disabled: false,
+  showMarkers: true,
 };
 
-// convert number or string units to px
-const defaultWidth = '400px';
-const getWidth = (width?: string | number): string => {
+const DEFAULT_WIDTH = 400;
+const formatWidth = (width: string | number) => {
   if (typeof width === 'number') {
     return `${width}px`;
   }
-  return width || defaultWidth;
+  return width;
 };
 
-// generate logo svg
-const getLogoIcon = (color: string = "#5A6872") => {
+const styleInput = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
+  // if responsive and width is provided, treat it as maxWidth
+  if (options.responsive) {
+    input.style.width = '100%';
+    if (options.width) {
+      input.style.maxWidth = formatWidth(options.width);
+    }
+    return;
+  }
+
+  // if not responsive, set fixed width
+  input.style.width = formatWidth(options.width || DEFAULT_WIDTH);
+};
+
+const getMarkerIcon = (color: string = "#ACBDC8") => {
   const fill = color.replace('#', '%23');
-  const svg = `<svg width="60" height="18" viewBox="0 0 60 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.0007 12.8407H20.0471V9.01782H20.7639L22.9293 12.8407H26.1549L23.6013 8.42048C24.7213 7.98741 25.5277 7.13621 25.5277 5.61301V5.55328C25.5277 3.29835 23.9746 2.16341 21.1821 2.16341H17.0007V12.8407ZM20.0471 7.03168V4.46315H21.0477C22.0333 4.46315 22.5709 4.80661 22.5709 5.67275V5.73248C22.5709 6.59861 22.0631 7.03168 21.0327 7.03168H20.0471Z" fill="${fill}"/>
-    <path d="M29.2966 13.0199C30.551 13.0199 31.2379 12.4973 31.6112 11.9298V12.8407H34.2097V7.77835C34.2097 5.70261 32.8358 4.82155 30.6854 4.82155C28.5499 4.82155 27.0715 5.74741 26.952 7.62901H29.4608C29.5206 7.13621 29.7894 6.70315 30.5211 6.70315C31.3723 6.70315 31.5515 7.19595 31.5515 7.94261V8.12181H30.8048C28.2064 8.12181 26.6534 8.83861 26.6534 10.6754C26.6534 12.333 27.8928 13.0199 29.2966 13.0199ZM30.2224 11.213C29.5952 11.213 29.2966 10.9293 29.2966 10.4813C29.2966 9.83915 29.7744 9.63008 30.8496 9.63008H31.5515V10.1079C31.5515 10.7799 30.984 11.213 30.2224 11.213Z" fill="${fill}"/>
-    <path d="M38.6318 13.0199C39.8115 13.0199 40.6777 12.3778 41.0659 11.5714V12.8407H43.739V1.59595H41.0659V6.13568C40.6179 5.34421 39.8862 4.82155 38.6616 4.82155C36.8099 4.82155 35.3464 6.24021 35.3464 8.89835V9.01782C35.3464 11.7207 36.8249 13.0199 38.6318 13.0199ZM39.5726 10.9741C38.6467 10.9741 38.0643 10.3021 38.0643 8.98795V8.86848C38.0643 7.50955 38.6019 6.83755 39.6024 6.83755C40.588 6.83755 41.1406 7.53941 41.1406 8.85355V8.97301C41.1406 10.3021 40.5432 10.9741 39.5726 10.9741Z" fill="${fill}"/>
-    <path d="M47.5112 13.0199C48.7656 13.0199 49.4525 12.4973 49.8258 11.9298V12.8407H52.4242V7.77835C52.4242 5.70261 51.0504 4.82155 48.9 4.82155C46.7645 4.82155 45.2861 5.74741 45.1666 7.62901H47.6754C47.7352 7.13621 48.004 6.70315 48.7357 6.70315C49.5869 6.70315 49.7661 7.19595 49.7661 7.94261V8.12181H49.0194C46.421 8.12181 44.868 8.83861 44.868 10.6754C44.868 12.333 46.1074 13.0199 47.5112 13.0199ZM48.437 11.213C47.8098 11.213 47.5112 10.9293 47.5112 10.4813C47.5112 9.83915 47.989 9.63008 49.0642 9.63008H49.7661V10.1079C49.7661 10.7799 49.1986 11.213 48.437 11.213Z" fill="${fill}"/>
-    <path d="M53.9493 12.8407H56.6224V9.13728C56.6224 7.88288 57.5184 7.37515 59.1461 7.41995V4.92608C57.9365 4.91115 57.1152 5.41888 56.6224 6.58368V5.03061H53.9493V12.8407Z" fill="${fill}"/>
-    <path d="M11.4074 14.5L5.7037 0.5L0 14.5L5.7037 12.1148L11.4074 14.5Z" fill="${fill}"/>
+  const svg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.5704 6.57036C12.5704 4.11632 10.6342 2.11257 8.21016 2C8.14262 2 8.06757 2 8.00003 2C7.93249 2 7.85744 2 7.7899 2C5.35838 2.11257 3.42967 4.11632 3.42967 6.57036C3.42967 6.60037 3.42967 6.6379 3.42967 6.66792C3.42967 6.69794 3.42967 6.73546 3.42967 6.76548C3.42967 9.46717 7.09196 13.3621 7.4672 13.7598C7.61729 13.9174 7.84994 14 8.00003 14C8.15012 14 8.38277 13.9174 8.53286 13.7598C8.9156 13.3621 12.5704 9.46717 12.5704 6.76548C12.5704 6.72795 12.5704 6.69794 12.5704 6.66792C12.5704 6.6379 12.5704 6.60037 12.5704 6.57036ZM7.99252 8.28893C7.04693 8.28893 6.27395 7.52345 6.27395 6.57036C6.27395 5.61726 7.03943 4.85178 7.99252 4.85178C8.94562 4.85178 9.7111 5.61726 9.7111 6.57036C9.7111 7.52345 8.94562 8.28893 7.99252 8.28893Z" fill="${fill}"/>
   </svg>`.trim();
   return `data:image/svg+xml;charset=utf-8,${svg}`;
 };
 
-const getSearchIcon = () => {
-  const svg = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.7807 10.7175L9.98844 8.925L9.44852 8.385C10.1084 7.5075 10.4984 6.4275 10.4984 5.25C10.4984 2.355 8.14373 0 5.24918 0C2.35463 0 0 2.355 0 5.25C0 8.145 2.35463 10.5 5.24918 10.5C6.4265 10.5 7.51383 10.1025 8.38369 9.45L9.64349 10.71L10.7158 11.7825C10.8583 11.9325 11.0533 12 11.2482 12C11.4432 12 11.6307 11.925 11.7807 11.7825C12.0731 11.49 12.0731 11.0175 11.7807 10.725V10.7175ZM1.49977 5.25C1.49977 3.18 3.1795 1.5 5.24918 1.5C7.31886 1.5 8.99859 3.18 8.99859 5.25C8.99859 7.32 7.31886 9 5.24918 9C3.1795 9 1.49977 7.32 1.49977 5.25Z" fill="%23ACBDC8"/>
-  </svg>`.trim();
-  return `data:image/svg+xml;charset=utf-8,${svg}`;
-};
 
 class AutocompleteUI {
   config: RadarAutocompleteConfig;
@@ -103,12 +106,11 @@ class AutocompleteUI {
     this.inputField.placeholder = this.config.placeholder;
     this.inputField.type = 'text';
     this.inputField.disabled = this.config.disabled;
-    this.inputField.style.width = getWidth(this.config.width);
+    styleInput(this.inputField, this.config);
 
     // search icon
-    const searchIcon = document.createElement('img');
+    const searchIcon = document.createElement('div');
     searchIcon.classList.add(CLASSNAMES.SEARCH_ICON);
-    searchIcon.src = getSearchIcon();
 
     // result list element
     this.resultsList = document.createElement('ul');
@@ -117,6 +119,7 @@ class AutocompleteUI {
     // create wrapper and input field on DOM
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add(CLASSNAMES.WRAPPER);
+    this.wrapper.style.display = this.config.responsive ? 'block' : 'inline-block';
     this.wrapper.appendChild(this.inputField);
     this.wrapper.appendChild(this.resultsList);
     this.wrapper.appendChild(searchIcon);
@@ -207,11 +210,16 @@ class AutocompleteUI {
     this.clearResultsList();
     this.results = results;
 
+    let marker: HTMLElement;
+    if (this.config.showMarkers) {
+      marker = document.createElement('img');
+      marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+    }
+
     // Create and append list items for each result
     results.forEach((result, index) => {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
-      li.setAttribute('data-result-index', `${index}`);
 
       // construct result with bolded label
       let listContent;
@@ -225,6 +233,11 @@ class AutocompleteUI {
         listContent = `<b>${label}</b> ${result.formattedAddress}`;
       }
       li.innerHTML = listContent;
+
+      // prepend marker if enabled
+      if (marker) {
+        li.prepend(marker.cloneNode());
+      }
 
       // add click handler to each result, use mousedown to fire before blur event
       li.addEventListener('mousedown', () => {
@@ -240,8 +253,8 @@ class AutocompleteUI {
       const poweredByText = document.createElement('span');
       poweredByText.textContent = 'Powered by';
 
-      const radarLogo = document.createElement('img');
-      radarLogo.src = getLogoIcon();
+      const radarLogo = document.createElement('span');
+      radarLogo.id = 'radar-powered-logo';
 
       const poweredByContainer = document.createElement('div');
       poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);

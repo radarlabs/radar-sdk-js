@@ -466,7 +466,10 @@ export interface RadarAutocompleteUIOptions {
   onError?: (error: any) => void,
   layers?: RadarGeocodeLayer[];
   disabled?: boolean,
+  responsive?: boolean;
   width?: string | number;
+  showMarkers?: boolean;
+  markerColor?: string;
 }
 
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
