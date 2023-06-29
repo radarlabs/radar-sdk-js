@@ -39,7 +39,7 @@ const formatWidth = (width: string | number) => {
   return width;
 };
 
-const styleInput = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
+const setWidth = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
   // if responsive and width is provided, treat it as maxWidth
   if (options.responsive) {
     input.style.width = '100%';
@@ -75,7 +75,6 @@ class AutocompleteUI {
   resultsList: HTMLElement;
   wrapper: HTMLElement;
 
-
   // create a new AutocompleteUI instance
   public static createAutocomplete(autocompleteOptions: RadarAutocompleteUIOptions): AutocompleteUI {
     return new AutocompleteUI(autocompleteOptions);
@@ -107,7 +106,6 @@ class AutocompleteUI {
     this.inputField.placeholder = this.config.placeholder;
     this.inputField.type = 'text';
     this.inputField.disabled = this.config.disabled;
-    styleInput(this.inputField, this.config);
 
     // search icon
     const searchIcon = document.createElement('div');
@@ -121,6 +119,8 @@ class AutocompleteUI {
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add(CLASSNAMES.WRAPPER);
     this.wrapper.style.display = this.config.responsive ? 'block' : 'inline-block';
+    setWidth(this.wrapper, this.config);
+
     this.wrapper.appendChild(this.inputField);
     this.wrapper.appendChild(this.resultsList);
     this.wrapper.appendChild(searchIcon);
