@@ -56,16 +56,21 @@ class MapUI {
 
     // create map
     const map = new maplibregl.Map(maplibreOptions);
-
-    // add zoom controls
-    const nav = new maplibregl.NavigationControl({ showCompass: false });
-    map.addControl(nav, 'bottom-right');
+    const container = map.getContainer();
 
     // add radar logo
     const img = document.createElement('img');
     img.id = 'radar-map-logo';
     img.src = RADAR_LOGO_URL;
     map.getContainer().appendChild(img);
+
+    // add zoom controls
+    const nav = new maplibregl.NavigationControl({ showCompass: false });
+    map.addControl(nav, 'bottom-right');
+
+    if (!container.style.width && !container.style.height) {
+      Logger.warn('map container does not have a set "width" or "height"');
+    }
 
     // TODO
     // add location button

@@ -23,7 +23,8 @@
 
 🔥 Try it! 🔥
 * <a href="https://radar.com/demo/js">Geofencing</a>
-* <a href="Https://radar.com/demo/api">Maps APIs</a>
+* <a href="https://radar.com/demo/api">Maps APIs</a>
+* <a href="[https://radarlabs.github.io/radar-sdk-js">Maps UI Kits</a>
 
 ## ✨ Features (TODO)
 * Feature 1
@@ -33,7 +34,7 @@
 
 ## 🚀 Installation and Usage
 
-### With npm:
+### With npm
 
 > **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
@@ -49,6 +50,7 @@ yarn add radar-sdk-js maplibre-gl-js@2.4.0
 Then import as an ES Module in your project
 ```js
 import Radar from 'radar-sdk-js';
+import 'radar-sdk-js/dist/radar.css'
 
 // initialize with your test or live publishable key
 Radar.initialize('prj_test_pk_...', { /* options */ });
@@ -60,7 +62,7 @@ Radar.initialize('prj_test_pk_...', { /* options */ });
 
 Add the following script in your `html` file
 ```html
-<script src="https://js.radar.com/v4.0.0-beta.1/radar.min.js"></script>
+<script src="https://js.radar.com/v4.0.0/radar.min.js"></script>
 ```
 
 Then initialize the Radar SDK
@@ -71,7 +73,85 @@ Then initialize the Radar SDK
 ```
 
 ## Quickstart
-TODO
+
+### Create a map
+To create a map, first initialize the Radar SDK with your publishable key. Then specify the HTML element where you want to render the map, by providing the element's ID, or the element object itself.
+```html
+<html>
+  <head>
+    <link href="https://js.radar.com/v4.0.0/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/v4.0.0/radar.min.js"></script>
+  </head>
+
+  <body>
+    <div id="map" style="width: 100%; height: 500px;" />
+
+    <script type="text/javascript">
+      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+
+      const map = Radar.ui.map({
+        container: 'map', // OR document.getElementById('map')
+      });
+    </script>
+  </body>
+</html>
+```
+> Remember to provide a `width` and `height` on the element the map is being rendered to
+
+### Create an autocomplete input
+To create an autocomplete input, first initialize the Radar SDK with your publishable key. Then specify the HTML element where you want to render the input.
+
+```html
+<html>
+  <head>
+    <link href="https://js.radar.com/v4.0.0/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/v4.0.0/radar.min.js"></script>
+  </head>
+
+  <body>
+    <div id="autocomplete"/>
+
+    <script type="text/javascript">
+      // initialize Radar SDK
+      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+
+
+      // create autocomplete widget
+      Radar.ui.autocomplete({
+        container: 'autocomplete', // OR document.getElementById('autocomplete')
+        responsive: true,
+        width: '600px',
+        onSelection: (result) => {
+          console.log(result);
+        },
+      });
+    </script>
+  </body>
+</html>
+```
+
+### Geofencing
+To power [geofencing](https://radar.com/documentation/geofencing/overview) experiences on the web, use the [Track API](https://radar.com/documentation/api#track) to grab the user's current location for geofence and event detection.
+
+```html
+<html>
+  <head>
+    <link href="https://js.radar.com/4.0.0-beta.17/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/4.0.0-beta.17/radar.min.js"></script>
+  </head>
+
+  <body>
+    <script>
+      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+
+      Radar.trackOnce({ userId: 'example-user-id' })
+        .then(({ location, user, events }) => {
+          // do something with user location or events
+        });
+    </script>
+  </body>
+</html>
+```
 
 See more examples and usage in the Radar web SDK documentation [here](https://radar.com/documentation/sdk/web).
 
