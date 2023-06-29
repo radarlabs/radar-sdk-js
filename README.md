@@ -26,11 +26,6 @@
 * <a href="https://radar.com/demo/api">Maps APIs</a>
 * <a href="https://radarlabs.github.io/radar-sdk-js/display-a-map">Maps UI Kits</a>
 
-## ✨ Features (TODO)
-* Feature 1
-* Feature 2
-* Typescript!
-* etc...
 
 ## 🚀 Installation and Usage
 
