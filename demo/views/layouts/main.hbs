@@ -75,20 +75,33 @@
         {{{ body }}}
 
         <script>
-          // highlight active link
-          const currentPage = window.location.pathname;
-          const link = $(`a[href=".${currentPage}"]`);
-          if (link) {
-            link.addClass('active');
-          }
-
           hljs.highlightAll();
 
+          // get publishableKey from query params or localstorage
+          const getKey = () => {
+            const url = new URL(location.href);
+            const queryKey = url.searchParams.get('publishableKey');
+            if (queryKey) {
+              return queryKey;
+            }
+            const storageKey = window.localStorage.getItem('radar-sdk-publishable-key');
+            if (storageKey) {
+              return storageKey;
+            }
+          };
+
+          const updateQueryParams = (pk) => {
+            const url = new URL(location.href);
+            url.searchParams.set('publishableKey', pk);
+            history.replaceState(null, '', url);
+          };
+
           // check if key is saved in localstorage
-          const pk = window.localStorage.getItem('radar-sdk-publishable-key');
+          const pk = getKey();
           if (pk) {
             $('#publishableKey').val(pk);
             $('#publishableKey').trigger('change'); // update any listeners for key changes
+            updateQueryParams(pk);
           } else {
             // show tooltip after 2s
             setTimeout(() => {
@@ -105,6 +118,13 @@
               window.localStorage.setItem('radar-sdk-publishable-key', publishableKey);
             }
           });
+
+          // highlight active link
+          const currentPage = window.location.pathname.split('/')[1];
+          const link = $(`a[href="./${currentPage}"]`);
+          if (link) {
+            link.addClass('active');
+          }
         </script>
       </div>
     </main>
