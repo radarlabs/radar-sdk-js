@@ -24,7 +24,7 @@
 🔥 Try it! 🔥
 * <a href="https://radar.com/demo/js">Geofencing</a>
 * <a href="https://radar.com/demo/api">Maps APIs</a>
-* <a href="https://radarlabs.github.io/radar-sdk-js">Maps UI Kits</a>
+* <a href="https://radarlabs.github.io/radar-sdk-js/display-a-map">Maps UI Kits</a>
 
 ## ✨ Features (TODO)
 * Feature 1
