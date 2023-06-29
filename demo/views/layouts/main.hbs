@@ -114,8 +114,14 @@
           // save publishable key changes in local storage
           $('#publishableKey').on('change', () => {
             const publishableKey = $('#publishableKey').val();
-            if (publishableKey) {
+            if (publishableKey) { // SET
               window.localStorage.setItem('radar-sdk-publishable-key', publishableKey);
+              updateQueryParams(publishableKey);
+            } else { // CLEAR
+              window.localStorage.removeItem('radar-sdk-publishable-key');
+              const url = new URL(location.href);
+              url.searchParams.delete('publishableKey');
+              history.replaceState(null, '', url);
             }
           });
 
