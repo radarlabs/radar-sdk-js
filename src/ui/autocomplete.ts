@@ -10,6 +10,7 @@ const CLASSNAMES = {
   SEARCH_ICON: 'radar-autocomplete-search-icon',
   RESULTS_LIST: 'radar-autocomplete-results-list',
   RESULTS_ITEM: 'radar-autocomplete-results-item',
+  RESULTS_MARKER: 'radar-autocomplete-results-marker',
   SELECTED_ITEM: 'radar-autocomplete-results-item-selected',
   POWERED_BY_RADAR: 'radar-powered',
   NO_RESULTS: 'radar-no-results',
@@ -214,6 +215,7 @@ class AutocompleteUI {
     let marker: HTMLElement;
     if (this.config.showMarkers) {
       marker = document.createElement('img');
+      marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
     }
 
