@@ -193,12 +193,13 @@ class AutocompleteUI {
   }
 
   public async fetchResults(query: string) {
-    const { limit, layers } = this.config;
+    const { limit, layers, countryCode } = this.config;
 
     const params: RadarAutocompleteParams = {
       query,
       limit,
       layers,
+      countryCode,
     }
 
     const { addresses } = await SearchAPI.autocomplete(params);
@@ -223,7 +224,7 @@ class AutocompleteUI {
 
       // construct result with bolded label
       let listContent;
-      if (result.formattedAddress.includes(result.addressLabel)) {
+      if (result.formattedAddress.includes(result.addressLabel) && result.layer !== 'postalCode') {
         // if addressLabel is contained in the formatted address, bold the address label
         const regex = new RegExp(`(${result.addressLabel}),?`);
         listContent = result.formattedAddress.replace(regex, '<b>$1</b>');

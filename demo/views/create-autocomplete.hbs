@@ -67,6 +67,7 @@
 
     autocomplete = Radar.ui.autocomplete({
       container: 'autocomplete',
+      countryCode: 'US',
       onSelection: (result) => {
         console.log(result);
         $('#result').html(JSON.stringify(result, null, 2));
