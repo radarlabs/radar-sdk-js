@@ -8,10 +8,18 @@ export const nycOffice: NavigatorPosition = {
   accuracy: 10,
 };
 
+
+const defaultPermissionFn = () => Promise.resolve({ state: 'prompt' } as PermissionStatus);
+(window as any).navigator.permissions = {
+  query: defaultPermissionFn,
+};
+
 // mock "approved" location permissions, and return the given position when
 // geolocation.getCurrentPosition is called
 export const enableLocation = (position: NavigatorPosition, callback?: any) => {
   const defaultFn = window.navigator.geolocation.getCurrentPosition;
+
+  window.navigator.permissions.query = () => Promise.resolve({ state: 'granted' } as PermissionStatus);
 
   // stub out getCurrentPosition
   window.navigator.geolocation.getCurrentPosition = ((success, err, args) => {
@@ -32,6 +40,7 @@ export const enableLocation = (position: NavigatorPosition, callback?: any) => {
     } finally {
       // restore previous function
       window.navigator.geolocation.getCurrentPosition = defaultFn;
+      window.navigator.permissions.query = defaultPermissionFn;
     }
   });
 }

@@ -3,6 +3,7 @@ import Device from '../device';
 import Http from '../http';
 import Logger from '../logger';
 import Session from '../session';
+import Navigator from '../navigator';
 
 import type { RadarTrackParams } from '../types';
 
@@ -18,11 +19,13 @@ class ConfigAPI {
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
+    const locationAuthorization = await Navigator.getPermissionStatus();
 
     const data = {
       deviceId,
       installId,
       sessionId,
+      locationAuthorization,
     };
 
     try {

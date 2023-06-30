@@ -9,6 +9,11 @@ const navigator = {
       error({ code: 1, message: 'User denied Geolocation' }); // default to permission denied
     },
   },
+  permissions: {
+    query: () => Promise.resolve({
+      state: 'prompt',
+    }),
+  },
 };
 
 Object.defineProperty(window, 'navigator', {
