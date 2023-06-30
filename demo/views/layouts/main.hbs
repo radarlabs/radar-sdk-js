@@ -96,12 +96,13 @@
             history.replaceState(null, '', url);
           };
 
-          // check if key is saved in localstorage
+          // check if key is saved in localstorage or in query params
           const pk = getKey();
           if (pk) {
             $('#publishableKey').val(pk);
             $('#publishableKey').trigger('change'); // update any listeners for key changes
             updateQueryParams(pk);
+            window.localStorage.setItem('radar-sdk-publishable-key', pk);
           } else {
             // show tooltip after 2s
             setTimeout(() => {
