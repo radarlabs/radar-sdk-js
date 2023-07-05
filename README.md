@@ -152,8 +152,8 @@ See more examples and usage in the Radar web SDK documentation [here](https://ra
 
 
 ## 🔗 Other links
-* [Contributing](#)
-* [Migrating from 3.x to 4.x](#)
+* [Contributing](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/CONTRIBUTING.md)
+* [Migrating from 3.x to 4.x](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/MIGRATION.md)
 
 ## 📫 Support
 
