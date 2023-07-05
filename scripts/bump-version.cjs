@@ -6,6 +6,7 @@ const srcfile = fs.readFileSync('./src/version.ts').toString();
 const current = package.version;
 let version = process.argv[2];
 
+
 // if version not provided, just bump the smallest increment
 if (!version) {
   const parts = current.split('.');
@@ -16,6 +17,11 @@ if (!version) {
   parts[parts.length - 1] = minor + 1; // bump version
   version = parts.join('.');
   console.log('No version provided, incrementing minor version to:', version);
+}
+
+// strip leading "v" in package version
+if (version.startsWith('v')) {
+  version = version.slice(1);
 }
 
 // update src/version.ts
