@@ -78,8 +78,14 @@ npm run bump-version 4.0.1-beta.1
 ```
 
 Beta versions should also be set as a `pre-release`
-[screenshot here]
+![image](https://github.com/radarlabs/radar-sdk-js/assets/814934/3503871c-02f9-47bd-9b62-01cfccf34e42)
+
+
+
+
+
 
 ### Production release
 Production releases should not have a `-beta` suffix, and be set as the `latest` release.
-[screenshot here]
+<img width="1245" alt="Screenshot 2023-07-05 at 12 31 07 PM" src="https://github.com/radarlabs/radar-sdk-js/assets/814934/de2b5f80-84e1-497b-b8f5-c74c92254f8d">
+
