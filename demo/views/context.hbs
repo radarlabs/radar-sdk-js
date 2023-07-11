@@ -1,0 +1,112 @@
+<div class="content flex-grow-1 p-4">
+    <h1 class="mb-4">Get context</h1>
+    <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+        <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for
+            details.</span>
+    </div>
+
+    <p>Get context for a location.</p>
+    <div class="mb-3 form-row">
+        <label for="latitude" class="col-form-label" style="width: 128px;">Latitude</label>
+        <div>
+            <input type="number" step="0.001" class="form-control" id="latitude" style="width: 250px;">
+        </div>
+    </div>
+    <div class="mb-3 form-row">
+        <label for="longitude" step="0.001" class="col-form-label" style="width: 128px;">Longitude</label>
+        <div>
+            <input type="number" class="form-control" id="longitude" style="width: 250px;">
+        </div>
+    </div>
+    <div class="mb-3 form-row">
+        <label for="accuracy" step="0.001" class="col-form-label" style="width: 128px;">Accuracy</label>
+        <div>
+            <input type="number" class="form-control" id="accuracy" style="width: 250px;">
+        </div>
+    </div>
+
+    <div>
+        <button id="get-context" type="button" class="btn btn-primary" disabled>Get Context</button>
+    </div>
+
+    <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+    </div>
+
+    <div>
+        <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
+    </div>
+
+    <div id="response-details" style="display: none;">
+        <h6 class="mt-4">Response</h6>
+        <div class="mt-2">
+            <pre><code id="response" class="code-sample language-json"></code><pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script&gt;
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+    
+    const location = { latitude: $('#latitude').val(), longitude: $('#longitude').val(), accuracy: $('#accuracy').val() }
+    Radar.getContext(location).then((response) => {
+        console.log('CONTEXT RESPONSE', { response });
+        $('#loader').hide();
+        
+        $('#response-details').show();
+        $('#response').html(JSON.stringify(response, null, 2));
+        hljs.highlightAll();
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+        </div>
+    </div>
+    <script>
+        $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+                $('#get-context').prop('disabled', false);
+            }
+        });
+
+        let map;
+        $('#get-context').click(() => {
+            $('#error-alert').hide();
+            $('#response-details').hide();
+
+            const publishableKey = $('#publishableKey').val();
+            Radar.initialize(publishableKey, { debug: true });
+
+            $('#loader').show();
+
+            const location = { latitude: $('#latitude').val(), longitude: $('#longitude').val(), accuracy: $('#accuracy').val() }
+            Radar.getContext(location).then((response) => {
+                console.log('CONTEXT RESPONSE', { response });
+                $('#loader').hide();
+
+                $('#response-details').show();
+                $('#response').html(JSON.stringify(response, null, 2));
+                hljs.highlightAll();
+            }).catch((err) => {
+                console.error('CONTEXT ERROR:', err);
+                $('#loader').hide();
+                $('#error-alert').show();
+                $('#error-text').html(err.message);
+            });
+        });
+    </script>
