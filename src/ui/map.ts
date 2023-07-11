@@ -60,9 +60,15 @@ class MapUI {
 
     // add radar logo
     const img = document.createElement('img');
-    img.id = 'radar-map-logo';
     img.src = RADAR_LOGO_URL;
-    map.getContainer().appendChild(img);
+
+    const link = document.createElement('a');
+    link.id = 'radar-map-logo';
+    link.href = 'https://radar.com?ref=powered_by_radar';
+    link.target = '_blank';
+    link.appendChild(img)
+    map.getContainer().appendChild(link);
+
 
     // add zoom controls
     const nav = new maplibregl.NavigationControl({ showCompass: false });

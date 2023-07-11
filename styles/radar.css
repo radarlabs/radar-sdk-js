@@ -17,6 +17,11 @@
   height: 38px;
 }
 
+#radar-map-logo img {
+  width: 80px;
+  height: 38px;
+}
+
 .maplibregl-marker:hover {
   cursor: pointer;
 }
@@ -185,7 +190,16 @@
   line-height: 10px;
 }
 
-.radar-powered > #radar-powered-logo {
+.radar-powered a {
+  text-decoration: none;
+  color: var(--radar-gray6);
+}
+
+.radar-powered a:visited {
+  color: var(--radar-gray6);
+}
+
+.radar-powered #radar-powered-logo {
   display: inline-block;
   margin-left: 4px;
   width: 40px;

@@ -253,17 +253,21 @@ class AutocompleteUI {
     this.open();
 
     if (results.length > 0) {
+      const link = document.createElement('a');
+      link.href = 'https://radar.com?ref=powered_by_radar';
+      link.target = '_blank';
+
       const poweredByText = document.createElement('span');
       poweredByText.textContent = 'Powered by';
+      link.appendChild(poweredByText);
 
       const radarLogo = document.createElement('span');
       radarLogo.id = 'radar-powered-logo';
+      link.appendChild(radarLogo);
 
       const poweredByContainer = document.createElement('div');
       poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
-      poweredByContainer.appendChild(poweredByText);
-      poweredByContainer.appendChild(radarLogo);
-
+      poweredByContainer.appendChild(link);
       this.resultsList.appendChild(poweredByContainer);
     } else {
       const noResultsText = document.createElement('div');
