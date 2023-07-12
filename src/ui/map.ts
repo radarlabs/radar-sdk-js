@@ -70,6 +70,11 @@ class MapUI {
     link.id = 'radar-map-logo';
     link.href = 'https://radar.com?ref=powered_by_radar';
     link.target = '_blank';
+    link.style.position = 'absolute';
+    link.style.bottom = '0';
+    link.style.left = '5px';
+    link.style.width = '80px';
+    link.style.height = '38px';
     link.appendChild(img)
     map.getContainer().appendChild(link);
 
