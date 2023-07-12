@@ -26,6 +26,14 @@ const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) =>
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
+// use formatted style URL if using one of Radar's out-of-the-box styles
+const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
+  if (!mapOptions.style || mapOptions.style === DEFAULT_STYLE) {
+    return createStyleURL(options, mapOptions.style);
+  }
+  return mapOptions.style;
+};
+
 class MapUI {
   public static getMapLibre() {
     return maplibregl;
@@ -34,20 +42,16 @@ class MapUI {
   public static createMap(mapOptions: RadarMapOptions): maplibregl.Map {
     const options = Config.get();
 
-    const style = mapOptions.style || DEFAULT_STYLE;
-    const radarStyleURL = createStyleURL(options, style);
-
     if (!options.publishableKey) {
       Logger.warn('publishableKey not set. Call Radar.initialize() with key before creating a new map.');
     }
 
     // configure maplibre options
+    const style = getStyle(options, mapOptions);
     const maplibreOptions: maplibregl.MapOptions = Object.assign({},
       defaultMaplibreOptions,
-      {
-        style: radarStyleURL,
-        container: mapOptions.container,
-      },
+      { style },
+      mapOptions,
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
@@ -68,7 +72,6 @@ class MapUI {
     link.target = '_blank';
     link.appendChild(img)
     map.getContainer().appendChild(link);
-
 
     // add zoom controls
     const nav = new maplibregl.NavigationControl({ showCompass: false });
