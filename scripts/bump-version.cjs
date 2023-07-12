@@ -35,4 +35,9 @@ fs.writeFileSync('./package.json', JSON.stringify(package, null, 2) + '\n');
 lockfile.version = version;
 fs.writeFileSync('./package-lock.json', JSON.stringify(lockfile, null, 2) + '\n');
 
+// update versions in readme
+const reg = new RegExp(`v${current}`, 'g');
+const readme = fs.readFileSync('./README.md').toString();
+fs.writeFileSync('./README.md', readme.replace(reg, `v${version}`));
+
 console.log('Updated to', version);

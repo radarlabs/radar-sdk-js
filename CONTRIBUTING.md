@@ -57,6 +57,8 @@ npm run bump-version
 ```
 This will increment the minor version in the necessary places throughout the codebase. This is required before cutting a new release otherwise tests will fail.
 
+This script will also update the version used in documentation throughout the repository.
+
 ### Releases
 _This only applies to authorized contributors_
 
