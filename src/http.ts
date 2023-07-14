@@ -1,5 +1,6 @@
 import SDK_VERSION from './version';
 import Config from './config';
+import Logger from './logger';
 
 import {
   RadarBadRequestError,
@@ -94,6 +95,11 @@ class Http {
 
         if (xhr.status == 200) {
           return resolve(response);
+        }
+
+        if (options.debug) {
+          Logger.debug(`API call failed: ${url}`);
+          console.error(response);
         }
 
         if (xhr.status === 400) {

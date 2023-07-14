@@ -10,6 +10,12 @@ const LOG_LEVELS = {
 
 // get the numeric level for logLevel option
 const getLevel = (): number => {
+
+  // disable logging in tests
+  if (window && (window as any).RADAR_TEST_ENV) {
+    return LOG_LEVELS.none;
+  }
+
   const { logLevel, debug } = Config.get();
   if (debug) {
     return LOG_LEVELS.debug;
@@ -17,7 +23,7 @@ const getLevel = (): number => {
   if (logLevel) {
     return LOG_LEVELS[logLevel];
   }
-  return 1; // default to error-level logging if not set
+  return LOG_LEVELS.error; // default to error-level logging if not set
 }
 
 class Logger {

@@ -54,7 +54,7 @@ describe('Track', () => {
         } catch (err: any) {
           expect(err.name).toEqual('RadarLocationPermissionsError');
           expect(err.message).toEqual('Permission denied.');
-          expect(err.status).toEqual('ERROR_LOCATION');
+          expect(err.status).toEqual('ERROR_PERMISSIONS');
         }
       });
     });

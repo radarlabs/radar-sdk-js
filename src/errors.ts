@@ -27,7 +27,7 @@ export class RadarLocationPermissionsError extends RadarError {
   constructor(message: string) {
     super(message);
     this.name = 'RadarLocationPermissionsError';
-    this.status = 'ERROR_LOCATION';
+    this.status = 'ERROR_PERMISSIONS';
   }
 }
 
