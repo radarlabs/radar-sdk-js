@@ -55,6 +55,8 @@ export const mockRequest = (status: number, response: any) => {
 
   MockXhr.onSend = (request: MockXhrRequest) => {
     // default handler for config calls
+    MockXhr.request = request;
+    
     if (request.url.includes('/v1/config')) {
       request.respond(200, responseHeaders, JSON.stringify({}));
       return;
@@ -66,4 +68,35 @@ export const mockRequest = (status: number, response: any) => {
     // reset default XHR
     MockXhr.onSend = prevHandler;
   };
+}
+
+export const getRequest = () => {
+  return MockXhr.request;
+}
+
+export const mockNetworkError = () => {
+  const prevHandler = MockXhr.onSend;
+
+  MockXhr.onSend = (request: MockXhrRequest) => {
+    request.setResponseHeaders(200, responseHeaders);
+    request.setNetworkError();
+
+    // reset default XHR
+    MockXhr.onSend = prevHandler;
+  }
+}
+
+// TODO(jasonl): Figure out how to mock network timeout errors
+export const mockTimeoutError = () => {
+  const prevHandler = MockXhr.onSend;
+
+
+  MockXhr.onSend = (request: MockXhrRequest, xhr: any) => {
+    request.setResponseHeaders(200, responseHeaders);
+    request.setResponseBody();
+    request.setRequestTimeout();
+
+    // reset default XHR
+    MockXhr.onSend = prevHandler;
+  }
 }

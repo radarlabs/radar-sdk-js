@@ -2,6 +2,7 @@ import SDK_VERSION from './version';
 import Config from './config';
 
 import {
+  RadarBadRequestError,
   RadarForbiddenError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
@@ -13,7 +14,7 @@ import {
   RadarUnknownError,
 } from './errors';
 
-type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
+export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
 interface HttpResponse {
   code: number;
@@ -96,7 +97,7 @@ class Http {
         }
 
         if (xhr.status === 400) {
-          reject(new RadarServerError(response));
+          reject(new RadarBadRequestError(response));
 
         } else if (xhr.status === 401) {
           reject(new RadarUnauthorizedError(response));
