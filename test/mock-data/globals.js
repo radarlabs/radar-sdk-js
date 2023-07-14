@@ -26,6 +26,11 @@ Object.defineProperty(URL, 'createObjectURL', {
   value: jest.fn()
 });
 
+Object.defineProperty(window, 'RADAR_TEST_ENV', {
+  writable: true,
+  value: true,
+});
+
 // mock HTTP server
 const MockXhr = newMockXhr();
 window.XMLHttpRequest = MockXhr;

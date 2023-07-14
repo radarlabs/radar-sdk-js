@@ -73,19 +73,24 @@ class Radar {
 
     // store settings in global config
     const live = isLiveKey(publishableKey);
-    const logLevel = live ? 'error' : 'warn';
+    const logLevel = live ? 'error' : 'info';
+    const debug = !live;
     const radarOptions = Object.assign(
       Config.defaultOptions,
       {
         publishableKey,
         live,
         logLevel,
+        debug,
       },
       options,
     );
     Config.setup(radarOptions);
 
     Logger.info(`initialized with ${live ? 'live' : 'test'} publishableKey.`);
+    if (options.debug) {
+      Logger.info(`using options: ${JSON.stringify(options)}`);
+    }
 
     ConfigAPI.getConfig();
   }
