@@ -5,7 +5,6 @@ import Config from '../../src/config';
 import Addresses from '../../src/api/addresses';
 
 import { mockRequest } from '../utils';
-import { RadarOptions } from '../../src/types';
 
 describe('Addresses', () => {
   const countryCode = 'US';
@@ -23,11 +22,9 @@ describe('Addresses', () => {
 
   const httpRequest = { method: 'GET', path: 'addresses/validate' };
 
-  let options: RadarOptions = {};
-
   beforeAll(() => {
     Radar.initialize('prj_test_pk_123');
-    options = Config.get();
+    const options = Config.get();
     validateResponse = options.debug ? debugValidateResponse : baseValidateResponse;
   });
 
