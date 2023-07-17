@@ -227,7 +227,6 @@ describe('Http', () => {
 
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
       const request: MockXhrRequest = getRequest();
-      console.log(request.requestHeaders);
 
       expect(response.code).toEqual(200);
       expect(request.requestHeaders.getHeader('X-Radar-Device-Type')).toEqual('Web');

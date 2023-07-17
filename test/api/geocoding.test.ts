@@ -67,7 +67,7 @@ describe('Geocoding', () => {
 
         const response = await Geocoding.reverseGeocode({});
         const validateResponse = getResponseWithDebug(options.debug, reverseGeocodeResponse, baseValidateResponse);
-        // console.log(response, baseValidateResponse)
+
         expect(response).toEqual(validateResponse);
       });
     });
