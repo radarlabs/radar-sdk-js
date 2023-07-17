@@ -104,10 +104,11 @@ export const mockTimeoutError = () => {
 /**
  * Appends a `response` property to the given response object if `isDebug` is true.
  */
-export const getResponseWithDebug = (isDebug: boolean | undefined, response: any, baseResponse: any) => {
-  const res = { ...response };
+export const getResponseWithDebug = (isDebug: boolean | undefined, httpResponse: any, baseResponse: any) => {
+  const res = { ...httpResponse };
+  delete res.meta;
   if (isDebug) {
-    res.response = baseResponse;
+    res.response = { ...baseResponse };
   }
   return res;
 }
