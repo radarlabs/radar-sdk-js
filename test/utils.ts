@@ -100,3 +100,14 @@ export const mockTimeoutError = () => {
     MockXhr.onSend = prevHandler;
   }
 }
+
+/**
+ * Appends a `response` property to the given response object if `isDebug` is true.
+ */
+export const getResponseWithDebug = (isDebug: boolean | undefined, response: any, baseResponse: any) => {
+  const res = { ...response };
+  if (isDebug) {
+    res.response = baseResponse;
+  }
+  return res;
+}

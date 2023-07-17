@@ -4,7 +4,8 @@ import Config from '../../src/config';
 
 import Addresses from '../../src/api/addresses';
 
-import { mockRequest } from '../utils';
+import { getResponseWithDebug, mockRequest } from '../utils';
+import { RadarOptions } from '../../src/types';
 
 describe('Addresses', () => {
   const countryCode = 'US';
@@ -17,15 +18,14 @@ describe('Addresses', () => {
   const addressLabel = '841 Broadway Unit 7';
 
   const baseValidateResponse: { [key: string]: any } = { address: {}, result: {} };
-  const debugValidateResponse: { [key: string]: any } = { address: {}, result: {}, response: baseValidateResponse };
-  let validateResponse = baseValidateResponse;
+
+  let radarOptions: RadarOptions = {};
 
   const httpRequest = { method: 'GET', path: 'addresses/validate' };
 
   beforeAll(() => {
     Radar.initialize('prj_test_pk_123');
-    const options = Config.get();
-    validateResponse = options.debug ? debugValidateResponse : baseValidateResponse;
+    radarOptions = Config.get();
   });
 
   afterAll(() => {
@@ -43,6 +43,8 @@ describe('Addresses', () => {
         mockRequest(200, baseValidateResponse)
 
         const response = await Addresses.validateAddress({ number, street } as any);
+
+        const validateResponse = getResponseWithDebug(radarOptions.debug, baseValidateResponse, baseValidateResponse);
 
         expect(httpSpy).toHaveBeenCalledWith({ ...httpRequest, data: { countryCode: undefined, stateCode: undefined, city: undefined, number: '841', postalCode: undefined, street: 'Broadway', unit: undefined, addressLabel: undefined } });
         expect(response).toEqual(validateResponse);
@@ -67,6 +69,8 @@ describe('Addresses', () => {
 
         const response = await Addresses.validateAddress(options);
 
+        const validateResponse = getResponseWithDebug(radarOptions.debug, baseValidateResponse, baseValidateResponse);
+
         expect(httpSpy).toHaveBeenCalledWith({ ...httpRequest, data: { countryCode: 'US', stateCode: 'NY', city: 'New York', postalCode: '10010', number: '841', street: 'Broadway', unit: '7', addressLabel: undefined } });
         expect(response).toEqual(validateResponse);
       }, 10000);
@@ -87,7 +91,10 @@ describe('Addresses', () => {
         addressLabel,
       }
 
-      const response = await Addresses.validateAddress(options)
+      const response = await Addresses.validateAddress(options);
+
+      const validateResponse = getResponseWithDebug(radarOptions.debug, baseValidateResponse, baseValidateResponse);
+
       expect(httpSpy).toHaveBeenCalledWith({ ...httpRequest, data: { countryCode: 'US', stateCode: 'NY', city: 'New York', postalCode: '10010', addressLabel: '841 Broadway Unit 7', number: undefined, street: undefined, unit: undefined } });
       expect(response).toEqual(validateResponse);
     });

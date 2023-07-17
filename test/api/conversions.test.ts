@@ -1,12 +1,13 @@
 import Radar from '../../src';
 import Conversions from '../../src/api/conversions';
 import Config from '../../src/config';
-import { mockRequest } from '../utils';
+import { RadarOptions } from '../../src/types';
+import { getResponseWithDebug, mockRequest } from '../utils';
 
 describe('Events', () => {
-  const eventResponse = { event: {} };
-  const debugEventResponse = { event: {}, response: eventResponse };
-  let validateEventResponse = eventResponse;
+  const baseEventResponse = { event: {} };
+
+  let options: RadarOptions = {};
 
   const name = 'opened_app';
   const metadata = { 'source': 'organic' };
@@ -17,8 +18,7 @@ describe('Events', () => {
 
   beforeAll(() => {
     Radar.initialize('prj_test_pk_123');
-    const options = Config.get();
-    validateEventResponse = options.debug ? debugEventResponse : eventResponse;
+    options = Config.get();
   });
 
   afterAll(() => {
@@ -27,17 +27,20 @@ describe('Events', () => {
 
   describe('events', () => {
     it('should return an event', async () => {
-      mockRequest(200, eventResponse);
+      mockRequest(200, baseEventResponse);
 
-      const response = await Conversions.logConversion(conversionEventData)
-      expect(response).toEqual(validateEventResponse);
+      const response = await Conversions.logConversion(conversionEventData);
+
+      const validateResponse = getResponseWithDebug(options.debug, response, baseEventResponse);
+      expect(response).toEqual(validateResponse);
     });
 
     it('should return a revenue event', async () => {
-      mockRequest(200, eventResponse);
+      mockRequest(200, baseEventResponse);
 
       const response = await Conversions.logConversion(revenueConversionEventData)
-      expect(response).toEqual(validateEventResponse);
+      const validateResponse = getResponseWithDebug(options.debug, response, baseEventResponse);
+      expect(response).toEqual(validateResponse);
     });
   });
 });
