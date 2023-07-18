@@ -9,13 +9,13 @@ describe('Device', () => {
   describe('getId', () => {
     describe('deviceId has not been set', () => {
       it('should generate a new deviceId in storage, and return the value', () => {
-        const setSpy = jest.spyOn(Storage, 'setItem');
-        const getSpy = jest.spyOn(Storage, 'getItem');
+        jest.spyOn(Storage, 'setItem');
+        jest.spyOn(Storage, 'getItem');
 
-        const deviceId = Device.getDeviceId();
+        Device.getDeviceId();
 
-        expect(setSpy).toHaveBeenCalled();
-        expect(getSpy).toHaveBeenCalledWith(Storage.DEVICE_ID);
+        expect(Storage.setItem).toHaveBeenCalled();
+        expect(Storage.getItem).toHaveBeenCalledWith(Storage.DEVICE_ID);
       });
     });
 

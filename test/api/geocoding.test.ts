@@ -16,16 +16,13 @@ describe('Geocoding', () => {
   const baseValidateResponse = { address: {} };
   let options: RadarOptions = {};
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
   });
 
-  afterAll(() => {
-    Radar.clear();
-  });
-
   afterEach(() => {
+    Radar.clear();
     jest.restoreAllMocks();
   });
 

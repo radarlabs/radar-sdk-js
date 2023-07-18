@@ -40,16 +40,13 @@ describe('Routing', () => {
 
   let options: RadarOptions = {};
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
   });
-
-  afterAll(() => {
-    Radar.clear();
-  });
-
+  
   afterEach(() => {
+    Radar.clear();
     jest.restoreAllMocks();
   });
 
@@ -63,7 +60,7 @@ describe('Routing', () => {
           const response = await Routing.distance({ destination, modes })
         } catch (err: any) {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
-          expect(Http.request).toBeCalledTimes(0);
+          expect(Http.request).toHaveBeenCalledTimes(0);
         }
       });
     });
@@ -104,7 +101,7 @@ describe('Routing', () => {
           const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode })
         } catch (err: any) {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
-          expect(Http.request).toBeCalledTimes(0);
+          expect(Http.request).toHaveBeenCalledTimes(0);
         }
       });
     });

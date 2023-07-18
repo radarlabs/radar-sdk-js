@@ -27,16 +27,13 @@ describe('Search', () => {
 
   let options: RadarOptions = {};
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
   });
 
-  afterAll(() => {
-    Radar.clear();
-  });
-
   afterEach(() => {
+    Radar.clear();
     jest.restoreAllMocks();
   });
 
@@ -50,7 +47,7 @@ describe('Search', () => {
           await Search.searchPlaces({});
         } catch (err: any) {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
-          expect(Http.request).toBeCalledTimes(0);
+          expect(Http.request).toHaveBeenCalledTimes(0);
         }
       });
     });
@@ -89,7 +86,7 @@ describe('Search', () => {
           await Search.searchGeofences({});
         } catch (err: any) {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
-          expect(Http.request).toBeCalledTimes(0);
+          expect(Http.request).toHaveBeenCalledTimes(0);
         }
       });
     });

@@ -9,10 +9,10 @@ describe('Session', () => {
   describe('session does not exist', () => {
     it('should create a return the new session id', () => {
       jest.spyOn(Storage, 'getItem').mockReturnValue(null);
-      const setSpy = jest.spyOn(Storage, 'setItem');
+      jest.spyOn(Storage, 'setItem');
 
       const sessionId = Session.getSessionId();
-      expect(setSpy).toHaveBeenCalledWith(Storage.SESSION_ID, sessionId);
+      expect(Storage.setItem).toHaveBeenCalledWith(Storage.SESSION_ID, sessionId);
     });
   });
 
@@ -21,10 +21,10 @@ describe('Session', () => {
       it('should not create a new session', () => {
         const validSessionTS = (Date.now() / 1000);
         jest.spyOn(Storage, 'getItem').mockReturnValue(validSessionTS.toString());
-        const setSpy = jest.spyOn(Storage, 'setItem');
+        jest.spyOn(Storage, 'setItem');
 
         const sessionId = Session.getSessionId();
-        expect(setSpy).not.toHaveBeenCalled();
+        expect(Storage.setItem).not.toHaveBeenCalled();
         expect(sessionId).toEqual(validSessionTS.toString());
       });
     });
@@ -33,10 +33,10 @@ describe('Session', () => {
       it('should create a new session', () => {
         const expiredSessionTS = ((Date.now() / 1000) - 600); // 10 mins old
         jest.spyOn(Storage, 'getItem').mockReturnValue(expiredSessionTS.toString());
-        const setSpy = jest.spyOn(Storage, 'setItem');
+        jest.spyOn(Storage, 'setItem');
 
         const sessionId = Session.getSessionId();
-        expect(setSpy).toHaveBeenCalledWith(Storage.SESSION_ID, sessionId);
+        expect(Storage.setItem).toHaveBeenCalledWith(Storage.SESSION_ID, sessionId);
       });
     });
   });

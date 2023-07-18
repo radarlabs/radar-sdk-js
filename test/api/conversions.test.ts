@@ -16,12 +16,12 @@ describe('Events', () => {
   const revenue = 10;
   const revenueConversionEventData = { name, metadata, revenue };
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
   });
 
-  afterAll(() => {
+  afterEach(() => {
     Radar.clear();
   });
 
