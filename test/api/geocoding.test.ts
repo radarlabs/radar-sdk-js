@@ -16,14 +16,20 @@ describe('Geocoding', () => {
   const baseValidateResponse = { address: {} };
   let options: RadarOptions = {};
 
+  let httpSpy: jest.SpyInstance;
+  let navigatorSpy: jest.SpyInstance;
+
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
+    httpSpy = jest.spyOn(Http, 'request');
+    navigatorSpy = jest.spyOn(Navigator, 'getCurrentPosition');
   });
 
   afterEach(() => {
     Radar.clear();
-    jest.restoreAllMocks();
+    httpSpy.mockRestore();
+    navigatorSpy.mockRestore();
   });
 
   describe('forward geocode', () => {
@@ -45,8 +51,7 @@ describe('Geocoding', () => {
 
     describe('location permissions denied', () => {
       it('should propagate the navigator error', async () => {
-        jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
-        jest.spyOn(Http, 'request');
+        navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
 
         try {
           await Geocoding.reverseGeocode({});
@@ -59,7 +64,7 @@ describe('Geocoding', () => {
 
     describe('location permissions approved', () => {
       it('should return a geocode response', async () => {
-        jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue({ latitude, longitude, accuracy: 100 });
+        navigatorSpy.mockResolvedValue({ latitude, longitude, accuracy: 100 });
         mockRequest(200, baseValidateResponse);
 
         const response = await Geocoding.reverseGeocode({});

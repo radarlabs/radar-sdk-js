@@ -23,15 +23,17 @@ describe('Addresses', () => {
 
   const httpRequest = { method: 'GET', path: 'addresses/validate' };
 
+  let httpSpy: jest.SpyInstance;
+
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
-    jest.spyOn(Http, 'request');
+    httpSpy = jest.spyOn(Http, 'request');
     radarOptions = Config.get();
   });
 
   afterEach(() => {
     Radar.clear();
-    jest.restoreAllMocks();
+    httpSpy.mockRestore();
   });
 
   describe('validateAddress', () => {

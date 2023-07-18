@@ -2,16 +2,22 @@ import Storage from '../src/storage';
 import Device from '../src/device';
 
 describe('Device', () => {
+  let setItemSpy: jest.SpyInstance;
+  let getItemSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    setItemSpy = jest.spyOn(Storage, 'setItem');
+    getItemSpy = jest.spyOn(Storage, 'getItem');
+  });
+
   afterEach(() => {
-    jest.restoreAllMocks();
+    setItemSpy.mockRestore();
+    getItemSpy.mockRestore();
   });
 
   describe('getId', () => {
     describe('deviceId has not been set', () => {
       it('should generate a new deviceId in storage, and return the value', () => {
-        jest.spyOn(Storage, 'setItem');
-        jest.spyOn(Storage, 'getItem');
-
         Device.getDeviceId();
 
         expect(Storage.setItem).toHaveBeenCalled();
@@ -23,7 +29,7 @@ describe('Device', () => {
       const deviceId = "abc-123";
       
       it('should return the deviceId stored saved in the storage', () => {
-        jest.spyOn(Storage, 'getItem').mockReturnValue(deviceId);
+        getItemSpy.mockReturnValue(deviceId);
         expect(Device.getDeviceId()).toEqual(deviceId);
       });
     });

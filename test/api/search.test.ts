@@ -27,21 +27,26 @@ describe('Search', () => {
 
   let options: RadarOptions = {};
 
+  let httpSpy: jest.SpyInstance;
+  let navigatorSpy: jest.SpyInstance;
+
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
+    httpSpy = jest.spyOn(Http, 'request');
+    navigatorSpy = jest.spyOn(Navigator, 'getCurrentPosition');
   });
 
   afterEach(() => {
     Radar.clear();
-    jest.restoreAllMocks();
+    httpSpy.mockRestore();
+    navigatorSpy.mockRestore();
   });
 
   describe('searchPlaces', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', async () => {
-        jest.spyOn(Http, 'request');
-        jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
+        navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
 
         try {
           await Search.searchPlaces({});
@@ -55,7 +60,7 @@ describe('Search', () => {
     describe('location permissions approved', () => {
       it('should return a placeSearch response', async () => {
         mockRequest(200, placesResponse);
-        jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue({ latitude, longitude, accuracy: 100 });
+        navigatorSpy.mockResolvedValue({ latitude, longitude, accuracy: 100 });
 
         const response = await Search.searchPlaces({});
         const validateResponse = getResponseWithDebug(options.debug, placesResponse, placesResponse);
@@ -79,8 +84,7 @@ describe('Search', () => {
   describe('searchGeofences', () => {
     describe('location permissions denied', () => {
       it('should propagate the navigator error', async () => {
-        jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
-        jest.spyOn(Http, 'request');
+        navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
 
         try {
           await Search.searchGeofences({});
@@ -94,7 +98,7 @@ describe('Search', () => {
     describe('location permissions approved', () => {
       it('should return a geofenceSearch response', async () => {
         mockRequest(200, geofencesResponse);
-        jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue({ latitude, longitude, accuracy: 100 });
+        navigatorSpy.mockResolvedValue({ latitude, longitude, accuracy: 100 });
 
         const response = await Search.searchGeofences({});
         const validateResponse = getResponseWithDebug(options.debug, geofencesResponse, geofencesResponse);
@@ -120,7 +124,6 @@ describe('Search', () => {
     describe('params are not provided', () => {
       it('should have undefined params and return an autocomplete response', async () => {
         mockRequest(200, autocompleteResponse);
-        jest.spyOn(Http, 'request');
 
         const response = await Search.autocomplete({ query })
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
@@ -133,7 +136,6 @@ describe('Search', () => {
     describe('params are provided', () => {
       it('should return an autocomplete response', async () => {
         mockRequest(200, autocompleteResponse);
-        jest.spyOn(Http, 'request');
 
         const near = { latitude, longitude };
 
@@ -146,7 +148,6 @@ describe('Search', () => {
 
       it('should return an autocomplete response, with expandUnits', async () => {
         mockRequest(200, autocompleteResponse);
-        jest.spyOn(Http, 'request');
 
         const near = { latitude, longitude };
         const expandUnits = true;
