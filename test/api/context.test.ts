@@ -22,23 +22,22 @@ describe('Context', () => {
     response: contextResponse,
   };
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
   });
 
-  afterAll(() => {
+  afterEach(() => {
     Radar.clear();
+    jest.restoreAllMocks();
   });
 
   describe('getContext', () => {
-
-    afterEach(() => {
-      jest.restoreAllMocks();
+    beforeEach(() => {
+      jest.spyOn(Http, 'request');
     });
 
     describe('location permissions denied', () => {
       it('should throw a navigation error', async () => {
-        jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         mockRequest(200, contextResponse);
 
@@ -54,8 +53,6 @@ describe('Context', () => {
     describe('location permissions approved', () => {
       it('should return a context response', async () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue({ latitude, longitude, accuracy: 100 });
-        jest.spyOn(Http, 'request');
-
         mockRequest(200, contextResponse);
 
         // TODO(jasonl): replace as any with the proper typing after pr comment is resolved
