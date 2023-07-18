@@ -3,7 +3,6 @@ export default {
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/test/**/*.test.ts'],
   setupFiles: [
-    'jest-localstorage-mock',
     './test/mock-data/globals.js',
   ],
   moduleNameMapper: {

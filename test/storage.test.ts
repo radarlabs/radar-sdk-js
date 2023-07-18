@@ -2,22 +2,8 @@ import Storage from '../src/storage';
 
 
 describe('Storage', () => {
-  let mockStorage: { [name: string]: any } = {};
-
-  beforeAll(() => {
-    global.Storage.prototype.setItem = jest.fn((key, value) => {
-      mockStorage[key] = value
-    })
-    global.Storage.prototype.getItem = jest.fn((key) => mockStorage[key])
-    global.Storage.prototype.clear = jest.fn(() => mockStorage = {});
-    global.Storage.prototype.removeItem = jest.fn((key) => delete mockStorage[key]);
-  });
-
   afterAll(() => {
-    global.Storage.prototype.setItem = jest.fn().mockReset();
-    global.Storage.prototype.getItem = jest.fn().mockReset();
-    global.Storage.prototype.clear = jest.fn().mockReset();
-    global.Storage.prototype.removeItem = jest.fn().mockReset();
+    Storage.clear();
   });
 
   describe('getItem', () => {
