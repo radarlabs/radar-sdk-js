@@ -29,6 +29,7 @@ describe('Addresses', () => {
     Radar.initialize('prj_test_pk_123');
     httpSpy = jest.spyOn(Http, 'request');
     radarOptions = Config.get();
+    mockRequest(200, baseValidateResponse);
   });
 
   afterEach(() => {
@@ -39,8 +40,6 @@ describe('Addresses', () => {
   describe('validateAddress', () => {
     describe('params are not provided', () => {
       it('should have undefined params and return an autocomplete response', async () => {
-        mockRequest(200, baseValidateResponse)
-
         const response = await Addresses.validateAddress({ number, street } as any);
 
         const validateResponse = getResponseWithDebug(radarOptions.debug, baseValidateResponse, baseValidateResponse);
@@ -52,8 +51,6 @@ describe('Addresses', () => {
 
     describe('params are provided', () => {
       it('number, street, unit provided should return an autocomplete response', async () => {
-        mockRequest(200, baseValidateResponse)
-
         const options = {
           countryCode,
           stateCode,
@@ -75,8 +72,6 @@ describe('Addresses', () => {
     });
 
     it('addressLabel provided should return an autocomplete response', async () => {
-      mockRequest(200, baseValidateResponse)
-
       const options = {
         countryCode,
         stateCode,

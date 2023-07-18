@@ -4,7 +4,6 @@ import Trips from '../../src/api/trips';
 import Radar from '../../src';
 import { RadarTripOptions } from '../../src/types';
 import { mockRequest } from '../utils';
-import Storage from '../../src/storage';
 
 describe('Trips', () => {
   const userId = 'user-id';
@@ -14,6 +13,7 @@ describe('Trips', () => {
     Radar.initialize('prj_test_pk_123');
     Radar.setUserId(userId);
     httpSpy = jest.spyOn(Http, 'request');
+    mockRequest(200, {});
   });
 
   afterEach(() => {
@@ -24,7 +24,6 @@ describe('Trips', () => {
   describe('startTrip', () => {
     describe('called without tripOptions', () => {
       it('should include tripOptions each set to unknown', async () => {
-        mockRequest(200, {});
         await Trips.startTrip({});
 
         expect(Http.request).toHaveBeenCalledTimes(1);
@@ -59,7 +58,6 @@ describe('Trips', () => {
           scheduledArrivalAt,
         };
 
-        mockRequest(200, {});
         await Trips.startTrip(tripOptions);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -88,7 +86,6 @@ describe('Trips', () => {
           scheduledArrivalAt,
         };
 
-        mockRequest(200, {});
         await Trips.startTrip(tripOptions)
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -118,7 +115,6 @@ describe('Trips', () => {
         };
 
         Radar.setUserId();
-        mockRequest(200, {});
         await Trips.startTrip(tripOptions)
 
         expect(Http.request).toHaveBeenCalledTimes(1);
@@ -150,7 +146,6 @@ describe('Trips', () => {
           scheduledArrivalAt,
         };
 
-        mockRequest(200, {});
         await Trips.startTrip(tripOptions)
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -179,7 +174,6 @@ describe('Trips', () => {
           scheduledArrivalAt,
         };
 
-        mockRequest(200, {});
         await Trips.updateTrip(tripOptions)
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -215,7 +209,6 @@ describe('Trips', () => {
 
         const status = 'started';
 
-        mockRequest(200, {});
         await Trips.updateTrip(tripOptions, status)
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -252,7 +245,6 @@ describe('Trips', () => {
 
         const status = 'started';
 
-        mockRequest(200, {});
         await Trips.updateTrip(tripOptions, status)
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({

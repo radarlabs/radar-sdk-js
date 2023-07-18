@@ -23,18 +23,17 @@ describe('Http', () => {
     });
 
     describe('success', () => {
+      beforeEach(() => {
+        mockRequest(200, successResponse);
+      });
 
       it('should return api response on success', async () => {
-        mockRequest(200, successResponse);
-
         const response = await Http.request(httpRequestParams);
 
         expect(response.code).toEqual(200);
       });
 
       it('should always include Device-Type and SDK-Version headers', async () => {
-        mockRequest(200, successResponse);
-
         const response = await Http.request(httpRequestParams);
         const request: MockXhrRequest = getRequest();
 
@@ -45,8 +44,6 @@ describe('Http', () => {
       });
 
       it('should filter out undefined values in data', async () => {
-        mockRequest(200, successResponse);
-
         const response = await Http.request(httpRequestParams);
         const request: MockXhrRequest = getRequest();
 
@@ -163,7 +160,7 @@ describe('Http', () => {
 
       it('should return a publishable key error if not set', async () => {
         Config.clear();
-        
+
         try {
           await Http.request({ method: 'PUT', path: 'users/userId', data: {} });
         } catch (e: any) {
@@ -178,6 +175,7 @@ describe('Http', () => {
 
     beforeEach(() => {
       Radar.initialize(publishableKey);
+      mockRequest(200, successResponse);
     });
 
     afterEach(() => {
@@ -186,8 +184,6 @@ describe('Http', () => {
 
 
     it('should inject GET parameters into the url querystring', async () => {
-      mockRequest(200, successResponse);
-
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
       const request: MockXhrRequest = getRequest();
 
@@ -198,7 +194,6 @@ describe('Http', () => {
     });
 
     it('should not append querystring of no params', async () => {
-      mockRequest(200, successResponse);
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data: {} });
       const request: MockXhrRequest = getRequest();
 
