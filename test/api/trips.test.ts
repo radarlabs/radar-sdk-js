@@ -4,28 +4,24 @@ import Trips from '../../src/api/trips';
 import Radar from '../../src';
 import { RadarTripOptions } from '../../src/types';
 import { mockRequest } from '../utils';
+import Storage from '../../src/storage';
 
 describe('Trips', () => {
-  let httpSpy: jest.SpyInstance;
   const userId = 'user-id';
 
-  beforeAll(() => {
+  beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
   });
 
-  afterAll(() => {
-    jest.restoreAllMocks();
+  afterEach(() => {
     Radar.clear();
+    jest.restoreAllMocks();
   });
 
   describe('startTrip', () => {
     beforeEach(() => {
-      httpSpy = jest.spyOn(Http, 'request');
       Radar.setUserId(userId);
-    });
-
-    afterEach(() => {
-      httpSpy.mockRestore();
+      jest.spyOn(Http, 'request');
     });
 
     describe('called without tripOptions', () => {
@@ -33,8 +29,8 @@ describe('Trips', () => {
         mockRequest(200, {});
         await Trips.startTrip({});
 
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
           path: 'trips',
           data: {
@@ -67,8 +63,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.startTrip(tripOptions);
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
           path: 'trips',
           data: {
@@ -96,8 +92,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.startTrip(tripOptions)
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
           path: 'trips',
           data: {
@@ -127,8 +123,8 @@ describe('Trips', () => {
         mockRequest(200, {});
         await Trips.startTrip(tripOptions)
 
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
           path: 'trips',
           data: {
@@ -158,8 +154,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.startTrip(tripOptions)
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
           path: 'trips',
           data: {
@@ -174,10 +170,6 @@ describe('Trips', () => {
   describe('updateTrip', () => {
     beforeEach(() => {
       jest.spyOn(Http, 'request');
-    });
-
-    afterEach(() => {
-      jest.restoreAllMocks();
     });
 
     describe('called without status', () => {
@@ -195,8 +187,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.updateTrip(tripOptions)
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
           path: `trips/${externalId}/update`,
           data: {
@@ -231,8 +223,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.updateTrip(tripOptions, status)
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
           path: `trips/${externalId}/update`,
           data: {
@@ -268,8 +260,8 @@ describe('Trips', () => {
 
         mockRequest(200, {});
         await Trips.updateTrip(tripOptions, status)
-        expect(Http.request).toBeCalledTimes(1);
-        expect(Http.request).toBeCalledWith({
+        expect(Http.request).toHaveBeenCalledTimes(1);
+        expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
           path: `trips/${externalId}/update`,
           data: {
