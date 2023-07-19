@@ -40,7 +40,8 @@ describe('Navigator', () => {
     });
 
     afterAll(() => {
-      Config.clear();
+      Config.setup();
+      jest.restoreAllMocks();
     });
 
     it('should cache and re-use the location if set', async () => {
@@ -51,14 +52,12 @@ describe('Navigator', () => {
       expect(cachedLocation.latitude).toEqual(nycOffice.latitude);
       expect(cachedLocation.longitude).toEqual(nycOffice.longitude);
 
-      // check cached version was returned and getCurrentPosition not called
+      // check chached version was returned and getCurrentPosition not called
       const spy = jest.spyOn(window.navigator.geolocation, 'getCurrentPosition');
       const cachedResponse = await Navigator.getCurrentPosition();
       expect(spy).not.toHaveBeenCalled();
       expect(cachedResponse.latitude).toEqual(nycOffice.latitude);
       expect(cachedResponse.longitude).toEqual(nycOffice.longitude);
-
-      spy.mockRestore();
     });
   });
 });

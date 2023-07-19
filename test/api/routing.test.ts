@@ -40,26 +40,21 @@ describe('Routing', () => {
 
   let options: RadarOptions = {};
 
-  let httpSpy: jest.SpyInstance;
-  let navigatorSpy: jest.SpyInstance;
-
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
-    httpSpy = jest.spyOn(Http, 'request');
-    navigatorSpy = jest.spyOn(Navigator, 'getCurrentPosition');
   });
-
+  
   afterEach(() => {
     Radar.clear();
-    httpSpy.mockRestore();
-    navigatorSpy.mockRestore();
+    jest.restoreAllMocks();
   });
 
   describe('getDistanceToDestination', () => {
     describe('location permissions denied', () => {
       it('should throw a navigation error', async () => {
-        navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
+        jest.spyOn(Http, 'request');
+        jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
         try {
           const response = await Routing.distance({ destination, modes })
@@ -74,7 +69,7 @@ describe('Routing', () => {
       describe('no `origin` arg given', () => {
         it('should return a routing response', async () => {
           mockRequest(200, routingResponse);
-          navigatorSpy.mockResolvedValue(origin);
+          jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue(origin);
 
           const response = await Routing.distance({ destination, modes });
           const validateResponse = getResponseWithDebug(options.debug, routingResponse, routingResponse);
@@ -99,7 +94,8 @@ describe('Routing', () => {
   describe('getMatrixDistances', () => {
     describe('location permissions denied', () => {
       it('should throw a navigation error', async () => {
-        navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
+        jest.spyOn(Http, 'request');
+        jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
         try {
           const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode })
@@ -114,8 +110,8 @@ describe('Routing', () => {
       describe('no `origins` arg given', () => {
         it('should return a routing response', async () => {
           mockRequest(200, matrixResponse);
-          navigatorSpy.mockResolvedValue(matrixOrigin);
-
+          jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue(matrixOrigin);
+          
           const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode })
           const validateReponse = getResponseWithDebug(options.debug, matrixResponse, matrixResponse)
 

@@ -29,7 +29,6 @@ class ConfigAPI {
     };
 
     try {
-      console.log("sending request")
       await Http.request({
         method: 'GET',
         path: 'config',

@@ -8,20 +8,22 @@ import Storage from '../../src/storage';
 
 describe('Trips', () => {
   const userId = 'user-id';
-  let httpSpy: jest.SpyInstance;
 
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
-    Radar.setUserId(userId);
-    httpSpy = jest.spyOn(Http, 'request');
   });
 
   afterEach(() => {
     Radar.clear();
-    httpSpy.mockRestore();
+    jest.restoreAllMocks();
   });
 
   describe('startTrip', () => {
+    beforeEach(() => {
+      Radar.setUserId(userId);
+      jest.spyOn(Http, 'request');
+    });
+
     describe('called without tripOptions', () => {
       it('should include tripOptions each set to unknown', async () => {
         mockRequest(200, {});
@@ -166,6 +168,10 @@ describe('Trips', () => {
   });
 
   describe('updateTrip', () => {
+    beforeEach(() => {
+      jest.spyOn(Http, 'request');
+    });
+
     describe('called without status', () => {
       it('should include status undefined', async () => {
         const externalId = 'trip-abc-123';

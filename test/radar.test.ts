@@ -13,7 +13,6 @@ import TrackAPI from '../src/api/track';
 import RoutingAPI from '../src/api/routing';
 
 import { latitude, longitude } from './common';
-import ConfigAPI from '../src/api/config';
 
 describe('Radar', () => {
   const accuracy = 5;
@@ -52,16 +51,11 @@ describe('Radar', () => {
   const units = 'imperial';
 
   describe('initialize', () => {
-    beforeAll(() => {
-      // test the getConfig code path which includes the HTTP request
-      // stubbed out in all other tests using configApi.mock.ts
-      // @ts-ignore
-      ConfigAPI.getConfig.mockRestore();
-    });
     describe('no key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
         try {
           Radar.initialize('');
+          throw new Error('Should not succeed.');
         } catch (err: any) {
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Publishable key required in initialization.');
@@ -73,6 +67,7 @@ describe('Radar', () => {
       it('should throw RadarPublishableKeyError', () => {
         try {
           Radar.initialize('_my_test_sk_123');
+          throw new Error('Should not succeed.');
         } catch (err: any) {
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Secret keys are not allowed. Please use your Radar publishable key.');
@@ -119,78 +114,68 @@ describe('Radar', () => {
     });
   });
 
-  describe('setters', () => {
-    let removeItemSpy: jest.SpyInstance;
-    let setItemSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      removeItemSpy = jest.spyOn(Storage, 'removeItem');
-      setItemSpy = jest.spyOn(Storage, 'setItem');
-    });
-
-    afterEach(() => {
-      removeItemSpy.mockRestore();
-      setItemSpy.mockRestore();
-    });
-
-    describe('setUserId', () => {
-      describe('no userId given', () => {
-        it('should delete userId from storage', () => {
-          Radar.setUserId();
-          expect(Storage.removeItem).toHaveBeenCalledWith(Storage.USER_ID);
-          expect(Storage.getItem(Storage.USER_ID)).toBeNull();
-        });
-      });
-
-      describe('userId given', () => {
-        it('should save userId in storage', () => {
-          const userId = 'abc123';
-          Radar.setUserId(userId);
-          expect(Storage.setItem).toHaveBeenCalledWith(Storage.USER_ID, userId);
-          expect(Storage.getItem(Storage.USER_ID)).toEqual('abc123');
-        });
+  describe('setUserId', () => {
+    describe('no userId given', () => {
+      it('should delete userId from storage', () => {
+        jest.spyOn(Storage, 'removeItem');
+        Radar.setUserId();
+        expect(Storage.removeItem).toHaveBeenCalledWith(Storage.USER_ID);
+        expect(Storage.getItem(Storage.USER_ID)).toBeNull();
       });
     });
 
-    describe('setDescription', () => {
-      describe('no description given', () => {
-        it('should delete description from storage', () => {
-          Radar.setDescription();
-          expect(Storage.removeItem).toHaveBeenCalledWith(Storage.DESCRIPTION);
-          expect(Storage.getItem(Storage.DESCRIPTION)).toBeNull();
-        });
-      });
-
-      describe('description given', () => {
-        it('should save description in storage', () => {
-          const description = 'abc123';
-          Radar.setDescription(description);
-          expect(Storage.setItem).toHaveBeenCalledWith(Storage.DESCRIPTION, description);
-          expect(Storage.getItem(Storage.DESCRIPTION)).toEqual('abc123');
-        });
-      });
-    });
-
-    describe('setMetadata', () => {
-      describe('no metadata given', () => {
-        it('should delete metadata from storage', () => {
-          Radar.setMetadata();
-          expect(Storage.removeItem).toHaveBeenCalledWith(Storage.METADATA);
-          expect(Storage.getItem(Storage.METADATA)).toBeNull();
-        });
-      });
-
-      describe('metadata given', () => {
-        it('should save metadata in storage', () => {
-          const metadata = { meta: 'mock-metadata' };
-          Radar.setMetadata(metadata);
-          expect(Storage.setItem).toHaveBeenCalledWith(Storage.METADATA, JSON.stringify(metadata));
-          expect(Storage.getItem(Storage.METADATA)).toEqual(JSON.stringify(metadata));
-        });
+    describe('userId given', () => {
+      it('should save userId in storage', () => {
+        jest.spyOn(Storage, 'setItem');
+        const userId = 'abc123';
+        Radar.setUserId(userId);
+        expect(Storage.setItem).toHaveBeenCalledWith(Storage.USER_ID, userId);
+        expect(Storage.getItem(Storage.USER_ID)).toEqual('abc123');
       });
     });
   });
 
+  describe('setDescription', () => {
+    describe('no description given', () => {
+      it('should delete description from storage', () => {
+        jest.spyOn(Storage, 'removeItem');
+        Radar.setDescription();
+        expect(Storage.removeItem).toHaveBeenCalledWith(Storage.DESCRIPTION);
+        expect(Storage.getItem(Storage.DESCRIPTION)).toBeNull();
+      });
+    });
+
+    describe('description given', () => {
+      it('should save description in storage', () => {
+        jest.spyOn(Storage, 'setItem');
+        const description = 'abc123';
+        Radar.setDescription(description);
+        expect(Storage.setItem).toHaveBeenCalledWith(Storage.DESCRIPTION, description);
+        expect(Storage.getItem(Storage.DESCRIPTION)).toEqual('abc123');
+      });
+    });
+  });
+
+  describe('setMetadata', () => {
+    describe('no metadata given', () => {
+      it('should delete metadata from storage', () => {
+        jest.spyOn(Storage, 'removeItem');
+        Radar.setMetadata();
+        expect(Storage.removeItem).toHaveBeenCalledWith(Storage.METADATA);
+        expect(Storage.getItem(Storage.METADATA)).toBeNull();
+      });
+    });
+
+    describe('metadata given', () => {
+      it('should save metadata in storage', () => {
+        jest.spyOn(Storage, 'setItem');
+        const metadata = { meta: 'mock-metadata' };
+        Radar.setMetadata(metadata);
+        expect(Storage.setItem).toHaveBeenCalledWith(Storage.METADATA, JSON.stringify(metadata));
+        expect(Storage.getItem(Storage.METADATA)).toEqual(JSON.stringify(metadata));
+      });
+    });
+  });
 
   describe('getLocation', () => {
     let navigatorStub: jest.SpyInstance<Promise<NavigatorPosition>>;
@@ -200,7 +185,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      navigatorStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should propagate the err if not successful', async () => {
@@ -231,7 +216,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      trackStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call trackOnce if the first arg is a callback', async () => {
@@ -279,7 +264,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      contextStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call getContext if the first arg is a callback', async () => {
@@ -304,7 +289,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      searchStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call searchPlaces', async () => {
@@ -323,7 +308,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      searchStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call searchGeofences', async () => {
@@ -342,7 +327,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      searchStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call autocomplete', async () => {
@@ -361,7 +346,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      geocodeStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call forward geocode', async () => {
@@ -380,7 +365,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      geocodeStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call reverseGeocode if arg is empty object', async () => {
@@ -406,7 +391,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      geocodeStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call ipGeocode if the first arg is a callback', async () => {
@@ -425,7 +410,7 @@ describe('Radar', () => {
     });
 
     afterEach(() => {
-      routingStub.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('should call getDistanceToDestination', async () => {
