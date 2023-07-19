@@ -99,7 +99,7 @@ class Http {
 
         if (options.debug) {
           Logger.debug(`API call failed: ${url}`);
-          console.error(response);
+          Logger.debug(JSON.stringify(response));
         }
 
         if (xhr.status === 400) {
