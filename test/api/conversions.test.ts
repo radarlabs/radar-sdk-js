@@ -19,7 +19,6 @@ describe('Events', () => {
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
-    mockRequest(200, baseEventResponse);
   });
 
   afterEach(() => {
@@ -28,6 +27,8 @@ describe('Events', () => {
 
   describe('events', () => {
     it('should return an event', async () => {
+      mockRequest(200, baseEventResponse);
+
       const response = await Conversions.logConversion(conversionEventData);
 
       const validateResponse = getResponseWithDebug(options.debug, response, baseEventResponse);
@@ -35,6 +36,8 @@ describe('Events', () => {
     });
 
     it('should return a revenue event', async () => {
+      mockRequest(200, baseEventResponse);
+
       const response = await Conversions.logConversion(revenueConversionEventData)
       const validateResponse = getResponseWithDebug(options.debug, response, baseEventResponse);
       expect(response).toEqual(validateResponse);

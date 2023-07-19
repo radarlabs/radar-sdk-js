@@ -29,7 +29,6 @@ describe('Context', () => {
     Radar.initialize('prj_test_pk_123');
     httpSpy = jest.spyOn(Http, 'request');
     navigatorSpy = jest.spyOn(Navigator, 'getCurrentPosition');
-    mockRequest(200, contextResponse);
   });
 
   afterEach(() => {
@@ -42,6 +41,7 @@ describe('Context', () => {
     describe('location permissions denied', () => {
       it('should throw a navigation error', async () => {
         navigatorSpy.mockRejectedValue('ERROR_PERMISSIONS');
+        mockRequest(200, contextResponse);
 
         try {
           await Context.getContext({ latitude, longitude });
@@ -55,6 +55,7 @@ describe('Context', () => {
     describe('location permissions approved', () => {
       it('should return a context response', async () => {
         navigatorSpy.mockResolvedValue({ latitude, longitude, accuracy: 100 });
+        mockRequest(200, contextResponse);
 
         // TODO(jasonl): replace as any with the proper typing after pr comment is resolved
         const response = await Context.getContext({} as any);

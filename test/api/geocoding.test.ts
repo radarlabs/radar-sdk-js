@@ -24,7 +24,6 @@ describe('Geocoding', () => {
     options = Config.get();
     httpSpy = jest.spyOn(Http, 'request');
     navigatorSpy = jest.spyOn(Navigator, 'getCurrentPosition');
-    mockRequest(200, baseValidateResponse);
   });
 
   afterEach(() => {
@@ -37,6 +36,8 @@ describe('Geocoding', () => {
     const forwardGeocodeResponse = { addresses: undefined };
 
     it('should return an address', async () => {
+      mockRequest(200, baseValidateResponse);
+
       const response = await Geocoding.forwardGeocode({ query })
 
       const validateResponse = getResponseWithDebug(options.debug, forwardGeocodeResponse, baseValidateResponse);
@@ -64,6 +65,8 @@ describe('Geocoding', () => {
     describe('location permissions approved', () => {
       it('should return a geocode response', async () => {
         navigatorSpy.mockResolvedValue({ latitude, longitude, accuracy: 100 });
+        mockRequest(200, baseValidateResponse);
+
         const response = await Geocoding.reverseGeocode({});
         const validateResponse = getResponseWithDebug(options.debug, reverseGeocodeResponse, baseValidateResponse);
 
@@ -76,6 +79,8 @@ describe('Geocoding', () => {
     const ipGeocodeResponse = { ip: undefined, proxy: undefined, ...baseValidateResponse, response: baseValidateResponse };
 
     it('should return a geocode response', async () => {
+      mockRequest(200, baseValidateResponse);
+
       const response = await Geocoding.ipGeocode();
       expect(response).toEqual(ipGeocodeResponse);
     });
