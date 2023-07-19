@@ -11,6 +11,7 @@ import ContextAPI from '../src/api/context';
 import SearchAPI from '../src/api/search';
 import TrackAPI from '../src/api/track';
 import RoutingAPI from '../src/api/routing';
+import ConfigAPI from '../src/api/config';
 
 import { latitude, longitude } from './common';
 
@@ -51,6 +52,15 @@ describe('Radar', () => {
   const units = 'imperial';
 
   describe('initialize', () => {
+    beforeEach(() => {
+      (window as any).RADAR_TEST_ENV = false;
+    });
+
+    afterEach(() => {
+      (window as any).RADAR_TEST_ENV = true;
+      jest.restoreAllMocks();
+    });
+
     describe('no key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
         try {
@@ -77,19 +87,23 @@ describe('Radar', () => {
 
     describe('test publishableKey is provided', () => {
       it('should initialize SDK in a test environment', () => {
+        jest.spyOn(ConfigAPI, 'getConfig');
         Radar.initialize('_my_test_pk_123');
         const options = Config.get();
         expect(options.publishableKey).toEqual('_my_test_pk_123');
         expect(options.live).toEqual(false);
+        expect(ConfigAPI.getConfig).toHaveBeenCalledTimes(1);
       });
     });
 
     describe('live publishableKey is provided', () => {
       it('should initialize SDK in a live environment', () => {
+        jest.spyOn(ConfigAPI, 'getConfig');
         Radar.initialize('_my_live_pk_123');
         const options = Config.get();
         expect(options.publishableKey).toEqual('_my_live_pk_123');
         expect(options.live).toEqual(true);
+        expect(ConfigAPI.getConfig).toHaveBeenCalledTimes(1);
       });
     });
   });

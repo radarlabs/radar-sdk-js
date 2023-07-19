@@ -92,7 +92,11 @@ class Radar {
       Logger.info(`using options: ${JSON.stringify(options)}`);
     }
 
-    ConfigAPI.getConfig();
+    // NOTE(jasonl): this allows us to run jest tests
+    // without having to mock the ConfigAPI.getConfig call
+    if (!(window as any)?.RADAR_TEST_ENV) {
+      ConfigAPI.getConfig();
+    }
   }
 
   public static clear() {

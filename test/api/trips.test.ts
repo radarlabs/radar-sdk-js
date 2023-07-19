@@ -11,6 +11,8 @@ describe('Trips', () => {
 
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
+    Radar.setUserId(userId);
+    jest.spyOn(Http, 'request');
   });
 
   afterEach(() => {
@@ -19,10 +21,6 @@ describe('Trips', () => {
   });
 
   describe('startTrip', () => {
-    beforeEach(() => {
-      Radar.setUserId(userId);
-      jest.spyOn(Http, 'request');
-    });
 
     describe('called without tripOptions', () => {
       it('should include tripOptions each set to unknown', async () => {
