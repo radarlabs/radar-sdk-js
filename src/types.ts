@@ -446,6 +446,7 @@ export interface RadarSearchGeofencesResponse extends RadarResponse {
 
 export interface RadarMapOptions extends maplibregl.MapOptions {
   container: string | HTMLElement;
+  useIP?: boolean;
 }
 
 export interface RadarMarkerOptions {

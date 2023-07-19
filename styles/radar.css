@@ -87,7 +87,7 @@
   opacity: 0.7;
 }
 
-.radar-autocomplete-input:hover {
+.radar-autocomplete-input:hover::placeholder {
   opacity: 0.8;
   transition: all 0.3s ease;
   -webkit-transition: all -webkit-transform 0.3s ease;
@@ -180,7 +180,7 @@
 .radar-powered {
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: flex-end;
   padding: 8px 16px;
   color: var(--radar-gray6);
 
