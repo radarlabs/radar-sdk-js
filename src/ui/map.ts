@@ -2,7 +2,6 @@ import maplibregl from 'maplibre-gl';
 
 import Config from '../config';
 import Logger from '../logger';
-import GeocodingAPI from '../api/geocoding';
 
 import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
 
@@ -86,21 +85,6 @@ class MapUI {
 
     if (!container.style.width && !container.style.height) {
       Logger.warn('map container does not have a set "width" or "height"');
-    }
-
-    // center map on base on IP address
-    if (mapOptions.useIP) {
-      GeocodingAPI.ipGeocode()
-        .then(({ address }) => {
-          if (address) {
-            if (address.latitude && address.longitude) {
-              map.setCenter([address.longitude, address.latitude]);
-            }
-          }
-        })
-        .catch((err) => {
-          Logger.warn(err.message);
-        });
     }
 
     // TODO
