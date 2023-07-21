@@ -36,3 +36,8 @@ jobs:
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'cdn/'
           DEST_DIR: ${{ env.MAJOR_VERSION }} # release latest major version
+      - run: npm run compile-site
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

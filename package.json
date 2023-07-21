@@ -51,6 +51,6 @@
     "@types/geojson": "^7946.0.10"
   },
   "peerDependencies": {
-    "maplibre-gl": "^2.4.0"
+    "maplibre-gl": "^2.4.0 || ^3.0.0"
   }
 }
