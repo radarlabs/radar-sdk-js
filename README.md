@@ -24,8 +24,8 @@
 🔥 Try it! 🔥
 * <a href="https://radar.com/demo/js">Geofencing</a>
 * <a href="https://radar.com/demo/api">Maps APIs</a>
-* <a href="https://radarlabs.github.io/radar-sdk-js/display-a-map">Maps UI Kits</a>
-
+* <a href="https://radar.com/documentation/maps/maps">Maps UI</a>
+* <a href="https://radar.com/documentation/maps/autocomplete">Autocomplete UI</a>
 
 ## 🚀 Installation and Usage
 
@@ -36,10 +36,10 @@
 Add the `radar-sdk-js` and `maplibre-gl-js` packages
 ```bash
 # with npm
-npm install --save radar-sdk-js maplibre-gl-js@2.4.0
+npm install --save radar-sdk-js maplibre-gl-js
 
 # with yarn
-yarn add radar-sdk-js maplibre-gl-js@2.4.0
+yarn add radar-sdk-js maplibre-gl-js
 ```
 
 Then import as an ES Module in your project
