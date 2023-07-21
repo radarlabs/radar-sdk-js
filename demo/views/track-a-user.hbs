@@ -1,0 +1,155 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Track a user</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
+  </div>
+
+  <p>Use the device location to get contextual details about the user's current location, and display it on a map.</p>
+
+  <div class="mt-5 mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-4 form-row">
+    <label for="desired-accuracy" class="col-form-label" style="width: 128px;">Desired accuracy</label>
+    <div>
+      <select id="desired-accuracy" class="form-select" style="width: 250px;">
+        <option value="high" selected>high</option>
+        <option value="medium">medium</option>
+        <option value="low">low</option>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <button id="track-once" type="button" class="btn btn-primary" disabled>Call track once</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div>
+    <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Location</h6>
+    <div class="mt-2">
+      <pre><code id="location" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">User</h6>
+    <div class="mt-2">
+      <pre><code id="user" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Events</h6>
+    <div class="mt-2">
+      <pre><code id="events" class="code-sample language-json"></code><pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script&gt;
+      $('#track-once').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+        Radar.trackOnce({ userId: 'test-user-id' })
+          .then(({ location, user, events }) =&gt; {
+            const map = Radar.ui.map({
+              container: 'map',
+            });
+            map.setCenter([location.longitude, location.latitude]);
+
+            const html = `
+              &lt;p&gt;${user.userId}&lt;/p&gt;
+              &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
+            `.trim();
+
+            const marker = Radar.ui.marker({ html })
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map);
+          });
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      $('#track-once').prop('disabled', false);
+    }
+  });
+
+  let map;
+  $('#track-once').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const userId = $('#user-id').val();
+    const desiredAccuracy = $('#desired-accuracy').val();
+    Radar.trackOnce({ userId, desiredAccuracy })
+      .then(({ location, user, events }) => {
+        console.log('TRACK RESPONSE', { location, user, events });
+        $('#loader').hide();
+
+        $('#map').show();
+        if (!map) {
+          map = Radar.ui.map({
+            container: 'map',
+          });
+        }
+        map.setCenter([location.longitude, location.latitude]);
+
+        if (map.getZoom() < 14) {
+          map.setZoom(14);
+        }
+
+        const html = `
+          <p>${user.userId}</p>
+          <p>${location.latitude},${location.longitude}</p>
+        `.trim();
+
+        const marker = Radar.ui.marker({ html })
+          .setLngLat([location.longitude, location.latitude])
+          .addTo(map);
+
+        $('#response-details').show();
+        $('#location').html(JSON.stringify(location, null, 2));
+        $('#user').html(JSON.stringify(user, null, 2));
+        $('#events').html(JSON.stringify(events, null, 2));
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error(err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
+</script>

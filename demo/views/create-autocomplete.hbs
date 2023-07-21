@@ -1,0 +1,91 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Address autocomplete</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error</strong> Something went wrong. Check the developer console for details.
+  </div>
+
+  <p>Create an autocomplete widget for searching an address.</p>
+
+  <div id="autocomplete-warning" class="callout gray">
+    Add publishable key to see autocomplete input
+  </div>
+
+  <div>
+    <div id="autocomplete" style="max-width: 800px;"></div>
+  </div>
+
+  <div id="result-container" class="mt-4" style="display: none;">
+    <p class="mb-1"><b>Selected result</b></p>
+    <pre><code id="result" class="code-sample language-json"></code></pre>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="autocomplete"/&gt;
+
+    &lt;script type="text/javascript"&gt;
+      // initialize Radar SDK
+      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+
+      // create autocomplete widget
+      Radar.ui.autocomplete({
+        container: 'autocomplete',
+        onSelection: (result) => {
+          console.log(result);
+        },
+        width: '600px',
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  let autocomplete;
+  const init = (publishableKey) => {
+    $('#error-alert').hide();
+    $('#autocomplete-warning').hide();
+
+    Radar.initialize(publishableKey, { debug: true });
+
+    // prevent duplicate inputs
+    if (autocomplete) {
+      autocomplete.remove();
+    }
+
+    autocomplete = Radar.ui.autocomplete({
+      container: 'autocomplete',
+      countryCode: 'US',
+      onSelection: (result) => {
+        console.log(result);
+        $('#result').html(JSON.stringify(result, null, 2));
+        $('#result-container').show();
+        hljs.highlightAll();
+      },
+      width: '600px',
+    });
+
+    console.log('AUTOCOMPLETE', autocomplete);
+  };
+
+
+  // initalize map on api key changes
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      init(publishableKey);
+    }
+  });
+</script>

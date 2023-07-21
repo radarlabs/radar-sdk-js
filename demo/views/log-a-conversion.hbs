@@ -1,0 +1,114 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Log a conversion</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
+  </div>
+
+  <p>Log a conversion to analyze alongside other location activity in your app</p>
+
+  <div class="mt-5 mb-3 form-row">
+    <label for="name" class="col-form-label" style="width: 128px;">Name</label>
+    <div>
+      <input type="text" class="form-control" id="name" style="width: 250px;" placeholder="Required">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="revenue" class="col-form-label" style="width: 128px;">Revenue</label>
+    <div>
+      <input type="number" class="form-control" id="revenue" style="width: 250px;">
+    </div>
+  </div>
+
+  <div>
+    <button id="log-conversion" type="button" class="btn btn-primary" disabled>Log conversion</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Response</h6>
+    <div class="mt-2">
+      <pre><code id="response" class="code-sample language-json"></code><pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
+
+    &lt;script&gt;
+      $('#log-conversion').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+        const conversionOptions = {
+          name: $('#name').val(),
+          userId: $('#user-id').val(),
+          revenue: $('#revenue').val(),
+        };
+
+        Radar.logConversion(options).then(({ event }) =&gt; {
+          console.log(event);
+        });
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      $('#log-conversion').prop('disabled', false);
+    }
+  });
+
+  $('#log-conversion').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const options = {
+      name: $('#name').val(),
+      userId: $('#user-id').val(),
+      revenue: $('#revenue').val(),
+    };
+
+    Radar.logConversion(options)
+      .then((response) => {
+        console.log('CONVERSION RESPONSE', response);
+        $('#loader').hide();
+        $('#response-details').show();
+        $('#response').html(JSON.stringify(response.event, null, 2));
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error('CREATE TRIP ERROR:', err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+</script>

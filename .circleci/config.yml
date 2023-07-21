@@ -9,7 +9,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
-          command: npm ci --force
+          command: npm ci
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
@@ -20,6 +20,3 @@ jobs:
       - store_artifacts:
           path: coverage
           prefix: coverage
-      - run:
-          name: Report Test Coverage
-          command: npm run report-coverage
