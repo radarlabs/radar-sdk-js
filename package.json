@@ -19,7 +19,7 @@
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
     "check-beta-tag": "node ./scripts/check-beta-tag.cjs",
     "bump-version": "node ./scripts/bump-version.cjs",
-    "test": "jest --collect-coverage",
+    "test": "jest --collect-coverage --runInBand",
     "test:watch": "jest --watch",
     "demo": "npm run build && node ./demo/server.cjs",
     "compile-site": "node ./scripts/compile-site.cjs"
