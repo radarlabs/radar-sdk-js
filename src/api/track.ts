@@ -12,7 +12,7 @@ import TripsAPI from './trips';
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
 class TrackAPI {
-  static async trackOnce(params: RadarTrackParams) {
+  static async trackOnce(params: RadarTrackParams, host: string | undefined = undefined) {
     const options = Config.get();
 
     let { latitude, longitude, accuracy, desiredAccuracy } = params;
@@ -72,6 +72,7 @@ class TrackAPI {
       method: 'POST',
       path: 'track',
       data: body,
+      host,
     });
 
     const { user, events } = response;
@@ -88,6 +89,10 @@ class TrackAPI {
     }
 
     return trackRes;
+  }
+
+  static async trackVerified(params: RadarTrackParams) {
+    this.trackOnce(params, 'localhost:52516');
   }
 }
 

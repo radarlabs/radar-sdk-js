@@ -27,10 +27,12 @@ class Http {
     method,
     path,
     data,
+    host,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
+    host: string | undefined;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -43,9 +45,9 @@ class Http {
       }
 
       // setup request URL
-      const host = options.host;
+      const urlHost = host || options.host;
       const version = options.version;
-      let url = `${host}/${version}/${path}`;
+      let url = `${urlHost}/${version}/${path}`;
 
       // remove undefined values from request data
       let body: any = {};
