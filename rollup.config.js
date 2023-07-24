@@ -31,7 +31,8 @@ export default [
     output: [
       {
         file: 'dist/radar.js',
-        format: 'esm',
+        format: 'umd',
+        name: 'Radar',
         sourcemap: true,
       },
     ],

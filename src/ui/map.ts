@@ -1,15 +1,22 @@
-import maplibregl from 'maplibre-gl';
-
 import Config from '../config';
 import Logger from '../logger';
 
 import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
 
+import * as maplibre from 'maplibre-gl';
+
+let maplibregl: any;
+try {
+  maplibregl = require('maplibre-gl');
+} catch (err) {
+  // do nothing
+}
+
 const DEFAULT_STYLE = 'radar-default-v1';
 
 const RADAR_LOGO_URL = 'https://api.radar.io/maps/static/images/logo.svg';
 
-const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
+const defaultMaplibreOptions: Partial<maplibre.MapOptions> = {
   minZoom: 1,
   maxZoom: 20,
   attributionControl: false,
@@ -18,7 +25,7 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
-const defaultMarkerOptions: Partial<maplibregl.MarkerOptions> = {
+const defaultMarkerOptions: Partial<maplibre.MarkerOptions> = {
   color: '#000257',
 };
 
@@ -39,7 +46,11 @@ class MapUI {
     return maplibregl;
   }
 
-  public static createMap(mapOptions: RadarMapOptions): maplibregl.Map {
+  public static createMap(mapOptions: RadarMapOptions): maplibre.Map | undefined {
+    if (!maplibregl) {
+      return;
+    }
+
     const options = Config.get();
 
     if (!options.publishableKey) {
@@ -48,7 +59,7 @@ class MapUI {
 
     // configure maplibre options
     const style = getStyle(options, mapOptions);
-    const maplibreOptions: maplibregl.MapOptions = Object.assign({},
+    const maplibreOptions: maplibre.MapOptions = Object.assign({},
       defaultMaplibreOptions,
       { style },
       mapOptions,
@@ -93,8 +104,12 @@ class MapUI {
     return map;
   }
 
-  public static createMarker(markerOptions: RadarMarkerOptions = {}): maplibregl.Marker {
-    const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
+  public static createMarker(markerOptions: RadarMarkerOptions = {}): maplibre.Marker | undefined {
+    if (!maplibregl) {
+      return;
+    }
+
+    const maplibreOptions: maplibre.MarkerOptions = Object.assign({}, defaultMarkerOptions);
 
     if (markerOptions.color) {
       maplibreOptions.color = markerOptions.color;
