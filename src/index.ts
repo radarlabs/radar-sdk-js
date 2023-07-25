@@ -13,6 +13,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
+import VerifyAPI from './api/verify';
 
 import MapUI from './ui/map';
 import AutocompleteUI from './ui/autocomplete';
@@ -145,7 +146,7 @@ class Radar {
 
   public static trackVerified(params: RadarTrackParams = {}) {
     try {
-      return TrackAPI.trackVerified(params);
+      return VerifyAPI.trackVerified(params);
     } finally {
       ConfigAPI.getConfig(params); // call with updated permissions
     }
