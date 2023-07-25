@@ -22,10 +22,6 @@
   height: 38px;
 }
 
-.maplibregl-marker:hover {
-  cursor: pointer;
-}
-
 @font-face {
   font-family: 'Graphik';
   font-weight: 400;
@@ -209,4 +205,30 @@
 
 .radar-no-results {
   padding: 8px 16px;
+}
+
+.maplibregl-marker:hover {
+  cursor: pointer;
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  padding: 2px 24px 2px 0 !important;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+  background-color: #FFFFFF !important;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-inner {
+  display: none !important;
+}
+
+
+.maplibregl-ctrl-attrib.maplibregl-compact.maplibregl-compact-show.loaded {
+  padding: 2px 28px 2px 8px !important;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact.maplibregl-compact-show.loaded .maplibregl-ctrl-attrib-inner {
+  display: block !important;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact.maplibregl-compact-show.loaded .maplibregl-ctrl-attrib-button {
+  display: block !important;
+  background-color: rgb(0, 0, 0/5%) !important;
 }

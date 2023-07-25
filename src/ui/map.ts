@@ -12,7 +12,7 @@ const RADAR_LOGO_URL = 'https://api.radar.io/maps/static/images/logo.svg';
 const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   minZoom: 1,
   maxZoom: 20,
-  attributionControl: false,
+  attributionControl: true,
   dragRotate: false,
   touchPitch: false,
   maplibreLogo: false,
@@ -53,7 +53,6 @@ class MapUI {
       { style },
       mapOptions,
     );
-    console.log('PASSED OPTIONS', mapOptions);
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
     // set container
@@ -86,6 +85,16 @@ class MapUI {
     if (!container.style.width && !container.style.height) {
       Logger.warn('map container does not have a set "width" or "height"');
     }
+
+    // dont expand on mobile view by default
+    map.on('load', () => {
+      const attrib = document.querySelector('.maplibregl-ctrl-attrib')
+      if (attrib) {
+        attrib.classList.remove('maplibregl-compact-show');
+        attrib.classList.remove('mapboxgl-compact-show');
+        attrib.classList.add('loaded');
+      }
+    });
 
     // TODO
     // add location button
