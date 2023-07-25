@@ -19,9 +19,9 @@ class VerifyAPI {
     const sessionId = Session.getSessionId();
     const description = params.description || Storage.getItem(Storage.DESCRIPTION);
 
-    // save userId for trip tracking
+    // save userId
     if (!userId) {
-      Logger.warn('userId not provided for trackOnce.');
+      Logger.warn('userId not provided for trackVerified.');
     } else {
       Storage.setItem(Storage.USER_ID, userId);
     }
@@ -49,7 +49,15 @@ class VerifyAPI {
       host: 'http://localhost:52516',
     });
 
-    const { user, events, location } = response;
+    const { user, events } = response;
+    let location;
+    if (user.location && user.location.coordinates && user.locationAccuracy) {
+      location = {
+        latitude: user.location.coordinates[1],
+        longitude: user.location.coordinates[0],
+        accuracy: user.locationAccuracy,
+      };
+    }
 
     const trackRes = {
       user,
