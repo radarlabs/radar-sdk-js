@@ -53,7 +53,6 @@ class MapUI {
       { style },
       mapOptions,
     );
-    console.log('PASSED OPTIONS', mapOptions);
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
     // set container
@@ -62,6 +61,10 @@ class MapUI {
     // create map
     const map = new maplibregl.Map(maplibreOptions);
     const container = map.getContainer();
+
+    if (!container.style.width && !container.style.height) {
+      Logger.warn('map container does not have a set "width" or "height"');
+    }
 
     // add radar logo
     const img = document.createElement('img');
@@ -79,16 +82,28 @@ class MapUI {
     link.appendChild(img)
     map.getContainer().appendChild(link);
 
+    // add attribution
+    const attribution = new maplibregl.AttributionControl({ compact: false });
+    map.addControl(attribution, 'bottom-right');
+
     // add zoom controls
     const nav = new maplibregl.NavigationControl({ showCompass: false });
     map.addControl(nav, 'bottom-right');
 
-    if (!container.style.width && !container.style.height) {
-      Logger.warn('map container does not have a set "width" or "height"');
-    }
-
-    // TODO
-    // add location button
+    // handle map resize actions
+    const onResize = () => {
+      const attrib = document.querySelector('.maplibregl-ctrl-attrib');
+      if (attrib) {
+        const width = map.getContainer().clientWidth;
+        if (width < 380) {
+          attrib.classList.add('hidden');
+        } else {
+          attrib.classList.remove('hidden');
+        }
+      }
+    };
+    map.on('resize', onResize);
+    map.on('load', onResize);
 
     return map;
   }
