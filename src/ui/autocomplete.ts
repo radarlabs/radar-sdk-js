@@ -83,55 +83,68 @@ class AutocompleteUI {
   constructor(options: Partial<RadarAutocompleteUIOptions> = {}) {
     this.config = Object.assign({}, defaultAutocompleteOptions, options) as RadarAutocompleteConfig;
 
-    // lookup container element
-    if (typeof this.config.container === 'string') {
-      const containerEL = document.getElementById(this.config.container);
-      if (!containerEL) {
-        throw new RadarAutocompleteContainerNotFound(`Could not find element with id ${this.config.container}`);
-      }
-      this.container = containerEL;
-    } else { // use provided element
-      this.container = this.config.container; // HTMLElement
-    }
-
-    // state
+    // setup state
     this.isOpen = false;
     this.debouncedFetchResults = this.debounce(this.fetchResults, this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
 
-    // input field element
-    this.inputField = document.createElement('input');
-    this.inputField.classList.add(CLASSNAMES.INPUT);
-    this.inputField.placeholder = this.config.placeholder;
-    this.inputField.type = 'text';
-    this.inputField.disabled = this.config.disabled;
+    // get container element
+    let containerEL;
+    if (typeof this.config.container === 'string') { // lookup container element by ID
+      containerEL = document.getElementById(this.config.container);
+    } else { // use provided element
+      this.container = this.config.container; // HTMLElement
+    }
+    if (!containerEL) {
+      throw new RadarAutocompleteContainerNotFound(`Could not find container element: ${this.config.container}`);
+    }
+    this.container = containerEL;
 
-    // search icon
-    const searchIcon = document.createElement('div');
-    searchIcon.classList.add(CLASSNAMES.SEARCH_ICON);
-
-    // result list element
-    this.resultsList = document.createElement('ul');
-    this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
-
-    // create wrapper and input field on DOM
+    // create wrapper for input and result list
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add(CLASSNAMES.WRAPPER);
     this.wrapper.style.display = this.config.responsive ? 'block' : 'inline-block';
     setWidth(this.wrapper, this.config);
 
-    this.wrapper.appendChild(this.inputField);
-    this.wrapper.appendChild(this.resultsList);
-    this.wrapper.appendChild(searchIcon);
+    // result list element
+    this.resultsList = document.createElement('ul');
+    this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
 
-    // event listeners
+    if (containerEL.nodeName === 'INPUT') {
+      // if an <input> element is provided, use that as the inputField,
+      // and append the resultList to it's parent container
+      this.inputField = containerEL as HTMLInputElement;
+
+      // append to dom
+      this.wrapper.appendChild(this.resultsList);
+      (containerEL.parentNode as any).appendChild(this.wrapper);
+
+    } else {
+      // if container is not an input, create new input and append to container
+
+      // create new input
+      this.inputField = document.createElement('input');
+      this.inputField.classList.add(CLASSNAMES.INPUT);
+      this.inputField.placeholder = this.config.placeholder;
+      this.inputField.type = 'text';
+      this.inputField.disabled = this.config.disabled;
+
+      // search icon
+      const searchIcon = document.createElement('div');
+      searchIcon.classList.add(CLASSNAMES.SEARCH_ICON);
+
+      // append to DOM
+      this.wrapper.appendChild(this.inputField);
+      this.wrapper.appendChild(this.resultsList);
+      this.wrapper.appendChild(searchIcon);
+      this.container.appendChild(this.wrapper);
+    }
+
+    // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('blur', () => this.close(), true);
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
-
-    // append to DOM
-    this.container.appendChild(this.wrapper);
 
     Logger.debug(`AutocompleteUI iniailized with options: ${JSON.stringify(this.config)}`);
   }
