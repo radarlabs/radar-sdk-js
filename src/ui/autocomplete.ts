@@ -94,7 +94,7 @@ class AutocompleteUI {
     if (typeof this.config.container === 'string') { // lookup container element by ID
       containerEL = document.getElementById(this.config.container);
     } else { // use provided element
-      this.container = this.config.container; // HTMLElement
+      containerEL = this.config.container; // HTMLElement
     }
     if (!containerEL) {
       throw new RadarAutocompleteContainerNotFound(`Could not find container element: ${this.config.container}`);
