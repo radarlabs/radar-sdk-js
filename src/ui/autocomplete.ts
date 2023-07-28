@@ -74,6 +74,7 @@ class AutocompleteUI {
   inputField: HTMLInputElement;
   resultsList: HTMLElement;
   wrapper: HTMLElement;
+  poweredByLink?: HTMLElement;
 
   // create a new AutocompleteUI instance
   public static createAutocomplete(autocompleteOptions: RadarAutocompleteUIOptions): AutocompleteUI {
@@ -127,7 +128,7 @@ class AutocompleteUI {
 
     // event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
-    this.inputField.addEventListener('blur', () => this.close(), true);
+    this.inputField.addEventListener('blur', (e) => this.close(e), true);
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
 
     // append to DOM
@@ -256,6 +257,7 @@ class AutocompleteUI {
       const link = document.createElement('a');
       link.href = 'https://radar.com?ref=powered_by_radar';
       link.target = '_blank';
+      this.poweredByLink = link;
 
       const poweredByText = document.createElement('span');
       poweredByText.textContent = 'Powered by';
@@ -289,17 +291,21 @@ class AutocompleteUI {
     // emit event
   }
 
-  public close() {
+  public close(e?: FocusEvent) {
     if (!this.isOpen) {
       return;
     }
 
-    this.wrapper.removeAttribute(ARIA.EXPANDED);
-    this.resultsList.setAttribute("hidden", "");
-    this.highlightedIndex = -1;
-    this.isOpen = false;
-    this.clearResultsList();
-    // emit event
+    // run this code async to allow link click to propagate before blur
+    const linkClick = e && (e.relatedTarget === this.poweredByLink);
+    setTimeout(() => {
+      this.wrapper.removeAttribute(ARIA.EXPANDED);
+      this.resultsList.setAttribute("hidden", "");
+      this.highlightedIndex = -1;
+      this.isOpen = false;
+      this.clearResultsList();
+      // emit event
+    }, linkClick ? 100 : 0);
   }
 
   public goTo(index: number) {
