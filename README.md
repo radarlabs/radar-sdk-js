@@ -33,13 +33,13 @@
 
 > **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
-Add the `radar-sdk-js` and `maplibre-gl-js` packages
+Add the `radar-sdk-js` and `maplibre-gl` packages
 ```bash
 # with npm
-npm install --save radar-sdk-js maplibre-gl-js
+npm install --save radar-sdk-js maplibre-gl
 
 # with yarn
-yarn add radar-sdk-js maplibre-gl-js
+yarn add radar-sdk-js maplibre-gl
 ```
 
 Then import as an ES Module in your project

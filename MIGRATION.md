@@ -10,7 +10,7 @@ Follow the instructions below for installing the latest version, and any updates
 
 The Radar JS SDK now has a dependency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) to power Radar Maps functionality. This is included as a `peerDependency` in the project, so if you're installing the Radar SDK as an ES Module, you'll need to install MapLibre as an additional package.
 ```bash
-npm install --save radar-sdk-js maplibre-gl-js@2.4.0
+npm install --save radar-sdk-js maplibre-gl
 ```
 
 ### Initialization
