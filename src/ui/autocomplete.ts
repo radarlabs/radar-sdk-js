@@ -128,7 +128,7 @@ class AutocompleteUI {
 
     // event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
-    this.inputField.addEventListener('blur', (e) => this.close(e), true);
+    this.inputField.addEventListener('blur', this.close.bind(this), true);
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
 
     // append to DOM
@@ -286,9 +286,8 @@ class AutocompleteUI {
     }
 
     this.wrapper.setAttribute(ARIA.EXPANDED, 'true');
-    this.resultsList.removeAttribute("hidden");
+    this.resultsList.removeAttribute('hidden');
     this.isOpen = true;
-    // emit event
   }
 
   public close(e?: FocusEvent) {
@@ -300,11 +299,10 @@ class AutocompleteUI {
     const linkClick = e && (e.relatedTarget === this.poweredByLink);
     setTimeout(() => {
       this.wrapper.removeAttribute(ARIA.EXPANDED);
-      this.resultsList.setAttribute("hidden", "");
+      this.resultsList.setAttribute('hidden', '');
       this.highlightedIndex = -1;
       this.isOpen = false;
       this.clearResultsList();
-      // emit event
     }, linkClick ? 100 : 0);
   }
 
