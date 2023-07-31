@@ -145,11 +145,7 @@ class Radar {
   }
 
   public static trackVerified(params: RadarTrackParams = {}) {
-    try {
-      return VerifyAPI.trackVerified(params);
-    } finally {
-      ConfigAPI.getConfig(params); // call with updated permissions
-    }
+    return VerifyAPI.trackVerified(params);
   }
 
   public static getContext(params: Location) {
