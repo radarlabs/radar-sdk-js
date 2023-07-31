@@ -132,7 +132,7 @@ class Http {
       }
 
       xhr.onerror = function() {
-        if (host && host.includes('localhost')) {
+        if (host && host.includes('localhost:52516')) {
           reject(new RadarDesktopAppError());
         } else {
           reject(new RadarServerError());
