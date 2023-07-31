@@ -31,6 +31,14 @@ export class RadarLocationPermissionsError extends RadarError {
   }
 }
 
+export class RadarDesktopAppError extends RadarError {
+  constructor() {
+    super('Desktop app not running.');
+    this.name = 'RadarDesktopAppError';
+    this.status = 'ERROR_DESKTOP_APP';
+  }
+}
+
 // HTTP Errors
 export class RadarBadRequestError extends RadarError {
   code: number;

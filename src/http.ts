@@ -4,6 +4,7 @@ import Logger from './logger';
 
 import {
   RadarBadRequestError,
+  RadarDesktopAppError,
   RadarForbiddenError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
@@ -131,7 +132,11 @@ class Http {
       }
 
       xhr.onerror = function() {
-        reject(new RadarServerError());
+        if (host && host.includes('localhost')) {
+          reject(new RadarDesktopAppError());
+        } else {
+          reject(new RadarServerError());
+        }
       }
 
       xhr.ontimeout = function() {
