@@ -4,6 +4,7 @@ import Logger from './logger';
 
 import {
   RadarBadRequestError,
+  RadarDesktopAppError,
   RadarForbiddenError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
@@ -27,10 +28,12 @@ class Http {
     method,
     path,
     data,
+    host,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
+    host?: string;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -43,9 +46,9 @@ class Http {
       }
 
       // setup request URL
-      const host = options.host;
+      const urlHost = host || options.host;
       const version = options.version;
-      let url = `${host}/${version}/${path}`;
+      let url = `${urlHost}/${version}/${path}`;
 
       // remove undefined values from request data
       let body: any = {};
@@ -129,7 +132,11 @@ class Http {
       }
 
       xhr.onerror = function() {
-        reject(new RadarServerError());
+        if (host && host.includes('localhost:52516')) {
+          reject(new RadarDesktopAppError());
+        } else {
+          reject(new RadarServerError());
+        }
       }
 
       xhr.ontimeout = function() {

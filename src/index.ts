@@ -13,6 +13,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
+import VerifyAPI from './api/verify';
 
 import MapUI from './ui/map';
 import AutocompleteUI from './ui/autocomplete';
@@ -141,6 +142,10 @@ class Radar {
     } finally {
       ConfigAPI.getConfig(params); // call with updated permissions
     }
+  }
+
+  public static trackVerified(params: RadarTrackParams = {}) {
+    return VerifyAPI.trackVerified(params);
   }
 
   public static getContext(params: Location) {
