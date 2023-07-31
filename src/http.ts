@@ -28,12 +28,12 @@ class Http {
     method,
     path,
     data,
-    host = undefined,
+    host,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
-    host?: string | undefined;
+    host?: string;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
