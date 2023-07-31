@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Radar JS SDK | log a conversion</title>
+    <title>Radar JS SDK | track verified</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
@@ -75,43 +75,45 @@
         </div>
 
         <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Log a conversion</h1>
+  <h1 class="mb-4">Track verified</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
     <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
   </div>
 
-  <p>Log a conversion to analyze alongside other location activity in your app</p>
+  <p>Use the Radar Verify app to verify the user's current location.</p>
 
   <div class="mt-5 mb-3 form-row">
-    <label for="name" class="col-form-label" style="width: 128px;">Name</label>
-    <div>
-      <input type="text" class="form-control" id="name" style="width: 250px;" placeholder="Required">
-    </div>
-  </div>
-  <div class="mb-3 form-row">
     <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
     <div>
       <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
     </div>
   </div>
-  <div class="mb-3 form-row">
-    <label for="revenue" class="col-form-label" style="width: 128px;">Revenue</label>
-    <div>
-      <input type="number" class="form-control" id="revenue" style="width: 250px;">
-    </div>
-  </div>
 
   <div>
-    <button id="log-conversion" type="button" class="btn btn-primary" disabled>Log conversion</button>
+    <button id="track-verified" type="button" class="btn btn-primary" disabled>Call track verified</button>
   </div>
 
   <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
   </div>
 
+  <div>
+    <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
+  </div>
+
   <div id="response-details" style="display: none;">
-    <h6 class="mt-4">Response</h6>
+    <h6 class="mt-4">Location</h6>
     <div class="mt-2">
-      <pre><code id="response" class="code-sample language-json"></code><pre>
+      <pre><code id="location" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">User</h6>
+    <div class="mt-2">
+      <pre><code id="user" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Events</h6>
+    <div class="mt-2">
+      <pre><code id="events" class="code-sample language-json"></code><pre>
     </div>
   </div>
 
@@ -129,18 +131,15 @@
     &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
 
     &lt;script&gt;
-      $('#log-conversion').click(() =&gt; {
+      $('#track-verified').click(() =&gt; {
         Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
-        const conversionOptions = {
-          name: $('#name').val(),
-          userId: $('#user-id').val(),
-          revenue: $('#revenue').val(),
-        };
-
-        Radar.logConversion(options).then(({ event }) =&gt; {
-          console.log(event);
-        });
+        Radar.trackVerified({ userId: 'test-user-id' })
+          .then(({ location, user, events }) =&gt; {
+            console.log(location);
+            console.log(user);
+            console.log(events);
+          });
       });
     &lt;/script&gt;
   &lt;/body&gt;
@@ -153,11 +152,12 @@
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      $('#log-conversion').prop('disabled', false);
+      $('#track-verified').prop('disabled', false);
     }
   });
 
-  $('#log-conversion').click(() => {
+  let map;
+  $('#track-verified').click(() => {
     $('#error-alert').hide();
     $('#response-details').hide();
 
@@ -166,27 +166,51 @@
 
     $('#loader').show();
 
-    const options = {
-      name: $('#name').val(),
-      userId: $('#user-id').val(),
-      revenue: $('#revenue').val(),
-    };
-
-    Radar.logConversion(options)
-      .then((response) => {
-        console.log('CONVERSION RESPONSE', response);
+    const userId = $('#user-id').val();
+    Radar.trackVerified({ userId })
+      .then(({ location, user, events }) => {
+        console.log('TRACK RESPONSE', { location, user, events });
         $('#loader').hide();
+
+        console.log(location);
+        console.log(user);
+        console.log(events);
+
+        $('#map').show();
+        if (!map) {
+          map = Radar.ui.map({
+            container: 'map',
+          });
+        }
+        map.setCenter([location.longitude, location.latitude]);
+
+        if (map.getZoom() < 14) {
+          map.setZoom(14);
+        }
+
+        const html = `
+          <p>${user.userId}</p>
+          <p>${location.latitude},${location.longitude}</p>
+        `.trim();
+
+        const marker = Radar.ui.marker({ html })
+          .setLngLat([location.longitude, location.latitude])
+          .addTo(map);
+
         $('#response-details').show();
-        $('#response').html(JSON.stringify(response.event, null, 2));
+        $('#location').html(JSON.stringify(location, null, 2));
+        $('#user').html(JSON.stringify(user, null, 2));
+        $('#events').html(JSON.stringify(events, null, 2));
         hljs.highlightAll();
       })
       .catch((err) => {
-        console.error('CREATE TRIP ERROR:', err);
+        console.error(err);
         $('#loader').hide();
         $('#error-alert').show();
         $('#error-text').html(err.message);
       });
   });
+
 </script>
 
 
