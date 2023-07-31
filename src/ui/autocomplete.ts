@@ -296,6 +296,7 @@ class AutocompleteUI {
     }
 
     // run this code async to allow link click to propagate before blur
+    // (add 100ms delay if closed from link click)
     const linkClick = e && (e.relatedTarget === this.poweredByLink);
     setTimeout(() => {
       this.wrapper.removeAttribute(ARIA.EXPANDED);
