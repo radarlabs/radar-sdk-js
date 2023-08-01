@@ -344,6 +344,11 @@ class AutocompleteUI {
     // fallback to deprecated "keyCode" if event.code not set
     const code = event.code !== undefined ? event.code : event.keyCode;
 
+    // allow event to propagate if result list is not open
+    if (!this.isOpen) {
+      return;
+    }
+
     switch (code) {
       // Next item
       case 'Tab':
