@@ -26,6 +26,14 @@ class TrackAPI {
       accuracy = deviceLocation.accuracy;
     }
 
+    // location authorization
+    let locationAuthorization;
+    try {
+      locationAuthorization = await Navigator.getPermissionStatus();
+    } catch (err: any) {
+      Logger.warn(`Location authorization error: ${err.message}`);
+    }
+
     // user indentification fields
     const userId = params.userId || Storage.getItem(Storage.USER_ID);
     const deviceId = params.deviceId || Device.getDeviceId();
@@ -52,6 +60,7 @@ class TrackAPI {
 
     const body = {
       ...params,
+      locationAuthorization,
       accuracy,
       description,
       deviceId,
