@@ -456,6 +456,7 @@ export interface RadarMarkerOptions {
 
 export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
+  near?: string | Location; // bias for location results
   debounceMS?: number, // Debounce time in milliseconds
   threshold?: number, // Minimum number of characters to trigger autocomplete
   limit?: number, // Maximum number of autocomplete results
@@ -463,6 +464,7 @@ export interface RadarAutocompleteUIOptions {
   countryCode?: string;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
+  onRequest?: (params: RadarAutocompleteParams) => void,
   onResults?: (results: any[]) => void,
   onError?: (error: any) => void,
   disabled?: boolean,

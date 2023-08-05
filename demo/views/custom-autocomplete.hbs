@@ -1,17 +1,17 @@
 <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Address autocomplete</h1>
+  <h1 class="mb-4">Custom autocomplete input</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
     <strong>Error</strong> Something went wrong. Check the developer console for details.
   </div>
 
-  <p>Create an autocomplete widget for searching an address.</p>
+  <p>Customize the autocomplete widget by providing an <code>&lt;input&gt;</code> as the container element.</p>
 
   <div id="autocomplete-warning" class="callout gray">
     Add publishable key to see autocomplete input
   </div>
 
   <div>
-    <div id="autocomplete"></div>
+    <input id="autocomplete" name="address" type="text" style="width: 300px" />
   </div>
 
   <div id="result-container" class="mt-4" style="display: none;">

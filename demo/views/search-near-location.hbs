@@ -1,0 +1,117 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Search near location</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error</strong> Something went wrong. Check the developer console for details.
+  </div>
+
+  <p>Use the map's centerpoint along with the <a href="#">near</a> param to bias search results with the map center.</p>
+
+  <div id="autocomplete-warning" class="callout gray">
+    Add publishable key to see autocomplete input
+  </div>
+
+  <div>
+    <div id="autocomplete"></div>
+  </div>
+
+  <div style="margin-top: 16px; position: relative;">
+    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+    <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
+      <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+    </div>
+    <div id="near" style="position: absolute; top: 10px; left: 10px; display: none;">
+      <p style="font-family: monospace;">Center: <span id="coords">0, 0</span></p>
+    </div>
+  </div>
+
+  <div class="row result-container" class="mt-4" style="margin-top: 16px; display: none;">
+    <div class="col-sm-6">
+      <p class="mb-1"><b>Params</b></p>
+      <pre><code id="params" class="code-sample language-json"></code></pre>
+    </div>
+    <div class="col-sm-6">
+      <p class="mb-1"><b>Selected result</b></p>
+      <pre><code id="result" class="code-sample language-json"></code></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  let autocomplete;
+  let map;
+  let marker;
+
+  const init = (publishableKey) => {
+    $('#error-alert').hide();
+    $('#autocomplete-warning').hide();
+    $('#map-warning').hide();
+    $('#map').show();
+
+    Radar.initialize(publishableKey, { debug: true });
+
+    // setup autocomplete
+    if (autocomplete) {
+      autocomplete.remove();
+    }
+    autocomplete = Radar.ui.autocomplete({
+      container: 'autocomplete',
+      countryCode: 'US',
+      threshold: 2,
+      onRequest: (params) => {
+        $('#params').html(JSON.stringify(params, null, 2));
+        $('.result-container').show();
+        hljs.highlightAll();
+      },
+      onSelection: (result) => {
+        console.log(result);
+        $('#result').html(JSON.stringify(result, null, 2));
+        $('.result-container').show();
+        hljs.highlightAll();
+
+        // add pin and center map
+        const { latitude, longitude } = result;
+        if (latitude && longitude) {
+          if (marker) {
+            marker.remove();
+          }
+          marker = Radar.ui.marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+          map.setZoom(14);
+          map.setCenter([longitude, latitude]);
+        }
+      },
+      width: '600px',
+    });
+
+    // setup map
+    if (map) {
+      map.remove();
+    }
+    map = Radar.ui.map({
+      container: 'map',
+    });
+    map.on('error', (err) => {
+      console.error(err);
+      $('#error-alert').show();
+    });
+    map.on('load', () => {
+      $('#near').show();
+    });
+    map.on('move', () => {
+      const { lat, lng } = map.getCenter();
+      const near = `${lat},${lng}`;
+      $('#coords').html(near);
+      autocomplete.setNear(near);
+    });
+  };
+
+
+  // initalize map on api key changes
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      init(publishableKey);
+    }
+  });
+</script>

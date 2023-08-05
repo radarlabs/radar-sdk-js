@@ -17,39 +17,6 @@
               <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
             </div>
           </div>
-
-          <div>
-            <pre>
-              <code class="code-sample language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;meta charset="utf-8" /&gt;
-    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
-    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
-    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
-  &lt;/head&gt;
-
-  &lt;body&gt;
-    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
-
-    &lt;script type="text/javascript"&gt;
-      // initialize Radar SDK
-      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
-
-      // create map
-      const map = Radar.ui.map({
-        container: 'map',
-      });
-
-      // create marker and add to map
-      const marker = Radar.ui.marker({ text: 'Radar HQ' })
-        .setLngLat([-73.9910078, 40.7342465])
-        .addTo(map);
-    &lt;/script&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code>
-            </pre>
-          </div>
         </div>
 
         <script>
@@ -70,9 +37,13 @@
               container: 'map',
             });
 
-            const marker = Radar.ui.marker({ text: 'Radar HQ' })
-              .setLngLat([-73.9910078, 40.7342465])
-              .addTo(map);
+            map.on('load', () => {
+              const { lat, lng } = map.getCenter();
+
+              const marker = Radar.ui.marker({ text: `${lat}, ${lng}` })
+                .setLngLat([lng, lat])
+                .addTo(map);
+            });
 
             map.on('error', (err) => {
               console.error(err);
