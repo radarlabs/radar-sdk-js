@@ -2,7 +2,7 @@ import Logger from '../logger';
 import SearchAPI from '../api/search';
 
 import { RadarAutocompleteContainerNotFound } from '../errors';
-import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams } from '../types';
+import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location } from '../types';
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -68,6 +68,7 @@ class AutocompleteUI {
   results: any[];
   highlightedIndex: number;
   debouncedFetchResults: (...args: any[]) => Promise<any>;
+  near?: string;
 
   // DOM elements
   container: HTMLElement;
@@ -89,6 +90,14 @@ class AutocompleteUI {
     this.debouncedFetchResults = this.debounce(this.fetchResults, this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
+
+    if (options.near) {
+      if (typeof options.near === 'string') {
+        this.near = options.near;
+      } else {
+        this.near = `${options.near.latitude},${options.near.longitude}`;
+      }
+    }
 
     // get container element
     let containerEL;
@@ -208,13 +217,21 @@ class AutocompleteUI {
   }
 
   public async fetchResults(query: string) {
-    const { limit, layers, countryCode } = this.config;
+    const { limit, layers, countryCode, onRequest } = this.config;
 
     const params: RadarAutocompleteParams = {
       query,
       limit,
       layers,
       countryCode,
+    }
+
+    if (this.near) {
+      params.near = this.near;
+    }
+
+    if (onRequest) {
+      onRequest(params);
     }
 
     const { addresses } = await SearchAPI.autocomplete(params);
@@ -416,9 +433,20 @@ class AutocompleteUI {
 
   // remove elements from DOM
   public remove() {
+    Logger.debug('AutocompleteUI removed.');
     this.inputField.remove();
     this.resultsList.remove();
     this.wrapper.remove();
+  }
+
+  public setNear(near: string | Location) {
+    if (near) {
+      if (typeof near === 'string') {
+        this.near = near;
+      } else {
+        this.near = `${near.latitude},${near.longitude}`;
+      }
+    }
   }
 }
 
