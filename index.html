@@ -4,12 +4,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
-    <link href="https://js.radar.com/v4.1.1/radar.css" rel="stylesheet">
+    <link href="https://js.radar.com/v4.1.2/radar.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" crossorigin="anonymous"></script>
-    <script src="https://js.radar.com/v4.1.1/radar.min.js"></script>
+    <script src="https://js.radar.com/v4.1.2/radar.min.js"></script>
   </head>
   <body>
     <main>
@@ -17,7 +17,7 @@
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
           <a href="/" class="d-flex align-items-baseline pb-1 mb-3 link-dark text-decoration-none border-bottom">
             <span class="fs-5 fw-semibold">Radar JS SDK</span>
-            <span style="font-size: 10px; margin-left: 10px;">v4.1.1</span>
+            <span style="font-size: 10px; margin-left: 10px;">v4.1.2</span>
           </a>
           <ul class="list-unstyled ps-0">
             <li class="mb-1">
@@ -34,6 +34,8 @@
                   <li><a href="./display-a-map" class="link-dark rounded">Display a map</a></li>
                   <li><a href="./add-a-marker" class="link-dark rounded">Add a marker</a></li>
                   <li><a href="./create-autocomplete" class="link-dark rounded">Address autocomplete</a></li>
+                  <li><a href="./custom-autocomplete" class="link-dark rounded">Custom autocomplete input</a></li>
+                  <li><a href="./search-near-location" class="link-dark rounded">Search near location</a></li>
                   <li class="border-top my-3"></li>
                 </ul>
               </div>
@@ -88,35 +90,16 @@
   </div>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+    <div id="map" style="width: 100%; height: 500px; display: none; position: relative;">
+      <select id="style" class="form-control" value="radar-default-v1">
+        <option value="radar-default-v1">radar-default-v1</option>
+        <option value="radar-light-v1">radar-light-v1</option>
+        <option value="radar-dark-v1">radar-dark-v1</option>
+      </select>
+    </div>
     <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
       <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
     </div>
-  </div>
-
-  <div class="mt-4">
-    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;meta charset="utf-8" /&gt;
-    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
-    &lt;link href="https://js.radar.com/v4.1.1/radar.css" rel="stylesheet"&gt;
-    &lt;script src="https://js.radar.com/v4.1.1/radar.min.js"&gt;&lt;/script&gt;
-  &lt;/head&gt;
-
-  &lt;body&gt;
-    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
-
-    &lt;script type="text/javascript"&gt;
-      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
-
-      const map = Radar.ui.map({
-        container: 'map',
-      });
-    &lt;/script&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code>
-    </pre>
   </div>
 </div>
 
@@ -144,6 +127,11 @@
     });
   };
 
+  // change styles
+  $('#style').on('change', (e) => {
+    console.log('Setting map style:', e.target.value);
+    map.setStyle(e.target.value);
+  });
 
   // initalize map on api key changes
   $('#publishableKey').on('change', () => {
@@ -153,6 +141,22 @@
     }
   });
 </script>
+
+<style>
+  select {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 180px !important;
+    appearance: none;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAOCAYAAAFC/+zoAAAABGdBTUEAALGPC/xhBQAAAlVJREFUOBHFVE1oE0EUnre7TauiRYN/gYJU86NQk2BFDdmIIKL04k1Q6qkXxYPgURDEmwfPQg+CIHipBryIvWVDEIl2kxDNplUsPYgHL0pbjbszvjd1J7sxEW/OIfu9b773XuZ7s8tYYAHh0kJLALBvirfq7XEZlGxnXbEkw7WRYjsPKFabBEr1xZOKKNVaV1QQABoIdj2YSrj69uNeWbdcb1/kHn9ECYVsSnIqGZvrKkAA+D9PC4/PA4OvZjY5Gtz0cdl2LnAhHjNgq6qcZTsPsdo0iSJGZM/xifHPyL1DLkWcmUnqAMBVApG0Ks2lA27HXSSMm1UzmzpKOLReNj7sDhF9AqvmXCYa8Pg/8WlohnYmP5GY76NlcgxCjAxp+hHNiBgHScRd/gJNvhtMqAoxJL1FMU709Yl0/I08Q7MpIl86zg8pBnhVyCSP0ZTRvffE4WHv4aFvSCxFv3+w9XcmxDBZLJjYJgUaO2emU8993R8uWXbLEYIlSLB5eCQ2eWjfJ1888GnVWmf969Urkh3KNWeGczGLwTKAPpXPxJu9wn+JK42lnOd6RRxglIF23kzHnwFekzxekyIWiAaKuGjN1UI2ORvgBkJroX2TgbgTOgXACs52SnlUaa7scDtrTxkThVAlYHNGdMt0bmys+8qhwKovb2d8fQ79PBXU48SKm3ZtvTQZi60RrxoERTi9Wzi920EOhdI+TYdRsgGnurO7D54GcC2fSdzvchuobwNfNMA+f5sumLQhd3h/o0uG0V8b+FKyz+usPsEvj/zW9Nrg6/7L8xcjHfmQXhIJDAAAAABJRU5ErkJggg==');
+    background-size: 12px;
+    background-position: calc(100% - 20px) center;
+    background-repeat: no-repeat;
+    padding-right: 45px;
+    z-index: 1;
+  }
+</style>
 
 
         <script>

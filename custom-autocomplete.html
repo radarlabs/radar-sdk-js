@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Radar JS SDK | display a map</title>
+    <title>Radar JS SDK | custom autocomplete</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
@@ -77,86 +77,65 @@
         </div>
 
         <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Display a map</h1>
+  <h1 class="mb-4">Custom autocomplete input</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
     <strong>Error</strong> Something went wrong. Check the developer console for details.
   </div>
 
-  <p>Initialize a new map with the Radar SDK and render on the page.</p>
+  <p>Customize the autocomplete widget by providing an <code>&lt;input&gt;</code> as the container element.</p>
 
-  <div class="callout">
-    Radar map objects are MapLibre GL JS references.
-    See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+  <div id="autocomplete-warning" class="callout gray">
+    Add publishable key to see autocomplete input
   </div>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px; display: none; position: relative;">
-      <select id="style" class="form-control" value="radar-default-v1">
-        <option value="radar-default-v1">radar-default-v1</option>
-        <option value="radar-light-v1">radar-light-v1</option>
-        <option value="radar-dark-v1">radar-dark-v1</option>
-      </select>
-    </div>
-    <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
-      <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
-    </div>
+    <input id="autocomplete" name="address" type="text" style="width: 300px" />
+  </div>
+
+  <div id="result-container" class="mt-4" style="display: none;">
+    <p class="mb-1"><b>Selected result</b></p>
+    <pre><code id="result" class="code-sample language-json"></code></pre>
   </div>
 </div>
 
 <script>
-  let map;
-  const initialize = (publishableKey) => {
+  let autocomplete;
+  const init = (publishableKey) => {
     $('#error-alert').hide();
-    $('#map-warning').hide();
-    $('#map').show();
+    $('#autocomplete-warning').hide();
 
     Radar.initialize(publishableKey, { debug: true });
 
-    // prevent duplicate maps from rendering over each other
-    if (map) {
-      map.remove();
+    // prevent duplicate inputs
+    if (autocomplete) {
+      autocomplete.remove();
     }
 
-    map = Radar.ui.map({
-      container: 'map',
+    autocomplete = Radar.ui.autocomplete({
+      container: 'autocomplete',
+      countryCode: 'US',
+      threshold: 2,
+      onSelection: (result) => {
+        console.log(result);
+        $('#result').html(JSON.stringify(result, null, 2));
+        $('#result-container').show();
+        hljs.highlightAll();
+      },
+      width: '600px',
     });
 
-    map.on('error', (err) => {
-      console.error(err);
-      $('#error-alert').show();
-    });
+    console.log('AUTOCOMPLETE', autocomplete);
   };
 
-  // change styles
-  $('#style').on('change', (e) => {
-    console.log('Setting map style:', e.target.value);
-    map.setStyle(e.target.value);
-  });
 
   // initalize map on api key changes
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      initialize(publishableKey);
+      init(publishableKey);
     }
   });
 </script>
-
-<style>
-  select {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 180px !important;
-    appearance: none;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAOCAYAAAFC/+zoAAAABGdBTUEAALGPC/xhBQAAAlVJREFUOBHFVE1oE0EUnre7TauiRYN/gYJU86NQk2BFDdmIIKL04k1Q6qkXxYPgURDEmwfPQg+CIHipBryIvWVDEIl2kxDNplUsPYgHL0pbjbszvjd1J7sxEW/OIfu9b773XuZ7s8tYYAHh0kJLALBvirfq7XEZlGxnXbEkw7WRYjsPKFabBEr1xZOKKNVaV1QQABoIdj2YSrj69uNeWbdcb1/kHn9ECYVsSnIqGZvrKkAA+D9PC4/PA4OvZjY5Gtz0cdl2LnAhHjNgq6qcZTsPsdo0iSJGZM/xifHPyL1DLkWcmUnqAMBVApG0Ks2lA27HXSSMm1UzmzpKOLReNj7sDhF9AqvmXCYa8Pg/8WlohnYmP5GY76NlcgxCjAxp+hHNiBgHScRd/gJNvhtMqAoxJL1FMU709Yl0/I08Q7MpIl86zg8pBnhVyCSP0ZTRvffE4WHv4aFvSCxFv3+w9XcmxDBZLJjYJgUaO2emU8993R8uWXbLEYIlSLB5eCQ2eWjfJ1888GnVWmf969Urkh3KNWeGczGLwTKAPpXPxJu9wn+JK42lnOd6RRxglIF23kzHnwFekzxekyIWiAaKuGjN1UI2ORvgBkJroX2TgbgTOgXACs52SnlUaa7scDtrTxkThVAlYHNGdMt0bmys+8qhwKovb2d8fQ79PBXU48SKm3ZtvTQZi60RrxoERTi9Wzi920EOhdI+TYdRsgGnurO7D54GcC2fSdzvchuobwNfNMA+f5sumLQhd3h/o0uG0V8b+FKyz+usPsEvj/zW9Nrg6/7L8xcjHfmQXhIJDAAAAABJRU5ErkJggg==');
-    background-size: 12px;
-    background-position: calc(100% - 20px) center;
-    background-repeat: no-repeat;
-    padding-right: 45px;
-    z-index: 1;
-  }
-</style>
 
 
         <script>
