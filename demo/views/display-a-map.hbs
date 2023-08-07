@@ -12,7 +12,13 @@
   </div>
 
   <div>
-    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+    <div id="map" style="width: 100%; height: 500px; display: none; position: relative;">
+      <select id="style" class="form-control" value="radar-default-v1">
+        <option value="radar-default-v1">radar-default-v1</option>
+        <option value="radar-light-v1">radar-light-v1</option>
+        <option value="radar-dark-v1">radar-dark-v1</option>
+      </select>
+    </div>
     <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
       <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
     </div>
@@ -43,6 +49,11 @@
     });
   };
 
+  // change styles
+  $('#style').on('change', (e) => {
+    console.log('Setting map style:', e.target.value);
+    map.setStyle(e.target.value);
+  });
 
   // initalize map on api key changes
   $('#publishableKey').on('change', () => {
@@ -52,3 +63,19 @@
     }
   });
 </script>
+
+<style>
+  select {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 180px !important;
+    appearance: none;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAOCAYAAAFC/+zoAAAABGdBTUEAALGPC/xhBQAAAlVJREFUOBHFVE1oE0EUnre7TauiRYN/gYJU86NQk2BFDdmIIKL04k1Q6qkXxYPgURDEmwfPQg+CIHipBryIvWVDEIl2kxDNplUsPYgHL0pbjbszvjd1J7sxEW/OIfu9b773XuZ7s8tYYAHh0kJLALBvirfq7XEZlGxnXbEkw7WRYjsPKFabBEr1xZOKKNVaV1QQABoIdj2YSrj69uNeWbdcb1/kHn9ECYVsSnIqGZvrKkAA+D9PC4/PA4OvZjY5Gtz0cdl2LnAhHjNgq6qcZTsPsdo0iSJGZM/xifHPyL1DLkWcmUnqAMBVApG0Ks2lA27HXSSMm1UzmzpKOLReNj7sDhF9AqvmXCYa8Pg/8WlohnYmP5GY76NlcgxCjAxp+hHNiBgHScRd/gJNvhtMqAoxJL1FMU709Yl0/I08Q7MpIl86zg8pBnhVyCSP0ZTRvffE4WHv4aFvSCxFv3+w9XcmxDBZLJjYJgUaO2emU8993R8uWXbLEYIlSLB5eCQ2eWjfJ1888GnVWmf969Urkh3KNWeGczGLwTKAPpXPxJu9wn+JK42lnOd6RRxglIF23kzHnwFekzxekyIWiAaKuGjN1UI2ORvgBkJroX2TgbgTOgXACs52SnlUaa7scDtrTxkThVAlYHNGdMt0bmys+8qhwKovb2d8fQ79PBXU48SKm3ZtvTQZi60RrxoERTi9Wzi920EOhdI+TYdRsgGnurO7D54GcC2fSdzvchuobwNfNMA+f5sumLQhd3h/o0uG0V8b+FKyz+usPsEvj/zW9Nrg6/7L8xcjHfmQXhIJDAAAAABJRU5ErkJggg==');
+    background-size: 12px;
+    background-position: calc(100% - 20px) center;
+    background-repeat: no-repeat;
+    padding-right: 45px;
+    z-index: 1;
+  }
+</style>

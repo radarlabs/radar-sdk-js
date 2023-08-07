@@ -7,6 +7,12 @@ import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
+const RADAR_STYLES = [
+  'radar-default-v1',
+  'radar-light-v1',
+  'radar-dark-v1',
+];
+
 const RADAR_LOGO_URL = 'https://api.radar.io/maps/static/images/logo.svg';
 
 const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
@@ -28,9 +34,12 @@ const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) =>
 
 // use formatted style URL if using one of Radar's out-of-the-box styles
 const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
-  if (!mapOptions.style || mapOptions.style === DEFAULT_STYLE) {
-    return createStyleURL(options, mapOptions.style);
+  const style = mapOptions.style;
+
+  if (!style || (typeof style === 'string' && RADAR_STYLES.includes(style))) {
+    return createStyleURL(options, mapOptions.style as string);
   }
+
   return mapOptions.style;
 };
 
@@ -50,13 +59,23 @@ class MapUI {
     const style = getStyle(options, mapOptions);
     const maplibreOptions: maplibregl.MapOptions = Object.assign({},
       defaultMaplibreOptions,
-      { style },
       mapOptions,
+      { style },
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
     // set container
     maplibreOptions.container = mapOptions.container;
+
+    // custom request handler for Radar styles
+    maplibreOptions.transformRequest = (url, resourceType) => {
+      if (resourceType === 'Style' && RADAR_STYLES.includes(url)) {
+        const radarStyleURL = createStyleURL(options, url);
+        return { url: radarStyleURL };
+      } else {
+        return { url };
+      }
+    };
 
     // create map
     const map = new maplibregl.Map(maplibreOptions);
