@@ -6,7 +6,6 @@
   <a href="https://radar.com">Website</a> |
   <a href="https://radar.com/blog">Blog</a> |
   <a href="https://radar.com/documentation">Documentation</a> |
-  <a href="https://radar.com/documentation/faq">FAQ</a> |
   <a href="mailto:support@radar.com">Support</a>
 </h4>
 
