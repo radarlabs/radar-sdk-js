@@ -46,7 +46,7 @@ class VerifyAPI {
       method: 'GET',
       path: 'verify',
       data: body,
-      host: 'http://localhost:52516',
+      host: 'https://radar-verify.com:52516',
     });
 
     const { user, events } = response;
