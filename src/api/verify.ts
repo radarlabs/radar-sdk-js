@@ -6,10 +6,10 @@ import Logger from '../logger';
 import Session from '../session';
 import Storage from '../storage';
 
-import type { RadarTrackParams, RadarTrackResponse } from '../types';
+import type { RadarTrackParams, RadarTrackResponse, RadarTrackTokenResponse } from '../types';
 
 class VerifyAPI {
-  static async trackVerified(params: RadarTrackParams) {
+  static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
     const options = Config.get();
 
     // user indentification fields
@@ -40,6 +40,7 @@ class VerifyAPI {
       sdkVersion: SDK_VERSION,
       stopped: true,
       userId,
+      encrypted,
     };
 
     const response: any = await Http.request({
@@ -49,7 +50,7 @@ class VerifyAPI {
       host: 'https://radar-verify.com:52516',
     });
 
-    const { user, events } = response;
+    const { user, events, token } = response;
     let location;
     if (user.location && user.location.coordinates && user.locationAccuracy) {
       location = {
@@ -59,17 +60,29 @@ class VerifyAPI {
       };
     }
 
-    const trackRes = {
-      user,
-      events,
-      location,
-    } as RadarTrackResponse;
-
-    if (options.debug) {
-      trackRes.response = response;
+    if (encrypted) {
+      const trackTokenRes = {
+        token,
+      } as RadarTrackTokenResponse;
+  
+      if (options.debug) {
+        trackTokenRes.response = response;
+      }
+  
+      return trackTokenRes;
+    } else {
+      const trackRes = {
+        user,
+        events,
+        location,
+      } as RadarTrackResponse;
+  
+      if (options.debug) {
+        trackRes.response = response;
+      }
+  
+      return trackRes;
     }
-
-    return trackRes;
   }
 }
 

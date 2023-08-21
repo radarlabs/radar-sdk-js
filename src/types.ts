@@ -206,6 +206,9 @@ export interface RadarTrackResponse extends RadarResponse {
   events?: RadarEvent[];
 }
 
+export interface RadarTrackTokenResponse extends RadarResponse {
+  token?: String;
+}
 
 export interface RadarContextResponse  extends RadarResponse {
   location?: Location;
