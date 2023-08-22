@@ -70,19 +70,19 @@ class VerifyAPI {
       }
   
       return trackTokenRes;
-    } else {
-      const trackRes = {
-        user,
-        events,
-        location,
-      } as RadarTrackResponse;
-  
-      if (options.debug) {
-        trackRes.response = response;
-      }
-  
-      return trackRes;
     }
+
+    const trackRes = {
+      user,
+      events,
+      location,
+    } as RadarTrackResponse;
+
+    if (options.debug) {
+      trackRes.response = response;
+    }
+
+    return trackRes;
   }
 }
 
