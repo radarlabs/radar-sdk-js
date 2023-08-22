@@ -52,7 +52,7 @@ class VerifyAPI {
 
     const { user, events, token } = response;
     let location;
-    if (user.location && user.location.coordinates && user.locationAccuracy) {
+    if (user && user.location && user.location.coordinates && user.locationAccuracy) {
       location = {
         latitude: user.location.coordinates[1],
         longitude: user.location.coordinates[0],
