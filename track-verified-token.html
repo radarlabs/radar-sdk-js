@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Radar JS SDK | search near location</title>
+    <title>Radar JS SDK | track verified token</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
@@ -78,121 +78,98 @@
         </div>
 
         <div class="content flex-grow-1 p-4">
-  <h1 class="mb-4">Search near location</h1>
+  <h1 class="mb-4">Track verified token</h1>
   <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
-    <strong>Error</strong> Something went wrong. Check the developer console for details.
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
   </div>
 
-  <p>Use the map's centerpoint along with the <a href="#">near</a> param to bias search results with the map center.</p>
+  <p>Use the Radar Verify app to verify the user's current location. Returns a JSON Web Token (JWT). Verify the JWT server-side using your secret key.</p>
 
-  <div id="autocomplete-warning" class="callout gray">
-    Add publishable key to see autocomplete input
+  <div class="mt-5 mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
   </div>
 
   <div>
-    <div id="autocomplete"></div>
+    <button id="track-verified" type="button" class="btn btn-primary" disabled>Call track verified token</button>
   </div>
 
-  <div style="margin-top: 16px; position: relative;">
-    <div id="map" style="width: 100%; height: 500px; display: none;"></div>
-    <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
-      <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
-    </div>
-    <div id="near" style="position: absolute; top: 10px; left: 10px; display: none;">
-      <p style="font-family: monospace;">Center: <span id="coords">0, 0</span></p>
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Token</h6>
+    <div class="mt-2">
+      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code><pre>
     </div>
   </div>
 
-  <div class="row result-container" class="mt-4" style="margin-top: 16px; display: none;">
-    <div class="col-sm-6">
-      <p class="mb-1"><b>Params</b></p>
-      <pre><code id="params" class="code-sample language-json"></code></pre>
-    </div>
-    <div class="col-sm-6">
-      <p class="mb-1"><b>Selected result</b></p>
-      <pre><code id="result" class="code-sample language-json"></code></pre>
-    </div>
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;link href="https://js.radar.com/v4.1.4/radar.css" rel="stylesheet"&gt;
+    &lt;script src="https://js.radar.com/v4.1.4/radar.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;script&gt;
+      $('#track-verified').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+        Radar.trackVerifiedToken({ userId: 'test-user-id' })
+          .then(({ token }) =&gt; {
+            console.log(token);
+          });
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
   </div>
 </div>
 
 <script>
-  let autocomplete;
-  let map;
-  let marker;
-
-  const init = (publishableKey) => {
-    $('#error-alert').hide();
-    $('#autocomplete-warning').hide();
-    $('#map-warning').hide();
-    $('#map').show();
-
-    Radar.initialize(publishableKey, { debug: true });
-
-    // setup autocomplete
-    if (autocomplete) {
-      autocomplete.remove();
-    }
-    autocomplete = Radar.ui.autocomplete({
-      container: 'autocomplete',
-      countryCode: 'US',
-      threshold: 2,
-      onRequest: (params) => {
-        $('#params').html(JSON.stringify(params, null, 2));
-        $('.result-container').show();
-        hljs.highlightAll();
-      },
-      onSelection: (result) => {
-        console.log(result);
-        $('#result').html(JSON.stringify(result, null, 2));
-        $('.result-container').show();
-        hljs.highlightAll();
-
-        // add pin and center map
-        const { latitude, longitude } = result;
-        if (latitude && longitude) {
-          if (marker) {
-            marker.remove();
-          }
-          marker = Radar.ui.marker()
-            .setLngLat([longitude, latitude])
-            .addTo(map);
-          map.setZoom(14);
-          map.setCenter([longitude, latitude]);
-        }
-      },
-      width: '600px',
-    });
-
-    // setup map
-    if (map) {
-      map.remove();
-    }
-    map = Radar.ui.map({
-      container: 'map',
-    });
-    map.on('error', (err) => {
-      console.error(err);
-      $('#error-alert').show();
-    });
-    map.on('load', () => {
-      $('#near').show();
-    });
-    map.on('move', () => {
-      const { lat, lng } = map.getCenter();
-      const near = `${lat},${lng}`;
-      $('#coords').html(near);
-      autocomplete.setNear(near);
-    });
-  };
-
-
-  // initalize map on api key changes
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
-      init(publishableKey);
+      $('#track-verified').prop('disabled', false);
     }
   });
+
+  $('#track-verified').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const userId = $('#user-id').val();
+    Radar.trackVerifiedToken({ userId })
+      .then(({ token }) => {
+        console.log('TRACK RESPONSE', { token });
+        $('#loader').hide();
+
+        console.log(token);
+
+        $('#response-details').show();
+        $('#token').html(token);
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error(err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
 </script>
 
 
