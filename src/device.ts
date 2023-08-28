@@ -17,7 +17,7 @@ class Device {
     if (userAgent) {
       userAgent = userAgent.toLowerCase();
       if (userAgent.includes('macintosh')) {
-        return 'MOBILE_IOS';
+        return 'DESKTOP_MAC';
       } else if (userAgent.includes('windows')) {
         return 'DESKTOP_WINDOWS';
       } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
