@@ -150,7 +150,7 @@ class Radar {
     if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, false, 'https://radar-verify.com:52516');
     } else if (platform === 'DESKTOP_WINDOWS') { // use Windows app
-      return VerifyAPI.trackVerified(params, false, 'http://localhost.com:52516');
+      return VerifyAPI.trackVerified(params, false, 'http://localhost:52516');
     } else { // bypass desktop app
       try {
         return TrackAPI.trackOnce(params, true, false, 'https://api-verified.radar.io');
@@ -165,7 +165,7 @@ class Radar {
     if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, true, 'https://radar-verify.com:52516');
     } else if (platform === 'DESKTOP_WINDOWS') { // use Windows app
-      return VerifyAPI.trackVerified(params, true, 'http://localhost.com:52516');
+      return VerifyAPI.trackVerified(params, true, 'http://localhost:52516');
     } else { // bypass desktop app
       try {
         return TrackAPI.trackOnce(params, true, true, 'https://api-verified.radar.io');
