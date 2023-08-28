@@ -475,6 +475,7 @@ export interface RadarAutocompleteUIOptions {
   disabled?: boolean,
   responsive?: boolean;
   width?: string | number;
+  maxHeight?: string | number;
   showMarkers?: boolean;
   markerColor?: string;
 }

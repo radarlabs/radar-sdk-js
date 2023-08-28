@@ -31,26 +31,34 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   showMarkers: true,
 };
 
-const DEFAULT_WIDTH = 400;
-const formatWidth = (width: string | number) => {
-  if (typeof width === 'number') {
-    return `${width}px`;
+// determine whether to use px or CSS string
+const formatCSSValue = (value: string | number) => {
+  if (typeof value === 'number') {
+    return `${value}px`;
   }
-  return width;
+  return value;
 };
 
+const DEFAULT_WIDTH = 400;
 const setWidth = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
   // if responsive and width is provided, treat it as maxWidth
   if (options.responsive) {
     input.style.width = '100%';
     if (options.width) {
-      input.style.maxWidth = formatWidth(options.width);
+      input.style.maxWidth = formatCSSValue(options.width);
     }
     return;
   }
 
   // if not responsive, set fixed width
-  input.style.width = formatWidth(options.width || DEFAULT_WIDTH);
+  input.style.width = formatCSSValue(options.width || DEFAULT_WIDTH);
+};
+
+const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions) => {
+  if (options.maxHeight) {
+    resultsList.style.maxHeight = formatCSSValue(options.maxHeight);
+    resultsList.style.overflowY = 'auto'; /* allow overflow when maxHeight is applied */
+  }
 };
 
 const getMarkerIcon = (color: string = "#ACBDC8") => {
@@ -120,6 +128,7 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
+    setHeight(this.resultsList, this.config);
 
     if (containerEL.nodeName === 'INPUT') {
       // if an <input> element is provided, use that as the inputField,

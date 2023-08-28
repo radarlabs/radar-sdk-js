@@ -50,6 +50,15 @@ This will point the pakage in your project to use the local version of the SDK.
 
 **Note**: Make sure you're using the node.js & npm installations in both projects, especially if you're using a node manager like `nvm` or `n`.
 
+To unlink, run the unlink command in the following order:
+```bash
+# First, from the project
+npm unlink --no-save radar-sdk-js
+
+# Then in the SDK repo
+npm unlink radar-sdk-js
+```
+
 ## Versions
 There is a built in utility for managing version increments:
 ```bash
