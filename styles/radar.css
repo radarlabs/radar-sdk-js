@@ -108,8 +108,6 @@
 
 .radar-autocomplete-results-list {
   position: absolute;
-  /* max-height: 280px;
-  overflow-y: scroll; */
   box-sizing: border-box;
   left: 0;
   right: 0;

@@ -133,6 +133,12 @@ class MapUI {
     if (markerOptions.color) {
       maplibreOptions.color = markerOptions.color;
     }
+    if (markerOptions.element) {
+      maplibreOptions.element = markerOptions.element;
+    }
+    if (markerOptions.scale) {
+      maplibreOptions.scale = markerOptions.scale;
+    }
 
     const marker = new maplibregl.Marker(maplibreOptions);
 

@@ -455,6 +455,8 @@ export interface RadarMarkerOptions {
   color?: string;
   text?: string;
   html?: string;
+  element?: HTMLElement;
+  scale?: number;
 }
 
 export interface RadarAutocompleteUIOptions {
@@ -473,6 +475,7 @@ export interface RadarAutocompleteUIOptions {
   disabled?: boolean,
   responsive?: boolean;
   width?: string | number;
+  maxHeight?: string | number;
   showMarkers?: boolean;
   markerColor?: string;
 }
