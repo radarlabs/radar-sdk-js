@@ -9,7 +9,7 @@ import Storage from '../storage';
 import type { RadarTrackParams, RadarTrackResponse, RadarTrackTokenResponse } from '../types';
 
 class VerifyAPI {
-  static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
+  static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false, host: string = 'http://localhost:52516') {
     const options = Config.get();
 
     // user indentification fields
@@ -47,7 +47,7 @@ class VerifyAPI {
       method: 'GET',
       path: 'verify',
       data: body,
-      host: 'https://radar-verify.com:52516',
+      host,
     });
 
     const { user, events, token } = response;

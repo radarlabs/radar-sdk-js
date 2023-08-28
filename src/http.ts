@@ -132,7 +132,7 @@ class Http {
       }
 
       xhr.onerror = function() {
-        if (host && host === 'https://radar-verify.com:52516') {
+        if (host && (host === 'https://radar-verify.com:52516' || host === 'http://localhost:52516')) {
           reject(new RadarDesktopAppError());
         } else {
           reject(new RadarServerError());

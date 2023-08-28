@@ -9,10 +9,10 @@ import Storage from '../storage';
 
 import TripsAPI from './trips';
 
-import type { RadarTrackParams, RadarTrackResponse } from '../types';
+import type { RadarTrackParams, RadarTrackResponse, RadarTrackTokenResponse } from '../types';
 
 class TrackAPI {
-  static async trackOnce(params: RadarTrackParams) {
+  static async trackOnce(params: RadarTrackParams, verified: boolean = false, encrypted: boolean = false, host: string | undefined = undefined) {
     const options = Config.get();
 
     let { latitude, longitude, accuracy, desiredAccuracy } = params;
@@ -75,16 +75,31 @@ class TrackAPI {
       stopped: true,
       userId,
       tripOptions,
+      verified,
+      encrypted,
     };
 
     const response: any = await Http.request({
       method: 'POST',
       path: 'track',
       data: body,
+      host,
     });
 
-    const { user, events } = response;
+    const { user, events, token } = response;
     const location = { latitude, longitude, accuracy };
+
+    if (encrypted) {
+      const trackTokenRes = {
+        token,
+      } as RadarTrackTokenResponse;
+  
+      if (options.debug) {
+        trackTokenRes.response = response;
+      }
+  
+      return trackTokenRes;
+    }
 
     const trackRes = {
       user,

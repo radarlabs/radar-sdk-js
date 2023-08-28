@@ -1,4 +1,5 @@
 import Config from './config';
+import Device from './device';
 import Logger from './logger';
 import Storage from './storage';
 import Navigator from './navigator';
@@ -145,11 +146,33 @@ class Radar {
   }
 
   public static trackVerified(params: RadarTrackParams = {}) {
-    return VerifyAPI.trackVerified(params);
+    const platform = Device.getPlatform();
+    if (platform === 'DESKTOP_MAC') {
+      return VerifyAPI.trackVerified(params, false, 'https://radar-verify.com:52516');
+    } else if (platform === 'DESKTOP_WINDOWS') {
+      return VerifyAPI.trackVerified(params, false, 'http://localhost.com:52516');
+    } else {
+      try {
+        return TrackAPI.trackOnce(params, true, false, 'https://api-verified.radar.io');
+      } finally {
+        ConfigAPI.getConfig(params); // call with updated permissions
+      }
+    }
   }
 
   public static trackVerifiedToken(params: RadarTrackParams = {}) {
-    return VerifyAPI.trackVerified(params, true);
+    const platform = Device.getPlatform();
+    if (platform === 'DESKTOP_MAC') {
+      return VerifyAPI.trackVerified(params, true, 'https://radar-verify.com:52516');
+    } else if (platform === 'DESKTOP_WINDOWS') {
+      return VerifyAPI.trackVerified(params, true, 'http://localhost.com:52516');
+    } else {
+      try {
+        return TrackAPI.trackOnce(params, true, true, 'https://api-verified.radar.io');
+      } finally {
+        ConfigAPI.getConfig(params); // call with updated permissions
+      }
+    }
   }
 
   public static getContext(params: Location) {

@@ -1,3 +1,4 @@
+import Config from './config';
 import Storage from './storage';
 
 const generateUUID = (): string => {
@@ -11,6 +12,23 @@ const generateUUID = (): string => {
 };
 
 class Device {
+  static getPlatform(): string {
+    let userAgent = navigator.userAgent;
+    if (userAgent) {
+      userAgent = userAgent.toLowerCase();
+      if (userAgent.includes('macintosh')) {
+        return 'MOBILE_IOS';
+      } else if (userAgent.includes('windows')) {
+        return 'DESKTOP_WINDOWS';
+      } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
+        return 'MOBILE_IOS';
+      } else if (userAgent.includes('android')) {
+        return 'MOBILE_ANDROID';
+      }
+    }
+    return 'OTHER';
+  }
+
   static getDeviceId(): string {
     // use existing deviceId if present
     const deviceId = Storage.getItem(Storage.DEVICE_ID);
