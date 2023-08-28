@@ -147,11 +147,11 @@ class Radar {
 
   public static trackVerified(params: RadarTrackParams = {}) {
     const platform = Device.getPlatform();
-    if (platform === 'DESKTOP_MAC') {
+    if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, false, 'https://radar-verify.com:52516');
-    } else if (platform === 'DESKTOP_WINDOWS') {
+    } else if (platform === 'DESKTOP_WINDOWS') { // use Windows app
       return VerifyAPI.trackVerified(params, false, 'http://localhost.com:52516');
-    } else {
+    } else { // bypass desktop app
       try {
         return TrackAPI.trackOnce(params, true, false, 'https://api-verified.radar.io');
       } finally {
@@ -162,11 +162,11 @@ class Radar {
 
   public static trackVerifiedToken(params: RadarTrackParams = {}) {
     const platform = Device.getPlatform();
-    if (platform === 'DESKTOP_MAC') {
+    if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, true, 'https://radar-verify.com:52516');
-    } else if (platform === 'DESKTOP_WINDOWS') {
+    } else if (platform === 'DESKTOP_WINDOWS') { // use Windows app
       return VerifyAPI.trackVerified(params, true, 'http://localhost.com:52516');
-    } else {
+    } else { // bypass desktop app
       try {
         return TrackAPI.trackOnce(params, true, true, 'https://api-verified.radar.io');
       } finally {
