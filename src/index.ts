@@ -34,6 +34,8 @@ import type {
   RadarSearchGeofencesParams,
   RadarSearchPlacesParams,
   RadarTrackParams,
+  RadarTrackResponse,
+  RadarTrackTokenResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
 } from './types';
@@ -137,7 +139,7 @@ class Radar {
     return Navigator.getCurrentPosition();
   }
 
-  public static trackOnce(params: RadarTrackParams = {}) {
+  public static trackOnce(params: RadarTrackParams = {}): Promise<RadarTrackResponse> {
     try {
       return TrackAPI.trackOnce(params);
     } finally {
@@ -145,7 +147,7 @@ class Radar {
     }
   }
 
-  public static trackVerified(params: RadarTrackParams = {}) {
+  public static trackVerified(params: RadarTrackParams = {}): Promise<RadarTrackResponse> {
     const platform = Device.getPlatform();
     if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, false, 'https://radar-verify.com:52516');
@@ -160,7 +162,7 @@ class Radar {
     }
   }
 
-  public static trackVerifiedToken(params: RadarTrackParams = {}) {
+  public static trackVerifiedToken(params: RadarTrackParams = {}): Promise<RadarTrackTokenResponse> {
     const platform = Device.getPlatform();
     if (platform === 'DESKTOP_MAC') { // use Mac app
       return VerifyAPI.trackVerified(params, true, 'https://radar-verify.com:52516');
