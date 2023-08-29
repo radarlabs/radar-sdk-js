@@ -71,7 +71,7 @@ describe('Track', () => {
       });
 
       it('should call track with the users location and get a response', async () => {
-        const trackRes = await Track.trackOnce({
+        const trackRes: RadarTrackResponse = await Track.trackOnce({
           userId: 'test-user',
           tripOptions: {
             externalId: 'test-trip',
