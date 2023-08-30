@@ -6,6 +6,8 @@ import {
   RadarBadRequestError,
   RadarDesktopAppError,
   RadarForbiddenError,
+  RadarLocationError,
+  RadarLocationPermissionsError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
   RadarPublishableKeyError,
@@ -94,6 +96,13 @@ class Http {
           response = JSON.parse(xhr.response);
         } catch (e) {
           return reject(new RadarServerError(response));
+        }
+
+        const err = xhr.getResponseHeader('X-Radar-Error');
+        if (err === 'ERROR_PERMISSIONS') {
+          return reject(new RadarLocationPermissionsError(response));
+        } else if (err === 'ERROR_LOCATION') {
+          return reject(new RadarLocationError(response));
         }
 
         if (xhr.status == 200) {
