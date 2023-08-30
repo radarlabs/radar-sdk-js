@@ -98,11 +98,11 @@ class Http {
           return reject(new RadarServerError(response));
         }
 
-        const err = xhr.getResponseHeader('X-Radar-Error');
-        if (err === 'ERROR_PERMISSIONS') {
-          return reject(new RadarLocationPermissionsError(response));
-        } else if (err === 'ERROR_LOCATION') {
-          return reject(new RadarLocationError(response));
+        const error = response?.meta?.error;
+        if (error === 'ERROR_PERMISSIONS') {
+          return reject(new RadarLocationPermissionsError('Location permissions not granted'));
+        } else if (error === 'ERROR_LOCATION') {
+          return reject(new RadarLocationError('Could not determine location'));
         }
 
         if (xhr.status == 200) {
