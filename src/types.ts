@@ -467,6 +467,7 @@ export interface RadarAutocompleteUIOptions {
   limit?: number, // Maximum number of autocomplete results
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
+  expandUnits?: boolean;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
   onRequest?: (params: RadarAutocompleteParams) => void,
