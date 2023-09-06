@@ -100,6 +100,13 @@
         console.log(user);
         console.log(events);
 
+        if (!location) {
+          $('#map').hide();
+          $('#response-details').hide();
+
+          return;
+        }
+
         $('#map').show();
         if (!map) {
           map = Radar.ui.map({
