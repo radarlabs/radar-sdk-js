@@ -340,7 +340,7 @@ export interface RadarAutocompleteParams {
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
-  addresses: RadarAutocompleteAddress;
+  addresses: RadarAutocompleteAddress[];
 }
 
 export interface RadarSearchPlacesParams {
