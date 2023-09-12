@@ -41,7 +41,9 @@ describe('Radar', () => {
 
   // geocoding
   const query = 'mock-query';
-  const addresses: RadarAddress = { geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude };
+  const addresses: RadarAddress[] = [
+    { geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude },
+  ];
 
   // routing
   const destination = {
@@ -364,10 +366,10 @@ describe('Radar', () => {
     });
 
     it('should call forward geocode', async () => {
-      geocodeStub.mockResolvedValue({ addresses: [addresses] });
+      geocodeStub.mockResolvedValue({ addresses });
 
       const response = await Radar.forwardGeocode({ query });
-      expect(response.addresses).toEqual([addresses]);
+      expect(response.addresses).toEqual(addresses);
     });
   });
 
