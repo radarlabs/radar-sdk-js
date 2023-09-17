@@ -6,6 +6,8 @@ import {
   RadarBadRequestError,
   RadarDesktopAppError,
   RadarForbiddenError,
+  RadarLocationError,
+  RadarLocationPermissionsError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
   RadarPublishableKeyError,
@@ -94,6 +96,15 @@ class Http {
           response = JSON.parse(xhr.response);
         } catch (e) {
           return reject(new RadarServerError(response));
+        }
+
+        const error = response?.meta?.error;
+        if (error === 'ERROR_PERMISSIONS') {
+          return reject(new RadarLocationPermissionsError('Location permissions not granted.'));
+        } else if (error === 'ERROR_LOCATION') {
+          return reject(new RadarLocationError('Could not determine location.'));
+        } else if (error === 'ERROR_NETWORK') {
+          return reject(new RadarTimeoutError());
         }
 
         if (xhr.status == 200) {
