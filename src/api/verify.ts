@@ -43,11 +43,14 @@ class VerifyAPI {
       encrypted,
     };
 
+    let userAgent = navigator.userAgent;
+    const windows = userAgent && userAgent.toLowerCase().includes('windows');
+
     const response: any = await Http.request({
       method: 'GET',
       path: 'verify',
       data: body,
-      host: 'https://radar-verify.com:52516',
+      host: windows ? 'http://localhost:52516' : 'https://radar-verify.com:52516',
     });
 
     const { user, events, token } = response;

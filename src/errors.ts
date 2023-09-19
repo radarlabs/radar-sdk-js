@@ -3,7 +3,7 @@ class RadarError extends Error {
 
   constructor(message: string) {
     super(message);
-    this.status = ''; // to be overridden (support for leagcy status)
+    this.status = ''; // to be overridden (support for legacy status)
   }
 }
 
