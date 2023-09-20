@@ -491,6 +491,20 @@ class AutocompleteUI {
 
     // update height
     setHeight(this.resultsList, this.config);
+
+    // update marker color
+    const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+    if (marker) {
+      marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+    }
+
+    // update hideResultsOnBlur
+    if (this.config.hideResultsOnBlur === true) {
+      this.inputField.addEventListener('blur', this.close.bind(this), true);
+    } 
+    if (this.config.hideResultsOnBlur === false){
+      this.inputField.removeEventListener('blur', this.close.bind(this), true);
+    }
   }
 }
 
