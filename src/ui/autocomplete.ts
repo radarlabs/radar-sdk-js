@@ -465,11 +465,13 @@ class AutocompleteUI {
   public setPlaceholder(placeholder: string) {
     this.config.placeholder = placeholder;
     this.inputField.placeholder = placeholder;
+    return this;
   }
 
   public setDisabled(disabled: boolean) {
     this.config.disabled = disabled;
     this.inputField.disabled = disabled;
+    return this;
   }
 
   public setResponsive(responsive: boolean) {
@@ -483,24 +485,29 @@ class AutocompleteUI {
       this.inputField.style.width = formatCSSValue(this.config.width || DEFAULT_WIDTH);
       this.inputField.style.maxWidth = 'none';
     }
+    return this;
   }
 
   public setWidth(width: number | string) {
     this.config.width = width;
     setWidth(this.wrapper, this.config);
+    return this;
   }
 
   public setMaxHeight(height: number | string) {
     this.config.maxHeight = height;
     setHeight(this.resultsList, this.config);
+    return this;
   }
 
   public setThreshold(threshold: number) {
     this.config.threshold = threshold;
+    return this;
   }
 
   public setLimit(limit: number) {
     this.config.limit = limit;
+    return this;
   }
 
   public setShowMarkers(showMarkers: boolean) {
@@ -525,6 +532,7 @@ class AutocompleteUI {
         }
       }
     }
+    return this;
   }
 
   public setMarkerColor(color: string) {
@@ -533,6 +541,7 @@ class AutocompleteUI {
     for (let i = 0; i < marker.length; i++) {
       marker[i].setAttribute('src', getMarkerIcon(color));
     }
+    return this;
   }
 
   public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
@@ -542,6 +551,7 @@ class AutocompleteUI {
     } else {
       this.inputField.removeEventListener('blur', this.close.bind(this), true);
     }
+    return this;
   }
 }
 
