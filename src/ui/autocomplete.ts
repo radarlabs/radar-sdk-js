@@ -492,10 +492,33 @@ class AutocompleteUI {
     // update height
     setHeight(this.resultsList, this.config);
 
-    // update marker color
-    const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
-    if (marker) {
+    // update showMarkers
+    if (this.config.showMarkers === true) {
+      const marker = document.createElement('img');
+      marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+      const resultItems = this.resultsList.getElementsByTagName('li');
+      for (let i = 0; i < resultItems.length; i++) {
+        const currentMarker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        if (!currentMarker) {
+          resultItems[i].prepend(marker.cloneNode());
+        }
+      }
+    }
+    if (this.config.showMarkers === false) {
+      const resultItems = this.resultsList.getElementsByTagName('li');
+      for (let i = 0; i < resultItems.length; i++) {
+        const marker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        if (marker) {
+          marker.remove();
+        }
+      }
+    }
+
+    // update marker color
+    const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER);
+    for (let i = 0; i < marker.length; i++) {
+      marker[i].setAttribute('src', getMarkerIcon(this.config.markerColor));
     }
 
     // update hideResultsOnBlur
