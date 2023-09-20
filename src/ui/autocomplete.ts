@@ -462,21 +462,19 @@ class AutocompleteUI {
     }
   }
 
-  public setOptions(options: Partial<RadarAutocompleteUIOptions>) {
-    this.config = Object.assign({}, this.config, options) as RadarAutocompleteConfig;
+  public setPlaceholder(placeholder: string) {
+    this.config.placeholder = placeholder;
+    this.inputField.placeholder = placeholder;
+  }
 
-    // update input placeholder
-    if (this.inputField) {
-      this.inputField.placeholder = this.config.placeholder;
-    }
+  public setDisabled(disabled: boolean) {
+    this.config.disabled = disabled;
+    this.inputField.disabled = disabled;
+  }
 
-    // update disabled state
-    if (this.inputField) {
-      this.inputField.disabled = this.config.disabled;
-    }
-
-    // update responsive state
-    if (this.config.responsive) {
+  public setResponsive(responsive: boolean) {
+    this.config.responsive = responsive;
+    if (responsive) {
       this.wrapper.style.display = 'block';
       this.inputField.style.width = '100%';
       this.inputField.style.maxWidth = formatCSSValue(this.config.width || DEFAULT_WIDTH);
@@ -485,15 +483,29 @@ class AutocompleteUI {
       this.inputField.style.width = formatCSSValue(this.config.width || DEFAULT_WIDTH);
       this.inputField.style.maxWidth = 'none';
     }
+  }
 
-    // update width
+  public setWidth(width: number | string) {
+    this.config.width = width;
     setWidth(this.wrapper, this.config);
+  }
 
-    // update height
+  public setMaxHeight(height: number | string) {
+    this.config.maxHeight = height;
     setHeight(this.resultsList, this.config);
+  }
 
-    // update showMarkers
-    if (this.config.showMarkers === true) {
+  public setThreshold(threshold: number) {
+    this.config.threshold = threshold;
+  }
+
+  public setLimit(limit: number) {
+    this.config.limit = limit;
+  }
+
+  public setShowMarkers(showMarkers: boolean) {
+    this.config.showMarkers = showMarkers;
+    if (showMarkers === true) {
       const marker = document.createElement('img');
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
@@ -504,8 +516,7 @@ class AutocompleteUI {
           resultItems[i].prepend(marker.cloneNode());
         }
       }
-    }
-    if (this.config.showMarkers === false) {
+    } else {
       const resultItems = this.resultsList.getElementsByTagName('li');
       for (let i = 0; i < resultItems.length; i++) {
         const marker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
@@ -514,18 +525,21 @@ class AutocompleteUI {
         }
       }
     }
+  }
 
-    // update marker color
+  public setMarkerColor(color: string) {
+    this.config.markerColor = color;
     const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER);
     for (let i = 0; i < marker.length; i++) {
-      marker[i].setAttribute('src', getMarkerIcon(this.config.markerColor));
+      marker[i].setAttribute('src', getMarkerIcon(color));
     }
+  }
 
-    // update hideResultsOnBlur
-    if (this.config.hideResultsOnBlur === true) {
+  public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
+    this.config.hideResultsOnBlur = hideResultsOnBlur;
+    if (hideResultsOnBlur === true) {
       this.inputField.addEventListener('blur', this.close.bind(this), true);
-    } 
-    if (this.config.hideResultsOnBlur === false){
+    } else {
       this.inputField.removeEventListener('blur', this.close.bind(this), true);
     }
   }
