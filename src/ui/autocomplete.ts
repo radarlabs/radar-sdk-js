@@ -29,6 +29,7 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   responsive: true,
   disabled: false,
   showMarkers: true,
+  hideResultsOnBlur: true,
 };
 
 // determine whether to use px or CSS string
@@ -162,8 +163,10 @@ class AutocompleteUI {
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
-    this.inputField.addEventListener('blur', this.close.bind(this), true);
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
+    if (this.config.hideResultsOnBlur){
+      this.inputField.addEventListener('blur', this.close.bind(this), true);
+    }
 
     Logger.debug(`AutocompleteUI iniailized with options: ${JSON.stringify(this.config)}`);
   }

@@ -479,6 +479,7 @@ export interface RadarAutocompleteUIOptions {
   maxHeight?: string | number;
   showMarkers?: boolean;
   markerColor?: string;
+  hideResultsOnBlur?: boolean;
 }
 
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
