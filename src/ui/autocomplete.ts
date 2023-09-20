@@ -461,6 +461,37 @@ class AutocompleteUI {
       }
     }
   }
+
+  public setOptions(options: Partial<RadarAutocompleteUIOptions>) {
+    this.config = Object.assign({}, this.config, options) as RadarAutocompleteConfig;
+
+    // update input placeholder
+    if (this.inputField) {
+      this.inputField.placeholder = this.config.placeholder;
+    }
+
+    // update disabled state
+    if (this.inputField) {
+      this.inputField.disabled = this.config.disabled;
+    }
+
+    // update responsive state
+    if (this.config.responsive) {
+      this.wrapper.style.display = 'block';
+      this.inputField.style.width = '100%';
+      this.inputField.style.maxWidth = formatCSSValue(this.config.width || DEFAULT_WIDTH);
+    } else {
+      this.wrapper.style.display = 'inline-block';
+      this.inputField.style.width = formatCSSValue(this.config.width || DEFAULT_WIDTH);
+      this.inputField.style.maxWidth = 'none';
+    }
+
+    // update width
+    setWidth(this.wrapper, this.config);
+
+    // update height
+    setHeight(this.resultsList, this.config);
+  }
 }
 
 export default AutocompleteUI;
