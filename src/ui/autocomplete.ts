@@ -460,6 +460,7 @@ class AutocompleteUI {
         this.near = `${near.latitude},${near.longitude}`;
       }
     }
+    return this;
   }
 
   public setPlaceholder(placeholder: string) {
