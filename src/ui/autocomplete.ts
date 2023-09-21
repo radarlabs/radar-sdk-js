@@ -452,13 +452,13 @@ class AutocompleteUI {
     this.wrapper.remove();
   }
 
-  public setNear(near: string | Location) {
-    if (near) {
-      if (typeof near === 'string') {
-        this.near = near;
-      } else {
-        this.near = `${near.latitude},${near.longitude}`;
-      }
+  public setNear(near: string | Location | undefined | null) {
+    if (near === undefined || near === null) {
+      this.near = undefined;
+    } else if (typeof near === 'string') {
+      this.near = near;
+    } else {
+      this.near = `${near.latitude},${near.longitude}`;
     }
     return this;
   }
