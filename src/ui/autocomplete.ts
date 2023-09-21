@@ -513,7 +513,7 @@ class AutocompleteUI {
 
   public setShowMarkers(showMarkers: boolean) {
     this.config.showMarkers = showMarkers;
-    if (showMarkers === true) {
+    if (showMarkers) {
       const marker = document.createElement('img');
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
@@ -547,7 +547,7 @@ class AutocompleteUI {
 
   public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
     this.config.hideResultsOnBlur = hideResultsOnBlur;
-    if (hideResultsOnBlur === true) {
+    if (hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this.close.bind(this), true);
     } else {
       this.inputField.removeEventListener('blur', this.close.bind(this), true);
