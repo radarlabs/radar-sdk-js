@@ -463,7 +463,8 @@ export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   near?: string | Location; // bias for location results
   debounceMS?: number, // Debounce time in milliseconds
-  threshold?: number, // Minimum number of characters to trigger autocomplete
+  threshold?: number, // DEPRECATED(use minCharacters instead)
+  minCharacters?: number, // Minimum number of characters to trigger autocomplete
   limit?: number, // Maximum number of autocomplete results
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
@@ -485,7 +486,8 @@ export interface RadarAutocompleteUIOptions {
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   debounceMS: number, // Debounce time in milliseconds
-  threshold: number, // Minimum number of characters to trigger autocomplete
+  threshold: number, // DEPRECATED(use minCharacters instead)
+  minCharacters: number, // Minimum number of characters to trigger autocomplete
   limit: number, // Maximum number of autocomplete results
   placeholder: string, // Placeholder text for the input field
   disabled: boolean,

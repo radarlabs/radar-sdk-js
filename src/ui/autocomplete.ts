@@ -23,7 +23,7 @@ const ARIA = {
 const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   container: 'autocomplete',
   debounceMS: 200, // Debounce time in milliseconds
-  threshold: 3, // Minimum number of characters to trigger autocomplete
+  minCharacters: 3, // Minimum number of characters to trigger autocomplete
   limit: 8, // Maximum number of autocomplete results
   placeholder: 'Search address', // Placeholder text for the input field
   responsive: true,
@@ -101,6 +101,12 @@ class AutocompleteUI {
     this.results = [];
     this.highlightedIndex = -1;
 
+    // set threshold alias
+    if (this.config.threshold !== undefined) {
+      this.config.minCharacters = this.config.threshold;
+      Logger.warn('AutocompleteUI option "threshold" is deprecated, use "minCharacters" instead.');
+    }
+
     if (options.near) {
       if (typeof options.near === 'string') {
         this.near = options.near;
@@ -165,7 +171,7 @@ class AutocompleteUI {
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
-    if (this.config.hideResultsOnBlur){
+    if (this.config.hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this.close.bind(this), true);
     }
 
@@ -175,7 +181,7 @@ class AutocompleteUI {
   public handleInput() {
     // Fetch autocomplete results and display them
     const query = this.inputField.value;
-    if (query.length < this.config.threshold) {
+    if (query.length < this.config.minCharacters) {
       return;
     }
 
@@ -494,8 +500,9 @@ class AutocompleteUI {
     return this;
   }
 
-  public setThreshold(threshold: number) {
-    this.config.threshold = threshold;
+  public setMinCharacters(minCharacters: number) {
+    this.config.minCharacters = minCharacters;
+    this.config.threshold = minCharacters;
     return this;
   }
 
