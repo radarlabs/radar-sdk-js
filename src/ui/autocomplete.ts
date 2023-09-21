@@ -51,8 +51,9 @@ const setWidth = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
     return;
   }
 
-  // if not responsive, set fixed width
+  // if not responsive, set fixed width and unset maxWidth
   input.style.width = formatCSSValue(options.width || DEFAULT_WIDTH);
+  input.style.maxWidth = 'none';
 };
 
 const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions) => {
@@ -477,15 +478,7 @@ class AutocompleteUI {
 
   public setResponsive(responsive: boolean) {
     this.config.responsive = responsive;
-    if (responsive) {
-      this.wrapper.style.display = 'block';
-      this.inputField.style.width = '100%';
-      this.inputField.style.maxWidth = formatCSSValue(this.config.width || DEFAULT_WIDTH);
-    } else {
-      this.wrapper.style.display = 'inline-block';
-      this.inputField.style.width = formatCSSValue(this.config.width || DEFAULT_WIDTH);
-      this.inputField.style.maxWidth = 'none';
-    }
+    setWidth(this.wrapper, this.config);
     return this;
   }
 
