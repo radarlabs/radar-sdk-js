@@ -44,13 +44,13 @@ class VerifyAPI {
     };
 
     let userAgent = navigator.userAgent;
-    const windows = userAgent && userAgent.toLowerCase().includes('windows');
+    const mac = userAgent && userAgent.toLowerCase().includes('mac');
 
     const response: any = await Http.request({
       method: 'GET',
       path: 'verify',
       data: body,
-      host: windows ? 'http://localhost:52516' : 'https://radar-verify.com:52516',
+      host: mac ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
     });
 
     const { user, events, token } = response;
