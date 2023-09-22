@@ -23,12 +23,13 @@ const ARIA = {
 const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   container: 'autocomplete',
   debounceMS: 200, // Debounce time in milliseconds
-  threshold: 3, // Minimum number of characters to trigger autocomplete
+  minCharacters: 3, // Minimum number of characters to trigger autocomplete
   limit: 8, // Maximum number of autocomplete results
   placeholder: 'Search address', // Placeholder text for the input field
   responsive: true,
   disabled: false,
   showMarkers: true,
+  hideResultsOnBlur: true,
 };
 
 // determine whether to use px or CSS string
@@ -50,8 +51,9 @@ const setWidth = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
     return;
   }
 
-  // if not responsive, set fixed width
+  // if not responsive, set fixed width and unset maxWidth
   input.style.width = formatCSSValue(options.width || DEFAULT_WIDTH);
+  input.style.removeProperty('max-width');
 };
 
 const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions) => {
@@ -98,6 +100,12 @@ class AutocompleteUI {
     this.debouncedFetchResults = this.debounce(this.fetchResults, this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
+
+    // set threshold alias
+    if (this.config.threshold !== undefined) {
+      this.config.minCharacters = this.config.threshold;
+      Logger.warn('AutocompleteUI option "threshold" is deprecated, use "minCharacters" instead.');
+    }
 
     if (options.near) {
       if (typeof options.near === 'string') {
@@ -162,8 +170,10 @@ class AutocompleteUI {
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
-    this.inputField.addEventListener('blur', this.close.bind(this), true);
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
+    if (this.config.hideResultsOnBlur) {
+      this.inputField.addEventListener('blur', this.close.bind(this), true);
+    }
 
     Logger.debug(`AutocompleteUI iniailized with options: ${JSON.stringify(this.config)}`);
   }
@@ -171,7 +181,7 @@ class AutocompleteUI {
   public handleInput() {
     // Fetch autocomplete results and display them
     const query = this.inputField.value;
-    if (query.length < this.config.threshold) {
+    if (query.length < this.config.minCharacters) {
       return;
     }
 
@@ -449,14 +459,100 @@ class AutocompleteUI {
     this.wrapper.remove();
   }
 
-  public setNear(near: string | Location) {
-    if (near) {
-      if (typeof near === 'string') {
-        this.near = near;
-      } else {
-        this.near = `${near.latitude},${near.longitude}`;
+  public setNear(near: string | Location | undefined | null) {
+    if (near === undefined || near === null) {
+      this.near = undefined;
+    } else if (typeof near === 'string') {
+      this.near = near;
+    } else {
+      this.near = `${near.latitude},${near.longitude}`;
+    }
+    return this;
+  }
+
+  public setPlaceholder(placeholder: string) {
+    this.config.placeholder = placeholder;
+    this.inputField.placeholder = placeholder;
+    return this;
+  }
+
+  public setDisabled(disabled: boolean) {
+    this.config.disabled = disabled;
+    this.inputField.disabled = disabled;
+    return this;
+  }
+
+  public setResponsive(responsive: boolean) {
+    this.config.responsive = responsive;
+    setWidth(this.wrapper, this.config);
+    return this;
+  }
+
+  public setWidth(width: number | string) {
+    this.config.width = width;
+    setWidth(this.wrapper, this.config);
+    return this;
+  }
+
+  public setMaxHeight(height: number | string) {
+    this.config.maxHeight = height;
+    setHeight(this.resultsList, this.config);
+    return this;
+  }
+
+  public setMinCharacters(minCharacters: number) {
+    this.config.minCharacters = minCharacters;
+    this.config.threshold = minCharacters;
+    return this;
+  }
+
+  public setLimit(limit: number) {
+    this.config.limit = limit;
+    return this;
+  }
+
+  public setShowMarkers(showMarkers: boolean) {
+    this.config.showMarkers = showMarkers;
+    if (showMarkers) {
+      const marker = document.createElement('img');
+      marker.classList.add(CLASSNAMES.RESULTS_MARKER);
+      marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+      const resultItems = this.resultsList.getElementsByTagName('li');
+      for (let i = 0; i < resultItems.length; i++) {
+        const currentMarker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        if (!currentMarker) {
+          resultItems[i].prepend(marker.cloneNode());
+        }
+      }
+    } else {
+      const resultItems = this.resultsList.getElementsByTagName('li');
+      for (let i = 0; i < resultItems.length; i++) {
+        const marker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        if (marker) {
+          marker.remove();
+        }
       }
     }
+    return this;
+  }
+
+  public setMarkerColor(color: string) {
+    this.config.markerColor = color;
+    const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER);
+    for (let i = 0; i < marker.length; i++) {
+      marker[i].setAttribute('src', getMarkerIcon(color));
+    }
+    return this;
+  }
+
+  public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
+    this.config.hideResultsOnBlur = hideResultsOnBlur;
+    if (hideResultsOnBlur) {
+      this.inputField.addEventListener('blur', this.close.bind(this), true);
+    } else {
+      this.inputField.removeEventListener('blur', this.close.bind(this), true);
+    }
+    return this;
   }
 }
 
