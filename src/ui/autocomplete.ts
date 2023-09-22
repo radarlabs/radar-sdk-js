@@ -53,7 +53,7 @@ const setWidth = (input: HTMLElement, options: RadarAutocompleteUIOptions) => {
 
   // if not responsive, set fixed width and unset maxWidth
   input.style.width = formatCSSValue(options.width || DEFAULT_WIDTH);
-  input.style.maxWidth = 'none';
+  input.style.removeProperty('max-width');
 };
 
 const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions) => {
