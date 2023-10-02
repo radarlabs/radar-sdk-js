@@ -1,3 +1,5 @@
+[SDK_VERSION]: v4.1.7
+
 <p align="center">
   <img src="assets/logo.svg">
 </p>
@@ -56,7 +58,7 @@ Radar.initialize('prj_test_pk_...', { /* options */ });
 
 Add the following script in your `html` file
 ```html
-<script src="https://js.radar.com/v4.1.7/radar.min.js"></script>
+<script src="https://js.radar.com/[SDK_VERSION]/radar.min.js"></script>
 ```
 
 Then initialize the Radar SDK
@@ -73,8 +75,8 @@ To create a map, first initialize the Radar SDK with your publishable key. Then 
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.1.7/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.1.7/radar.min.js"></script>
+    <link href="https://js.radar.com/[SDK_VERSION]/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/[SDK_VERSION]/radar.min.js"></script>
   </head>
 
   <body>
@@ -98,8 +100,8 @@ To create an autocomplete input, first initialize the Radar SDK with your publis
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.1.7/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.1.7/radar.min.js"></script>
+    <link href="https://js.radar.com/[SDK_VERSION]/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/[SDK_VERSION]/radar.min.js"></script>
   </head>
 
   <body>
@@ -130,8 +132,8 @@ To power [geofencing](https://radar.com/documentation/geofencing/overview) exper
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.1.7/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.1.7/radar.min.js"></script>
+    <link href="https://js.radar.com/[SDK_VERSION]/radar.css" rel="stylesheet">
+    <script src="https://js.radar.com/[SDK_VERSION]/radar.min.js"></script>
   </head>
 
   <body>
