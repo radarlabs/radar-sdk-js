@@ -25,14 +25,23 @@ const onlyEmitFile = () => ({
 });
 
 export default [
-  // ES Module (written to /dist)
+  // ES Module & UMD (written to /dist)
   {
     input: 'src/index.ts',
     output: [
       {
-        file: 'dist/radar.js',
+        file: 'dist/radar.esm.js',
         format: 'esm',
         sourcemap: true,
+      },
+      {
+        file: 'dist/radar.umd.js',
+        format: 'umd',
+        name: 'Radar',
+        sourcemap: true,
+        globals: {
+          'maplibre-gl': 'maplibregl',
+        },
       },
     ],
     external: ['maplibre-gl'],

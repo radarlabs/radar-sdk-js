@@ -1,10 +1,11 @@
 {
   "name": "radar-sdk-js",
-  "version": "4.1.11",
+  "version": "4.2.0-beta.0",
   "description": "Web Javascript SDK for Radar, location infrastructure for mobile and web apps.",
   "homepage": "https://radar.com",
   "type": "module",
-  "module": "dist/radar.js",
+  "main": "dist/radar.umd.js",
+  "module": "dist/radar.esm.js",
   "types": "dist/index.d.ts",
   "style": "dist/radar.css",
   "build": "rollup -c",
