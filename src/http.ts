@@ -31,11 +31,13 @@ class Http {
     path,
     data,
     host,
+    headers,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
+    headers?: Record<string, string>;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -76,13 +78,24 @@ class Http {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
 
-      // set headers
+      // set standard headers
       xhr.setRequestHeader('Authorization', publishableKey);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
-      // set custom headers if present
+      // set passed custom headers if present
+      if (headers) {
+        Object.keys(headers).forEach(key => {
+          const val = headers[key];
+          xhr.setRequestHeader(key, val);
+        });
+        for (let header in headers) {
+          xhr.setRequestHeader(header, headers[header]);
+        }
+      }
+
+      // set config custom headers if present
       if (typeof options.getRequestHeaders === 'function') {
         const headers: { [key: string]: string } = options.getRequestHeaders();
         Object.keys(headers || {}).forEach((key) => {

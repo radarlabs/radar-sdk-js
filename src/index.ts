@@ -33,6 +33,7 @@ import type {
   RadarSearchGeofencesParams,
   RadarSearchPlacesParams,
   RadarTrackParams,
+  RadarTrackVerifiedParams,
   RadarTripOptions,
   RadarValidateAddressParams,
 } from './types';
@@ -144,11 +145,11 @@ class Radar {
     }
   }
 
-  public static trackVerified(params: RadarTrackParams = {}) {
+  public static trackVerified(params: RadarTrackVerifiedParams = {}) {
     return VerifyAPI.trackVerified(params);
   }
 
-  public static trackVerifiedToken(params: RadarTrackParams = {}) {
+  public static trackVerifiedToken(params: RadarTrackVerifiedParams = {}) {
     return VerifyAPI.trackVerified(params, true);
   }
 

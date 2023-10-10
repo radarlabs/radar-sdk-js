@@ -22,6 +22,7 @@ export interface RadarOptions {
   live?: boolean;
   logLevel?: LogLevel;
   host?: string;
+  verifiedHost?: string;
   version?: string;
   cacheLocationMinutes?: number;
   locationMaximumAge?: number;
@@ -68,6 +69,10 @@ export interface RadarTrackParams {
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
   desiredAccuracy?: 'high' | 'medium' | 'low';
+}
+
+export interface RadarTrackVerifiedParams extends RadarTrackParams {
+  skipDesktopApp?: boolean;
 }
 
 export enum RadarEventConfidence {
