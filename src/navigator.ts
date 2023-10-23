@@ -9,13 +9,6 @@ interface PositionOptionOverrides {
   desiredAccuracy?: string;
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
-const PERMISSION_ERROR_MESSAGES: any = {
-  1: 'Permission denied.',
-  2: 'Position unavailable.',
-  3: 'Timeout.',
-};
-
 const DEFAULT_POSITION_OPTIONS: PositionOptions = {
   maximumAge: 0,
   timeout: 1000 * 30, // 30 seconds
@@ -95,9 +88,8 @@ class Navigator {
           return resolve({ latitude, longitude, accuracy });
         },
         (err: GeolocationPositionError) => { // location call failed or user did not grant permission
-          if (err && err.code) {
-            const message = PERMISSION_ERROR_MESSAGES[err.code.toString()] || 'unknown';
-            return reject(new RadarLocationPermissionsError(message));
+          if (err && err.code === 1) {
+            return reject(new RadarLocationPermissionsError('Permission denied.'));
           }
           return reject(new RadarLocationError('Could not determine location.'));
         },
