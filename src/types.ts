@@ -42,6 +42,11 @@ export type RadarTravelMode =
   | 'motorbike'
   | 'truck';
 
+export type RadarAvoidOption =
+  | 'tolls'
+  | 'highways'
+  | 'ferries';
+
 export interface RadarTripOptions {
   userId?: string;
   externalId?: string;
@@ -367,6 +372,7 @@ export interface RadarDistanceParams {
   units?: 'metric' | 'imperial';
   geometry?: boolean;
   geometryPoints?: boolean;
+  avoid?: RadarAvoidOption[] | string;
 }
 
 
@@ -402,6 +408,7 @@ export interface RadarMatrixParams {
   destinations: Location[] | string;
   mode: RadarTravelMode;
   units?: 'metric' | 'imperial';
+  avoid?: RadarAvoidOption[] | string;
 }
 
 export interface RadarMatrixRoute {
