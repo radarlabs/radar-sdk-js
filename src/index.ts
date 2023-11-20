@@ -136,6 +136,10 @@ class Radar {
     return Navigator.getCurrentPosition();
   }
 
+  public static getPermissionsStatus() {
+    return Navigator.getPermissionStatus()
+  }
+
   public static trackOnce(params: RadarTrackParams = {}) {
     try {
       return TrackAPI.trackOnce(params);
