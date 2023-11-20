@@ -4,7 +4,7 @@ import Storage from '../src/storage';
 import Navigator from '../src/navigator';
 import SDK_VERSION from '../src/version';
 
-import type { NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarReverseGeocodeParams, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
+import type { LocationAuthorization, NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarReverseGeocodeParams, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
 
 import Geocoding from '../src/api/geocoding';
 import ContextAPI from '../src/api/context';
@@ -221,6 +221,25 @@ describe('Radar', () => {
       expect(response.latitude).toEqual(latitude);
       expect(response.longitude).toEqual(longitude);
       expect(response.accuracy).toEqual(accuracy);
+    });
+  });
+
+  describe('getPermissionsStatus', () => {
+    let navigatorStub: jest.SpyInstance<Promise<LocationAuthorization>>;
+
+    beforeEach(() => {
+      navigatorStub = jest.spyOn(Navigator, 'getPermissionStatus');
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should succeed', async () => {
+      navigatorStub.mockResolvedValue('GRANTED_FOREGROUND');
+
+      const response = await Radar.getPermissionsStatus();
+      expect(response).toEqual('GRANTED_FOREGROUND');
     });
   });
 
