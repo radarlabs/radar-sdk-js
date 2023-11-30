@@ -20,6 +20,7 @@ class RoutingAPI {
       units,
       geometry,
       geometryPoints,
+      avoid,
     } = params;
 
     // use browser location if "near" not provided
@@ -40,6 +41,10 @@ class RoutingAPI {
       modes = modes.join(',');
     }
 
+    if (Array.isArray(avoid)) {
+      avoid = avoid.join(',');
+    }
+
     const response: any = await Http.request({
       method: 'GET',
       path: 'route/distance',
@@ -50,6 +55,7 @@ class RoutingAPI {
         units,
         geometry,
         geometryPoints,
+        avoid,
       },
     });
 
@@ -72,6 +78,7 @@ class RoutingAPI {
       destinations,
       mode,
       units,
+      avoid,
     } = params;
 
     // use browser location if "near" not provided
@@ -91,6 +98,10 @@ class RoutingAPI {
       destinations = destinations.map((location) => `${location.latitude},${location.longitude}`).join('|');
     }
 
+    if (Array.isArray(avoid)) {
+      avoid = avoid.join(',');
+    }
+
     const response: any = await Http.request({
       method: 'GET',
       path: 'route/matrix',
@@ -99,6 +110,7 @@ class RoutingAPI {
         destinations,
         mode,
         units,
+        avoid,
       },
     });
 
