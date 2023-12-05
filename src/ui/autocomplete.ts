@@ -4,6 +4,8 @@ import SearchAPI from '../api/search';
 import { RadarAutocompleteContainerNotFound } from '../errors';
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location } from '../types';
 
+import crypto from 'crypto';
+
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
   INPUT: 'radar-autocomplete-input',
@@ -86,6 +88,7 @@ class AutocompleteUI {
   resultsList: HTMLElement;
   wrapper: HTMLElement;
   poweredByLink?: HTMLElement;
+  session?: string;
 
   // create a new AutocompleteUI instance
   public static createAutocomplete(autocompleteOptions: RadarAutocompleteUIOptions): AutocompleteUI {
@@ -237,6 +240,10 @@ class AutocompleteUI {
 
   public async fetchResults(query: string) {
     const { limit, layers, countryCode, expandUnits, onRequest } = this.config;
+    if (!this.session) {
+      this.session = this.generateUUID();
+    }
+    const session = this.session;
 
     const params: RadarAutocompleteParams = {
       query,
@@ -244,6 +251,7 @@ class AutocompleteUI {
       layers,
       countryCode,
       expandUnits,
+      session,
     }
 
     if (this.near) {
@@ -442,6 +450,9 @@ class AutocompleteUI {
       onSelection(result);
     }
 
+    // Close out session
+    this.session = undefined;
+
     // clear results list
     this.close();
   }
@@ -509,6 +520,10 @@ class AutocompleteUI {
   public setLimit(limit: number) {
     this.config.limit = limit;
     return this;
+  }
+
+  public generateUUID = (): string => {
+    return crypto.randomUUID();
   }
 
   public setShowMarkers(showMarkers: boolean) {

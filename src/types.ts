@@ -342,6 +342,7 @@ export interface RadarAutocompleteParams {
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
   expandUnits?: boolean;
+  session?: string;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {

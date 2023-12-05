@@ -22,6 +22,7 @@ class SearchAPI {
       layers,
       countryCode,
       expandUnits,
+      session,
     } = params;
 
     // near can be provided as a string or Location object
@@ -42,6 +43,7 @@ class SearchAPI {
         layers,
         countryCode,
         expandUnits,
+        session,
       },
     });
 
