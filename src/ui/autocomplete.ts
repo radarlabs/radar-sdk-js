@@ -2,7 +2,7 @@ import Logger from '../logger';
 import SearchAPI from '../api/search';
 
 import { RadarAutocompleteContainerNotFound } from '../errors';
-import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location } from '../types';
+import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionParams } from '../types';
 
 import crypto from 'crypto';
 
@@ -448,6 +448,15 @@ class AutocompleteUI {
     const onSelection = this.config.onSelection;
     if (onSelection) {
       onSelection(result);
+    }
+
+    // Session work
+    if (this.session) {
+      const params: RadarAutocompleteSessionParams = {
+        session: this.session,
+        selection: index,
+      }
+      SearchAPI.autocompleteSelect(params);
     }
 
     // Close out session

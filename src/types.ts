@@ -345,6 +345,11 @@ export interface RadarAutocompleteParams {
   session?: string;
 }
 
+export interface RadarAutocompleteSessionParams {
+  session: string;
+  selection: number;
+}
+
 export interface RadarAutocompleteResponse extends RadarResponse {
   addresses: RadarAutocompleteAddress[];
 }

@@ -9,6 +9,7 @@ import type {
   RadarSearchPlacesResponse,
   RadarSearchGeofencesParams,
   RadarSearchGeofencesResponse,
+  RadarAutocompleteSessionParams,
 } from '../types';
 
 class SearchAPI {
@@ -56,6 +57,22 @@ class SearchAPI {
     }
 
     return autocompleteRes;
+  }
+
+  static async autocompleteSelect(params: RadarAutocompleteSessionParams) {
+    let {
+      session,
+      selection,
+    } = params;
+
+    await Http.request({
+      method: 'GET',
+      path: 'search/autocomplete/session',
+      data: {
+        session,
+        selection,
+      },
+    });
   }
 
   static async searchGeofences(params: RadarSearchGeofencesParams): Promise<RadarSearchGeofencesResponse> {
