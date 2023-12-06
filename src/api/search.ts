@@ -67,7 +67,7 @@ class SearchAPI {
 
     await Http.request({
       method: 'GET',
-      path: 'search/autocomplete/session',
+      path: 'search/autocomplete/selection',
       data: {
         session,
         selection,
