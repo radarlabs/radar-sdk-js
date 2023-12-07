@@ -35,7 +35,6 @@ describe('Radar', () => {
   const radius = 100;
   const chains = ['dunkin', 'sbucks'];
   const categories = ['coffee-shop'];
-  const groups = ['airport'];
   const tags = ['geofence-tags'];
   const limit = 50;
 
@@ -311,7 +310,7 @@ describe('Radar', () => {
     it('should call searchPlaces', async () => {
       searchStub.mockResolvedValue({ places: [] });
 
-      const response = await Radar.searchPlaces({ radius, chains, categories, groups, limit });
+      const response = await Radar.searchPlaces({ radius, chains, categories, limit });
       expect(response.places).toEqual([]);
     });
   });
