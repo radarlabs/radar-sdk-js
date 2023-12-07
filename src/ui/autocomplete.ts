@@ -1,5 +1,8 @@
 import Logger from '../logger';
 import SearchAPI from '../api/search';
+import Device from '../device';
+import Session from '../session';
+import Storage from '../storage';
 
 import { RadarAutocompleteContainerNotFound } from '../errors';
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionParams } from '../types';
@@ -450,11 +453,19 @@ class AutocompleteUI {
       onSelection(result);
     }
 
-    // Session work
+    // Radar Autocomplete Session
     if (this.session) {
+      const userId = Storage.getItem(Storage.USER_ID) || undefined;
+      const deviceId = Device.getDeviceId() || undefined;
+      const installId = Device.getInstallId() || undefined;
+      const radarSessionId = Session.getSessionId() || undefined;
       const params: RadarAutocompleteSessionParams = {
         session: this.session,
         selection: index,
+        userId,
+        deviceId,
+        installId,
+        radarSessionId,
       }
       SearchAPI.autocompleteSelect(params);
     }

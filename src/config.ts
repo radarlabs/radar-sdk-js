@@ -6,7 +6,8 @@ class Config {
   static defaultOptions = {
     live: false,
     logLevel: 'error',
-    host: 'https://api.radar.io',
+    // host: 'https://api.radar-staging.com',
+    host: 'http://localhost:8081',
     version: 'v1',
     debug: false,
   };

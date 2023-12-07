@@ -60,17 +60,11 @@ class SearchAPI {
   }
 
   static async autocompleteSelect(params: RadarAutocompleteSessionParams) {
-    let {
-      session,
-      selection,
-    } = params;
-
     await Http.request({
       method: 'GET',
       path: 'search/autocomplete/selection',
       data: {
-        session,
-        selection,
+        ...params
       },
     });
   }

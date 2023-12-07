@@ -348,6 +348,10 @@ export interface RadarAutocompleteParams {
 export interface RadarAutocompleteSessionParams {
   session: string;
   selection: number;
+  radarSessionId?: string;
+  userId?: string;
+  deviceId?: string;
+  installId?: string;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
