@@ -92,6 +92,7 @@ class AutocompleteUI {
   wrapper: HTMLElement;
   poweredByLink?: HTMLElement;
   session?: string;
+  autocompleteParams?: RadarAutocompleteParams;
 
   // create a new AutocompleteUI instance
   public static createAutocomplete(autocompleteOptions: RadarAutocompleteUIOptions): AutocompleteUI {
@@ -243,6 +244,7 @@ class AutocompleteUI {
 
   public async fetchResults(query: string) {
     const { limit, layers, countryCode, expandUnits, onRequest } = this.config;
+
     if (!this.session) {
       this.session = this.generateUUID();
     }
@@ -264,6 +266,8 @@ class AutocompleteUI {
     if (onRequest) {
       onRequest(params);
     }
+
+    this.autocompleteParams = params; // set previous params for autocomplete session selections
 
     const { addresses } = await SearchAPI.autocomplete(params);
     return addresses;
@@ -466,12 +470,14 @@ class AutocompleteUI {
         deviceId,
         installId,
         radarSessionId,
+        ...this.autocompleteParams
       }
       SearchAPI.autocompleteSelect(params);
     }
 
     // Close out session
     this.session = undefined;
+    this.autocompleteParams = undefined;
 
     // clear results list
     this.close();
