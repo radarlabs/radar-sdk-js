@@ -5,7 +5,7 @@ import Session from '../session';
 import Storage from '../storage';
 
 import { RadarAutocompleteContainerNotFound } from '../errors';
-import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionParams } from '../types';
+import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionSelectionParams } from '../types';
 
 import crypto from 'crypto';
 
@@ -463,7 +463,7 @@ class AutocompleteUI {
       const deviceId = Device.getDeviceId() || undefined;
       const installId = Device.getInstallId() || undefined;
       const radarSessionId = Session.getSessionId() || undefined;
-      const params: RadarAutocompleteSessionParams = {
+      const params: RadarAutocompleteSessionSelectionParams = {
         session: this.session,
         selection: index,
         userId,

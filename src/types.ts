@@ -345,7 +345,7 @@ export interface RadarAutocompleteParams {
   session?: string;
 }
 
-export interface RadarAutocompleteSessionParams {
+export interface RadarAutocompleteSessionSelectionParams {
   session: string;
   selection: number;
   radarSessionId?: string;
