@@ -23,7 +23,7 @@ class SearchAPI {
       layers,
       countryCode,
       expandUnits,
-      session,
+      sessionToken,
     } = params;
 
     // near can be provided as a string or Location object
@@ -44,7 +44,7 @@ class SearchAPI {
         layers,
         countryCode,
         expandUnits,
-        session,
+        sessionToken,
       },
     });
 
@@ -61,7 +61,7 @@ class SearchAPI {
 
   static async autocompleteSelect(params: RadarAutocompleteSessionSelectionParams) {
     await Http.request({
-      method: 'GET',
+      method: 'POST',
       path: 'search/autocomplete/selection',
       data: {
         ...params

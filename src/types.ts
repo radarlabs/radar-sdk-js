@@ -342,12 +342,12 @@ export interface RadarAutocompleteParams {
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
   expandUnits?: boolean;
-  session?: string;
+  sessionToken?: string;
 }
 
 export interface RadarAutocompleteSessionSelectionParams {
-  session: string;
-  selection: number;
+  sessionToken: string;
+  selectionIndex: number;
   radarSessionId?: string;
   userId?: string;
   deviceId?: string;

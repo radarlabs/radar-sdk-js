@@ -7,8 +7,6 @@ import Storage from '../storage';
 import { RadarAutocompleteContainerNotFound } from '../errors';
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionSelectionParams } from '../types';
 
-import crypto from 'crypto';
-
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
   INPUT: 'radar-autocomplete-input',
@@ -91,7 +89,7 @@ class AutocompleteUI {
   resultsList: HTMLElement;
   wrapper: HTMLElement;
   poweredByLink?: HTMLElement;
-  session?: string;
+  sessionToken?: string;
   autocompleteParams?: RadarAutocompleteParams;
 
   // create a new AutocompleteUI instance
@@ -245,10 +243,10 @@ class AutocompleteUI {
   public async fetchResults(query: string) {
     const { limit, layers, countryCode, expandUnits, onRequest } = this.config;
 
-    if (!this.session) {
-      this.session = this.generateUUID();
+    if (!this.sessionToken) {
+      this.sessionToken = this.generateUUID();
     }
-    const session = this.session;
+    const sessionToken = this.sessionToken;
 
     const params: RadarAutocompleteParams = {
       query,
@@ -256,7 +254,7 @@ class AutocompleteUI {
       layers,
       countryCode,
       expandUnits,
-      session,
+      sessionToken,
     }
 
     if (this.near) {
@@ -458,14 +456,14 @@ class AutocompleteUI {
     }
 
     // Radar Autocomplete Session
-    if (this.session) {
+    if (this.sessionToken) {
       const userId = Storage.getItem(Storage.USER_ID) || undefined;
       const deviceId = Device.getDeviceId() || undefined;
       const installId = Device.getInstallId() || undefined;
       const radarSessionId = Session.getSessionId() || undefined;
       const params: RadarAutocompleteSessionSelectionParams = {
-        session: this.session,
-        selection: index,
+        sessionToken: this.sessionToken,
+        selectionIndex: index,
         userId,
         deviceId,
         installId,
@@ -476,7 +474,7 @@ class AutocompleteUI {
     }
 
     // Close out session
-    this.session = undefined;
+    this.sessionToken = undefined;
     this.autocompleteParams = undefined;
 
     // clear results list
