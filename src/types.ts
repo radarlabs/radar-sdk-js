@@ -347,7 +347,7 @@ export interface RadarAutocompleteParams {
 
 export interface RadarAutocompleteSessionSelectionParams {
   sessionToken: string;
-  selectionIndex: number;
+  selectedIndex: number;
   radarSessionId?: string;
   userId?: string;
   deviceId?: string;

@@ -463,7 +463,7 @@ class AutocompleteUI {
       const radarSessionId = Session.getSessionId() || undefined;
       const params: RadarAutocompleteSessionSelectionParams = {
         sessionToken: this.sessionToken,
-        selectionIndex: index,
+        selectedIndex: index,
         userId,
         deviceId,
         installId,
