@@ -1,8 +1,11 @@
 import Logger from '../logger';
 import SearchAPI from '../api/search';
+import Device from '../device';
+import Session from '../session';
+import Storage from '../storage';
 
 import { RadarAutocompleteContainerNotFound } from '../errors';
-import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location } from '../types';
+import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig, RadarAutocompleteParams, Location, RadarAutocompleteSessionSelectionParams } from '../types';
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -86,6 +89,8 @@ class AutocompleteUI {
   resultsList: HTMLElement;
   wrapper: HTMLElement;
   poweredByLink?: HTMLElement;
+  sessionToken?: string;
+  autocompleteParams?: RadarAutocompleteParams;
 
   // create a new AutocompleteUI instance
   public static createAutocomplete(autocompleteOptions: RadarAutocompleteUIOptions): AutocompleteUI {
@@ -238,12 +243,18 @@ class AutocompleteUI {
   public async fetchResults(query: string) {
     const { limit, layers, countryCode, expandUnits, onRequest } = this.config;
 
+    if (!this.sessionToken) {
+      this.sessionToken = this.generateUUID();
+    }
+    const sessionToken = this.sessionToken;
+
     const params: RadarAutocompleteParams = {
       query,
       limit,
       layers,
       countryCode,
       expandUnits,
+      sessionToken,
     }
 
     if (this.near) {
@@ -253,6 +264,8 @@ class AutocompleteUI {
     if (onRequest) {
       onRequest(params);
     }
+
+    this.autocompleteParams = params; // set previous params for autocomplete session selections
 
     const { addresses } = await SearchAPI.autocomplete(params);
     return addresses;
@@ -442,6 +455,28 @@ class AutocompleteUI {
       onSelection(result);
     }
 
+    // Radar Autocomplete Session
+    if (this.sessionToken) {
+      const userId = Storage.getItem(Storage.USER_ID) || undefined;
+      const deviceId = Device.getDeviceId() || undefined;
+      const installId = Device.getInstallId() || undefined;
+      const radarSessionId = Session.getSessionId() || undefined;
+      const params: RadarAutocompleteSessionSelectionParams = {
+        sessionToken: this.sessionToken,
+        selectedIndex: index,
+        userId,
+        deviceId,
+        installId,
+        radarSessionId,
+        ...this.autocompleteParams
+      }
+      SearchAPI.autocompleteSelect(params);
+    }
+
+    // Close out session
+    this.sessionToken = undefined;
+    this.autocompleteParams = undefined;
+
     // clear results list
     this.close();
   }
@@ -509,6 +544,16 @@ class AutocompleteUI {
   public setLimit(limit: number) {
     this.config.limit = limit;
     return this;
+  }
+
+  public generateUUID = (): string => {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
+      const r = Math.random() * 16 | 0;
+      const v = (char == 'x') ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+
+    return uuid;
   }
 
   public setShowMarkers(showMarkers: boolean) {

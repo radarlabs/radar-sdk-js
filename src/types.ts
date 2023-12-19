@@ -342,6 +342,23 @@ export interface RadarAutocompleteParams {
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
   expandUnits?: boolean;
+  sessionToken?: string;
+}
+
+export interface RadarAutocompleteSessionSelectionParams {
+  sessionToken: string;
+  selectedIndex: number;
+  radarSessionId?: string;
+  userId?: string;
+  deviceId?: string;
+  installId?: string;
+
+  query?: string;
+  near?: Location | string;
+  limit?: number;
+  layers?: RadarGeocodeLayer[];
+  countryCode?: string;
+  expandUnits?: boolean;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
