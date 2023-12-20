@@ -257,9 +257,6 @@ export interface RadarConversionResponse extends RadarResponse {
 export type RadarGeocodeLayer =
   | 'place'
   | 'address'
-  | 'intersection'
-  | 'street'
-  | 'neighborhood'
   | 'postalCode'
   | 'locality'
   | 'county'
