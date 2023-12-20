@@ -478,6 +478,7 @@ export interface RadarAutocompleteUIOptions {
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
   expandUnits?: boolean;
+  mailable?: boolean;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
   onRequest?: (params: RadarAutocompleteParams) => void,

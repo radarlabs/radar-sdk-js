@@ -21,6 +21,7 @@ class SearchAPI {
       limit,
       layers,
       countryCode,
+      expandUnits,
       mailable,
     } = params;
 
@@ -41,6 +42,7 @@ class SearchAPI {
         limit,
         layers,
         countryCode,
+        expandUnits,
         mailable,
       },
     });
