@@ -21,7 +21,7 @@ class SearchAPI {
       limit,
       layers,
       countryCode,
-      expandUnits,
+      mailable,
     } = params;
 
     // near can be provided as a string or Location object
@@ -41,7 +41,7 @@ class SearchAPI {
         limit,
         layers,
         countryCode,
-        expandUnits,
+        mailable,
       },
     });
 
