@@ -341,6 +341,8 @@ export interface RadarAutocompleteParams {
   limit?: number;
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
+  /** @deprecated this is always true, regardless of the value passed here */
+  expandUnits?: boolean;
   mailable?: boolean;
 }
 
