@@ -88,6 +88,7 @@ class MapUI {
     // add radar logo
     const img = document.createElement('img');
     img.src = RADAR_LOGO_URL;
+    img.alt = 'radar logo image';
 
     const link = document.createElement('a');
     link.id = 'radar-map-logo';
