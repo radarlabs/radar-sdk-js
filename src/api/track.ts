@@ -15,15 +15,31 @@ class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
 
-    let { latitude, longitude, accuracy, desiredAccuracy } = params;
+    let { latitude, longitude, accuracy, desiredAccuracy, fraud } = params;
 
-    // if latitude & longitude are not provided,
-    // try and retrieve device location (will prompt for location permissions)
-    if (!latitude || !longitude) {
-      const deviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy });
-      latitude = deviceLocation.latitude;
-      longitude = deviceLocation.longitude;
-      accuracy = deviceLocation.accuracy;
+    let mocked = false;
+
+    if (fraud) {
+      const firstDeviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy: 'low' });
+      const secondDeviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy: 'high' });
+      if (firstDeviceLocation && secondDeviceLocation &&
+        firstDeviceLocation.latitude == secondDeviceLocation.latitude &&
+        firstDeviceLocation.longitude == secondDeviceLocation.longitude &&
+        firstDeviceLocation.accuracy == secondDeviceLocation.accuracy) {
+          mocked = true;
+      }
+      latitude = secondDeviceLocation.latitude;
+      longitude = secondDeviceLocation.longitude;
+      accuracy = secondDeviceLocation.accuracy;
+    } else {
+      // if latitude & longitude are not provided,
+      // try and retrieve device location (will prompt for location permissions)
+      if (!latitude || !longitude) {
+        const deviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy });
+        latitude = deviceLocation.latitude;
+        longitude = deviceLocation.longitude;
+        accuracy = deviceLocation.accuracy;
+      }
     }
 
     // location authorization
@@ -75,6 +91,7 @@ class TrackAPI {
       stopped: true,
       userId,
       tripOptions,
+      mocked,
     };
 
     const response: any = await Http.request({

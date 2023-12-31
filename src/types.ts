@@ -73,6 +73,7 @@ export interface RadarTrackParams {
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
   desiredAccuracy?: 'high' | 'medium' | 'low';
+  fraud?: boolean;
 }
 
 export enum RadarEventConfidence {
