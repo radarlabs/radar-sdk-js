@@ -25,7 +25,8 @@ class TrackAPI {
       if (firstDeviceLocation && secondDeviceLocation &&
         firstDeviceLocation.latitude == secondDeviceLocation.latitude &&
         firstDeviceLocation.longitude == secondDeviceLocation.longitude &&
-        firstDeviceLocation.accuracy == secondDeviceLocation.accuracy) {
+        firstDeviceLocation.accuracy == secondDeviceLocation.accuracy &&
+        secondDeviceLocation.accuracy <= 150) {
           mocked = true;
       }
       latitude = secondDeviceLocation.latitude;
