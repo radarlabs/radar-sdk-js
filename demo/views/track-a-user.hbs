@@ -12,13 +12,22 @@
       <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
     </div>
   </div>
-  <div class="mb-4 form-row">
+  <div class="mb-3 form-row">
     <label for="desired-accuracy" class="col-form-label" style="width: 128px;">Desired accuracy</label>
     <div>
       <select id="desired-accuracy" class="form-select" style="width: 250px;">
         <option value="high" selected>high</option>
         <option value="medium">medium</option>
         <option value="low">low</option>
+      </select>
+    </div>
+  </div>
+  <div class="mb-4 form-row">
+    <label for="fraud" class="col-form-label" style="width: 128px;">Fraud</label>
+    <div>
+      <select id="fraud" class="form-select" style="width: 250px;">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
       </select>
     </div>
   </div>
@@ -112,7 +121,8 @@
 
     const userId = $('#user-id').val();
     const desiredAccuracy = $('#desired-accuracy').val();
-    Radar.trackOnce({ userId, desiredAccuracy })
+    const fraud = $('#fraud').val() === 'true';
+    Radar.trackOnce({ userId, desiredAccuracy, fraud })
       .then(({ location, user, events }) => {
         console.log('TRACK RESPONSE', { location, user, events });
         $('#loader').hide();
