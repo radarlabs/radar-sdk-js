@@ -111,7 +111,7 @@ class TrackAPI {
           locationAuthorization,
         },
         headers: {
-          'X-Radar-Desktop-Device-Type': 'Mac',
+          'X-Radar-Desktop-Device-Type': 'Web',
         },
       });
 
