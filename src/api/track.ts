@@ -1,3 +1,5 @@
+import { detectIncognito } from 'detectincognitojs';
+
 import SDK_VERSION from '../version';
 import Config from '../config';
 import Device from '../device';
@@ -6,7 +8,6 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
-
 import TripsAPI from './trips';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
@@ -15,7 +16,7 @@ class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
 
-    let { latitude, longitude, accuracy, desiredAccuracy } = params;
+    let { latitude, longitude, accuracy, desiredAccuracy, fraud } = params;
 
     // if latitude & longitude are not provided,
     // try and retrieve device location (will prompt for location permissions)
@@ -47,6 +48,16 @@ class TrackAPI {
       timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     } catch (err: any) {
       Logger.warn(`Error getting time zone: ${err.message}`);
+    }
+
+    let incognito = false;
+    if (fraud) {
+      try {
+        const result = await detectIncognito();
+        incognito = result.isPrivate;
+      } catch (err: any) {
+        Logger.warn(`Error detecting incognito mode: ${err.message}`);
+      }
     }
 
     // save userId for trip tracking
@@ -83,6 +94,7 @@ class TrackAPI {
       userId,
       tripOptions,
       timeZone,
+      incognito,
     };
 
     const response: any = await Http.request({
