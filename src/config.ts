@@ -7,6 +7,7 @@ class Config {
     live: false,
     logLevel: 'error',
     host: 'https://api.radar.io',
+    verifiedHost: 'https://api-verified.radar.io',
     version: 'v1',
     debug: false,
   };
