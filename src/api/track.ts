@@ -42,6 +42,13 @@ class TrackAPI {
     const deviceType = params.deviceType || 'Web';
     const description = params.description || Storage.getItem(Storage.DESCRIPTION);
 
+    let timeZone;
+    try {
+      timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch (err: any) {
+      Logger.warn(`Error getting time zone: ${err.message}`);
+    }
+
     // save userId for trip tracking
     if (!userId) {
       Logger.warn('userId not provided for trackOnce.');
@@ -75,6 +82,7 @@ class TrackAPI {
       stopped: true,
       userId,
       tripOptions,
+      timeZone,
     };
 
     const response: any = await Http.request({
