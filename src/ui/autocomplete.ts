@@ -236,7 +236,7 @@ class AutocompleteUI {
   }
 
   public async fetchResults(query: string) {
-    const { limit, layers, countryCode, expandUnits, onRequest } = this.config;
+    const { limit, layers, countryCode, expandUnits, mailable, onRequest } = this.config;
 
     const params: RadarAutocompleteParams = {
       query,
@@ -244,6 +244,7 @@ class AutocompleteUI {
       layers,
       countryCode,
       expandUnits,
+      mailable,
     }
 
     if (this.near) {

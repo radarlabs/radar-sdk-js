@@ -257,9 +257,6 @@ export interface RadarConversionResponse extends RadarResponse {
 export type RadarGeocodeLayer =
   | 'place'
   | 'address'
-  | 'intersection'
-  | 'street'
-  | 'neighborhood'
   | 'postalCode'
   | 'locality'
   | 'county'
@@ -341,7 +338,9 @@ export interface RadarAutocompleteParams {
   limit?: number;
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
+  /** @deprecated this is always true, regardless of the value passed here */
   expandUnits?: boolean;
+  mailable?: boolean;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
@@ -476,6 +475,7 @@ export interface RadarAutocompleteUIOptions {
   layers?: RadarGeocodeLayer[];
   countryCode?: string;
   expandUnits?: boolean;
+  mailable?: boolean;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
   onRequest?: (params: RadarAutocompleteParams) => void,
