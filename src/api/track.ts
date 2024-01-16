@@ -117,11 +117,13 @@ class TrackAPI {
 
       const header = JSON.stringify({
         alg: 'HS256',
-        typ: 'JWT'
+        typ: 'JWT',
       });
       const payload = JSON.stringify({
-        ...body,
-        incognito,
+        payload: JSON.stringify({
+          ...body,
+          incognito,
+        }),
       });
       
       const token = KJUR.jws.JWS.sign('HS256', header, payload, { utf8: dk });
