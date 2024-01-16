@@ -1,4 +1,6 @@
 import { detectIncognito } from 'detectincognitojs';
+// @ts-ignore
+import { KJUR } from 'jsrsasign';
 
 import SDK_VERSION from '../version';
 import Config from '../config';
@@ -50,16 +52,6 @@ class TrackAPI {
       Logger.warn(`Error getting time zone: ${err.message}`);
     }
 
-    let incognito = false;
-    if (fraud) {
-      try {
-        const result = await detectIncognito();
-        incognito = result.isPrivate;
-      } catch (err: any) {
-        Logger.warn(`Error detecting incognito mode: ${err.message}`);
-      }
-    }
-
     // save userId for trip tracking
     if (!userId) {
       Logger.warn('userId not provided for trackOnce.');
@@ -94,14 +86,64 @@ class TrackAPI {
       userId,
       tripOptions,
       timeZone,
-      incognito,
     };
 
-    const response: any = await Http.request({
-      method: 'POST',
-      path: 'track',
-      data: body,
-    });
+    let response: any;
+    if (fraud) {
+      let incognito = false;
+      try {
+        const result = await detectIncognito();
+        incognito = result.isPrivate;
+      } catch (err: any) {
+        Logger.warn(`Error detecting incognito mode: ${err.message}`);
+      }
+
+      const host = 'https://api-verified.radar.io';
+
+      const { dk }: any = await Http.request({
+        host,
+        method: 'GET',
+        path: 'config',
+        data: {
+          deviceId,
+          installId,
+          sessionId,
+          locationAuthorization,
+        },
+        headers: {
+          'X-Radar-Desktop-Device-Type': 'Mac',
+        },
+      });
+
+      const header = JSON.stringify({
+        alg: 'HS256',
+        typ: 'JWT'
+      });
+      const payload = JSON.stringify({
+        ...body,
+        incognito,
+      });
+      
+      const token = KJUR.jws.JWS.sign('HS256', header, payload, { utf8: dk });
+
+      response = await Http.request({
+        host,
+        method: 'POST',
+        path: 'track',
+        data: {
+          token,
+        },
+        headers: {
+          'X-Radar-Body-Is-Token': 'true',
+        },
+      });
+    } else {
+      response = await Http.request({
+        method: 'POST',
+        path: 'track',
+        data: body,
+      });
+    }
 
     const { user, events } = response;
     const location = { latitude, longitude, accuracy };
