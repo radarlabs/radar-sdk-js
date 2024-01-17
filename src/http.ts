@@ -31,11 +31,13 @@ class Http {
     path,
     data,
     host,
+    headers,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
+    headers?: Record<string, string>;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -76,13 +78,21 @@ class Http {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
 
-      // set headers
+      // set standard headers
       xhr.setRequestHeader('Authorization', publishableKey);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
       xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
 
-      // set custom headers if present
+      // set passed custom headers if present
+      if (headers) {
+        Object.keys(headers).forEach(key => {
+          const val = headers[key];
+          xhr.setRequestHeader(key, val);
+        });
+      }
+
+      // set config custom headers if present
       if (typeof options.getRequestHeaders === 'function') {
         const headers: { [key: string]: string } = options.getRequestHeaders();
         Object.keys(headers || {}).forEach((key) => {
@@ -143,7 +153,7 @@ class Http {
       }
 
       xhr.onerror = function() {
-        if (host && host === 'https://radar-verify.com:52516') {
+        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
           reject(new RadarDesktopAppError());
         } else {
           reject(new RadarServerError());
