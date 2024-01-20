@@ -10,21 +10,20 @@ import TripsAPI from './trips';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
-const stringToUint8Array = (str: string): Uint8Array => 
-  new TextEncoder().encode(str);
-
-const base64urlEncode = (str: string): string => 
+const base64Encode = (str: string): string => 
   btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
 const signJWT = async (payload: object, key: string): Promise<string> => {
-  const encodedHeader = base64urlEncode(JSON.stringify({
+  const encoder = new TextEncoder();
+
+  const encodedHeader = base64Encode(JSON.stringify({
     alg: 'HS256',
     typ: 'JWT',
   }));
-  const encodedPayload = base64urlEncode(JSON.stringify(payload));
+  const encodedPayload = base64Encode(JSON.stringify(payload));
 
-  const keyData = stringToUint8Array(key);
-  const messageData = stringToUint8Array(`${encodedHeader}.${encodedPayload}`);
+  const keyData = encoder.encode(key);
+  const messageData = encoder.encode(`${encodedHeader}.${encodedPayload}`);
 
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
@@ -35,7 +34,7 @@ const signJWT = async (payload: object, key: string): Promise<string> => {
   );
 
   const signatureArrayBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
-  const signature = base64urlEncode(String.fromCharCode(...Array.from(new Uint8Array(signatureArrayBuffer))));
+  const signature = base64Encode(String.fromCharCode(...Array.from(new Uint8Array(signatureArrayBuffer))));
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 };
@@ -135,7 +134,10 @@ class TrackAPI {
         },
       });
 
-      const csl = Date.now() - now - scl;
+      let csl = -1;
+      if (scl > 0) {
+        csl = Date.now() - now - scl;
+      }
 
       const payload = {
         payload: JSON.stringify({
@@ -145,7 +147,9 @@ class TrackAPI {
         }),
       };
       
-      const token = signJWT(payload, dk);
+      const token = await signJWT(payload, dk);
+
+      console.log(token);
 
       response = await Http.request({
         host,
