@@ -149,8 +149,6 @@ class TrackAPI {
       
       const token = await signJWT(payload, dk);
 
-      console.log(token);
-
       response = await Http.request({
         host,
         method: 'POST',
