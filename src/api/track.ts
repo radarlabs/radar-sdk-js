@@ -1,7 +1,3 @@
-import { detectIncognito } from 'detectincognitojs';
-// @ts-ignore
-import { KJUR } from 'jsrsasign';
-
 import SDK_VERSION from '../version';
 import Config from '../config';
 import Device from '../device';
@@ -13,6 +9,36 @@ import Storage from '../storage';
 import TripsAPI from './trips';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
+
+const stringToUint8Array = (str: string): Uint8Array => 
+  new TextEncoder().encode(str);
+
+const base64urlEncode = (str: string): string => 
+  btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+const signJWT = async (payload: object, key: string): Promise<string> => {
+  const encodedHeader = base64urlEncode(JSON.stringify({
+    alg: 'HS256',
+    typ: 'JWT',
+  }));
+  const encodedPayload = base64urlEncode(JSON.stringify(payload));
+
+  const keyData = stringToUint8Array(key);
+  const messageData = stringToUint8Array(`${encodedHeader}.${encodedPayload}`);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: { name: 'SHA-256' } },
+    false,
+    ['sign']
+  );
+
+  const signatureArrayBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+  const signature = base64urlEncode(String.fromCharCode(...Array.from(new Uint8Array(signatureArrayBuffer))));
+
+  return `${encodedHeader}.${encodedPayload}.${signature}`;
+};
 
 class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
@@ -90,17 +116,11 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      let incognito = false;
-      try {
-        const result = await detectIncognito();
-        incognito = result.isPrivate;
-      } catch (err: any) {
-        Logger.warn(`Error detecting incognito mode: ${err.message}`);
-      }
-
       const host = 'https://api-verified.radar.io';
 
-      const { dk }: any = await Http.request({
+      const now = Date.now();
+
+      const { dk, scl }: any = await Http.request({
         host,
         method: 'GET',
         path: 'config',
@@ -115,18 +135,17 @@ class TrackAPI {
         },
       });
 
-      const header = JSON.stringify({
-        alg: 'HS256',
-        typ: 'JWT',
-      });
-      const payload = JSON.stringify({
+      const csl = Date.now() - now - scl;
+
+      const payload = {
         payload: JSON.stringify({
           ...body,
-          incognito,
+          scl,
+          csl,
         }),
-      });
+      };
       
-      const token = KJUR.jws.JWS.sign('HS256', header, payload, { utf8: dk });
+      const token = signJWT(payload, dk);
 
       response = await Http.request({
         host,
