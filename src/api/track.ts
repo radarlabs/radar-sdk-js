@@ -88,37 +88,34 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      // const host = 'https://api-verified.radar.io';
-      const host = 'https://api-tim.radar-staging.com';
-      const wsHost = 'wss://nickpatrick-ws-node.fly.dev';
-      // const wsHost = 'ws://localhost:8080';
+      const host = 'https://api-verified.radar.io';
+      const pingHost = 'ping.radar-verify.com';
 
-      const now = Date.now();
+      let [configRes, pingRes, csl] = await Promise.all([
+        Http.request({
+          host,
+          method: 'GET',
+          path: 'config',
+          data: {
+            deviceId,
+            installId,
+            sessionId,
+            locationAuthorization,
+          },
+          headers: {
+            'X-Radar-Desktop-Device-Type': 'Web',
+          },
+        }),
+        Http.request({
+          host: `https://${pingHost}`,
+          method: 'GET',
+          path: 'ping',
+        }),
+        ping(`wss://${pingHost}`),
+      ]);
 
-      const { dk, scl }: any = await Http.request({
-        host,
-        method: 'GET',
-        path: 'config',
-        data: {
-          deviceId,
-          installId,
-          sessionId,
-          locationAuthorization,
-        },
-        headers: {
-          'X-Radar-Desktop-Device-Type': 'Web',
-        },
-      });
-
-      const csl = await ping(wsHost);
-
-      if (scl > 0) {
-        console.log({
-          csl,
-          scl,
-          ratio: csl / scl,
-        });
-      }
+      const { dk }: any = configRes;
+      const { scl }: any = pingRes;
 
       const payload = {
         payload: JSON.stringify({

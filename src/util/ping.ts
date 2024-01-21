@@ -23,9 +23,9 @@ export const ping = (host: string): Promise<number> => {
           if (pings >= 3) {
             clearInterval(pingInterval);
             clearInterval(timeoutInterval);
-            const avg = latencies.reduce((sum, value) => sum + value, 0) / latencies.length;
+            const median = latencies.sort((a, b) => a - b)[1];
             socket.close();
-            resolve(avg);
+            resolve(median);
           }
         }
       };
