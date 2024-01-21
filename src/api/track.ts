@@ -91,7 +91,7 @@ class TrackAPI {
       const host = 'https://api-verified.radar.io';
       const pingHost = 'ping.radar-verify.com';
 
-      let [configRes, pingRes, csl] = await Promise.all([
+      let [configRes, pingRes, ipGeocodeRes, csl] = await Promise.all([
         Http.request({
           host,
           method: 'GET',
@@ -111,11 +111,17 @@ class TrackAPI {
           method: 'GET',
           path: 'ping',
         }),
+        Http.request({
+          method: 'GET',
+          path: 'geocode/ip',
+        }),
         ping(`wss://${pingHost}`),
       ]);
 
       const { dk }: any = configRes;
       const { scl }: any = pingRes;
+      const { address }: any = ipGeocodeRes;
+      const { city, countryFlag } = address;
 
       const payload = {
         payload: JSON.stringify({
@@ -138,6 +144,19 @@ class TrackAPI {
           'X-Radar-Body-Is-Token': 'true',
         },
       });
+
+      if (response && response.user) {
+        if (!response.user.metadata) {
+          response.user.metadata = {};
+        }
+
+        response.user.metadata['radar:debug'] = {
+          scl,
+          csl,
+          ratio: csl / scl,
+          city: `${countryFlag} ${city}`,
+        }
+      }
     } else {
       response = await Http.request({
         method: 'POST',

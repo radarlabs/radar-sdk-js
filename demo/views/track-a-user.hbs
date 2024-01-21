@@ -124,6 +124,10 @@
     const fraud = $('#fraud').val() === 'true';
     Radar.trackOnce({ userId, desiredAccuracy, fraud })
       .then(({ location, user, events }) => {
+        if (user && user.metadata && user.metadata['radar:debug']) {
+          console.log(user.metadata['radar:debug'])
+        }
+
         console.log('TRACK RESPONSE', { location, user, events });
         $('#loader').hide();
 
