@@ -117,7 +117,6 @@ class TrackAPI {
           scl,
           ratio: csl / scl,
         });
-        console.log(csl);
       }
 
       const payload = {
