@@ -8,6 +8,7 @@ import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
 import { signJWT } from '../util/jwt'
+import { ping } from '../util/ping'
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
@@ -87,7 +88,9 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      const host = 'https://api-verified.radar.io';
+      // const host = 'https://api-verified.radar.io';
+      const host = 'https://api-tim.radar-staging.com';
+      const wsHost = 'ws://localhost:8080';
 
       const now = Date.now();
 
@@ -106,9 +109,15 @@ class TrackAPI {
         },
       });
 
-      let csl = -1;
+      const csl = await ping(wsHost);
+
       if (scl > 0) {
-        csl = Date.now() - now - scl;
+        console.log({
+          csl,
+          scl,
+          ratio: csl / scl,
+        });
+        console.log(csl);
       }
 
       const payload = {
