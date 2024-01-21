@@ -17,7 +17,7 @@ export const ping = (host: string): Promise<number> => {
       socket.onmessage = (event) => {
         if (event.data === 'pong') {
           const latency = Date.now() - start;
-          console.log('pong');
+          console.log(`pong: ${latency} ms`);
           latencies.push(latency);
 
           if (pings >= 3) {
