@@ -39,8 +39,8 @@ export const ping = (host: string): Promise<number> => {
       reject(-1);
     }
 
-    socket.onerror = (err: any) => {
-      console.error(`Error opening socket: ${err.message}`);
+    socket.onerror = (err) => {
+      console.error('Error opening socket: ', err);
       socket.close();
       reject(-1);
     };

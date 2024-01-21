@@ -90,6 +90,7 @@ class TrackAPI {
     if (fraud) {
       // const host = 'https://api-verified.radar.io';
       const host = 'https://api-tim.radar-staging.com';
+      // const wsHost = 'wss://nickpatrick-ws-node.fly.dev:8080';
       const wsHost = 'ws://localhost:8080';
 
       const now = Date.now();
