@@ -1,5 +1,5 @@
-export const ping = (host: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
+export const ping = (host: string): Promise<any> => {
+  return new Promise((resolve) => {
     const socket = new WebSocket(host);
 
     let pings = 0;
@@ -34,13 +34,13 @@ export const ping = (host: string): Promise<number> => {
       clearInterval(pingInterval);
       clearInterval(timeoutInterval);
       socket.close();
-      reject(-1);
+      resolve(-1);
     }
 
     socket.onerror = (err) => {
       console.error('Error opening socket: ', err);
       socket.close();
-      reject(-1);
+      resolve(-1);
     };
 
     socket.onopen = () => {

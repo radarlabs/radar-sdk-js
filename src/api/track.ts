@@ -91,43 +91,49 @@ class TrackAPI {
       const host = 'https://api-verified.radar.io';
       const pingHost = 'ping.radar-verify.com';
 
-      let [configRes, pingRes, ipGeocodeRes, csl] = await Promise.all([
-        Http.request({
-          host,
-          method: 'GET',
-          path: 'config',
-          data: {
-            deviceId,
-            installId,
-            sessionId,
-            locationAuthorization,
-          },
-          headers: {
-            'X-Radar-Desktop-Device-Type': 'Web',
-          },
-        }),
-        Http.request({
-          host: `https://${pingHost}`,
-          method: 'GET',
-          path: 'ping',
-        }),
-        Http.request({
-          method: 'GET',
-          path: 'geocode/ip',
-        }),
-        ping(`wss://${pingHost}`),
-      ]);
+      const lang = navigator.language;
+      const langs = navigator.languages;
 
-      const { dk }: any = configRes;
-      const { scl }: any = pingRes;
-      const { address }: any = ipGeocodeRes;
-      const { city, countryFlag } = address;
+      const { dk }: any = await Http.request({
+        host,
+        method: 'GET',
+        path: 'config',
+        data: {
+          deviceId,
+          installId,
+          sessionId,
+          locationAuthorization,
+        },
+        headers: {
+          'X-Radar-Desktop-Device-Type': 'Web',
+        },
+      });
+
+      let sclVal = -1;
+      let cslVal = -1;
+      try {
+        const [sclRes, csl] = await Promise.all([
+          Http.request({
+            host: `https://${pingHost}`,
+            method: 'GET',
+            path: 'ping',
+          }),
+          ping(`wss://${pingHost}`),
+        ]);
+        const { scl }: any = sclRes;
+        sclVal = scl;
+        cslVal = csl;
+      } catch (err) {
+        
+      }
 
       const payload = {
         payload: JSON.stringify({
           ...body,
-          scl,
-          csl,
+          scl: sclVal,
+          csl: cslVal,
+          lang,
+          langs,
         }),
       };
       
@@ -151,11 +157,9 @@ class TrackAPI {
         }
 
         response.user.metadata['radar:debug'] = {
-          scl,
-          csl,
-          ratio: csl / scl,
-          city: `${countryFlag} ${city}`,
-        }
+          sclVal,
+          cslVal,
+        };
       }
     } else {
       response = await Http.request({
