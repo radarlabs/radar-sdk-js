@@ -124,7 +124,7 @@ class TrackAPI {
         sclVal = scl;
         cslVal = csl;
       } catch (err) {
-        
+        // do nothing, send scl = -1 and csl = -1
       }
 
       const payload = {
