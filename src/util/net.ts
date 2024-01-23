@@ -40,7 +40,7 @@ export const ping = (host: string): Promise<any> => {
     }
 
     socket.onerror = (err) => {
-      console.error('Error opening socket: ', err);
+      Logger.warn('Error opening socket');
       socket.close();
       resolve(-1);
     };
