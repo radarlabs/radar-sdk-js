@@ -7,8 +7,8 @@ import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
-import { signJWT } from '../util/jwt'
-import { ping } from '../util/ping'
+import { signJWT } from '../util/jwt';
+import { ping } from '../util/net';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 

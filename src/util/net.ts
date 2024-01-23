@@ -1,3 +1,5 @@
+import Logger from '../logger';
+
 export const ping = (host: string): Promise<any> => {
   return new Promise((resolve) => {
     const socket = new WebSocket(host);
@@ -30,7 +32,7 @@ export const ping = (host: string): Promise<any> => {
     }
 
     const timeout = () => {
-      console.error('Socket timeout');
+      Logger.warn('Socket timeout');
       clearInterval(pingInterval);
       clearInterval(timeoutInterval);
       socket.close();
