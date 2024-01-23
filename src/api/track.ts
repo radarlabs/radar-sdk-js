@@ -151,11 +151,11 @@ class TrackAPI {
         },
       });
 
-      if (response && response.user) {
+      if (options.debug && response && response.user) {
         if (!response.user.metadata) {
           response.user.metadata = {};
         }
-
+        
         response.user.metadata['radar:debug'] = {
           sclVal,
           cslVal,
