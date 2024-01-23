@@ -1,7 +1,3 @@
-import { detectIncognito } from 'detectincognitojs';
-// @ts-ignore
-import { KJUR } from 'jsrsasign';
-
 import SDK_VERSION from '../version';
 import Config from '../config';
 import Device from '../device';
@@ -11,6 +7,8 @@ import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
+import { signJWT } from '../util/jwt';
+import { ping } from '../util/net';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
@@ -90,15 +88,11 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      let incognito = false;
-      try {
-        const result = await detectIncognito();
-        incognito = result.isPrivate;
-      } catch (err: any) {
-        Logger.warn(`Error detecting incognito mode: ${err.message}`);
-      }
-
       const host = 'https://api-verified.radar.io';
+      const pingHost = 'ping.radar-verify.com';
+
+      const lang = navigator.language;
+      const langs = navigator.languages;
 
       const { dk }: any = await Http.request({
         host,
@@ -115,18 +109,35 @@ class TrackAPI {
         },
       });
 
-      const header = JSON.stringify({
-        alg: 'HS256',
-        typ: 'JWT',
-      });
-      const payload = JSON.stringify({
+      let sclVal = -1;
+      let cslVal = -1;
+      try {
+        const [sclRes, csl] = await Promise.all([
+          Http.request({
+            host: `https://${pingHost}`,
+            method: 'GET',
+            path: 'ping',
+          }),
+          ping(`wss://${pingHost}`),
+        ]);
+        const { scl }: any = sclRes;
+        sclVal = scl;
+        cslVal = csl;
+      } catch (err) {
+        // do nothing, send scl = -1 and csl = -1
+      }
+
+      const payload = {
         payload: JSON.stringify({
           ...body,
-          incognito,
+          scl: sclVal,
+          csl: cslVal,
+          lang,
+          langs,
         }),
-      });
+      };
       
-      const token = KJUR.jws.JWS.sign('HS256', header, payload, { utf8: dk });
+      const token = await signJWT(payload, dk);
 
       response = await Http.request({
         host,
@@ -139,6 +150,17 @@ class TrackAPI {
           'X-Radar-Body-Is-Token': 'true',
         },
       });
+
+      if (options.debug && response && response.user) {
+        if (!response.user.metadata) {
+          response.user.metadata = {};
+        }
+        
+        response.user.metadata['radar:debug'] = {
+          sclVal,
+          cslVal,
+        };
+      }
     } else {
       response = await Http.request({
         method: 'POST',
