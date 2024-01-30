@@ -31,11 +31,11 @@ export class RadarLocationPermissionsError extends RadarError {
   }
 }
 
-export class RadarDesktopAppError extends RadarError {
+export class RadarAppError extends RadarError {
   constructor() {
-    super('Desktop app not running.');
-    this.name = 'RadarDesktopAppError';
-    this.status = 'ERROR_DESKTOP_APP';
+    super('Radar Verify app not running.');
+    this.name = 'RadarAppError';
+    this.status = 'ERROR_APP';
   }
 }
 
@@ -131,11 +131,11 @@ export class RadarServerError extends RadarError {
   }
 }
 
-export class RadarTimeoutError extends RadarError {
+export class RadarNetworkError extends RadarError {
   constructor() {
-    super('Request timed out.');
-    this.name = 'RadarTimeoutError';
-    this.status = 'ERROR_TIMED_OUT';
+    super('Network error.');
+    this.name = 'RadarNetworkError';
+    this.status = 'ERROR_NETWORK';
   }
 }
 
