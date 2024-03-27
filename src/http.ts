@@ -31,12 +31,14 @@ class Http {
     path,
     data,
     host,
-    headers,
+    versioned = true,
+    headers = {},
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
+    versioned?: boolean;
     headers?: Record<string, string>;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
@@ -53,6 +55,10 @@ class Http {
       const urlHost = host || options.host;
       const version = options.version;
       let url = `${urlHost}/${version}/${path}`;
+
+      if (!versioned) {
+        url = `${urlHost}/${path}`;
+      }
 
       // remove undefined values from request data
       let body: any = {};
@@ -78,32 +84,35 @@ class Http {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
 
-      // set standard headers
-      xhr.setRequestHeader('Authorization', publishableKey);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
-      xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
+      const defaultHeaders = {
+        'Authorization': publishableKey,
+        'Content-Type': 'application/json',
+        'X-Radar-Device-Type': 'Web',
+        'X-Radar-SDK-Version': SDK_VERSION,
+      };
 
-      // set passed custom headers if present
-      if (headers) {
-        Object.keys(headers).forEach(key => {
-          const val = headers[key];
-          xhr.setRequestHeader(key, val);
-        });
-      }
-
-      // set config custom headers if present
+      // set custom config headers if present
+      let configHeaders: { [key: string]: string } = {};
       if (typeof options.getRequestHeaders === 'function') {
-        const headers: { [key: string]: string } = options.getRequestHeaders();
-        Object.keys(headers || {}).forEach((key) => {
-          xhr.setRequestHeader(key, headers[key]);
-        });
+        configHeaders = options.getRequestHeaders();
       }
+
+      // combines default headers with custom headers and config headers
+      const allHeaders = Object.assign(defaultHeaders, headers, configHeaders);
+
+      // set headers 
+      Object.entries(allHeaders).forEach(([key, val]) => {
+        xhr.setRequestHeader(key, val);
+      });
 
       xhr.onload = () => {
         let response: any;
         try {
-          response = JSON.parse(xhr.response);
+          if (allHeaders['Content-Type'] === 'application/json') {
+            response = JSON.parse(xhr.response);
+          } else {
+            response = { code: xhr.status, data: xhr.response };
+          }
         } catch (e) {
           return reject(new RadarServerError(response));
         }

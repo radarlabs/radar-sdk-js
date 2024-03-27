@@ -1,7 +1,9 @@
-import maplibregl from 'maplibre-gl';
+import maplibregl, { Marker, MarkerOptions } from 'maplibre-gl';
 
 import Config from '../config';
+import Http from '../http';
 import Logger from '../logger';
+import RadarLogoControl from './RadarLogoControl';
 
 import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
 
@@ -28,22 +30,49 @@ const defaultMarkerOptions: Partial<maplibregl.MarkerOptions> = {
   color: '#000257',
 };
 
+const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
+
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
-// use formatted style URL if using one of Radar's out-of-the-box styles
+const getMarkerOptions = (marker: Marker): MarkerOptions => {
+  const markerOptions: MarkerOptions = {
+    // element: marker.getElement(),
+    color: marker._color,
+    scale: marker._scale,
+    offset: marker.getOffset(),
+    anchor: marker._anchor,
+    draggable: marker.isDraggable(),
+    clickTolerance: marker._clickTolerance,
+    rotation: marker.getRotation(),
+    rotationAlignment: marker.getRotationAlignment(),
+    pitchAlignment: marker.getPitchAlignment()
+  }
+
+  return markerOptions;
+}
+
+/** Check if style is a Radar style or a custom style */
+const isRadarStyle = (style: string) => {
+  return RADAR_STYLES.includes(style) || uuidRegex.test(style)
+};
+
+/** Use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style */
 const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
-  if (!style || (typeof style === 'string' && RADAR_STYLES.includes(style))) {
-    return createStyleURL(options, mapOptions.style as string);
+  if (!style || (typeof style === 'string' && isRadarStyle(style))) {
+    return createStyleURL(options, style);
   }
 
   return mapOptions.style;
 };
 
 class MapUI {
+  private static customMarkerRawSvg: string | undefined;
+  private static markers: Marker[] = [];
+
   public static getMapLibre() {
     return maplibregl;
   }
@@ -69,7 +98,7 @@ class MapUI {
 
     // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
-      if (resourceType === 'Style' && RADAR_STYLES.includes(url)) {
+      if (resourceType === 'Style' && isRadarStyle(url)) {
         const radarStyleURL = createStyleURL(options, url);
         return { url: radarStyleURL };
       } else {
@@ -86,20 +115,8 @@ class MapUI {
     }
 
     // add radar logo
-    const img = document.createElement('img');
-    img.src = RADAR_LOGO_URL;
-
-    const link = document.createElement('a');
-    link.id = 'radar-map-logo';
-    link.href = 'https://radar.com?ref=powered_by_radar';
-    link.target = '_blank';
-    link.style.position = 'absolute';
-    link.style.bottom = '0';
-    link.style.left = '5px';
-    link.style.width = '80px';
-    link.style.height = '38px';
-    link.appendChild(img)
-    map.getContainer().appendChild(link);
+    const radarLogo = new RadarLogoControl();
+    map.addControl(radarLogo, 'bottom-left');
 
     // add attribution
     const attribution = new maplibregl.AttributionControl({ compact: false });
@@ -121,14 +138,58 @@ class MapUI {
         }
       }
     };
+
+    const onStyleLoad = async () => {
+      MapUI.customMarkerRawSvg = undefined;
+      const style = map.getStyle();
+
+      const customMarkers = (style.metadata as any)?.['radar:customMarkers'];
+      if (Array.isArray(customMarkers) && customMarkers.length > 0) {
+        const customMarker = customMarkers[0]; // only support one custom marker for now
+        try {
+          const markerRawSvg = await Http.request({
+            method: 'GET',
+            versioned: false,
+            path: `maps/markers/${customMarker.id}`,
+            headers: {
+              'Content-Type': 'image/svg+xml',
+            },
+          });
+          MapUI.customMarkerRawSvg = markerRawSvg.data;
+        } catch (err) {
+          Logger.warn(`Error getting custom marker: ${customMarker.id} - using default marker.`);
+        }
+      }
+
+      // set markers if necessary
+      for (let i = 0; i < MapUI.markers.length; i++) {
+        if (MapUI.customMarkerRawSvg) {
+          // set custom marker
+          MapUI.markers[i]._element.innerHTML = MapUI.customMarkerRawSvg;
+        } else {
+          const markerOptions = getMarkerOptions(MapUI.markers[i]);
+          const newMarker = new Marker(markerOptions); // get default element
+
+          // set default element
+          MapUI.markers[i]._element.innerHTML = newMarker._element.innerHTML;
+        }
+      }
+    }
     map.on('resize', onResize);
     map.on('load', onResize);
+    map.on('styledata', onStyleLoad);
 
     return map;
   }
 
   public static createMarker(markerOptions: RadarMarkerOptions = {}): maplibregl.Marker {
     const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
+
+    // has a custom marker
+    if (MapUI.customMarkerRawSvg) {
+      maplibreOptions.element = document.createElement('div');
+      maplibreOptions.element.innerHTML = MapUI.customMarkerRawSvg;
+    }
 
     if (markerOptions.color) {
       maplibreOptions.color = markerOptions.color;
@@ -151,6 +212,7 @@ class MapUI {
       marker.setPopup(popup);
     }
 
+    MapUI.markers.push(marker);
     return marker;
   }
 }
