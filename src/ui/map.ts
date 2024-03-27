@@ -1,8 +1,9 @@
-import maplibregl, { MapStyleDataEvent, Marker, MarkerOptions } from 'maplibre-gl';
+import maplibregl, { Marker, MarkerOptions } from 'maplibre-gl';
 
 import Config from '../config';
 import Http from '../http';
 import Logger from '../logger';
+import RadarLogoControl from './RadarLogoControl';
 
 import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
 
@@ -114,20 +115,8 @@ class MapUI {
     }
 
     // add radar logo
-    const img = document.createElement('img');
-    img.src = RADAR_LOGO_URL;
-
-    const link = document.createElement('a');
-    link.id = 'radar-map-logo';
-    link.href = 'https://radar.com?ref=powered_by_radar';
-    link.target = '_blank';
-    link.style.position = 'absolute';
-    link.style.bottom = '0';
-    link.style.left = '5px';
-    link.style.width = '80px';
-    link.style.height = '38px';
-    link.appendChild(img)
-    map.getContainer().appendChild(link);
+    const radarLogo = new RadarLogoControl();
+    map.addControl(radarLogo, 'bottom-left');
 
     // add attribution
     const attribution = new maplibregl.AttributionControl({ compact: false });
