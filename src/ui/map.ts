@@ -4,6 +4,7 @@ import Config from '../config';
 import Logger from '../logger';
 
 import type { RadarOptions, RadarMapOptions, RadarMarkerOptions } from '../types';
+import RadarLogoControl from './RadarLogoControl';
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
@@ -28,16 +29,23 @@ const defaultMarkerOptions: Partial<maplibregl.MarkerOptions> = {
   color: '#000257',
 };
 
+const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
+
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
-// use formatted style URL if using one of Radar's out-of-the-box styles
+/** Check if style is a Radar style or a custom style */
+const isRadarStyle = (style: string) => {
+  return RADAR_STYLES.includes(style) || uuidRegex.test(style)
+};
+
+/** Use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style */ 
 const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
-  if (!style || (typeof style === 'string' && RADAR_STYLES.includes(style))) {
-    return createStyleURL(options, mapOptions.style as string);
+  if (!style || (typeof style === 'string' && isRadarStyle(style))) {
+    return createStyleURL(options, style);
   }
 
   return mapOptions.style;
@@ -69,7 +77,7 @@ class MapUI {
 
     // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
-      if (resourceType === 'Style' && RADAR_STYLES.includes(url)) {
+      if (resourceType === 'Style' && isRadarStyle(url)) {
         const radarStyleURL = createStyleURL(options, url);
         return { url: radarStyleURL };
       } else {
