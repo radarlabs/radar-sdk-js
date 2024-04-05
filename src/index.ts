@@ -16,6 +16,8 @@ import TripsAPI from './api/trips';
 import VerifyAPI from './api/verify';
 
 import MapUI from './ui/map';
+import Map from './ui/mapv2';
+import Marker from './ui/marker';
 import AutocompleteUI from './ui/autocomplete';
 
 import SDK_VERSION from './version';
@@ -59,6 +61,8 @@ class Radar {
       maplibregl: MapUI.getMapLibre(),
       map: MapUI.createMap,
       marker: MapUI.createMarker,
+      mapV2: Map,
+      markerV2: Marker,
       autocomplete: AutocompleteUI.createAutocomplete,
     };
   }
