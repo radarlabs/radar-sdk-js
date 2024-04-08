@@ -164,6 +164,35 @@ class RadarMap extends maplibregl.Map {
     });
     this.fitBounds(bounds, fitBoundsOptions);
   }
+
+  addGeoJSON(polygon: GeoJSON.Feature & { id: string }, layerProperties: Pick<maplibregl.FillLayerSpecification, 'minzoom' | 'maxzoom' | 'layout' | 'paint'>, onClick?: (event: maplibregl.MapMouseEvent & { features?: GeoJSON.Feature<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>[] | undefined; }) => void) {
+    if (!this.loaded()) {
+      this.on('load', () => {
+        this.addGeoJSON(polygon, layerProperties);
+      });
+      return;
+    }
+
+    this.addSource(polygon.id, {
+      type: 'geojson',
+      data: polygon
+    });
+    this.addLayer({
+      ...layerProperties,
+      id: polygon.id,
+      type: 'fill', // TODO: maybe support other types
+      source: polygon.id,
+    });
+
+    if (onClick) {
+      this.on('click', polygon.id, onClick);
+    }
+  }
+
+  removeGeoJSON(polygonId: string) {
+    this.removeLayer(polygonId);
+    this.removeSource(polygonId);
+  }
 };
 
 export default RadarMap;
