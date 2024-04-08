@@ -1,6 +1,6 @@
 import maplibregl, { MapMouseEvent } from 'maplibre-gl';
 
-import RadarMap from './mapv2';
+import RadarMap from './map';
 
 import type { RadarMarkerImage, RadarMarkerOptions } from '../types';
 
@@ -46,7 +46,6 @@ class RadarMarker extends maplibregl.Marker {
     } else if (markerOptions.html) {
       const popup = new maplibregl.Popup({ offset: 35 }).setHTML(markerOptions.html);
       this.setPopup(popup);
-
     }
   }
 
@@ -77,6 +76,24 @@ class RadarMarker extends maplibregl.Marker {
       }
       this.fire('click', this);
     }
+  }
+
+  getOptions(): RadarMarkerOptions {
+    const markerOptions: RadarMarkerOptions = {
+      // TODO: element: marker.getElement(),
+      image: this._image,
+      color: this._color,
+      scale: this._scale,
+      offset: this.getOffset(),
+      anchor: this._anchor,
+      draggable: this.isDraggable(),
+      clickTolerance: this._clickTolerance,
+      rotation: this.getRotation(),
+      rotationAlignment: this.getRotationAlignment(),
+      pitchAlignment: this.getPitchAlignment()
+    }
+
+    return markerOptions;
   }
 }
 
