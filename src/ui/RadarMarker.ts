@@ -1,6 +1,6 @@
 import maplibregl, { MapMouseEvent } from 'maplibre-gl';
 
-import RadarMap from './map';
+import type RadarMap from './RadarMap';
 
 import type { RadarMarkerImage, RadarMarkerOptions } from '../types';
 

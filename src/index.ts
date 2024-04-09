@@ -15,7 +15,7 @@ import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
 import VerifyAPI from './api/verify';
 
-import MapUI from './ui/mapFactory';
+import MapUI from './ui/map';
 import AutocompleteUI from './ui/autocomplete';
 
 import SDK_VERSION from './version';
