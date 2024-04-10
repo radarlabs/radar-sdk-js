@@ -155,15 +155,6 @@ class RadarMap extends maplibregl.Map {
     }
     this.on('styledata', onStyleLoad);
   }
-
-  fitToMarkers(fitBoundsOptions: maplibregl.FitBoundsOptions = { padding: 50 }, overrideMarkers?: RadarMarker[]) {
-    const bounds = new maplibregl.LngLatBounds();
-    const markers = overrideMarkers || this._markers;
-    markers.forEach(marker => {
-      bounds.extend(marker.getLngLat());
-    });
-    this.fitBounds(bounds, fitBoundsOptions);
-  }
 };
 
 export default RadarMap;
