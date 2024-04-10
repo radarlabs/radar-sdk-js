@@ -458,12 +458,16 @@ export interface RadarMapOptions extends maplibregl.MapOptions {
   container: string | HTMLElement;
 }
 
-export interface RadarMarkerOptions {
-  color?: string;
+export interface RadarMarkerImage {
+  url: string;
+  width: string;
+  height: string;
+}
+
+export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   text?: string;
   html?: string;
-  element?: HTMLElement;
-  scale?: number;
+  image?: RadarMarkerImage;
 }
 
 export interface RadarAutocompleteUIOptions {
