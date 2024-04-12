@@ -33,7 +33,7 @@ const defaultMarkerOptions: Partial<maplibregl.MarkerOptions> = {
 const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
 
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
-  `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
+  `${options.host}/maps/styles/${style}`
 );
 
 const getMarkerOptions = (marker: Marker): MarkerOptions => {
@@ -98,12 +98,18 @@ class MapUI {
 
     // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
+      let transformedUrl = url;
+      let headers: any = { 'Authorization': options.publishableKey };
       if (resourceType === 'Style' && isRadarStyle(url)) {
-        const radarStyleURL = createStyleURL(options, url);
-        return { url: radarStyleURL };
-      } else {
-        return { url };
+        transformedUrl = createStyleURL(options, url);
       }
+
+      if (typeof options.getRequestHeaders === 'function') {
+        const overrideHeaders = options.getRequestHeaders();
+        headers = Object.assign(headers, overrideHeaders);
+      }
+
+      return { url: transformedUrl, headers };
     };
 
     // create map
