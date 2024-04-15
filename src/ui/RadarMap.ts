@@ -71,6 +71,7 @@ class RadarMap extends maplibregl.Map {
     // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
       let radarStyleURL = url;
+      let headers = { 'Authorization': config.publishableKey };
       if (resourceType === 'Style' && isRadarStyle(url)) {
         radarStyleURL = createStyleURL(config, url);
       }
@@ -79,7 +80,11 @@ class RadarMap extends maplibregl.Map {
         return mapOptions.transformRequest(radarStyleURL, resourceType);
       }
 
-      return { url: radarStyleURL };
+      if (typeof config.getRequestHeaders === 'function') {
+        headers = Object.assign(headers, config.getRequestHeaders());
+      }
+
+      return { url: radarStyleURL, headers };
     };
 
     super(maplibreOptions);
