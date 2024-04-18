@@ -127,13 +127,14 @@ class RadarMap extends maplibregl.Map {
       const style = this.getStyle();
 
       const customMarkers = (style.metadata as any)?.['radar:customMarkers'];
-      if (Array.isArray(customMarkers) && customMarkers.length > 0) {
+      const radarCustomStyleId = (style.metadata as any)?.['radar:styleId'];
+      if (radarCustomStyleId && Array.isArray(customMarkers) && customMarkers.length > 0) {
         const customMarker = customMarkers[0]; // only support one custom marker for now
         try {
           const markerRawSvg = await Http.request({
             method: 'GET',
             versioned: false,
-            path: `maps/markers/${customMarker.id}`,
+            path: `maps/${radarCustomStyleId}/markers/${customMarker.id}`,
             headers: {
               'Content-Type': 'image/svg+xml',
             },
