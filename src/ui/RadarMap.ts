@@ -1,11 +1,10 @@
 import maplibregl from 'maplibre-gl';
 
 import RadarMarker from './RadarMarker';
+import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
-import Http from '../http';
 import Logger from '../logger';
-import RadarLogoControl from './RadarLogoControl';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
@@ -121,45 +120,10 @@ class RadarMap extends maplibregl.Map {
     };
     this.on('resize', onResize);
     this.on('load', onResize);
+  }
 
-    const onStyleLoad = async () => {
-      this._customMarkerRawSvg = undefined;
-      const style = this.getStyle();
-
-      const customMarkers = (style.metadata as any)?.['radar:customMarkers'];
-      const radarCustomStyleId = (style.metadata as any)?.['radar:styleId'];
-      if (radarCustomStyleId && Array.isArray(customMarkers) && customMarkers.length > 0) {
-        const customMarker = customMarkers[0]; // only support one custom marker for now
-        try {
-          const markerRawSvg = await Http.request({
-            method: 'GET',
-            versioned: false,
-            path: `maps/${radarCustomStyleId}/markers/${customMarker.id}`,
-            headers: {
-              'Content-Type': 'image/svg+xml',
-            },
-          });
-          this._customMarkerRawSvg = markerRawSvg.data;
-        } catch (err) {
-          Logger.warn(`Error getting custom marker: ${customMarker.id} - using default marker.`);
-        }
-      }
-
-      // set markers if necessary
-      this._markers.forEach((marker) => {
-        if (this._customMarkerRawSvg && !marker._image) {
-          // set custom marker
-          marker._element.innerHTML = this._customMarkerRawSvg;
-        } else {
-          const markerOptions = marker.getOptions();
-          const newMarker = new RadarMarker(markerOptions); // get default element
-
-          // set default element
-          marker._element.innerHTML = newMarker._element.innerHTML;
-        }
-      });
-    }
-    this.on('styledata', onStyleLoad);
+  getMarkers(): RadarMarker[] {
+    return this._markers;
   }
 };
 

@@ -105,6 +105,10 @@ class Http {
         xhr.setRequestHeader(key, val);
       });
 
+      if (allHeaders['Content-Type'] === 'image/png') {
+        xhr.responseType = 'blob';
+      }
+
       xhr.onload = () => {
         let response: any;
         try {

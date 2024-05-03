@@ -460,14 +460,15 @@ export interface RadarMapOptions extends maplibregl.MapOptions {
 
 export interface RadarMarkerImage {
   url: string;
-  width: string;
-  height: string;
+  width?: number;
+  height?: number;
 }
 
 export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   text?: string;
   html?: string;
   image?: RadarMarkerImage;
+  customMarkerId?: string;
 }
 
 export interface RadarAutocompleteUIOptions {
