@@ -187,28 +187,28 @@ class TrackAPI {
 
         return trackRes;
       }
-    } else {
-      response = await Http.request({
-        method: 'POST',
-        path: 'track',
-        data: body,
-      });
-
-      const { user, events } = response;
-      const location = { latitude, longitude, accuracy };
-
-      const trackRes = {
-        user,
-        events,
-        location,
-      } as RadarTrackResponse;
-
-      if (options.debug) {
-        trackRes.response = response;
-      }
-
-      return trackRes;
     }
+
+    response = await Http.request({
+      method: 'POST',
+      path: 'track',
+      data: body,
+    });
+
+    const { user, events } = response;
+    const location = { latitude, longitude, accuracy };
+
+    const trackRes = {
+      user,
+      events,
+      location,
+    } as RadarTrackResponse;
+
+    if (options.debug) {
+      trackRes.response = response;
+    }
+
+    return trackRes;
   }
 }
 
