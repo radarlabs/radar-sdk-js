@@ -194,7 +194,7 @@ class TrackAPI {
         data: body,
       });
 
-      let { user, events } = response;
+      const { user, events } = response;
       const location = { latitude, longitude, accuracy };
 
       const trackRes = {
