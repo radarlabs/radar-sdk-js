@@ -13,7 +13,7 @@ describe('Navigator', () => {
           throw new Error('Response should not succeed.');
         } catch (err: any) {
           expect(err.name).toEqual('RadarPermissionsError');
-          expect(err.message).toEqual('Permission denied.');
+          expect(err.message).toEqual('Location permissions denied.');
           expect(err.status).toEqual('ERROR_PERMISSIONS');
         }
       });

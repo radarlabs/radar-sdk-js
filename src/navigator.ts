@@ -90,9 +90,9 @@ class Navigator {
         (err: GeolocationPositionError) => { // location call failed or user did not grant permission
           if (err && err.code === 1) {
             // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
-            // code 1 means permission denied
+            // code 1 means location permissions denied
             // codes 2 and 3 mean location unavailable or timeout
-            return reject(new RadarPermissionsError('Permission denied.'));
+            return reject(new RadarPermissionsError('Browser location permissions denied.'));
           }
           return reject(new RadarLocationError('Could not determine location.'));
         },
