@@ -6,7 +6,7 @@ import Logger from '../logger';
 import Session from '../session';
 import Storage from '../storage';
 
-import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
+import type { RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
 
 class VerifyAPI {
   static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
