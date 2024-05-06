@@ -448,6 +448,7 @@ export interface RadarSearchGeofencesParams {
   tags?: string[] | string;
   metadata?: RadarMetadata;
   limit?: number;
+  includeGeometry?: boolean;
 }
 
 export interface RadarSearchGeofencesResponse extends RadarResponse {

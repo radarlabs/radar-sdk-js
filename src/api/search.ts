@@ -67,6 +67,7 @@ class SearchAPI {
       tags,
       metadata,
       limit,
+      includeGeometry,
     } = params;
 
     // use browser location if "near" not provided
@@ -92,6 +93,7 @@ class SearchAPI {
         tags,
         metadata,
         limit,
+        includeGeometry,
       },
     });
 
