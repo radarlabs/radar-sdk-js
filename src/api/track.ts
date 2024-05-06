@@ -10,7 +10,7 @@ import TripsAPI from './trips';
 import { signJWT } from '../util/jwt';
 import { ping } from '../util/net';
 
-import type { RadarTrackParams, RadarTrackResponse } from '../types';
+import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
 
 class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
@@ -88,7 +88,7 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      const host = 'https://api-verified.radar.io';
+      const host = 'https://api-verified.radar-staging.com';
       const pingHost = 'ping.radar-verify.com';
 
       const lang = navigator.language;
@@ -160,6 +160,32 @@ class TrackAPI {
           sclVal,
           cslVal,
         };
+
+        let { user, events, token, expiresAt } = response;
+        const location = { latitude, longitude, accuracy };
+        let passed;
+        let expiresIn;
+        if (expiresAt) {
+          expiresAt = Date.parse(expiresAt);
+          passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
+          expiresIn = expiresAt ? (expiresAt.getMilliseconds() - new Date().getMilliseconds()) / 1000 : null;
+        }
+
+        const trackRes = {
+          user,
+          events,
+          location,
+          token,
+          expiresAt,
+          expiresIn,
+          passed,
+        } as RadarTrackVerifiedResponse;
+
+        if (options.debug) {
+          trackRes.response = response;
+        }
+
+        return trackRes;
       }
     } else {
       response = await Http.request({
@@ -167,22 +193,22 @@ class TrackAPI {
         path: 'track',
         data: body,
       });
+
+      let { user, events } = response;
+      const location = { latitude, longitude, accuracy };
+
+      const trackRes = {
+        user,
+        events,
+        location,
+      } as RadarTrackResponse;
+
+      if (options.debug) {
+        trackRes.response = response;
+      }
+
+      return trackRes;
     }
-
-    const { user, events } = response;
-    const location = { latitude, longitude, accuracy };
-
-    const trackRes = {
-      user,
-      events,
-      location,
-    } as RadarTrackResponse;
-
-    if (options.debug) {
-      trackRes.response = response;
-    }
-
-    return trackRes;
   }
 }
 
