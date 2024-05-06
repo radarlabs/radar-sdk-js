@@ -65,7 +65,7 @@ class VerifyAPI {
     let passed;
     let expiresIn;
     if (expiresAt) {
-      expiresAt = Date.parse(expiresAt);
+      expiresAt = new Date(expiresAt);
       passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
       expiresIn = expiresAt ? (expiresAt.getTime() - new Date().getTime()) / 1000 : null;
     }
