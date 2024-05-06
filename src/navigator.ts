@@ -1,7 +1,7 @@
 import Config from './config';
 import Logger from './logger';
 import Storage from './storage';
-import { RadarLocationError, RadarLocationPermissionsError } from './errors';
+import { RadarLocationError, RadarPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
@@ -92,7 +92,7 @@ class Navigator {
             // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
             // code 1 means permission denied
             // codes 2 and 3 mean location unavailable or timeout
-            return reject(new RadarLocationPermissionsError('Permission denied.'));
+            return reject(new RadarPermissionsError('Permission denied.'));
           }
           return reject(new RadarLocationError('Could not determine location.'));
         },
