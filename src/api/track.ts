@@ -10,7 +10,7 @@ import TripsAPI from './trips';
 import { signJWT } from '../util/jwt';
 import { ping } from '../util/net';
 
-import type { RadarTrackParams, RadarTrackResponse } from '../types';
+import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
 
 class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
@@ -160,14 +160,40 @@ class TrackAPI {
           sclVal,
           cslVal,
         };
+
+        let { user, events, token, expiresAt } = response;
+        const location = { latitude, longitude, accuracy };
+        let passed;
+        let expiresIn;
+        if (expiresAt) {
+          expiresAt = new Date(expiresAt);
+          passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
+          expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
+        }
+
+        const trackRes = {
+          user,
+          events,
+          location,
+          token,
+          expiresAt,
+          expiresIn,
+          passed,
+        } as RadarTrackVerifiedResponse;
+
+        if (options.debug) {
+          trackRes.response = response;
+        }
+
+        return trackRes;
       }
-    } else {
-      response = await Http.request({
-        method: 'POST',
-        path: 'track',
-        data: body,
-      });
     }
+
+    response = await Http.request({
+      method: 'POST',
+      path: 'track',
+      data: body,
+    });
 
     const { user, events } = response;
     const location = { latitude, longitude, accuracy };

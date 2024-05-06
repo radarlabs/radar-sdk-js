@@ -4,18 +4,18 @@ import Logger from './logger';
 
 import {
   RadarBadRequestError,
-  RadarDesktopAppError,
   RadarForbiddenError,
   RadarLocationError,
-  RadarLocationPermissionsError,
+  RadarNetworkError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
+  RadarPermissionsError,
   RadarPublishableKeyError,
   RadarRateLimitError,
   RadarServerError,
-  RadarTimeoutError,
   RadarUnauthorizedError,
   RadarUnknownError,
+  RadarVerifyAppError,
 } from './errors';
 
 export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -110,11 +110,11 @@ class Http {
 
         const error = response?.meta?.error;
         if (error === 'ERROR_PERMISSIONS') {
-          return reject(new RadarLocationPermissionsError('Location permissions not granted.'));
+          return reject(new RadarPermissionsError('Location permissions not granted.'));
         } else if (error === 'ERROR_LOCATION') {
           return reject(new RadarLocationError('Could not determine location.'));
         } else if (error === 'ERROR_NETWORK') {
-          return reject(new RadarTimeoutError());
+          return reject(new RadarNetworkError());
         }
 
         if (xhr.status == 200) {
@@ -154,14 +154,14 @@ class Http {
 
       xhr.onerror = function() {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(new RadarDesktopAppError());
+          reject(new RadarVerifyAppError());
         } else {
           reject(new RadarServerError());
         }
       }
 
       xhr.ontimeout = function() {
-        reject(new RadarTimeoutError());
+        reject(new RadarVerifyAppError());
       }
 
       xhr.send(JSON.stringify(body));

@@ -148,10 +148,6 @@ class Radar {
     return VerifyAPI.trackVerified(params);
   }
 
-  public static trackVerifiedToken(params: RadarTrackParams = {}) {
-    return VerifyAPI.trackVerified(params, true);
-  }
-
   public static getContext(params: Location) {
     return ContextAPI.getContext(params);
   }
