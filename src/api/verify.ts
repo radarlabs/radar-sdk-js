@@ -67,7 +67,7 @@ class VerifyAPI {
     if (expiresAt) {
       expiresAt = new Date(expiresAt);
       passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
-      expiresIn = expiresAt ? (expiresAt.getTime() - new Date().getTime()) / 1000 : null;
+      expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
     }
 
     const trackRes = {
