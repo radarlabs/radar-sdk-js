@@ -92,7 +92,7 @@ class Navigator {
             // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
             // code 1 means location permissions denied
             // codes 2 and 3 mean location unavailable or timeout
-            return reject(new RadarPermissionsError('Browser location permissions denied.'));
+            return reject(new RadarPermissionsError('Location permissions denied.'));
           }
           return reject(new RadarLocationError('Could not determine location.'));
         },
