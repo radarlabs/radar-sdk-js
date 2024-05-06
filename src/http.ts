@@ -154,14 +154,14 @@ class Http {
 
       xhr.onerror = function() {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(new RadarDesktopAppError());
+          reject(new RadarVerifyAppError());
         } else {
           reject(new RadarServerError());
         }
       }
 
       xhr.ontimeout = function() {
-        reject(new RadarTimeoutError());
+        reject(new RadarVerifyAppError());
       }
 
       xhr.send(JSON.stringify(body));
