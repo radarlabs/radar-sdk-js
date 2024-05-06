@@ -28,3 +28,4 @@ cdn/
 coverage/
 site/
 .nyc_output/
+.vscode/
