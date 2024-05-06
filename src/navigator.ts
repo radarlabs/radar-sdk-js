@@ -9,13 +9,6 @@ interface PositionOptionOverrides {
   desiredAccuracy?: string;
 }
 
-
-const PERMISSION_ERROR_MESSAGES: any = {
-  1: 'Permission denied.',
-  2: 'Position unavailable.',
-  3: 'Timeout.',
-};
-
 const DEFAULT_POSITION_OPTIONS: PositionOptions = {
   maximumAge: 0,
   timeout: 1000 * 30, // 30 seconds
