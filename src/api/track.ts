@@ -88,7 +88,7 @@ class TrackAPI {
 
     let response: any;
     if (fraud) {
-      const host = 'https://api-verified.radar-staging.com';
+      const host = 'https://api-verified.radar.io';
       const pingHost = 'ping.radar-verify.com';
 
       const lang = navigator.language;
