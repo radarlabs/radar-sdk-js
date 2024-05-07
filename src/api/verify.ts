@@ -6,7 +6,7 @@ import Logger from '../logger';
 import Session from '../session';
 import Storage from '../storage';
 
-import type { RadarTrackParams, RadarTrackResponse, RadarTrackTokenResponse } from '../types';
+import type { RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
 
 class VerifyAPI {
   static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
@@ -53,7 +53,7 @@ class VerifyAPI {
       host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
     });
 
-    const { user, events, token } = response;
+    let { user, events, token, expiresAt } = response;
     let location;
     if (user && user.location && user.location.coordinates && user.locationAccuracy) {
       location = {
@@ -62,24 +62,23 @@ class VerifyAPI {
         accuracy: user.locationAccuracy,
       };
     }
-
-    if (encrypted) {
-      const trackTokenRes = {
-        token,
-      } as RadarTrackTokenResponse;
-  
-      if (options.debug) {
-        trackTokenRes.response = response;
-      }
-  
-      return trackTokenRes;
+    let passed;
+    let expiresIn;
+    if (expiresAt) {
+      expiresAt = new Date(expiresAt);
+      passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
+      expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
     }
 
     const trackRes = {
       user,
       events,
       location,
-    } as RadarTrackResponse;
+      token,
+      expiresAt,
+      expiresIn,
+      passed,
+    } as RadarTrackVerifiedResponse;
 
     if (options.debug) {
       trackRes.response = response;

@@ -52,8 +52,8 @@ describe('Track', () => {
           await Track.trackOnce({});
           throw new Error('Test did not throw expected error.');
         } catch (err: any) {
-          expect(err.name).toEqual('RadarLocationPermissionsError');
-          expect(err.message).toEqual('Permission denied.');
+          expect(err.name).toEqual('RadarPermissionsError');
+          expect(err.message).toEqual('Location permissions denied.');
           expect(err.status).toEqual('ERROR_PERMISSIONS');
         }
       });

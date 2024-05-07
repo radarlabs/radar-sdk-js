@@ -108,7 +108,8 @@ export type RadarEventType =
   | 'user.updated_trip'
   | 'user.approaching_trip_destination'
   | 'user.arrived_at_trip_destination'
-  | 'user.stopped_trip';
+  | 'user.stopped_trip'
+  | 'user.failed_fraud';
 
 export interface RadarGeofence {
   _id: string;
@@ -212,8 +213,11 @@ export interface RadarTrackResponse extends RadarResponse {
   events?: RadarEvent[];
 }
 
-export interface RadarTrackTokenResponse extends RadarResponse {
+export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
   token?: String;
+  expiresAt?: Date;
+  expiresIn?: number;
+  passed?: boolean;
 }
 
 export interface RadarContextResponse  extends RadarResponse {
@@ -448,6 +452,7 @@ export interface RadarSearchGeofencesParams {
   tags?: string[] | string;
   metadata?: RadarMetadata;
   limit?: number;
+  includeGeometry?: boolean;
 }
 
 export interface RadarSearchGeofencesResponse extends RadarResponse {
