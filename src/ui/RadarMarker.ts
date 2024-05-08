@@ -117,24 +117,6 @@ class RadarMarker extends maplibregl.Marker {
     }
     return super.remove();
   }
-
-  getOptions(): RadarMarkerOptions {
-    const markerOptions: RadarMarkerOptions = {
-      // TODO: element: marker.getElement(),
-      image: this._image,
-      color: this._color,
-      scale: this._scale,
-      offset: this.getOffset(),
-      anchor: this._anchor,
-      draggable: this.isDraggable(),
-      clickTolerance: this._clickTolerance,
-      rotation: this.getRotation(),
-      rotationAlignment: this.getRotationAlignment(),
-      pitchAlignment: this.getPitchAlignment()
-    }
-
-    return markerOptions;
-  }
 }
 
 export default RadarMarker;
