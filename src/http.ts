@@ -33,6 +33,7 @@ class Http {
     host,
     version,
     headers = {},
+    responseType,
   }: {
     method: HttpMethod;
     path: string;
@@ -40,6 +41,7 @@ class Http {
     host?: string;
     version?: string;
     headers?: Record<string, string>;
+    responseType?: XMLHttpRequestResponseType;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -101,17 +103,17 @@ class Http {
         xhr.setRequestHeader(key, allHeaders[key]);
       });
 
-      if (allHeaders['Content-Type'] === 'image/png') {
-        xhr.responseType = 'blob';
+      if (responseType) {
+        xhr.responseType = responseType;
       }
 
       xhr.onload = () => {
         let response: any;
         try {
-          if (allHeaders['Content-Type'] === 'application/json') {
-            response = JSON.parse(xhr.response);
-          } else {
+          if (xhr.responseType === 'blob') {
             response = { code: xhr.status, data: xhr.response };
+          } else {
+            response = JSON.parse(xhr.response);
           }
         } catch (e) {
           return reject(new RadarServerError(response));
@@ -161,7 +163,7 @@ class Http {
         }
       }
 
-      xhr.onerror = function() {
+      xhr.onerror = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
           reject(new RadarVerifyAppError());
         } else {
@@ -169,7 +171,7 @@ class Http {
         }
       }
 
-      xhr.ontimeout = function() {
+      xhr.ontimeout = function () {
         reject(new RadarVerifyAppError());
       }
 

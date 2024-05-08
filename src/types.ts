@@ -464,7 +464,8 @@ export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformR
 }
 
 export interface RadarMarkerImage {
-  url: string;
+  url?: string;
+  radarMarkerId?: string;
   width?: number;
   height?: number;
 }
@@ -473,7 +474,6 @@ export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   text?: string;
   html?: string;
   image?: RadarMarkerImage;
-  customMarkerId?: string;
 }
 
 export interface RadarAutocompleteUIOptions {

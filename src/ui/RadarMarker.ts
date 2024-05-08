@@ -22,21 +22,23 @@ const getFileExtension = (file: string): string => {
 
 const createImageElement = (options: RadarMarkerImage) => {
   const element = document.createElement('img');
-  element.src = options.url;
+  element.src = options.url!;
+
   if (options.width) {
     element.width = options.width;
   }
   if (options.height) {
     element.height = options.height;
   }
-  element.style.maxWidth = '64px';
-  element.style.maxHeight = '64px';
+  if (!options.width && !options.height) {
+    element.style.maxWidth = '64px';
+    element.style.maxHeight = '64px';
+  }
   return element;
 }
 class RadarMarker extends maplibregl.Marker {
   _map!: RadarMap;
   _image?: RadarMarkerImage;
-  _customMarkerId?: string;
 
   constructor(markerOptions: RadarMarkerOptions) {
     const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
@@ -50,49 +52,51 @@ class RadarMarker extends maplibregl.Marker {
     if (markerOptions.scale) {
       maplibreOptions.scale = markerOptions.scale;
     }
-    if (markerOptions.image) {
-      maplibreOptions.element = createImageElement(markerOptions.image);
-    }
 
     super(maplibreOptions);
 
     if (markerOptions.image) {
       this._image = markerOptions.image;
-    }
 
-    if (markerOptions.customMarkerId) {
-      const ext = getFileExtension(markerOptions.customMarkerId);
-      if (ext !== 'svg' && ext !== 'png') {
-        Logger.error(`Invalid custom marker extension ${ext} - falling back to default marker`);
-      } else {
-        this._customMarkerId = markerOptions.customMarkerId;
-        const originalElement = this._element.cloneNode(true);
-        this._element.childNodes.forEach((child) => {
-          child.remove();
-        });
-        const contentType = fileExtensionToContentType[ext];
+      const originalElement = this._element.cloneNode(true);
+      this._element.childNodes.forEach((child) => {
+        child.remove();
+      });
 
+      const onSuccess = (blob: Blob) => {
+        const customMarkerUrl = URL.createObjectURL(blob);
+        this._element.replaceChildren(createImageElement({ url: customMarkerUrl }));
+      };
+
+      const onError = (err: any) => {
+        Logger.error(`Could not get custom marker: ${err.message} - falling back to default marker`);
+        this._element.replaceChildren(...originalElement.childNodes);
+      }
+
+      if (markerOptions.image.url) {
+        fetch(markerOptions.image.url)
+          .then(res => {
+            if (res.status === 200) {
+              res.blob()
+                .then(onSuccess)
+                .catch(onError);
+            } else {
+              onError(new Error(res.statusText));
+            }
+          })
+          .catch(onError)
+      }
+
+      if (markerOptions.image.radarMarkerId) {
         // fetch custom marker
         Http.request({
           method: 'GET',
           version: 'maps',
-          path: `markers/${markerOptions.customMarkerId}`,
-          headers: {
-            'Content-Type': contentType,
-          },
-        }).then((res) => {
-          if (res.data instanceof Blob) {
-            // png returns a Blob
-            const customMarkerUrl = URL.createObjectURL(res.data);
-            this._element.replaceChildren(createImageElement({ url: customMarkerUrl }));
-          } else {
-            // svg returns an xml string
-            this._element.innerHTML = res.data;
-          }
-        }).catch((err) => {
-          Logger.error(`Could not get custom marker: ${err.message} - falling back to default marker`);
-          this._element.replaceChildren(...originalElement.childNodes);
-        });
+          path: `markers/${markerOptions.image.radarMarkerId}`,
+          responseType: 'blob',
+        })
+          .then(({ data }) => onSuccess(data))
+          .catch(onError);
       }
     }
 
