@@ -31,14 +31,14 @@ class Http {
     path,
     data,
     host,
-    versioned = true,
+    version,
     headers = {},
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
-    versioned?: boolean;
+    version?: string;
     headers?: Record<string, string>;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
@@ -53,12 +53,8 @@ class Http {
 
       // setup request URL
       const urlHost = host || options.host;
-      const version = options.version;
-      let url = `${urlHost}/${version}/${path}`;
-
-      if (!versioned) {
-        url = `${urlHost}/${path}`;
-      }
+      const urlVersion = version || options.version;
+      let url = `${urlHost}/${urlVersion}/${path}`;
 
       // remove undefined values from request data
       let body: any = {};
@@ -98,11 +94,11 @@ class Http {
       }
 
       // combines default headers with custom headers and config headers
-      const allHeaders = Object.assign(defaultHeaders, headers, configHeaders);
+      const allHeaders = Object.assign(defaultHeaders, configHeaders, headers);
 
-      // set headers 
-      Object.entries(allHeaders).forEach(([key, val]) => {
-        xhr.setRequestHeader(key, val);
+      // set headers
+      Object.keys(allHeaders).forEach((key) => {
+        xhr.setRequestHeader(key, allHeaders[key]);
       });
 
       if (allHeaders['Content-Type'] === 'image/png') {

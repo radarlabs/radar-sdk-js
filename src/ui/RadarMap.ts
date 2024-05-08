@@ -30,7 +30,7 @@ const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) =>
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
-/** Check if style is a Radar style or a custom style */
+// check if style is a Radar style or a custom style
 const isRadarStyle = (style: string) => {
   if (RADAR_STYLES.includes(style)) { // Radar built-in style
     return true;
@@ -41,7 +41,7 @@ const isRadarStyle = (style: string) => {
   return false;
 };
 
-/** Use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style */
+// use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style
 const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
@@ -122,6 +122,14 @@ class RadarMap extends maplibregl.Map {
     };
     this.on('resize', onResize);
     this.on('load', onResize);
+  }
+
+  addMarker(marker: RadarMarker) {
+    this._markers.push(marker);
+  }
+
+  removeMarker(marker: RadarMarker) {
+    this._markers = this._markers.filter((mapMarker: RadarMarker) => mapMarker !== marker);
   }
 
   getMarkers(): RadarMarker[] {

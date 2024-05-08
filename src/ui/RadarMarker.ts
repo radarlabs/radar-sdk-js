@@ -66,17 +66,17 @@ class RadarMarker extends maplibregl.Marker {
         Logger.error(`Invalid custom marker extension ${ext} - falling back to default marker`);
       } else {
         this._customMarkerId = markerOptions.customMarkerId;
-
         const originalElement = this._element.cloneNode(true);
         this._element.childNodes.forEach((child) => {
           child.remove();
         });
         const contentType = fileExtensionToContentType[ext];
 
+        // fetch custom marker
         Http.request({
           method: 'GET',
-          versioned: false,
-          path: `maps/PlACEHOLDER/markers/${markerOptions.customMarkerId}`,
+          version: 'maps',
+          path: `markers/${markerOptions.customMarkerId}`,
           headers: {
             'Content-Type': contentType,
           },
@@ -107,13 +107,13 @@ class RadarMarker extends maplibregl.Marker {
   }
 
   addTo(map: RadarMap) {
-    map._markers.push(this);
+    map.addMarker(this);
     return super.addTo(map);
   }
 
   remove() {
     if (this._map) {
-      this._map._markers = this._map._markers.filter((marker) => marker !== this);
+      this._map.removeMarker(this);
     }
     return super.remove();
   }
