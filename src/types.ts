@@ -459,7 +459,7 @@ export interface RadarSearchGeofencesResponse extends RadarResponse {
   geofences: RadarGeofence[];
 }
 
-export interface RadarMapOptions extends maplibregl.MapOptions {
+export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
   container: string | HTMLElement;
 }
 

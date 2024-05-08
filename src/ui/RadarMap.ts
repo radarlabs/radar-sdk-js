@@ -1,5 +1,6 @@
 import maplibregl from 'maplibre-gl';
 
+import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
 import RadarLogoControl from './RadarLogoControl';
 
@@ -25,15 +26,19 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
-const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
-
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
 /** Check if style is a Radar style or a custom style */
 const isRadarStyle = (style: string) => {
-  return RADAR_STYLES.includes(style) || uuidRegex.test(style)
+  if (RADAR_STYLES.includes(style)) { // Radar built-in style
+    return true;
+  }
+  if (!/^(http:|https:)/.test(style)) { // Radar custom style (not a URL)
+    return true;
+  }
+  return false;
 };
 
 /** Use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style */
@@ -44,7 +49,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
     return createStyleURL(options, style);
   }
 
-  return mapOptions.style;
+  return mapOptions.style; // style object or URL
 };
 
 class RadarMap extends maplibregl.Map {
@@ -67,29 +72,26 @@ class RadarMap extends maplibregl.Map {
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
-    // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
-      let radarStyleURL = url;
-      let headers = { 'Authorization': config.publishableKey };
       if (resourceType === 'Style' && isRadarStyle(url)) {
-        radarStyleURL = createStyleURL(config, url);
+        url = createStyleURL(config, url);
       }
 
-      if (mapOptions.transformRequest) {
-        return mapOptions.transformRequest(radarStyleURL, resourceType);
-      }
-
+      let headers = {
+        'Authorization': config.publishableKey,
+        'X-Radar-Device-Type': 'Web',
+        'X-Radar-SDK-Version': SDK_VERSION,
+      };
       if (typeof config.getRequestHeaders === 'function') {
         headers = Object.assign(headers, config.getRequestHeaders());
       }
 
-      return { url: radarStyleURL, headers };
+      return { url, headers };
     };
 
     super(maplibreOptions);
 
     const container = this.getContainer();
-
     if (!container.style.width && !container.style.height) {
       Logger.warn('map container does not have a set "width" or "height"');
     }

@@ -12,13 +12,11 @@ class MapUI {
 
   public static createMap(mapOptions: RadarMapOptions): RadarMap {
     const radarMap = new RadarMap(mapOptions);
-
     return radarMap;
   }
 
   public static createMarker(markerOptions: RadarMarkerOptions = {}): RadarMarker {
     const radarMarker = new RadarMarker(markerOptions);
-
     return radarMarker;
   }
 }
