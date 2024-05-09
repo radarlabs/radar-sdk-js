@@ -64,13 +64,13 @@ class RadarMarker extends maplibregl.Marker {
       });
 
       const onSuccess = (blob: Blob) => {
-        const customMarkerUrl = URL.createObjectURL(blob);
-        this._element.replaceChildren(createImageElement({ url: customMarkerUrl }));
+        const markerObject = URL.createObjectURL(blob);
+        this._element.replaceChildren(createImageElement({ url: markerObject }));
       };
 
       const onError = (err: any) => {
-        Logger.error(`Could not get custom marker: ${err.message} - falling back to default marker`);
-        this._element.replaceChildren(...originalElement.childNodes);
+        Logger.error(`Could not load marker: ${err.message} - falling back to default marker`);
+        this._element.replaceChildren(...Array.from(originalElement.childNodes));
       }
 
       if (markerOptions.image.url) {
