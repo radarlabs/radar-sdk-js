@@ -459,16 +459,21 @@ export interface RadarSearchGeofencesResponse extends RadarResponse {
   geofences: RadarGeofence[];
 }
 
-export interface RadarMapOptions extends maplibregl.MapOptions {
+export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
   container: string | HTMLElement;
 }
 
-export interface RadarMarkerOptions {
-  color?: string;
+export interface RadarMarkerImage {
+  url?: string;
+  radarMarkerId?: string;
+  width?: number;
+  height?: number;
+}
+
+export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   text?: string;
   html?: string;
-  element?: HTMLElement;
-  scale?: number;
+  image?: RadarMarkerImage;
 }
 
 export interface RadarAutocompleteUIOptions {
