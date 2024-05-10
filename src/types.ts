@@ -460,7 +460,8 @@ export interface RadarSearchGeofencesResponse extends RadarResponse {
 }
 
 export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
-  fallbackLanguage?: string;
+  languages?: string[];
+  navigatorFallbackLanguage?: string;
 }
 
 export interface RadarMarkerImage {

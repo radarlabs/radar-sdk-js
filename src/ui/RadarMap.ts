@@ -1,4 +1,4 @@
-import maplibregl, { MapStyleDataEvent } from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 
 import RadarMarker from './RadarMarker';
 import RadarLogoControl from './RadarLogoControl';
@@ -19,13 +19,14 @@ const RADAR_STYLES = [
   'radar-dark-v1',
 ];
 
-const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
+const defaultMapOptions: Partial<RadarMapOptions> = {
   minZoom: 1,
   maxZoom: 20,
   attributionControl: false,
   dragRotate: false,
   touchPitch: false,
   maplibreLogo: false,
+  navigatorFallbackLanguage: 'en',
 };
 
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
@@ -55,7 +56,6 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 };
 
 class RadarMap extends maplibregl.Map {
-  _customMarkerRawSvg: string | undefined;
   _markers: RadarMarker[] = [];
 
   constructor(mapOptions: RadarMapOptions) {
@@ -67,14 +67,14 @@ class RadarMap extends maplibregl.Map {
 
     // configure maplibre options
     const style = getStyle(config, mapOptions);
-    const maplibreOptions: maplibregl.MapOptions = Object.assign({},
-      defaultMaplibreOptions,
+    const maplibreOptions: RadarMapOptions = Object.assign({},
+      defaultMapOptions,
       mapOptions,
       { style },
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
-    maplibreOptions.transformRequest = (url, resourceType) => {
+    (maplibreOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
       if (resourceType === 'Style' && isRadarStyle(url)) {
         url = createStyleURL(config, url);
       }
@@ -123,7 +123,7 @@ class RadarMap extends maplibregl.Map {
       }
     };
 
-    const onStyleLoad = (e: MapStyleDataEvent) => {
+    const onStyleLoad = (e: maplibregl.MapStyleDataEvent) => {
       const styleJSON = (e as any).style?.stylesheet; // for some reason, style does not exist in the types
       if (!styleJSON) {
         Logger.warn('style data not available');
@@ -131,8 +131,7 @@ class RadarMap extends maplibregl.Map {
       }
 
       // transform text-field expressions to use local language
-      const options = { fallbackLanguage: mapOptions.fallbackLanguage || 'en' };
-      const newStyleJSON = transformMapStyle(styleJSON, options);
+      const newStyleJSON = transformMapStyle(styleJSON, maplibreOptions);
       this.setStyle(newStyleJSON);
     };
     this.on('resize', onResize);

@@ -2,7 +2,10 @@ import * as _ from './_';
 
 import Logger from '../logger';
 
-const RADAR_LOCAL_LANGUAGE_EXPR = ['get', 'radar:name_local'];
+import { RadarMapOptions } from '../types';
+
+// NOTE(jasonl): ENSURE THIS STAYS IN SYNC WITH THE SERVER IMPLEMENTATION
+const RADAR_LANGUAGE_EXPR = ['get', 'radar:name_client_language'];
 
 /** get an array of languages set in the browser in RFC 5646 format */
 const getBrowserLanguages = (options = { fallback: 'en', format: 'RFC-5646' }) => {
@@ -22,7 +25,7 @@ const getBrowserLanguages = (options = { fallback: 'en', format: 'RFC-5646' }) =
   return languagesRFC5646;
 };
 
-const replaceAllValueInExpression = (expr: any, target: any[], value: any[]): any => {
+const replaceAllValuesInExpression = (expr: any, target: any[], value: any[]): any => {
   if (target.length !== value.length) {
     Logger.warn('replaceAllValueInExpression: Target and value arrays must be the same length');
     return expr;
@@ -34,27 +37,38 @@ const replaceAllValueInExpression = (expr: any, target: any[], value: any[]): an
   }
 
   if (Array.isArray(expr)) {
-    return expr.map((e) => replaceAllValueInExpression(e, target, value));
+    return expr.map((e) => replaceAllValuesInExpression(e, target, value));
   }
 
   return expr;
 };
 
-export const transformMapStyle = (styleJSON: any, options = { fallbackLanguage: 'en' }): any => {
-  if (styleJSON?.metadata?.['radar:language'] === 'local') {
-    const browserLanguages = getBrowserLanguages({ fallback: options.fallbackLanguage, format: 'ISO-639-1' });
+export const transformMapStyle = (styleJSON: any, options: Pick<RadarMapOptions, 'languages' | 'navigatorFallbackLanguage'>): any => {
+  let languages: string[] = [];
 
+  // use browser language if style language is set to local
+  if (styleJSON?.metadata?.['radar:language'] === 'local') {
+    const fallbackLanguage = options.navigatorFallbackLanguage || 'en';
+    languages = getBrowserLanguages({ fallback: fallbackLanguage, format: 'ISO-639-1' });
+  }
+
+  // client set language takes precedence
+  if (options.languages) {
+    languages = options.languages;
+  }
+
+  if (languages.length > 0) {
     // construct expression ordered by language preference
     const localLanguageExpression: any[] = ['coalesce'];
-    browserLanguages.forEach((l: any) => {
+    languages.forEach((l: any) => {
       localLanguageExpression.push(['get', `name_${l}`], ['get', `name:${l}`]);
     });
 
     const transformedLayers = styleJSON.layers.map((layer: any) => {
       if (layer.type === 'symbol' && layer.layout['text-field']) {
-        layer.layout['text-field'] = replaceAllValueInExpression(
+        layer.layout['text-field'] = replaceAllValuesInExpression(
           layer.layout['text-field'],
-          [RADAR_LOCAL_LANGUAGE_EXPR],
+          [RADAR_LANGUAGE_EXPR],
           [localLanguageExpression]
         );
 
