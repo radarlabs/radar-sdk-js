@@ -1,11 +1,13 @@
-import maplibregl from 'maplibre-gl';
+import maplibregl, { MapStyleDataEvent } from 'maplibre-gl';
 
-import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
 import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
 import Logger from '../logger';
+import SDK_VERSION from '../version';
+
+import { transformMapStyle } from '../util/mapStyle';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
@@ -120,8 +122,22 @@ class RadarMap extends maplibregl.Map {
         }
       }
     };
+
+    const onStyleLoad = (e: MapStyleDataEvent) => {
+      const styleJSON = (e as any).style?.stylesheet; // for some reason, style does not exist in the types
+      if (!styleJSON) {
+        Logger.warn('style data not available');
+        return;
+      }
+
+      // transform text-field expressions to use local language
+      const options = { fallbackLanguage: mapOptions.fallbackLanguage || 'en' };
+      const newStyleJSON = transformMapStyle(styleJSON, options);
+      this.setStyle(newStyleJSON);
+    };
     this.on('resize', onResize);
     this.on('load', onResize);
+    this.on('styledata', onStyleLoad);
   }
 
   addMarker(marker: RadarMarker) {
