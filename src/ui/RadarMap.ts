@@ -28,8 +28,8 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
 
 const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   let url = `${options.host}/maps/styles/${mapOptions.style}?publishableKey=${options.publishableKey}`
-  if (mapOptions.locale) {
-    url += `&locale=${mapOptions.locale}`
+  if (mapOptions.language) {
+    url += `&language=${mapOptions.language}`
   }
   return url
 };
@@ -85,6 +85,7 @@ class RadarMap extends maplibregl.Map {
         'Authorization': config.publishableKey,
         'X-Radar-Device-Type': 'Web',
         'X-Radar-SDK-Version': SDK_VERSION,
+        'X-Radar-Device-Language': navigator.language,
       };
       if (typeof config.getRequestHeaders === 'function') {
         headers = Object.assign(headers, config.getRequestHeaders());
