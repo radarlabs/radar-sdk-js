@@ -75,7 +75,11 @@ class RadarMap extends maplibregl.Map {
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
-    (maplibreOptions as maplibregl.MapOptions).transformRequest = (url) => {
+    (maplibreOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
+      // this handles when a style is switched
+      if (resourceType === 'Style' && isRadarStyle(url)) {
+        url = createStyleURL(config, { ...maplibreOptions, style: url });
+      }
 
       let headers = {
         'Authorization': config.publishableKey,
