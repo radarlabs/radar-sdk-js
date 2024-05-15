@@ -26,6 +26,10 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
+const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
+  padding: 50,
+};
+
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
@@ -134,6 +138,22 @@ class RadarMap extends maplibregl.Map {
 
   getMarkers(): RadarMarker[] {
     return this._markers;
+  }
+
+  fitToMarkers(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideMarkers?: RadarMarker[]) {
+    const markers = overrideMarkers || this.getMarkers();
+
+    if (markers.length === 0) {
+      return;
+    }
+
+    const bounds = new maplibregl.LngLatBounds();
+    markers.forEach((marker) => {
+      bounds.extend(marker.getLngLat());
+    });
+
+    const options = Object.assign(defaultFitMarkersOptions, fitBoundsOptions);
+    this.fitBounds(bounds, options);
   }
 };
 
