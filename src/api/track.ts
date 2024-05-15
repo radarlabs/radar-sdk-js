@@ -137,14 +137,14 @@ class TrackAPI {
         }),
       };
       
-      const token = await signJWT(payload, dk);
+      const reqToken = await signJWT(payload, dk);
 
       response = await Http.request({
         host,
         method: 'POST',
         path: 'track',
         data: {
-          token,
+          token: reqToken,
         },
         headers: {
           'X-Radar-Body-Is-Token': 'true',
@@ -160,33 +160,33 @@ class TrackAPI {
           sclVal,
           cslVal,
         };
-
-        let { user, events, token, expiresAt } = response;
-        const location = { latitude, longitude, accuracy };
-        let passed;
-        let expiresIn;
-        if (expiresAt) {
-          expiresAt = new Date(expiresAt);
-          passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
-          expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
-        }
-
-        const trackRes = {
-          user,
-          events,
-          location,
-          token,
-          expiresAt,
-          expiresIn,
-          passed,
-        } as RadarTrackVerifiedResponse;
-
-        if (options.debug) {
-          trackRes.response = response;
-        }
-
-        return trackRes;
       }
+
+      let { user, events, token, expiresAt } = response;
+      const location = { latitude, longitude, accuracy };
+      let passed;
+      let expiresIn;
+      if (expiresAt) {
+        expiresAt = new Date(expiresAt);
+        passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
+        expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
+      }
+
+      const trackRes = {
+        user,
+        events,
+        location,
+        token,
+        expiresAt,
+        expiresIn,
+        passed,
+      } as RadarTrackVerifiedResponse;
+
+      if (options.debug) {
+        trackRes.response = response;
+      }
+
+      return trackRes;
     }
 
     response = await Http.request({
