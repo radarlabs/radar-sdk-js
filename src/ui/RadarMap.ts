@@ -6,6 +6,7 @@ import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
 import Logger from '../logger';
+import Navigator from '../navigator';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
@@ -89,7 +90,7 @@ class RadarMap extends maplibregl.Map {
         'Authorization': config.publishableKey,
         'X-Radar-Device-Type': 'Web',
         'X-Radar-SDK-Version': SDK_VERSION,
-        'X-Radar-Device-Language': navigator.language,
+        'X-Radar-Device-Language': Navigator.getLanguage(),
       };
       if (typeof config.getRequestHeaders === 'function') {
         headers = Object.assign(headers, config.getRequestHeaders());
