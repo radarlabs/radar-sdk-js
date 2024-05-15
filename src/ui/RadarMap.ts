@@ -1,11 +1,11 @@
 import maplibregl from 'maplibre-gl';
 
+import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
+import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
-import Http from '../http';
 import Logger from '../logger';
-import RadarLogoControl from './RadarLogoControl';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
@@ -26,18 +26,22 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
-const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
-
 const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
   `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
 );
 
-/** Check if style is a Radar style or a custom style */
+// check if style is a Radar style or a custom style
 const isRadarStyle = (style: string) => {
-  return RADAR_STYLES.includes(style) || uuidRegex.test(style)
+  if (RADAR_STYLES.includes(style)) { // Radar built-in style
+    return true;
+  }
+  if (!/^(http:|https:)/.test(style)) { // Radar custom style (not a URL)
+    return true;
+  }
+  return false;
 };
 
-/** Use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style */
+// use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style
 const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
@@ -45,7 +49,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
     return createStyleURL(options, style);
   }
 
-  return mapOptions.style;
+  return mapOptions.style; // style object or URL
 };
 
 class RadarMap extends maplibregl.Map {
@@ -68,24 +72,26 @@ class RadarMap extends maplibregl.Map {
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
-    // custom request handler for Radar styles
     maplibreOptions.transformRequest = (url, resourceType) => {
-      let radarStyleURL = url;
       if (resourceType === 'Style' && isRadarStyle(url)) {
-        radarStyleURL = createStyleURL(config, url);
+        url = createStyleURL(config, url);
       }
 
-      if (mapOptions.transformRequest) {
-        return mapOptions.transformRequest(radarStyleURL, resourceType);
+      let headers = {
+        'Authorization': config.publishableKey,
+        'X-Radar-Device-Type': 'Web',
+        'X-Radar-SDK-Version': SDK_VERSION,
+      };
+      if (typeof config.getRequestHeaders === 'function') {
+        headers = Object.assign(headers, config.getRequestHeaders());
       }
 
-      return { url: radarStyleURL };
+      return { url, headers };
     };
 
     super(maplibreOptions);
 
     const container = this.getContainer();
-
     if (!container.style.width && !container.style.height) {
       Logger.warn('map container does not have a set "width" or "height"');
     }
@@ -116,50 +122,29 @@ class RadarMap extends maplibregl.Map {
     };
     this.on('resize', onResize);
     this.on('load', onResize);
+  }
 
-    const onStyleLoad = async () => {
-      this._customMarkerRawSvg = undefined;
-      const style = this.getStyle();
+  addMarker(marker: RadarMarker) {
+    this._markers.push(marker);
+  }
 
-      const customMarkers = (style.metadata as any)?.['radar:customMarkers'];
-      if (Array.isArray(customMarkers) && customMarkers.length > 0) {
-        const customMarker = customMarkers[0]; // only support one custom marker for now
-        try {
-          const markerRawSvg = await Http.request({
-            method: 'GET',
-            versioned: false,
-            path: `maps/markers/${customMarker.id}`,
-            headers: {
-              'Content-Type': 'image/svg+xml',
-            },
-          });
-          this._customMarkerRawSvg = markerRawSvg.data;
-        } catch (err) {
-          Logger.warn(`Error getting custom marker: ${customMarker.id} - using default marker.`);
-        }
-      }
+  removeMarker(marker: RadarMarker) {
+    this._markers = this._markers.filter((mapMarker: RadarMarker) => mapMarker !== marker);
+  }
 
-      // set markers if necessary
-      this._markers.forEach((marker) => {
-        if (this._customMarkerRawSvg && !marker._image) {
-          // set custom marker
-          marker._element.innerHTML = this._customMarkerRawSvg;
-        } else {
-          const markerOptions = marker.getOptions();
-          const newMarker = new RadarMarker(markerOptions); // get default element
-
-          // set default element
-          marker._element.innerHTML = newMarker._element.innerHTML;
-        }
-      });
-    }
-    this.on('styledata', onStyleLoad);
+  getMarkers(): RadarMarker[] {
+    return this._markers;
   }
 
   fitToMarkers(fitBoundsOptions: maplibregl.FitBoundsOptions = { padding: 50 }, overrideMarkers?: RadarMarker[]) {
     const bounds = new maplibregl.LngLatBounds();
-    const markers = overrideMarkers || this._markers;
-    markers.forEach(marker => {
+    const markers = overrideMarkers || this.getMarkers();
+
+    if (markers.length === 0) {
+      return;
+    }
+
+    markers.forEach((marker) => {
       bounds.extend(marker.getLngLat());
     });
     this.fitBounds(bounds, fitBoundsOptions);

@@ -39,6 +39,21 @@
     <div class="mt-2">
       <pre><code id="events" class="code-sample language-json"></code><pre>
     </div>
+
+    <h6 class="mt-4">Token</h6>
+    <div class="mt-2">
+      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Expires at</h6>
+    <div class="mt-2">
+      <pre><code id="expires-at" class="code-sample language-json"></code><pre>
+    </div>
+
+    <h6 class="mt-2">Passed</h6>
+    <div class="mt-2">
+      <pre><code id="passed" class="code-sample language-json"></code><pre>
+    </div>
   </div>
 
   <div class="mt-4">
@@ -59,10 +74,14 @@
         Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
 
         Radar.trackVerified({ userId: 'test-user-id' })
-          .then(({ location, user, events }) =&gt; {
+          .then(({ location, user, events, token, expiresAt, expiresIn, passed }) =&gt; {
             console.log(location);
             console.log(user);
             console.log(events);
+            console.log(token);
+            console.log(expiresAt);
+            console.log(expiresIn);
+            console.log(passed);
           });
       });
     &lt;/script&gt;
@@ -92,13 +111,9 @@
 
     const userId = $('#user-id').val();
     Radar.trackVerified({ userId })
-      .then(({ location, user, events }) => {
-        console.log('TRACK RESPONSE', { location, user, events });
+      .then(({ location, user, events, token, expiresAt, expiresIn, passed }) => {
+        console.log('TRACK RESPONSE', { location, user, events, token, expiresAt, expiresIn, passed });
         $('#loader').hide();
-
-        console.log(location);
-        console.log(user);
-        console.log(events);
 
         if (!location) {
           $('#map').hide();
@@ -131,6 +146,9 @@
         $('#location').html(JSON.stringify(location, null, 2));
         $('#user').html(JSON.stringify(user, null, 2));
         $('#events').html(JSON.stringify(events, null, 2));
+        $('#token').html(token);
+        $('#expires-at').html(expiresAt);
+        $('#passed').html(passed ? 'true' : 'false');
         hljs.highlightAll();
       })
       .catch((err) => {

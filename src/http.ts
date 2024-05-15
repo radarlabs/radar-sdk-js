@@ -4,18 +4,18 @@ import Logger from './logger';
 
 import {
   RadarBadRequestError,
-  RadarDesktopAppError,
   RadarForbiddenError,
   RadarLocationError,
-  RadarLocationPermissionsError,
+  RadarNetworkError,
   RadarNotFoundError,
   RadarPaymentRequiredError,
+  RadarPermissionsError,
   RadarPublishableKeyError,
   RadarRateLimitError,
   RadarServerError,
-  RadarTimeoutError,
   RadarUnauthorizedError,
   RadarUnknownError,
+  RadarVerifyAppError,
 } from './errors';
 
 export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -31,15 +31,17 @@ class Http {
     path,
     data,
     host,
-    versioned = true,
+    version,
     headers = {},
+    responseType,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
-    versioned?: boolean;
+    version?: string;
     headers?: Record<string, string>;
+    responseType?: XMLHttpRequestResponseType;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -53,12 +55,8 @@ class Http {
 
       // setup request URL
       const urlHost = host || options.host;
-      const version = options.version;
-      let url = `${urlHost}/${version}/${path}`;
-
-      if (!versioned) {
-        url = `${urlHost}/${path}`;
-      }
+      const urlVersion = version || options.version;
+      let url = `${urlHost}/${urlVersion}/${path}`;
 
       // remove undefined values from request data
       let body: any = {};
@@ -98,20 +96,24 @@ class Http {
       }
 
       // combines default headers with custom headers and config headers
-      const allHeaders = Object.assign(defaultHeaders, headers, configHeaders);
+      const allHeaders = Object.assign(defaultHeaders, configHeaders, headers);
 
-      // set headers 
-      Object.entries(allHeaders).forEach(([key, val]) => {
-        xhr.setRequestHeader(key, val);
+      // set headers
+      Object.keys(allHeaders).forEach((key) => {
+        xhr.setRequestHeader(key, allHeaders[key]);
       });
+
+      if (responseType) {
+        xhr.responseType = responseType;
+      }
 
       xhr.onload = () => {
         let response: any;
         try {
-          if (allHeaders['Content-Type'] === 'application/json') {
-            response = JSON.parse(xhr.response);
-          } else {
+          if (xhr.responseType === 'blob') {
             response = { code: xhr.status, data: xhr.response };
+          } else {
+            response = JSON.parse(xhr.response);
           }
         } catch (e) {
           return reject(new RadarServerError(response));
@@ -119,11 +121,11 @@ class Http {
 
         const error = response?.meta?.error;
         if (error === 'ERROR_PERMISSIONS') {
-          return reject(new RadarLocationPermissionsError('Location permissions not granted.'));
+          return reject(new RadarPermissionsError('Location permissions not granted.'));
         } else if (error === 'ERROR_LOCATION') {
           return reject(new RadarLocationError('Could not determine location.'));
         } else if (error === 'ERROR_NETWORK') {
-          return reject(new RadarTimeoutError());
+          return reject(new RadarNetworkError());
         }
 
         if (xhr.status == 200) {
@@ -161,16 +163,16 @@ class Http {
         }
       }
 
-      xhr.onerror = function() {
+      xhr.onerror = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(new RadarDesktopAppError());
+          reject(new RadarVerifyAppError());
         } else {
           reject(new RadarServerError());
         }
       }
 
-      xhr.ontimeout = function() {
-        reject(new RadarTimeoutError());
+      xhr.ontimeout = function () {
+        reject(new RadarVerifyAppError());
       }
 
       xhr.send(JSON.stringify(body));

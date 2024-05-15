@@ -7,13 +7,13 @@ import { nycOffice, enableLocation } from './utils';
 describe('Navigator', () => {
   describe('getCurrentPosition', () => {
     describe('location permissions denied', () => {
-      it('should throw a RadarLocationPermissionsError', async () => {
+      it('should throw a RadarPermissionsError', async () => {
         try {
           await Navigator.getCurrentPosition();
           throw new Error('Response should not succeed.');
         } catch (err: any) {
-          expect(err.name).toEqual('RadarLocationPermissionsError');
-          expect(err.message).toEqual('Permission denied.');
+          expect(err.name).toEqual('RadarPermissionsError');
+          expect(err.message).toEqual('Location permissions denied.');
           expect(err.status).toEqual('ERROR_PERMISSIONS');
         }
       });
