@@ -90,7 +90,6 @@ class RadarMap extends maplibregl.Map {
         'Authorization': config.publishableKey,
         'X-Radar-Device-Type': 'Web',
         'X-Radar-SDK-Version': SDK_VERSION,
-        'X-Radar-Device-Language': Navigator.getLanguage(),
       };
       if (typeof config.getRequestHeaders === 'function') {
         headers = Object.assign(headers, config.getRequestHeaders());

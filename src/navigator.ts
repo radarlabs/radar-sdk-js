@@ -128,15 +128,6 @@ class Navigator {
       });
     });
   }
-
-  public static async getLanguage() {
-    if (!navigator || !navigator.language) {
-      Logger.warn('navigator.language is not available');
-      return undefined;
-    }
-
-    return navigator.language;
-  }
 }
 
 export default Navigator;
