@@ -121,6 +121,20 @@ class RadarMarker extends maplibregl.Marker {
     }
     return super.remove();
   }
+
+  _onMapClick(e: maplibregl.MapMouseEvent): void {
+    const targetElement = e.originalEvent.target;
+    const element = this._element;
+
+    if (targetElement === element || element.contains(targetElement as any)) {
+      // TODO: Need to stop propagation somehow
+      // can use addEventListener in the constructor instead but then the togglePopup logic will be kinda wonky
+      if (this._popup) {
+        this.togglePopup();
+      }
+      this.fire('click', this);
+    }
+  }
 }
 
 export default RadarMarker;
