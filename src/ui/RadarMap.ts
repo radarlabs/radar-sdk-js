@@ -6,6 +6,7 @@ import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
 import Logger from '../logger';
+import Navigator from '../navigator';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
@@ -30,9 +31,13 @@ const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
   padding: 50,
 };
 
-const createStyleURL = (options: RadarOptions, style: string = DEFAULT_STYLE) => (
-  `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
-);
+const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
+  let url = `${options.host}/maps/styles/${mapOptions.style}?publishableKey=${options.publishableKey}`
+  if (mapOptions.language) {
+    url += `&language=${mapOptions.language}`
+  }
+  return url
+};
 
 // check if style is a Radar style or a custom style
 const isRadarStyle = (style: string) => {
@@ -50,14 +55,13 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
   if (!style || (typeof style === 'string' && isRadarStyle(style))) {
-    return createStyleURL(options, style);
+    return createStyleURL(options, mapOptions);
   }
 
   return mapOptions.style; // style object or URL
 };
 
 class RadarMap extends maplibregl.Map {
-  _customMarkerRawSvg: string | undefined;
   _markers: RadarMarker[] = [];
 
   constructor(mapOptions: RadarMapOptions) {
@@ -69,16 +73,17 @@ class RadarMap extends maplibregl.Map {
 
     // configure maplibre options
     const style = getStyle(config, mapOptions);
-    const maplibreOptions: maplibregl.MapOptions = Object.assign({},
+    const maplibreOptions: RadarMapOptions = Object.assign({},
       defaultMaplibreOptions,
       mapOptions,
       { style },
     );
     Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
 
-    maplibreOptions.transformRequest = (url, resourceType) => {
+    (maplibreOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
+      // this handles when a style is switched
       if (resourceType === 'Style' && isRadarStyle(url)) {
-        url = createStyleURL(config, url);
+        url = createStyleURL(config, { ...maplibreOptions, style: url });
       }
 
       let headers = {
