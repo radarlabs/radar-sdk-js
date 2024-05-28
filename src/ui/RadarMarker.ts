@@ -11,15 +11,6 @@ const defaultMarkerOptions: maplibregl.MarkerOptions = {
   color: '#000257',
 };
 
-const fileExtensionToContentType: Record<string, string> = {
-  svg: 'image/svg+xml',
-  png: 'image/png',
-};
-
-const getFileExtension = (file: string): string => {
-  return file.split('.').pop() || '';
-}
-
 const createImageElement = (options: RadarMarkerImage) => {
   const element = document.createElement('img');
   element.src = options.url!;
@@ -33,6 +24,8 @@ const createImageElement = (options: RadarMarkerImage) => {
   if (!options.width && !options.height) {
     element.style.maxWidth = '64px';
     element.style.maxHeight = '64px';
+    element.style.width = '100%';
+    element.style.height = '100%';
   }
   return element;
 }
