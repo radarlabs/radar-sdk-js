@@ -470,10 +470,16 @@ export interface RadarMarkerImage {
   height?: number;
 }
 
+export interface RadarMarkerPopupOptions extends maplibregl.PopupOptions {
+  text?: string;
+  html?: string;
+}
+
 export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   text?: string;
   html?: string;
   image?: RadarMarkerImage;
+  popup?: RadarMarkerPopupOptions;
 }
 
 export interface RadarAutocompleteUIOptions {

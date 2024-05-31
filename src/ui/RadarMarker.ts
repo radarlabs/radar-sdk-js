@@ -7,7 +7,7 @@ import type RadarMap from './RadarMap';
 
 import type { RadarMarkerImage, RadarMarkerOptions } from '../types';
 
-const defaultMarkerOptions: maplibregl.MarkerOptions = {
+const defaultMarkerOptions: RadarMarkerOptions = {
   color: '#000257',
 };
 
@@ -93,12 +93,27 @@ class RadarMarker extends maplibregl.Marker {
       }
     }
 
-    // set popup text or HTML
+    // handle deprecated popup options
     if (markerOptions.text) {
-      const popup = new maplibregl.Popup({ offset: 35 }).setText(markerOptions.text);
-      this.setPopup(popup);
-    } else if (markerOptions.html) {
-      const popup = new maplibregl.Popup({ offset: 35 }).setHTML(markerOptions.html);
+      markerOptions.popup = markerOptions.popup || {};
+      markerOptions.popup!.text = markerOptions.text;
+    }
+    if (markerOptions.html) {
+      markerOptions.popup = markerOptions.popup || {};
+      markerOptions.popup!.html = markerOptions.html;
+    }
+
+    // set popup text or HTML
+    if (markerOptions.popup) {
+      const popup = new maplibregl.Popup(markerOptions.popup)
+
+      if (markerOptions.popup.text) {
+        popup.setText(markerOptions.popup.text);
+      }
+      if (markerOptions.popup.html) {
+        popup.setHTML(markerOptions.popup.html);
+      }
+
       this.setPopup(popup);
     }
   }
