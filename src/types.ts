@@ -463,22 +463,30 @@ export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformR
   language?: string;
 }
 
-export interface RadarMarkerImage {
-  url?: string;
-  radarMarkerId?: string;
-  width?: number;
-  height?: number;
-}
-
 export interface RadarMarkerPopupOptions extends maplibregl.PopupOptions {
   text?: string;
   html?: string;
+  element?: HTMLElement;
 }
 
 export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
+  /**
+   * @deprecated Use popup.text
+   */
   text?: string;
+
+  /**
+   * @deprecated Use popup.html
+   */
   html?: string;
-  image?: RadarMarkerImage;
+
+  // marker configs
+  url?: string;
+  marker?: string;
+  width?: number;
+  height?: number;
+
+  // popup configs
   popup?: RadarMarkerPopupOptions;
 }
 

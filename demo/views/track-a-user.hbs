@@ -89,7 +89,7 @@
               &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
             `.trim();
 
-            const marker = Radar.ui.marker({ html })
+            const marker = Radar.ui.marker({ popup: { html }})
               .setLngLat([location.longitude, location.latitude])
               .addTo(map);
           });
@@ -144,7 +144,7 @@
           <p>${location.latitude},${location.longitude}</p>
         `.trim();
 
-        const marker = Radar.ui.marker({ html })
+        const marker = Radar.ui.marker({ popup: { html }})
           .setLngLat([location.longitude, location.latitude])
           .addTo(map);
 
