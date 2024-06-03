@@ -5,13 +5,16 @@ import Logger from '../logger';
 
 import type RadarMap from './RadarMap';
 
-import type { RadarMarkerImage, RadarMarkerOptions } from '../types';
+import type { RadarMarkerOptions } from '../types';
 
-const defaultMarkerOptions: RadarMarkerOptions = {
-  color: '#000257',
-};
+interface ImageOptions {
+  url?: string;
+  width?: number;
+  height?: number;
+}
 
-const createImageElement = (options: RadarMarkerImage) => {
+
+const createImageElement = (options: ImageOptions) => {
   const element = document.createElement('img');
   element.src = options.url!;
 
@@ -30,13 +33,17 @@ const createImageElement = (options: RadarMarkerImage) => {
   return element;
 }
 
+const defaultMarkerOptions: RadarMarkerOptions = {
+  color: '#000257',
+};
+
 class RadarMarker extends maplibregl.Marker {
   _map!: RadarMap;
-  _image?: RadarMarkerImage;
 
   constructor(markerOptions: RadarMarkerOptions) {
     const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
 
+    // init MapLibre marker configs
     if (markerOptions.color) {
       maplibreOptions.color = markerOptions.color;
     }
@@ -49,9 +56,8 @@ class RadarMarker extends maplibregl.Marker {
 
     super(maplibreOptions);
 
-    if (markerOptions.image) {
-      this._image = markerOptions.image;
-
+    // handle marker images (Radar marker, or custom URL)
+    if (markerOptions.marker || markerOptions.url) {
       const originalElement = this._element.cloneNode(true);
       this._element.childNodes.forEach((child) => {
         child.remove();
@@ -67,8 +73,8 @@ class RadarMarker extends maplibregl.Marker {
         this._element.replaceChildren(...Array.from(originalElement.childNodes));
       }
 
-      if (markerOptions.image.url) {
-        fetch(markerOptions.image.url)
+      if (markerOptions.url) {
+        fetch(markerOptions.url)
           .then(res => {
             if (res.status === 200) {
               res.blob()
@@ -81,12 +87,12 @@ class RadarMarker extends maplibregl.Marker {
           .catch(onError)
       }
 
-      if (markerOptions.image.radarMarkerId) {
+      if (markerOptions.marker) {
         // fetch custom marker
         Http.request({
           method: 'GET',
           version: 'maps',
-          path: `markers/${markerOptions.image.radarMarkerId}`,
+          path: `markers/${markerOptions.marker}`,
           responseType: 'blob',
         })
           .then(({ data }) => onSuccess(data))
@@ -96,10 +102,12 @@ class RadarMarker extends maplibregl.Marker {
 
     // handle deprecated popup options
     if (markerOptions.text) {
+      Logger.warn('marker option "text" is deprecated, and will be removed in a future version. Use "popup.text".');
       markerOptions.popup = markerOptions.popup || {};
       markerOptions.popup!.text = markerOptions.text;
     }
     if (markerOptions.html) {
+      Logger.warn('marker option "html" is deprecated, and will be removed in a future version. Use "popup.html".');
       markerOptions.popup = markerOptions.popup || {};
       markerOptions.popup!.html = markerOptions.html;
     }

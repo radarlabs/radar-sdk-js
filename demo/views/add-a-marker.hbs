@@ -43,7 +43,11 @@
             map.on('load', () => {
               const { lat, lng } = map.getCenter();
 
-              marker = Radar.ui.marker({ text: `${lat}, ${lng}` })
+              marker = Radar.ui.marker({
+                popup: {
+                  text: `${lat}, ${lng}`,
+                  },
+                })
                 .setLngLat([lng, lat])
                 .addTo(map);
 
@@ -59,8 +63,10 @@
                 }
                 const { lat, lng } = map.getCenter();
                 marker = Radar.ui.marker({
-                  image: { url },
-                  text: `${lat}, ${lng}`,
+                  url,
+                  popup: {
+                    text: `${lat}, ${lng}`,
+                  },
                 })
                   .setLngLat([lng, lat])
                   .addTo(map);

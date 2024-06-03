@@ -111,7 +111,11 @@
               &lt;p&gt;${location.latitude},${location.longitude}&lt;/p&gt;
             `.trim();
 
-            const userMarker = Radar.ui.marker({ html: userContent })
+            const userMarker = Radar.ui.marker({
+              popup: {
+                html: userContent,
+              },
+            })
               .setLngLat([location.longitude, location.latitude])
               .addTo(map);
 
@@ -122,7 +126,12 @@
                 &lt;p&gt;${user.trip.destinationGeofenceExternalId}&lt;/p&gt;
               `.trim();
 
-              const destMarker = Radar.ui.marker({ html: destContent, color: '#FF6F00' })
+              const destMarker = Radar.ui.marker({
+                color: '#FF6F00',
+                popup: {
+                  html: destContent,
+                },
+              })
                 .setLngLat(user.trip.destinationLocation.coordinates)
                 .addTo(map);
 
@@ -197,7 +206,7 @@
               <p>${location.latitude},${location.longitude}</p>
             `.trim();
 
-            const userMarker = Radar.ui.marker({ html: userHtml })
+            const userMarker = Radar.ui.marker({ popup: { html: userHtml }})
               .setLngLat([location.longitude, location.latitude])
               .addTo(map);
 
@@ -208,7 +217,12 @@
                 <p>${user.trip.destinationGeofenceExternalId}</p>
               `.trim();
 
-              destMarker = Radar.ui.marker({ html: destHtml, color: '#FF6F00' })
+              destMarker = Radar.ui.marker({
+                color: '#FF6F00',
+                popup: {
+                  html: destHtml,
+                },
+              })
                 .setLngLat(user.trip.destinationLocation.coordinates)
                 .addTo(map);
             }
