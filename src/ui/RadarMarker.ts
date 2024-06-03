@@ -122,6 +122,9 @@ class RadarMarker extends maplibregl.Marker {
       if (markerOptions.popup.html) {
         popup.setHTML(markerOptions.popup.html);
       }
+      if (markerOptions.popup.element) {
+        popup.setDOMContent(markerOptions.popup.element);
+      }
 
       this.setPopup(popup);
     }
