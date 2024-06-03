@@ -71,6 +71,10 @@
               });
             });
 
+            map.on('click', (e) => {
+              console.log('MAP CLICK', e);
+            });
+
             map.on('error', (err) => {
               console.error(err);
               $('#error-alert').show();
