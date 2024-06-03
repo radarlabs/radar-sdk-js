@@ -47,6 +47,10 @@
                 .setLngLat([lng, lat])
                 .addTo(map);
 
+              marker.on('click', (e) => {
+                console.log('MARKER CLICK', e);
+              });
+
               // use custom marker from URL
               $('#imageUrl').on('change', (e) => {
                 const url = e.target.value;
@@ -60,6 +64,10 @@
                 })
                   .setLngLat([lng, lat])
                   .addTo(map);
+
+                marker.on('click', (e) => {
+                  console.log('MARKER CLICK', e);
+                });
               });
             });
 

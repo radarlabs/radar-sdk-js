@@ -29,6 +29,7 @@ const createImageElement = (options: RadarMarkerImage) => {
   }
   return element;
 }
+
 class RadarMarker extends maplibregl.Marker {
   _map!: RadarMap;
   _image?: RadarMarkerImage;
@@ -105,7 +106,7 @@ class RadarMarker extends maplibregl.Marker {
 
     // set popup text or HTML
     if (markerOptions.popup) {
-      const popup = new maplibregl.Popup(markerOptions.popup)
+      const popup = new maplibregl.Popup(markerOptions.popup);
 
       if (markerOptions.popup.text) {
         popup.setText(markerOptions.popup.text);
@@ -115,6 +116,14 @@ class RadarMarker extends maplibregl.Marker {
       }
 
       this.setPopup(popup);
+    }
+
+    // pass-through click event from element to marker
+    const element = this.getElement();
+    if (element) {
+      element.addEventListener('click', (e) => {
+        this.fire('click', e);
+      });
     }
   }
 
