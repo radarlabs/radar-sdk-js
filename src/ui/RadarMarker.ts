@@ -19,10 +19,18 @@ const createImageElement = (options: ImageOptions) => {
   element.src = options.url!;
 
   if (options.width) {
-    element.width = options.width;
+    if (typeof options.width === 'number') {
+      element.width = options.width;
+    } else {
+      element.style.width = options.width;
+    }
   }
   if (options.height) {
-    element.height = options.height;
+    if (typeof options.height === 'number') {
+      element.height = options.height;
+    } else {
+      element.style.height = options.height;
+    }
   }
   if (!options.width && !options.height) {
     element.style.maxWidth = '64px';
@@ -65,7 +73,11 @@ class RadarMarker extends maplibregl.Marker {
 
       const onSuccess = (blob: Blob) => {
         const markerObject = URL.createObjectURL(blob);
-        this._element.replaceChildren(createImageElement({ url: markerObject }));
+        this._element.replaceChildren(createImageElement({
+          width: markerOptions.width,
+          height: markerOptions.height,
+          url: markerObject,
+        }));
       };
 
       const onError = (err: any) => {
