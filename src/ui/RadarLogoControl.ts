@@ -6,6 +6,7 @@ class RadarLogoControl {
   onAdd() {
     const img = document.createElement('img');
     img.src = RADAR_LOGO_URL;
+    img.alt = 'Radar Maps Platform';
 
     this.link = document.createElement('a');
     this.link.id = 'radar-map-logo';
