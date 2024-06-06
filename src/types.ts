@@ -483,8 +483,8 @@ export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   // marker configs
   url?: string;
   marker?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 
   // popup configs
   popup?: RadarMarkerPopupOptions;
