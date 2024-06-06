@@ -6,7 +6,6 @@ import RadarLogoControl from './RadarLogoControl';
 
 import Config from '../config';
 import Logger from '../logger';
-import Navigator from '../navigator';
 
 import type { RadarOptions, RadarMapOptions } from '../types';
 
