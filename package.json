@@ -1,6 +1,6 @@
 {
   "name": "radar-sdk-js",
-  "version": "4.2.1",
+  "version": "4.3.0",
   "description": "Web Javascript SDK for Radar, location infrastructure for mobile and web apps.",
   "homepage": "https://radar.com",
   "type": "module",
@@ -38,7 +38,7 @@
     "handlebars": "^4.7.7",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
-    "maplibre-gl": "^2.4.0",
+    "maplibre-gl": "^4.3.2",
     "mock-xmlhttprequest": "^8.2.0",
     "nodemon": "^2.0.22",
     "rollup": "^3.23.0",
@@ -52,6 +52,6 @@
     "@types/geojson": "^7946.0.10"
   },
   "peerDependencies": {
-    "maplibre-gl": "^2.4.0 || ^3.0.0"
+    "maplibre-gl": "^2.4.0 || ^3.0.0 || ^4.0.0"
   }
 }

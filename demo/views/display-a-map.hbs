@@ -12,6 +12,8 @@
   </div>
 
   <div>
+    <input id="customStyleID" class="form-control form-control-sm mb-3" data-bs-placement="bottom" data-bs-title="Set your custom style ID" type="text" placeholder="Radar style ID" />
+
     <div id="map" style="width: 100%; height: 500px; display: none; position: relative;">
       <select id="style" class="form-control" value="radar-default-v1">
         <option value="radar-default-v1">radar-default-v1</option>
@@ -39,8 +41,28 @@
       map.remove();
     }
 
+    // handle style in URL
+    let style = 'radar-default-v1';
+    const url = new URL(location.href);
+    const styleId = url.searchParams.get('style');
+    if (styleId) {
+      style = styleId;
+      $('#customStyleID').val(styleId);
+    }
+
     map = Radar.ui.map({
       container: 'map',
+      style,
+    });
+
+    map.on('load', () => {
+      // grab style from URL
+      const url = new URL(location.href);
+      const styleId = url.searchParams.get('style');
+      if (styleId) {
+        $('#customStyleID').val(styleId);
+        $('#customStyleID').trigger('change');
+      }
     });
 
     map.on('error', (err) => {
@@ -53,6 +75,15 @@
   $('#style').on('change', (e) => {
     console.log('Setting map style:', e.target.value);
     map.setStyle(e.target.value);
+  });
+
+  $('#customStyleID').on('change', (e) => {
+    const styleId = e.target.value;
+    console.log('Setting map style:', styleId);
+    const url = new URL(location.href);
+    url.searchParams.set('style', styleId);
+    history.replaceState(null, '', url);
+    map.setStyle(styleId);
   });
 
   // initalize map on api key changes

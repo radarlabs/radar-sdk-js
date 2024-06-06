@@ -31,13 +31,17 @@ class Http {
     path,
     data,
     host,
-    headers,
+    version,
+    headers = {},
+    responseType,
   }: {
     method: HttpMethod;
     path: string;
     data?: any;
     host?: string;
+    version?: string;
     headers?: Record<string, string>;
+    responseType?: XMLHttpRequestResponseType;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -51,8 +55,8 @@ class Http {
 
       // setup request URL
       const urlHost = host || options.host;
-      const version = options.version;
-      let url = `${urlHost}/${version}/${path}`;
+      const urlVersion = version || options.version;
+      let url = `${urlHost}/${urlVersion}/${path}`;
 
       // remove undefined values from request data
       let body: any = {};
@@ -78,32 +82,39 @@ class Http {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
 
-      // set standard headers
-      xhr.setRequestHeader('Authorization', publishableKey);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('X-Radar-Device-Type', 'Web');
-      xhr.setRequestHeader('X-Radar-SDK-Version', SDK_VERSION);
+      const defaultHeaders = {
+        'Authorization': publishableKey,
+        'Content-Type': 'application/json',
+        'X-Radar-Device-Type': 'Web',
+        'X-Radar-SDK-Version': SDK_VERSION,
+      };
 
-      // set passed custom headers if present
-      if (headers) {
-        Object.keys(headers).forEach(key => {
-          const val = headers[key];
-          xhr.setRequestHeader(key, val);
-        });
+      // set custom config headers if present
+      let configHeaders: { [key: string]: string } = {};
+      if (typeof options.getRequestHeaders === 'function') {
+        configHeaders = options.getRequestHeaders();
       }
 
-      // set config custom headers if present
-      if (typeof options.getRequestHeaders === 'function') {
-        const headers: { [key: string]: string } = options.getRequestHeaders();
-        Object.keys(headers || {}).forEach((key) => {
-          xhr.setRequestHeader(key, headers[key]);
-        });
+      // combines default headers with custom headers and config headers
+      const allHeaders = Object.assign(defaultHeaders, configHeaders, headers);
+
+      // set headers
+      Object.keys(allHeaders).forEach((key) => {
+        xhr.setRequestHeader(key, allHeaders[key]);
+      });
+
+      if (responseType) {
+        xhr.responseType = responseType;
       }
 
       xhr.onload = () => {
         let response: any;
         try {
-          response = JSON.parse(xhr.response);
+          if (xhr.responseType === 'blob') {
+            response = { code: xhr.status, data: xhr.response };
+          } else {
+            response = JSON.parse(xhr.response);
+          }
         } catch (e) {
           return reject(new RadarServerError(response));
         }
@@ -152,7 +163,7 @@ class Http {
         }
       }
 
-      xhr.onerror = function() {
+      xhr.onerror = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
           reject(new RadarVerifyAppError());
         } else {
@@ -160,7 +171,7 @@ class Http {
         }
       }
 
-      xhr.ontimeout = function() {
+      xhr.ontimeout = function () {
         reject(new RadarVerifyAppError());
       }
 

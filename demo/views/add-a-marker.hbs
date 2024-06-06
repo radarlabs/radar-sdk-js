@@ -12,6 +12,8 @@
           </div>
 
           <div>
+            <input id="imageUrl" class="form-control form-control-sm mb-3" data-bs-placement="bottom" data-bs-title="Set your remote marker URL" type="text" placeholder="URL for marker image" />
+
             <div id="map" style="width: 100%; height: 500px; display: none;"></div>
             <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
               <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
@@ -37,12 +39,46 @@
               container: 'map',
             });
 
+            let marker;
             map.on('load', () => {
               const { lat, lng } = map.getCenter();
 
-              const marker = Radar.ui.marker({ text: `${lat}, ${lng}` })
+              marker = Radar.ui.marker({
+                popup: {
+                  text: `${lat}, ${lng}`,
+                  },
+                })
                 .setLngLat([lng, lat])
                 .addTo(map);
+
+              marker.on('click', (e) => {
+                console.log('MARKER CLICK', e);
+              });
+
+              // use custom marker from URL
+              $('#imageUrl').on('change', (e) => {
+                const url = e.target.value;
+                if (marker) {
+                  marker.remove();
+                }
+                const { lat, lng } = map.getCenter();
+                marker = Radar.ui.marker({
+                  url,
+                  popup: {
+                    text: `${lat}, ${lng}`,
+                  },
+                })
+                  .setLngLat([lng, lat])
+                  .addTo(map);
+
+                marker.on('click', (e) => {
+                  console.log('MARKER CLICK', e);
+                });
+              });
+            });
+
+            map.on('click', (e) => {
+              console.log('MAP CLICK', e);
             });
 
             map.on('error', (err) => {
@@ -59,4 +95,5 @@
               init(publishableKey);
             }
           });
+
         </script>
