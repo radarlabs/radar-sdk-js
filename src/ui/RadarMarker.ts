@@ -9,8 +9,8 @@ import type { RadarMarkerOptions } from '../types';
 
 interface ImageOptions {
   url?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 
