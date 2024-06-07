@@ -4,12 +4,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
-    <link href="https://js.radar.com/v4.2.1/radar.css" rel="stylesheet">
+    <link href="https://js.radar.com/v4.3.0/radar.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" crossorigin="anonymous"></script>
-    <script src="https://js.radar.com/v4.2.1/radar.min.js"></script>
+    <script src="https://js.radar.com/v4.3.0/radar.min.js"></script>
   </head>
   <body>
     <main>
@@ -17,7 +17,7 @@
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
           <a href="/" class="d-flex align-items-baseline pb-1 mb-3 link-dark text-decoration-none border-bottom">
             <span class="fs-5 fw-semibold">Radar JS SDK</span>
-            <span style="font-size: 10px; margin-left: 10px;">v4.2.1</span>
+            <span style="font-size: 10px; margin-left: 10px;">v4.3.0</span>
           </a>
           <ul class="list-unstyled ps-0">
             <li class="mb-1">
@@ -90,6 +90,8 @@
           </div>
 
           <div>
+            <input id="imageUrl" class="form-control form-control-sm mb-3" data-bs-placement="bottom" data-bs-title="Set your remote marker URL" type="text" placeholder="URL for marker image" />
+
             <div id="map" style="width: 100%; height: 500px; display: none;"></div>
             <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
               <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
@@ -115,12 +117,46 @@
               container: 'map',
             });
 
+            let marker;
             map.on('load', () => {
               const { lat, lng } = map.getCenter();
 
-              const marker = Radar.ui.marker({ text: `${lat}, ${lng}` })
+              marker = Radar.ui.marker({
+                popup: {
+                  text: `${lat}, ${lng}`,
+                  },
+                })
                 .setLngLat([lng, lat])
                 .addTo(map);
+
+              marker.on('click', (e) => {
+                console.log('MARKER CLICK', e);
+              });
+
+              // use custom marker from URL
+              $('#imageUrl').on('change', (e) => {
+                const url = e.target.value;
+                if (marker) {
+                  marker.remove();
+                }
+                const { lat, lng } = map.getCenter();
+                marker = Radar.ui.marker({
+                  url,
+                  popup: {
+                    text: `${lat}, ${lng}`,
+                  },
+                })
+                  .setLngLat([lng, lat])
+                  .addTo(map);
+
+                marker.on('click', (e) => {
+                  console.log('MARKER CLICK', e);
+                });
+              });
+            });
+
+            map.on('click', (e) => {
+              console.log('MAP CLICK', e);
             });
 
             map.on('error', (err) => {
@@ -137,6 +173,7 @@
               init(publishableKey);
             }
           });
+
         </script>
 
 
