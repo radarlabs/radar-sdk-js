@@ -132,8 +132,10 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
+    this.resultsList.classList.add('id', CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-live', 'polite');
+    this.resultsList.setAttribute('aria-label', 'Search results');
     setHeight(this.resultsList, this.config);
 
     if (containerEL.nodeName === 'INPUT') {
@@ -167,8 +169,9 @@ class AutocompleteUI {
     }
 
     // set aria roles
+    this.inputField.setAttribute('role', 'combobox');
+    this.inputField.setAttribute('aria-controls', CLASSNAMES.RESULTS_LIST);
     this.inputField.setAttribute('aria-expanded', 'false');
-    this.inputField.setAttribute('aria-control', 'autocomplete-list');
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
