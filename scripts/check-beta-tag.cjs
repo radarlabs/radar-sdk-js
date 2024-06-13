@@ -9,8 +9,8 @@ if (!tagVersion.startsWith('v')) {
   console.error('Tag must start with "v"');
   process.exit(1);
 }
-if (!tagVersion.includes('-beta')) {
-  console.error('Prelease version should contiain a "-beta" suffix');
+if (!tagVersion.includes('-beta') && !tagVersion.includes('-core')) {
+  console.error('Prelease version should contiain a "-beta" or "-core" suffix');
   process.exit(1);
 }
 tagVersion = tagVersion.slice(1); // remove "v"
