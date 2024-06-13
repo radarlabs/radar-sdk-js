@@ -395,39 +395,34 @@ class AutocompleteUI {
   }
 
   public handleKeyboardNavigation(event: KeyboardEvent) {
-    // fallback to deprecated "keyCode" if event.code not set
-    const code = event.code !== undefined ? event.code : event.keyCode;
+    const key = event.key;
 
     // allow event to propagate if result list is not open
     if (!this.isOpen) {
       return;
     }
 
-    switch (code) {
+    switch (key) {
       // Next item
       case 'Tab':
       case 'ArrowDown':
-      case 40:
         event.preventDefault();
         this.goTo(this.highlightedIndex + 1);
         break;
 
       // Prev item
       case 'ArrowUp':
-      case 38:
         event.preventDefault();
         this.goTo(this.highlightedIndex - 1);
         break;
 
       // Select
       case 'Enter':
-      case 13:
         this.select(this.highlightedIndex);
         break;
 
       // Close
       case 'Esc':
-      case 27:
         this.close();
         break;
     }
