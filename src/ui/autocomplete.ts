@@ -16,10 +16,6 @@ const CLASSNAMES = {
   NO_RESULTS: 'radar-no-results',
 };
 
-const ARIA = {
-  EXPANDED: 'aria-expanded',
-};
-
 const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   container: 'autocomplete',
   debounceMS: 200, // Debounce time in milliseconds
@@ -136,6 +132,8 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
+    this.resultsList.setAttribute('role', 'listbox');
+    this.resultsList.setAttribute('aria-live', 'polite');
     setHeight(this.resultsList, this.config);
 
     if (containerEL.nodeName === 'INPUT') {
@@ -167,6 +165,13 @@ class AutocompleteUI {
       this.wrapper.appendChild(searchIcon);
       this.container.appendChild(this.wrapper);
     }
+
+    // set aria roles
+    this.inputField.setAttribute('aria-expanded', 'false');
+    this.inputField.setAttribute('aria-control', 'autocomplete-list');
+    this.inputField.setAttribute('aria-haspopup', 'listbox');
+    this.inputField.setAttribute('aria-autocomplete', 'list');
+    this.inputField.setAttribute('aria-activedescendant', '');
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
@@ -275,6 +280,8 @@ class AutocompleteUI {
     results.forEach((result, index) => {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
+      li.setAttribute('role', 'option');
+      li.setAttribute('id', `item-${index}`);
 
       // construct result with bolded label
       let listContent;
@@ -336,7 +343,7 @@ class AutocompleteUI {
       return;
     }
 
-    this.wrapper.setAttribute(ARIA.EXPANDED, 'true');
+    this.inputField.setAttribute('aria-expanded', 'true');
     this.resultsList.removeAttribute('hidden');
     this.isOpen = true;
   }
@@ -350,7 +357,8 @@ class AutocompleteUI {
     // (add 100ms delay if closed from link click)
     const linkClick = e && (e.relatedTarget === this.poweredByLink);
     setTimeout(() => {
-      this.wrapper.removeAttribute(ARIA.EXPANDED);
+      this.inputField.setAttribute('aria-expanded', 'false');
+      this.inputField.setAttribute('aria-activedescendant', '');
       this.resultsList.setAttribute('hidden', '');
       this.highlightedIndex = -1;
       this.isOpen = false;
@@ -379,6 +387,9 @@ class AutocompleteUI {
 
     // add class name to newly highlighted item
     resultItems[index].classList.add(CLASSNAMES.SELECTED_ITEM);
+
+    // set aria active descendant
+    this.inputField.setAttribute('aria-activedescendant', `item-${index}`);
 
     this.highlightedIndex = index;
   }
