@@ -99,10 +99,6 @@ export default [
       nodeResolve(),
       commonjs(),
       json(),
-      postcss({
-        extract: 'radar.css',
-        minimize: true,
-      }),
     ],
   }
 ];

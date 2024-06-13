@@ -34,9 +34,6 @@ import type {
   RadarValidateAddressParams,
 } from './types';
 
-import '../styles/radar.css';
-
-
 const isSecretKey = (key: string): boolean => (
   key.includes('_sk_')
 );
