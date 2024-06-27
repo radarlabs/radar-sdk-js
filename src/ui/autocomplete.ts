@@ -132,7 +132,7 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
-    this.resultsList.classList.add('id', CLASSNAMES.RESULTS_LIST);
+    this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-live', 'polite');
     this.resultsList.setAttribute('aria-label', 'Search results');
@@ -284,7 +284,7 @@ class AutocompleteUI {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `item-${index}`);
+      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
 
       // construct result with bolded label
       let listContent;
@@ -392,7 +392,7 @@ class AutocompleteUI {
     resultItems[index].classList.add(CLASSNAMES.SELECTED_ITEM);
 
     // set aria active descendant
-    this.inputField.setAttribute('aria-activedescendant', `item-${index}`);
+    this.inputField.setAttribute('aria-activedescendant', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
 
     this.highlightedIndex = index;
   }
