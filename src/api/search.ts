@@ -116,7 +116,6 @@ class SearchAPI {
       radius,
       chains,
       categories,
-      groups,
       limit,
     } = params;
 
@@ -136,9 +135,6 @@ class SearchAPI {
     if (Array.isArray(categories)) {
       categories = categories.join(',');
     }
-    if (Array.isArray(groups)) {
-      groups = groups.join(',');
-    }
 
     const response: any = await Http.request({
       method: 'GET',
@@ -148,7 +144,6 @@ class SearchAPI {
         radius,
         chains,
         categories,
-        groups,
         limit,
       },
     });
