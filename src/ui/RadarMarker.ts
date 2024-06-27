@@ -7,12 +7,27 @@ import type RadarMap from './RadarMap';
 
 import type { RadarMarkerOptions } from '../types';
 
+class RadarMarkerMouseEvent {
+  type: 'click';
+  target: RadarMarker;
+  originalEvent: MouseEvent;
+  lngLat: maplibregl.LngLat;
+  point: maplibregl.Point2D;
+
+  constructor(type: 'click', marker: RadarMarker, originalEvent: MouseEvent) {
+    this.target = marker;
+    this.originalEvent = originalEvent;
+    this.point = marker._pos;
+    this.lngLat = marker.getLngLat();
+    this.type = type;
+  }
+}
+
 interface ImageOptions {
   url?: string;
   width?: number | string;
   height?: number | string;
 }
-
 
 const createImageElement = (options: ImageOptions) => {
   const element = document.createElement('img');
@@ -145,11 +160,7 @@ class RadarMarker extends maplibregl.Marker {
     const element = this.getElement();
     if (element) {
       element.addEventListener('click', (e) => {
-        e.stopPropagation(); // stop propagation to map
-        if (this._popup) {
-          this.togglePopup();
-        }
-        this.fire('click', e);
+        this.fire('click', new RadarMarkerMouseEvent('click', this, e));
       });
     }
   }
