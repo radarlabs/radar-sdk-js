@@ -12,7 +12,7 @@ import type {
 } from '../types';
 
 class SearchAPI {
-  static async autocomplete(params: RadarAutocompleteParams): Promise<RadarAutocompleteResponse> {
+  static async autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
     let {
@@ -45,6 +45,7 @@ class SearchAPI {
         expandUnits,
         mailable,
       },
+      requestId,
     });
 
     const autocompleteRes = {

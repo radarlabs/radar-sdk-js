@@ -185,12 +185,12 @@
 }
 
 .radar-powered a {
-  text-decoration: none;
-  color: var(--radar-gray6);
+  text-decoration: none !important;
+  color: var(--radar-gray6) !important;
 }
 
 .radar-powered a:visited {
-  color: var(--radar-gray6);
+  color: var(--radar-gray6) !important;
 }
 
 .radar-powered #radar-powered-logo {
@@ -210,4 +210,7 @@
 }
 .maplibregl-ctrl-attrib.hidden {
   display: none !important;
+}
+.maplibregl-popup-close-button:focus-visible {
+  outline: none;
 }

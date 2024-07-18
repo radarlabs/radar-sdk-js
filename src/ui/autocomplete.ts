@@ -168,6 +168,9 @@ class AutocompleteUI {
       this.container.appendChild(this.wrapper);
     }
 
+    // disable browser autofill
+    this.inputField.setAttribute('autocomplete', 'off');
+
     // set aria roles
     this.inputField.setAttribute('role', 'combobox');
     this.inputField.setAttribute('aria-controls', CLASSNAMES.RESULTS_LIST);
@@ -263,7 +266,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses } = await SearchAPI.autocomplete(params);
+    const { addresses } = await SearchAPI.autocomplete(params, 'autocomplete-ui');
     return addresses;
   }
 
