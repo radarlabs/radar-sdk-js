@@ -50,6 +50,31 @@ export default [
 
   // IIFE (browser bundles, written to /cdn)
   {
+    input: 'src/core.ts',
+    output: [
+      {
+        file: 'cdn/radar-core.js',
+        format: 'iife',
+        name: 'Radar',
+        plugins: [onlyEmitFile()],
+      },
+      {
+        file: 'cdn/radar-core.min.js',
+        format: 'iife',
+        name: 'Radar',
+        plugins: [terser(), onlyEmitFile()],
+      },
+    ],
+    plugins: [
+      typescript(),
+      nodeResolve(),
+      commonjs(),
+      json(),
+    ],
+  },
+
+  // IIFE (browser bundles, written to /cdn)
+  {
     input: 'src/index.ts',
     output: [
       {
