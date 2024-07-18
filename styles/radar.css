@@ -211,3 +211,6 @@
 .maplibregl-ctrl-attrib.hidden {
   display: none !important;
 }
+.maplibregl-popup-close-button:focus-visible {
+  outline: none;
+}

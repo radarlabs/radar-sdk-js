@@ -25,6 +25,8 @@ interface HttpResponse {
   data: any;
 }
 
+const inFlightRequests = new Map<string, XMLHttpRequest>();
+
 class Http {
   static async request({
     method,
@@ -34,6 +36,7 @@ class Http {
     version,
     headers = {},
     responseType,
+    requestId,
   }: {
     method: HttpMethod;
     path: string;
@@ -42,6 +45,7 @@ class Http {
     version?: string;
     headers?: Record<string, string>;
     responseType?: XMLHttpRequestResponseType;
+    requestId?: string;
   }) {
     return new Promise<HttpResponse>((resolve, reject) => {
       const options = Config.get();
@@ -79,8 +83,21 @@ class Http {
         body = undefined; // dont send body for GET request
       }
 
+      // check for in-flight requests with matching requestIds
+      if (requestId) {
+        const request = inFlightRequests.get(requestId);
+        if (request) {
+          request.abort(); // abort request
+        }
+      }
+
       const xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
+
+      // save reference to request
+      if (requestId) {
+        inFlightRequests.set(requestId, xhr);
+      }
 
       const defaultHeaders = {
         'Authorization': publishableKey,
@@ -109,6 +126,11 @@ class Http {
 
       xhr.onload = () => {
         let response: any;
+
+        if (requestId) { // clear in-flight request
+          inFlightRequests.delete(requestId);
+        }
+
         try {
           if (xhr.responseType === 'blob') {
             response = { code: xhr.status, data: xhr.response };

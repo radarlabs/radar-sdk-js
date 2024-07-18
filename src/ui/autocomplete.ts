@@ -263,7 +263,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses } = await SearchAPI.autocomplete(params);
+    const { addresses } = await SearchAPI.autocomplete(params, 'autocomplete-ui');
     return addresses;
   }
 
