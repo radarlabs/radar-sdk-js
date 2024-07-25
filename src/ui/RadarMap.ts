@@ -115,7 +115,10 @@ class RadarMap extends maplibregl.Map {
     this.addControl(attribution, 'bottom-right');
 
     // add zoom controls
-    const nav = new maplibregl.NavigationControl({ showCompass: false });
+    const nav = new maplibregl.NavigationControl({
+      showCompass: false,
+      showZoom: maplibreOptions.showZoom ?? true,
+    });
     this.addControl(nav, 'bottom-right');
 
     // handle map resize actions
