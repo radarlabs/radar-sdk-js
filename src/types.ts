@@ -461,6 +461,7 @@ export interface RadarSearchGeofencesResponse extends RadarResponse {
 
 export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
   language?: string;
+  showZoomControls?: boolean;
 }
 
 export interface RadarMarkerPopupOptions extends maplibregl.PopupOptions {

@@ -17,6 +17,11 @@ const RADAR_STYLES = [
   'radar-dark-v1',
 ];
 
+// Radar specific configs
+const defaultRadarMapOptions: Partial<RadarMapOptions> = {
+  showZoomControls: true,
+};
+
 const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   minZoom: 1,
   maxZoom: 20,
@@ -65,26 +70,27 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
 
-  constructor(mapOptions: RadarMapOptions) {
+  constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
 
     if (!config.publishableKey) {
       Logger.warn('publishableKey not set. Call Radar.initialize() with key before creating a new map.');
     }
 
-    // configure maplibre options
-    const style = getStyle(config, mapOptions);
-    const maplibreOptions: RadarMapOptions = Object.assign({},
+    // configure map options
+    const style = getStyle(config, radarMapOptions);
+    const mapOptions: RadarMapOptions = Object.assign({},
+      defaultRadarMapOptions,
       defaultMaplibreOptions,
-      mapOptions,
+      radarMapOptions,
       { style },
     );
-    Logger.debug(`initialize map with options: ${JSON.stringify(maplibreOptions)}`);
+    Logger.debug(`initialize map with options: ${JSON.stringify(mapOptions)}`);
 
-    (maplibreOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
+    (mapOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
       // this handles when a style is switched
       if (resourceType === 'Style' && isRadarStyle(url)) {
-        url = createStyleURL(config, { ...maplibreOptions, style: url });
+        url = createStyleURL(config, { ...mapOptions, style: url });
       }
 
       let headers = {
@@ -99,7 +105,7 @@ class RadarMap extends maplibregl.Map {
       return { url, headers };
     };
 
-    super(maplibreOptions);
+    super(mapOptions); // initialize MapLibre instance
 
     const container = this.getContainer();
     if (!container.style.width && !container.style.height) {
@@ -115,7 +121,10 @@ class RadarMap extends maplibregl.Map {
     this.addControl(attribution, 'bottom-right');
 
     // add zoom controls
-    const nav = new maplibregl.NavigationControl({ showCompass: false });
+    const nav = new maplibregl.NavigationControl({
+      showCompass: false,
+      showZoom: mapOptions.showZoomControls,
+    });
     this.addControl(nav, 'bottom-right');
 
     // handle map resize actions
