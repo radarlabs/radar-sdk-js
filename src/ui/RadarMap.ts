@@ -38,11 +38,11 @@ const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
 const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style || DEFAULT_STYLE;
 
-  let url = `${options.host}/maps/styles/${style}?publishableKey=${options.publishableKey}`
+  let url = `${options.host}/maps/styles/${style}`
   if (mapOptions.language) {
-    url += `&language=${mapOptions.language}`
+    url += `?language=${mapOptions.language}`
   }
-  return url
+  return url;
 };
 
 // check if style is a Radar style or a custom style
