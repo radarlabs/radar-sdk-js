@@ -1,6 +1,6 @@
 {
   "name": "radar-sdk-js",
-  "version": "4.3.3",
+  "version": "4.3.4",
   "description": "Web Javascript SDK for Radar, location infrastructure for mobile and web apps.",
   "homepage": "https://radar.com",
   "type": "module",
