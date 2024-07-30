@@ -491,6 +491,31 @@ export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   popup?: RadarMarkerPopupOptions;
 }
 
+export interface RadarLineOptions {
+  id?: string;
+  properties?: any;
+  paint?: {
+    'line-color'?: string;
+    'line-width'?: number;
+    'line-opacity'?: number;
+    'line-cap'?: 'butt' | 'round' | 'square';
+    'line-offset'?: number;
+    'line-blur'?: number;
+    'line-dasharray'?: Array<number>;
+    'line-gap-width'?: number;
+    'line-gradient'?: any;
+    'border-width'?: number;
+    'border-color'?: string;
+  },
+  onClick?: (feature: any) => {};
+  fitToLine?: boolean;
+  fitOptions?: maplibregl.FitBoundsOptions;
+}
+
+export interface RadarPolylineOptions extends RadarLineOptions {
+  precision?: number;
+};
+
 export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   near?: string | Location; // bias for location results

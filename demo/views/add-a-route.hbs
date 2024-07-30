@@ -1,0 +1,74 @@
+        <div class="content flex-grow-1 p-4">
+          <h1 class="mb-4">Add a route</h1>
+          <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+            <strong>Error</strong> Something went wrong. Check the developer console for details.
+          </div>
+
+          <p>Initialize a new map with the Radar SDK and add a route to the map.</p>
+
+          <div class="callout">
+            Radar map objects are MapLibre GL JS references.
+            See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between;">
+              <input id="route" class="form-control form-control-sm mb-3" style="height: 34px;" data-bs-placement="bottom" data-bs-title="Add your route polyline or GeoJSON" type="text" placeholder="Add route here" />
+
+              <select class="form-select form-control form-control-sm" style="width: 400px; height: 30px; margin-left: 16px;">
+                <option name="type" value="polyline6">polyline6</option>
+                <option name="type" value="polyline5">polyline5</option>
+                <option name="type" value="geojson">GeoJSON</option>
+              </select>
+            </div>
+
+            <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+            <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
+              <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          let map;
+          const init = (publishableKey) => {
+            $('#error-alert').hide();
+            $('#map-warning').hide();
+            $('#map').show();
+
+            const DEFAULT_POLYLINE = 'iyeulAveaclCuVfw@aA|CuAlEgj@teBm@jBs@|BbBjA~XzRdFnDfBlA`A{C`@mA~h@icBfAmD`A{Cff@c|A|A{E|BZfJrAh[lEhC^dBThMdBnTtCd@LzBx@|BjA^RhZnUzBdB`BtAl\\zWvAjAlBzA|UjRfEhD`ClBhRfOlCxBjBxAhBxAxKzItNhL|BhBnB|Af]rXnB~A|AnAn[fWbAv@~ArAzBfBxStPbInGtB`BlBzA~b@l]bAx@d@\\jBxAjMdKTPxGlFnJvH|StPnCxBhFbEr@{EfEeYvCyRf@kD\\{BBUtC}RfAoFbAcFpDsNl@_Cl@aCfLcd@r@sCn@cC`Lsc@p@kCl@aCjE}P`E}Od@iBz@{DrD`A|JxCxWdFxc@fLzIzBzL~C~Bj@dAXlg@rM~Ab@pA^|`@pLp@RtBl@bBf@xEpAjQ`FtBl@xF~AjEjAtIbCxGMzWjIhCv@jBl@ju@pUnCz@pCdAvRnIfUpJlV~KtBbAlB~@l`@|SvBhAXNjCvApLnGxBlAnFtCnGeEbZyQ~G}E`B}AhBsBfByBnFkH|AiBzAeBzAcB|A{AdB}ApBwAhCyAfCkApVwKbh\\qjOjBKhBWdCu@zDgBvAi@xAi@dBc@`BQpAGrAFvAVtAp@lAz@lAvA~@hBj@|BXdCFtBIhCWtBe@`By@|AeArAm@`@e@Rs@PyANoB@yAL}AT_BXyBQ}IW_Um@aQUqAHcBTyBf@_Dt@{Ad@uAj@}CrAuR|IoCnA\\gUBiBmCBoDGaIOkL[yNWeB@gBBcC?ao@iBwBEyBGkYs@}HQoAEeBEua@aAyAEyGQ';
+            $('#route').val(DEFAULT_POLYLINE);
+
+
+            Radar.initialize(publishableKey, { debug: true });
+
+            // prevent duplicate maps
+            if (map) {
+              map.remove();
+            }
+
+            map = Radar.ui.map({
+              container: 'map',
+            });
+
+            let route = DEFAULT_POLYLINE;
+            map.on('load', () => {
+              map.addPolyline(route, { fitToLine: true });
+            });
+
+            map.on('error', (err) => {
+              console.error(err);
+              $('#error-alert').show();
+            });
+          };
+
+
+          // initalize map on api key changes
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              init(publishableKey);
+            }
+          });
+
+        </script>
