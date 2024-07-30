@@ -219,6 +219,20 @@ class RadarMarker extends maplibregl.Marker {
     const element = this.getElement();
     if (element) {
       element.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent clicks from propagating to map
+
+        // since we're stopping the propagation to map,
+        // we need to manually toggle the popup associated with the marker
+        if (this.getPopup()) {
+          // close any other open popups
+          (this._map.getMarkers() || []).forEach((otherMarker) => {
+            if (otherMarker.getPopup().isOpen()) {
+              otherMarker.togglePopup();
+            }
+          });
+          this.togglePopup();
+        }
+
         this.fire('click', new RadarMarkerMouseEvent('click', this, e));
       });
     }

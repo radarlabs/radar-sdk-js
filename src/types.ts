@@ -470,7 +470,7 @@ export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformR
   showZoomControls?: boolean;
 }
 
-export interface RadarMarkerPopupOptions extends maplibregl.PopupOptions {
+export interface RadarPopupOptions extends maplibregl.PopupOptions {
   text?: string;
   html?: string;
   element?: HTMLElement;
@@ -494,9 +494,43 @@ export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   height?: number | string;
 
   // popup configs
-  popup?: RadarMarkerPopupOptions;
+  popup?: RadarPopupOptions;
 }
 
+export interface RadarLineOptions {
+  id?: string;
+  properties?: any;
+  paint?: {
+    'line-color'?: string;
+    'line-width'?: number;
+    'line-opacity'?: number;
+    'line-cap'?: 'butt' | 'round' | 'square';
+    'line-offset'?: number;
+    'line-blur'?: number;
+    'line-dasharray'?: Array<number>;
+    'line-gap-width'?: number;
+    'line-gradient'?: any;
+    'border-width'?: number;
+    'border-color'?: string;
+    'border-opacity'?: number;
+  },
+}
+
+export interface RadarPolylineOptions extends RadarLineOptions {
+  precision?: number;
+};
+
+export interface RadarPolygonOptions {
+  id?: string;
+  properties?: any;
+  paint?: {
+    'fill-color'?: string;
+    'fill-opacity'?: number;
+    'border-width'?: number;
+    'border-color'?: string;
+    'border-opacity'?: number;
+  },
+}
 export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   near?: string | Location; // bias for location results
