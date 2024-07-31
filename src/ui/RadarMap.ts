@@ -86,6 +86,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
+  _features: GeoJSON.Feature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
@@ -188,12 +189,19 @@ class RadarMap extends maplibregl.Map {
     this.fitBounds(bounds, options);
   }
 
+  clearMarkers() {
+    this._markers.forEach((marker) => {
+      marker.remove();
+    });
+  }
+
   addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
-    // wait for map to load if called before map is done loading
+    // make sure map is loaded before attempting to add new features
     if (!this.loaded()) {
-      this.on('load', () => {
+      setTimeout(() => {
+        Logger.debug('addPolyline: map not ready - retrying in 250ms');
         this.addPolyline(polyline, polylineOptions);
-      });
+      }, 250);
       return;
     }
 
@@ -205,7 +213,7 @@ class RadarMap extends maplibregl.Map {
     // create a GeoJSON LineString feature from polyline
     const featureId = lineOptions.id || `polyline-feature-${Date.now()}`;
     const coordinates = decodePolyline(polyline, lineOptions.precision);
-    const feature: GeoJSON.GeoJSON = {
+    const feature: GeoJSON.Feature = {
       id: featureId,
       type: 'Feature',
       geometry: {
@@ -232,6 +240,7 @@ class RadarMap extends maplibregl.Map {
           },
           paint: filterUndefined({
             'line-color': lineOptions.paint['border-color'],
+            'line-opacity': lineOptions.paint['border-opacity'],
             'line-width': borderWidth,
           }),
         });
@@ -239,7 +248,7 @@ class RadarMap extends maplibregl.Map {
 
       // add layer(s) for styling feature
       this.addLayer({
-        id: `${featureId}-line`,
+        id: featureId,
         source: featureId,
         type: 'line',
         layout: {
@@ -267,10 +276,51 @@ class RadarMap extends maplibregl.Map {
       }
     }
 
-    // TODO: onClick
-    // also add over if onClick is given
+    if (lineOptions.onClick) {
+      // set hover state if click handler is present
+      this.on('mouseenter', featureId, () => {
+        this.getCanvas().style.cursor = 'pointer';
+      });
+      this.on('mouseleave', featureId, () => {
+        this.getCanvas().style.cursor = '';
+      });
+      // call onClick if line clicked
+      this.on('click', featureId, (e) => {
+        (lineOptions.onClick as any)(e, feature);
+      });
+    }
 
-    return featureId;
+    this._features.push(feature);
+    return feature;
+  }
+
+  // take a feature, or featureId to remove the feature from map
+  removeFeature(featureOrId: string | GeoJSON.Feature) {
+    let featureId;
+    if (typeof featureOrId === 'string') {
+      featureId = featureOrId;
+    } else {
+      featureId = (featureOrId.id || '').toString();
+    }
+
+    if (featureId) {
+      if (this.getLayer(featureId)) {
+        this.removeLayer(featureId);
+      }
+      if (this.getLayer(`${featureId}-border`)) {
+        this.removeLayer(`${featureId}-border`);
+      }
+      if (this.getSource(featureId)) {
+        this.removeSource(featureId);
+      }
+    }
+  }
+
+  // remove all features from the map
+  clearFeatures() {
+    this._features.forEach((feature) => {
+      this.removeFeature(feature);
+    });
   }
 };
 

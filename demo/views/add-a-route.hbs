@@ -15,7 +15,7 @@
             <div style="display: flex; justify-content: space-between;">
               <input id="route" class="form-control form-control-sm mb-3" style="height: 34px;" data-bs-placement="bottom" data-bs-title="Add your route polyline or GeoJSON" type="text" placeholder="Add route here" />
 
-              <select class="form-select form-control form-control-sm" style="width: 400px; height: 30px; margin-left: 16px;">
+              <select id="format" class="form-select form-control form-control-sm" style="width: 400px; height: 30px; margin-left: 16px;">
                 <option name="type" value="polyline6">polyline6</option>
                 <option name="type" value="polyline5">polyline5</option>
                 <option name="type" value="geojson">GeoJSON</option>
@@ -30,13 +30,42 @@
         </div>
 
         <script>
+          const DEFAULT_POLYLINE = 'iyeulAveaclCuVfw@aA|CuAlEgj@teBm@jBs@|BbBjA~XzRdFnDfBlA`A{C`@mA~h@icBfAmD`A{Cff@c|A|A{E|BZfJrAh[lEhC^dBThMdBnTtCd@LzBx@|BjA^RhZnUzBdB`BtAl\\zWvAjAlBzA|UjRfEhD`ClBhRfOlCxBjBxAhBxAxKzItNhL|BhBnB|Af]rXnB~A|AnAn[fWbAv@~ArAzBfBxStPbInGtB`BlBzA~b@l]bAx@d@\\jBxAjMdKTPxGlFnJvH|StPnCxBhFbEr@{EfEeYvCyRf@kD\\{BBUtC}RfAoFbAcFpDsNl@_Cl@aCfLcd@r@sCn@cC`Lsc@p@kCl@aCjE}P`E}Od@iBz@{DrD`A|JxCxWdFxc@fLzIzBzL~C~Bj@dAXlg@rM~Ab@pA^|`@pLp@RtBl@bBf@xEpAjQ`FtBl@xF~AjEjAtIbCxGMzWjIhCv@jBl@ju@pUnCz@pCdAvRnIfUpJlV~KtBbAlB~@l`@|SvBhAXNjCvApLnGxBlAnFtCnGeEbZyQ~G}E`B}AhBsBfByBnFkH|AiBzAeBzAcB|A{AdB}ApBwAhCyAfCkApVwKbh\\qjOjBKhBWdCu@zDgBvAi@xAi@dBc@`BQpAGrAFvAVtAp@lAz@lAvA~@hBj@|BXdCFtBIhCWtBe@`By@|AeArAm@`@e@Rs@PyANoB@yAL}AT_BXyBQ}IW_Um@aQUqAHcBTyBf@_Dt@{Ad@uAj@}CrAuR|IoCnA\\gUBiBmCBoDGaIOkL[yNWeB@gBBcC?ao@iBwBEyBGkYs@}HQoAEeBEua@aAyAEyGQ';
+
+          const addPolyline = (map, route, format) => {
+            map.clearFeatures();
+            map.clearMarkers();
+
+            let precision;
+            if (format === 'polyline6') {
+              precision = 6;
+            } else if (format === 'polyline5') {
+              precision = 5;
+            }
+
+            map.addPolyline(route, {
+              precision,
+              fitOptions: {
+                padding: 20,
+              },
+              onClick: (e, feature) => {
+                Radar.ui.marker({
+                  text: `${route.slice(0, 6)}...`,
+                })
+                .setLngLat([e.lngLat.lng, e.lngLat.lat])
+                .addTo(map);
+              },
+            });
+          };
+
           let map;
+          let route = DEFAULT_POLYLINE;
+          let format = 'polyline6';
+
           const init = (publishableKey) => {
             $('#error-alert').hide();
             $('#map-warning').hide();
             $('#map').show();
-
-            const DEFAULT_POLYLINE = 'iyeulAveaclCuVfw@aA|CuAlEgj@teBm@jBs@|BbBjA~XzRdFnDfBlA`A{C`@mA~h@icBfAmD`A{Cff@c|A|A{E|BZfJrAh[lEhC^dBThMdBnTtCd@LzBx@|BjA^RhZnUzBdB`BtAl\\zWvAjAlBzA|UjRfEhD`ClBhRfOlCxBjBxAhBxAxKzItNhL|BhBnB|Af]rXnB~A|AnAn[fWbAv@~ArAzBfBxStPbInGtB`BlBzA~b@l]bAx@d@\\jBxAjMdKTPxGlFnJvH|StPnCxBhFbEr@{EfEeYvCyRf@kD\\{BBUtC}RfAoFbAcFpDsNl@_Cl@aCfLcd@r@sCn@cC`Lsc@p@kCl@aCjE}P`E}Od@iBz@{DrD`A|JxCxWdFxc@fLzIzBzL~C~Bj@dAXlg@rM~Ab@pA^|`@pLp@RtBl@bBf@xEpAjQ`FtBl@xF~AjEjAtIbCxGMzWjIhCv@jBl@ju@pUnCz@pCdAvRnIfUpJlV~KtBbAlB~@l`@|SvBhAXNjCvApLnGxBlAnFtCnGeEbZyQ~G}E`B}AhBsBfByBnFkH|AiBzAeBzAcB|A{AdB}ApBwAhCyAfCkApVwKbh\\qjOjBKhBWdCu@zDgBvAi@xAi@dBc@`BQpAGrAFvAVtAp@lAz@lAvA~@hBj@|BXdCFtBIhCWtBe@`By@|AeArAm@`@e@Rs@PyANoB@yAL}AT_BXyBQ}IW_Um@aQUqAHcBTyBf@_Dt@{Ad@uAj@}CrAuR|IoCnA\\gUBiBmCBoDGaIOkL[yNWeB@gBBcC?ao@iBwBEyBGkYs@}HQoAEeBEua@aAyAEyGQ';
             $('#route').val(DEFAULT_POLYLINE);
 
 
@@ -51,9 +80,9 @@
               container: 'map',
             });
 
-            let route = DEFAULT_POLYLINE;
+            // initial load
             map.on('load', () => {
-              map.addPolyline(route, { fitToLine: true });
+              addPolyline(map, route, format);
             });
 
             map.on('error', (err) => {
@@ -62,6 +91,15 @@
             });
           };
 
+
+          $('#route').on('change', () => {
+            route = $('#route').val();
+            addPolyline(map, route, format);
+          });
+          $('#format').on('change', () => {
+            format = $('#format').val();
+            addPolyline(map, route, format);
+          });
 
           // initalize map on api key changes
           $('#publishableKey').on('change', () => {
