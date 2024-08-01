@@ -508,9 +508,6 @@ export interface RadarLineOptions {
     'border-color'?: string;
     'border-opacity'?: number;
   },
-  onClick?: (mapEvent: any, feature?: any) => {};
-  fitToLine?: boolean;
-  fitOptions?: maplibregl.FitBoundsOptions;
 }
 
 export interface RadarPolylineOptions extends RadarLineOptions {

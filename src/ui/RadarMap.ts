@@ -2,9 +2,9 @@ import maplibregl from 'maplibre-gl';
 
 import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
+import RadarMapFeature from './RadarMapFeature';
+import RadarLineFeature from './RadarLineFeature';
 import RadarLogoControl from './RadarLogoControl';
-import { decodePolyline } from '../util/polyline';
-import { filterUndefined } from '../util/object';
 
 import Config from '../config';
 import Logger from '../logger';
@@ -12,7 +12,6 @@ import Logger from '../logger';
 import type {
   RadarOptions,
   RadarMapOptions,
-  RadarLineOptions,
   RadarPolylineOptions,
 } from '../types';
 
@@ -40,16 +39,6 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
 
 const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
   padding: 50,
-};
-
-const defaultLineOptions: Partial<RadarLineOptions> = {
-  paint: {
-    'line-cap': 'round',
-    'line-color': '#000257',
-    'line-width': 4,
-    'border-color': '#FFFFFF',
-    'border-width': 2,
-  }
 };
 
 const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
@@ -86,7 +75,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
-  _features: GeoJSON.Feature[] = [];
+  _features: RadarMapFeature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
@@ -195,133 +184,46 @@ class RadarMap extends maplibregl.Map {
     });
   }
 
-  addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
-    // make sure map is loaded before attempting to add new features
-    if (!this.loaded()) {
-      setTimeout(() => {
-        Logger.debug('addPolyline: map not ready - retrying in 250ms');
-        this.addPolyline(polyline, polylineOptions);
-      }, 250);
-      return;
-    }
-
-    const lineOptions: RadarPolylineOptions = Object.assign({},
-      defaultLineOptions,
-      polylineOptions,
-    );
-
-    // create a GeoJSON LineString feature from polyline
-    const featureId = lineOptions.id || `polyline-feature-${Date.now()}`;
-    const coordinates = decodePolyline(polyline, lineOptions.precision);
-    const feature: GeoJSON.Feature = {
-      id: featureId,
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates,
-      },
-      properties: lineOptions.properties || {},
-    }
-
-    if (lineOptions.paint) { // paint will always be present due to default options, but not required as params
-
-      // add geojson feature as data source
-      this.addSource(featureId, { type: 'geojson', data: feature });
-
-      // add border layer if options are present
-      if (lineOptions.paint['line-width'] && lineOptions.paint['border-width']) {
-        const borderWidth = lineOptions.paint['line-width'] + lineOptions.paint['border-width'];
-        this.addLayer({
-          id: `${featureId}-border`,
-          source: featureId,
-          type: 'line',
-          layout: {
-            'line-cap': lineOptions.paint['line-cap'],
-          },
-          paint: filterUndefined({
-            'line-color': lineOptions.paint['border-color'],
-            'line-opacity': lineOptions.paint['border-opacity'],
-            'line-width': borderWidth,
-          }),
-        });
-      }
-
-      // add layer(s) for styling feature
-      this.addLayer({
-        id: featureId,
-        source: featureId,
-        type: 'line',
-        layout: {
-          'line-cap': lineOptions.paint['line-cap'],
-        },
-        paint: filterUndefined({
-          'line-color': lineOptions.paint['line-color'],
-          'line-width': lineOptions.paint['line-width'],
-          'line-opacity': lineOptions.paint['line-opacity'],
-          'line-offset': lineOptions.paint['line-offset'],
-          'line-blur': lineOptions.paint['line-blur'],
-          'line-dasharray': lineOptions.paint['line-dasharray'],
-          'line-gap-width': lineOptions.paint['line-gap-width'],
-          'line-gradient': lineOptions.paint['line-gradient'],
-        }),
-      });
-
-      // fit map to line when adding if fitOptions are given
-      if (lineOptions.fitToLine || lineOptions.fitOptions) {
-        const bounds = new maplibregl.LngLatBounds();
-        coordinates.forEach((coord: any) => {
-          bounds.extend(coord);
-        });
-        this.fitBounds(bounds, lineOptions.fitOptions);
-      }
-    }
-
-    if (lineOptions.onClick) {
-      // set hover state if click handler is present
-      this.on('mouseenter', featureId, () => {
-        this.getCanvas().style.cursor = 'pointer';
-      });
-      this.on('mouseleave', featureId, () => {
-        this.getCanvas().style.cursor = '';
-      });
-      // call onClick if line clicked
-      this.on('click', featureId, (e) => {
-        (lineOptions.onClick as any)(e, feature);
-      });
-    }
-
-    this._features.push(feature);
-    return feature;
+  getFeatures() {
+    return this._features;
   }
 
-  // take a feature, or featureId to remove the feature from map
-  removeFeature(featureOrId: string | GeoJSON.Feature) {
-    let featureId;
-    if (typeof featureOrId === 'string') {
-      featureId = featureOrId;
-    } else {
-      featureId = (featureOrId.id || '').toString();
-    }
-
-    if (featureId) {
-      if (this.getLayer(featureId)) {
-        this.removeLayer(featureId);
-      }
-      if (this.getLayer(`${featureId}-border`)) {
-        this.removeLayer(`${featureId}-border`);
-      }
-      if (this.getSource(featureId)) {
-        this.removeSource(featureId);
-      }
-    }
-  }
+  // TODO:
+  // fitToFeatures(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideFeatures?: string[] | RadarMapFeature[]) {
+  //   const bounds = new maplibregl.LngLatBounds();
+  //   feature.geometry.coordinates.forEach((coord: any) => {
+  //     bounds.extend(coord);
+  //   });
+  //   map.fitBounds(bounds, options.fitOptions);
+  // }
 
   // remove all features from the map
   clearFeatures() {
     this._features.forEach((feature) => {
-      this.removeFeature(feature);
+      feature.remove();
     });
   }
+
+  addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
+    const feature = RadarLineFeature.fromPolyline(this, polyline, polylineOptions);
+    this._features.push(feature);
+    return feature;
+
+    // if (lineOptions.onClick) {
+    //   // set hover state if click handler is present
+    //   this.on('mouseenter', featureId, () => {
+    //     this.getCanvas().style.cursor = 'pointer';
+    //   });
+    //   this.on('mouseleave', featureId, () => {
+    //     this.getCanvas().style.cursor = '';
+    //   });
+    //   // call onClick if line clicked
+    //   this.on('click', featureId, (e) => {
+    //     (lineOptions.onClick as any)(e, feature);
+    //   });
+    // }
+  }
+
 };
 
 export default RadarMap;

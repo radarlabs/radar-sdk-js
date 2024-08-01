@@ -1,10 +1,10 @@
         <div class="content flex-grow-1 p-4">
-          <h1 class="mb-4">Add a route</h1>
+          <h1 class="mb-4">Add a polyline</h1>
           <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
             <strong>Error</strong> Something went wrong. Check the developer console for details.
           </div>
 
-          <p>Initialize a new map with the Radar SDK and add a route to the map.</p>
+          <p>Initialize a new map with the Radar SDK and add a polyline to the map.</p>
 
           <div class="callout">
             Radar map objects are MapLibre GL JS references.
@@ -18,7 +18,6 @@
               <select id="format" class="form-select form-control form-control-sm" style="width: 400px; height: 30px; margin-left: 16px;">
                 <option name="type" value="polyline6">polyline6</option>
                 <option name="type" value="polyline5">polyline5</option>
-                <option name="type" value="geojson">GeoJSON</option>
               </select>
             </div>
 
@@ -32,19 +31,24 @@
         <script>
           const DEFAULT_POLYLINE = 'iyeulAveaclCuVfw@aA|CuAlEgj@teBm@jBs@|BbBjA~XzRdFnDfBlA`A{C`@mA~h@icBfAmD`A{Cff@c|A|A{E|BZfJrAh[lEhC^dBThMdBnTtCd@LzBx@|BjA^RhZnUzBdB`BtAl\\zWvAjAlBzA|UjRfEhD`ClBhRfOlCxBjBxAhBxAxKzItNhL|BhBnB|Af]rXnB~A|AnAn[fWbAv@~ArAzBfBxStPbInGtB`BlBzA~b@l]bAx@d@\\jBxAjMdKTPxGlFnJvH|StPnCxBhFbEr@{EfEeYvCyRf@kD\\{BBUtC}RfAoFbAcFpDsNl@_Cl@aCfLcd@r@sCn@cC`Lsc@p@kCl@aCjE}P`E}Od@iBz@{DrD`A|JxCxWdFxc@fLzIzBzL~C~Bj@dAXlg@rM~Ab@pA^|`@pLp@RtBl@bBf@xEpAjQ`FtBl@xF~AjEjAtIbCxGMzWjIhCv@jBl@ju@pUnCz@pCdAvRnIfUpJlV~KtBbAlB~@l`@|SvBhAXNjCvApLnGxBlAnFtCnGeEbZyQ~G}E`B}AhBsBfByBnFkH|AiBzAeBzAcB|A{AdB}ApBwAhCyAfCkApVwKbh\\qjOjBKhBWdCu@zDgBvAi@xAi@dBc@`BQpAGrAFvAVtAp@lAz@lAvA~@hBj@|BXdCFtBIhCWtBe@`By@|AeArAm@`@e@Rs@PyANoB@yAL}AT_BXyBQ}IW_Um@aQUqAHcBTyBf@_Dt@{Ad@uAj@}CrAuR|IoCnA\\gUBiBmCBoDGaIOkL[yNWeB@gBBcC?ao@iBwBEyBGkYs@}HQoAEeBEua@aAyAEyGQ';
 
+          let feature;
           const addPolyline = (map, route, format) => {
-            map.clearFeatures();
-            map.clearMarkers();
-
-            let precision;
+            let precision = 6;
             if (format === 'polyline6') {
               precision = 6;
             } else if (format === 'polyline5') {
               precision = 5;
             }
 
-            map.addPolyline(route, {
-              precision,
+            // clear existing data
+            map.clearFeatures();
+            map.clearMarkers();
+            clearInterval(interval);
+
+            const feature = map.addPolyline(route, { id: 'route', precision });
+            console.log('feature:', feature);
+
+            /*
               fitOptions: {
                 padding: 20,
               },
@@ -55,7 +59,7 @@
                 .setLngLat([e.lngLat.lng, e.lngLat.lat])
                 .addTo(map);
               },
-            });
+            */
           };
 
           let map;
