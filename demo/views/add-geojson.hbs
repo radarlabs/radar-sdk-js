@@ -1,0 +1,115 @@
+        <div class="content flex-grow-1 p-4">
+          <h1 class="mb-4">Add a polyline</h1>
+          <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+            <strong>Error</strong> Something went wrong. Check the developer console for details.
+          </div>
+
+          <p>Initialize a new map with the Radar SDK and add a GeoJSON feature to the map.</p>
+
+          <div class="callout">
+            Radar map objects are MapLibre GL JS references.
+            See their <a href="https://maplibre.org/maplibre-gl-js-docs/api/">documentation</a> for additional functionality.
+          </div>
+
+          <div>
+            <textarea id="geojson" class="form-control form-control-sm mb-3" style="height: 130px;" data-bs-placement="bottom" data-bs-title="Add your route polyline" type="text" placeholder="Add GeoJSON feature here"></textarea>
+
+            <div id="map" style="width: 100%; height: 500px; display: none;"></div>
+            <div id="map-warning" style="width: 100%; height: 500px; background: #f7fafc;">
+              <p style="color: #697386; font-weight: bold; text-align: center; padding-top: 220px;">Add publishable key to see map</p>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          const DEFAULT_GEOJSON_FEATURE = '{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.95820498349376,40.80026256420331],[-73.9816545434309,40.76824212209061],[-73.97283590550576,40.764244806438285],[-73.94918592197929,40.79677293396304],[-73.95820498349376,40.80026256420331]]]}}';
+          // const DEFAULT_GEOJSON_FEATURE = '{"type":"Feature","properties":{},"geometry":{"coordinates":[[-73.95809049027652,40.80019010945142],[-73.95792650156356,40.79956941510278],[-73.95841846770163,40.79903147530655],[-73.95825447898942,40.798369389572],[-73.95727054671187,40.79799696344418],[-73.95694256928675,40.797003816888946],[-73.95672391766904,40.79630032908929],[-73.95737987252073,40.79576236280053],[-73.95841846770163,40.795265774665125],[-73.95901975964925,40.79485194838119],[-73.96000369192606,40.79410705456934],[-73.96082363548994,40.7936104540523],[-73.96180756776752,40.79340353607347],[-73.96208088228856,40.79212063021319],[-73.96251818552328,40.79166539959459],[-73.96393942103406,40.79034107459367],[-73.96399408393889,40.789099495916076],[-73.96530599364154,40.788561471279564],[-73.96721919529108,40.78765095811761],[-73.96754717271693,40.7859954476576],[-73.96705520657817,40.78504351045504],[-73.96803913885499,40.78363627394418],[-73.96880441951555,40.78305681494962],[-73.96924172274952,40.782477350899484],[-73.96940571146246,40.78177370918479],[-73.96989767760049,40.78069753684963],[-73.97088160987803,40.77991109219337],[-73.97350542928336,40.77796563646018],[-73.97432537284725,40.77614430711532],[-73.97410672123029,40.77560617752587],[-73.97476267608198,40.77428153227217],[-73.97591059707172,40.77390897103635],[-73.97651188901861,40.77279127479261],[-73.97683986644446,40.77200473653497],[-73.9788623939029,40.770514427986484],[-73.97995565198858,40.76923107995185],[-73.97973700037159,40.768320301794176],[-73.97705851806147,40.767119711512834],[-73.97536396802887,40.76794770713141],[-73.9749266647949,40.76935527600628],[-73.97372408090035,40.769810659552775],[-73.97230284538882,40.76964506589704],[-73.97099093568616,40.77063862164226],[-73.96940571146246,40.77150797073264],[-73.96902307113255,40.772625688564375],[-73.96896840822774,40.774074554065805],[-73.96842177918488,40.77490246302358],[-73.96754717271693,40.77564757226432],[-73.96727385819516,40.77651685581657],[-73.96650857753534,40.77755170235744],[-73.96579795977956,40.779166030772416],[-73.96481402750277,40.78007666026306],[-73.96383009522593,40.78127701642737],[-73.96257284842733,40.78173231826318],[-73.9611516129158,40.78164953634368],[-73.9589104338404,40.78396739109968],[-73.95694256928675,40.786740432471845],[-73.95688790638195,40.788395924360685],[-73.95699723219082,40.79017553211082],[-73.95530268215823,40.79216201466048],[-73.9547013902106,40.7939415214764],[-73.95404543535965,40.79505886184529],[-73.95322549179501,40.79580374497792]],"type":"LineString"}}';
+
+          let feature;
+          const addGeoJSON = (map, geojsonText) => {
+
+            // clear existing data
+            map.clearFeatures();
+            map.clearMarkers();
+
+            try {
+              const geojson = JSON.parse(geojsonText);
+
+              let feature;
+              switch (geojson.geometry.type) {
+                case 'LineString':
+                  feature = map.addLine(geojson);
+                  break;
+                case 'Polygon':
+                case 'MultiPolygon':
+                  feature = map.addPolygon(geojson);
+                  break;
+                default:
+                  throw new Error(`Uknown geometry type: ${geojson.geometry.type}`);
+              }
+
+              console.log(feature);
+              map.fitToFeatures({ padding: 20 });
+
+              feature.on('click', ({ feature, originalEvent: event }) => {
+                  console.log('CLICKED!', feature, event);
+                  Radar.ui.marker({
+                    text: JSON.stringify(feature.properties, null, 2),
+                  })
+                  .setLngLat([event.lngLat.lng, event.lngLat.lat])
+                  .addTo(map);
+              });
+
+            } catch (err) {
+              console.error(err);
+              $('#error-alert').show();
+            }
+          };
+
+          let map;
+          let geojsonText = DEFAULT_GEOJSON_FEATURE;
+
+          const init = (publishableKey) => {
+            $('#error-alert').hide();
+            $('#map-warning').hide();
+            $('#map').show();
+            $('#geojson').val(geojsonText);
+
+
+            Radar.initialize(publishableKey, { debug: true });
+
+            // prevent duplicate maps
+            if (map) {
+              map.remove();
+            }
+
+            map = Radar.ui.map({
+              container: 'map',
+            });
+
+            // initial load
+            map.on('load', () => {
+              addGeoJSON(map, geojsonText);
+            });
+
+            map.on('error', (err) => {
+              console.error(err);
+              $('#error-alert').show();
+            });
+          };
+
+
+          $('#geojson').on('change', () => {
+            geojsonText = $('#geojson').val();
+            addGeoJSON(map, geojsonText);
+          });
+
+          // initalize map on api key changes
+          $('#publishableKey').on('change', () => {
+            const publishableKey = $('#publishableKey').val();
+            if (publishableKey) {
+              init(publishableKey);
+            }
+          });
+
+        </script>

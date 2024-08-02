@@ -514,6 +514,17 @@ export interface RadarPolylineOptions extends RadarLineOptions {
   precision?: number;
 };
 
+export interface RadarPolygonOptions {
+  id?: string;
+  properties?: any;
+  paint?: {
+    'fill-color'?: string;
+    'fill-opacity'?: number;
+    'border-width'?: number;
+    'border-color'?: string;
+    'border-opacity'?: number;
+  },
+}
 export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   near?: string | Location; // bias for location results

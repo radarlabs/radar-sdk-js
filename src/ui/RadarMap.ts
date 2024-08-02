@@ -4,6 +4,7 @@ import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
 import RadarMapFeature from './RadarMapFeature';
 import RadarLineFeature from './RadarLineFeature';
+import RadarPolygonFeature from './RadarPolygonFeature';
 import RadarLogoControl from './RadarLogoControl';
 import { getAllCoords } from '../util/geojson';
 
@@ -13,7 +14,9 @@ import Logger from '../logger';
 import type {
   RadarOptions,
   RadarMapOptions,
+  RadarLineOptions,
   RadarPolylineOptions,
+  RadarPolygonOptions,
 } from '../types';
 
 const DEFAULT_STYLE = 'radar-default-v1';
@@ -209,12 +212,23 @@ class RadarMap extends maplibregl.Map {
     });
   }
 
+  addPolygon(polygon: GeoJSON.Feature<GeoJSON.Polygon|GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
+    const feature = new RadarPolygonFeature(this, polygon, polygonOptions);
+    this._features.push(feature);
+    return feature;
+  }
+
+  addLine(line: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
+    const feature = new RadarLineFeature(this, line, lineOptions);
+    this._features.push(feature);
+    return feature;
+  }
+
   addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
     const feature = RadarLineFeature.fromPolyline(this, polyline, polylineOptions);
     this._features.push(feature);
     return feature;
   }
-
 };
 
 export default RadarMap;
