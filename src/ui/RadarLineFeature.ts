@@ -1,9 +1,9 @@
-import maplibregl from 'maplibre-gl';
 import RadarMapFeature from './RadarMapFeature';
 import Logger from '../logger';
 import { decodePolyline } from '../util/polyline';
 import { filterUndefined } from '../util/object';
 
+import type RadarMap from './RadarMap';
 import type { RadarLineOptions, RadarPolylineOptions } from '../types';
 
 const defaultLineOptions: Partial<RadarLineOptions> = {
@@ -17,7 +17,7 @@ const defaultLineOptions: Partial<RadarLineOptions> = {
 };
 
 class RadarLineFeature extends RadarMapFeature {
-  constructor(map: maplibregl.Map, feature: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
+  constructor(map: RadarMap, feature: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
     super(map, feature);
     const featureId = this.id;
 
@@ -96,7 +96,7 @@ class RadarLineFeature extends RadarMapFeature {
     return this;
   }
 
-  static fromPolyline(map: maplibregl.Map, polyline: string, polylineOptions?: RadarPolylineOptions) {
+  static fromPolyline(map: RadarMap, polyline: string, polylineOptions?: RadarPolylineOptions) {
     const featureId = polylineOptions?.id || `polyline-feature-${Date.now()}`;
 
     const coordinates = decodePolyline(polyline, polylineOptions?.precision);

@@ -5,6 +5,7 @@ import RadarMarker from './RadarMarker';
 import RadarMapFeature from './RadarMapFeature';
 import RadarLineFeature from './RadarLineFeature';
 import RadarLogoControl from './RadarLogoControl';
+import { getAllCoords } from '../util/geojson';
 
 import Config from '../config';
 import Logger from '../logger';
@@ -188,14 +189,18 @@ class RadarMap extends maplibregl.Map {
     return this._features;
   }
 
-  // TODO:
-  // fitToFeatures(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideFeatures?: string[] | RadarMapFeature[]) {
-  //   const bounds = new maplibregl.LngLatBounds();
-  //   feature.geometry.coordinates.forEach((coord: any) => {
-  //     bounds.extend(coord);
-  //   });
-  //   map.fitBounds(bounds, options.fitOptions);
-  // }
+  fitToFeatures(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideFeatures?: RadarMapFeature[]) {
+    const features = (overrideFeatures || this._features).map((mapFeature) => mapFeature._feature);
+    const coords = getAllCoords(features);
+
+    if (coords.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      coords.forEach((coord: any) => {
+        bounds.extend(coord);
+      });
+      this.fitBounds(bounds, fitBoundsOptions);
+    }
+  }
 
   // remove all features from the map
   clearFeatures() {

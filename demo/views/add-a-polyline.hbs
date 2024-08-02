@@ -13,7 +13,7 @@
 
           <div>
             <div style="display: flex; justify-content: space-between;">
-              <input id="route" class="form-control form-control-sm mb-3" style="height: 34px;" data-bs-placement="bottom" data-bs-title="Add your route polyline or GeoJSON" type="text" placeholder="Add route here" />
+              <input id="route" class="form-control form-control-sm mb-3" style="height: 34px;" data-bs-placement="bottom" data-bs-title="Add your route polyline" type="text" placeholder="Add polyline here" />
 
               <select id="format" class="form-select form-control form-control-sm" style="width: 400px; height: 30px; margin-left: 16px;">
                 <option name="type" value="polyline6">polyline6</option>
@@ -43,15 +43,12 @@
             // clear existing data
             map.clearFeatures();
             map.clearMarkers();
-            clearInterval(interval);
 
             const feature = map.addPolyline(route, { id: 'route', precision });
-            console.log('feature:', feature);
+            console.log(feature);
+            map.fitToFeatures({ padding: 20 });
 
             /*
-              fitOptions: {
-                padding: 20,
-              },
               onClick: (e, feature) => {
                 Radar.ui.marker({
                   text: `${route.slice(0, 6)}...`,
