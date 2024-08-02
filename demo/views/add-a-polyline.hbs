@@ -48,15 +48,14 @@
             console.log(feature);
             map.fitToFeatures({ padding: 20 });
 
-            /*
-              onClick: (e, feature) => {
+            feature.on('click', ({ feature, originalEvent: event }) => {
+                console.log('CLICKED!', feature, event);
                 Radar.ui.marker({
                   text: `${route.slice(0, 6)}...`,
                 })
-                .setLngLat([e.lngLat.lng, e.lngLat.lat])
+                .setLngLat([event.lngLat.lng, event.lngLat.lat])
                 .addTo(map);
-              },
-            */
+            });
           };
 
           let map;

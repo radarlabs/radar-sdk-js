@@ -80,7 +80,7 @@ class RadarLineFeature extends RadarMapFeature {
     // ensure map is ready before modifying source and layers
     if (map.loaded()) {
       addFeatureToMap();
-    } else { // wait for map to load, or abort
+    } else { // wait for map to load up to 1 second, or abort
       let count = 0;
       let interval = setInterval(() => {
         if (map.loaded()) {

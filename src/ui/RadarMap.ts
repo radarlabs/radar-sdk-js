@@ -213,20 +213,6 @@ class RadarMap extends maplibregl.Map {
     const feature = RadarLineFeature.fromPolyline(this, polyline, polylineOptions);
     this._features.push(feature);
     return feature;
-
-    // if (lineOptions.onClick) {
-    //   // set hover state if click handler is present
-    //   this.on('mouseenter', featureId, () => {
-    //     this.getCanvas().style.cursor = 'pointer';
-    //   });
-    //   this.on('mouseleave', featureId, () => {
-    //     this.getCanvas().style.cursor = '';
-    //   });
-    //   // call onClick if line clicked
-    //   this.on('click', featureId, (e) => {
-    //     (lineOptions.onClick as any)(e, feature);
-    //   });
-    // }
   }
 
 };

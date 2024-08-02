@@ -1,7 +1,24 @@
 import type RadarMap from './RadarMap';
 
+type RadarFeatureEventType = 'click' | 'mousemove' | 'mouseenter' | 'mouseleave';
+
+class RadarFeatureMouseEvent {
+  type: RadarFeatureEventType;
+  feature: RadarMapFeature;
+  originalEvent: any;
+
+  constructor(type: RadarFeatureEventType, feature: RadarMapFeature, originalEvent: any) {
+    this.type = type;
+    this.feature = feature;
+    this.originalEvent = originalEvent;
+  }
+};
+
 abstract class RadarMapFeature {
   id: string;
+  geometry: GeoJSON.Geometry;
+  properties: GeoJSON.GeoJsonProperties;
+
   _map: RadarMap;
   _feature: GeoJSON.Feature;
   _sourceIds: string[] = [];
@@ -9,6 +26,8 @@ abstract class RadarMapFeature {
 
   constructor(map: RadarMap, feature: GeoJSON.Feature) {
     this.id = (feature.id ?? `feature-${Date.now()}`).toString();
+    this.geometry = feature.geometry;
+    this.properties = feature.properties || {};
     this._feature = feature;
     this._map = map;
   }
@@ -32,6 +51,23 @@ abstract class RadarMapFeature {
     this._map._features = this._map._features.filter(
       (other) => other.id !== this.id
     );
+  }
+
+  // register events with feature layer
+  on(event: RadarFeatureEventType, callback: (event: RadarFeatureMouseEvent) => void) {
+    this._map.on(event, this.id, (originalEvent: any) => {
+      callback(new RadarFeatureMouseEvent(event, this, originalEvent));
+    });
+
+    // add pointer cursor if feature is clickable
+    if (event === 'click') {
+      this._map.on('mouseenter', this.id, () => {
+        this._map.getCanvas().style.cursor = 'pointer';
+      });
+      this._map.on('mouseleave', this.id, () => {
+        this._map.getCanvas().style.cursor = '';
+      });
+    }
   }
 }
 
