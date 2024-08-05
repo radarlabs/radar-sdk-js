@@ -39,46 +39,35 @@
               container: 'map',
             });
 
+            let url;
             let marker;
             map.on('load', () => {
               const { lat, lng } = map.getCenter();
 
-              marker = Radar.ui.marker({
-                popup: {
-                  text: `${lat}, ${lng}`,
-                  },
-                })
-                .setLngLat([lng, lat])
-                .addTo(map);
+              map.on('click', (e) => {
+              console.log('MAP CLICK', e);
+                const { lng, lat } = e.lngLat;
 
-              marker.on('click', (e) => {
-                console.log('MARKER CLICK', e);
+                // create marker from click location
+                const marker = Radar.ui.marker({ url })
+                  .setLngLat([lng, lat])
+                  .addTo(map);
+
+                // fit map to markers
+                map.fitToMarkers({ maxZoom: 14, padding: 80 });
+
+                // add listener to remove marker on click
+                marker.on('click', (e) => {
+                  console.log('MARKER CLICK', e);
+                  marker.remove();
+                  map.fitToMarkers({ maxZoom: 14, padding: 80 }); // refit after marker removed
+                });
               });
 
               // use custom marker from URL
               $('#imageUrl').on('change', (e) => {
-                const url = e.target.value;
-                if (marker) {
-                  marker.remove();
-                }
-                const { lat, lng } = map.getCenter();
-                marker = Radar.ui.marker({
-                  url,
-                  popup: {
-                    text: `${lat}, ${lng}`,
-                  },
-                })
-                  .setLngLat([lng, lat])
-                  .addTo(map);
-
-                marker.on('click', (e) => {
-                  console.log('MARKER CLICK', e);
-                });
+                url = e.target.value;
               });
-            });
-
-            map.on('click', (e) => {
-              console.log('MAP CLICK', e);
             });
 
             map.on('error', (err) => {
