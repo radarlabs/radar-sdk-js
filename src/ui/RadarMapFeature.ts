@@ -54,13 +54,13 @@ abstract class RadarMapFeature {
   }
 
   // register events with feature layer
-  on(event: RadarFeatureEventType, callback: (event: RadarFeatureMouseEvent) => void) {
-    this._map.on(event, this.id, (originalEvent: any) => {
-      callback(new RadarFeatureMouseEvent(event, this, originalEvent));
+  on(eventType: RadarFeatureEventType, callback: (event: RadarFeatureMouseEvent) => void) {
+    this._map.on(eventType, this.id, (event: any) => {
+      callback(new RadarFeatureMouseEvent(eventType, this, event));
     });
 
     // add pointer cursor if feature is clickable
-    if (event === 'click') {
+    if (eventType === 'click') {
       this._map.on('mouseenter', this.id, () => {
         this._map.getCanvas().style.cursor = 'pointer';
       });

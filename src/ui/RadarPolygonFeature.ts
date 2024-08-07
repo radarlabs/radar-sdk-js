@@ -68,17 +68,17 @@ class RadarPolygonFeature extends RadarMapFeature {
     // ensure map is ready before modifying source and layers
     if (map.loaded()) {
       addFeatureToMap();
-    } else { // wait for map to load up to 1 second, or abort
+    } else { // wait for map to load up to 3 seconds, or abort
       let count = 0;
       let interval = setInterval(() => {
         if (map.loaded()) {
           clearInterval(interval);
           addFeatureToMap();
-        } else if (++count >= 5) {
+        } else if (++count >= 30 /* 3 seconds */) {
           clearInterval(interval);
           Logger.warn(`could not add polygon feature ${feature.id}`);
         }
-      }, 200);
+      }, 100);
     }
 
     return this;

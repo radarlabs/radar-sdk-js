@@ -49,12 +49,12 @@
             map.fitToFeatures({ padding: 20 });
 
             feature.on('click', ({ feature, originalEvent: event }) => {
-                console.log('CLICKED!', feature, event);
-                Radar.ui.marker({
-                  text: `${route.slice(0, 6)}...`,
-                })
-                .setLngLat([event.lngLat.lng, event.lngLat.lat])
-                .addTo(map);
+              console.log('CLICKED!', feature, event);
+              Radar.ui.popup({
+                text: `Polyline: ${route.slice(0, 12)}...`,
+              })
+              .setLngLat([event.lngLat.lng, event.lngLat.lat])
+              .addTo(map);
             });
           };
 

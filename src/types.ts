@@ -464,7 +464,7 @@ export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformR
   showZoomControls?: boolean;
 }
 
-export interface RadarMarkerPopupOptions extends maplibregl.PopupOptions {
+export interface RadarPopupOptions extends maplibregl.PopupOptions {
   text?: string;
   html?: string;
   element?: HTMLElement;
@@ -488,7 +488,7 @@ export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
   height?: number | string;
 
   // popup configs
-  popup?: RadarMarkerPopupOptions;
+  popup?: RadarPopupOptions;
 }
 
 export interface RadarLineOptions {
