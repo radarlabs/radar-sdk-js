@@ -26,6 +26,14 @@ abstract class RadarMapFeature {
 
   constructor(map: RadarMap, feature: GeoJSON.Feature) {
     this.id = (feature.id ?? `feature-${Date.now()}`).toString();
+
+    // check for duplicate IDs
+    (map.getFeatures() || []).forEach((feature) => {
+      if (feature.id === this.id) {
+        throw new Error(`RadarMapFeature: feature with id ${this.id} already exists.`);
+      }
+    });
+
     this.geometry = feature.geometry;
     this.properties = feature.properties || {};
     this._feature = feature;
