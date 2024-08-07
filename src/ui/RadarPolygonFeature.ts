@@ -1,6 +1,6 @@
 import RadarMapFeature from './RadarMapFeature';
 import Logger from '../logger';
-import { filterUndefined } from '../util/object';
+import { filterUndefined, mergeDeep } from '../util/object';
 
 import type RadarMap from './RadarMap';
 import type { RadarPolygonOptions } from '../types';
@@ -21,10 +21,7 @@ class RadarPolygonFeature extends RadarMapFeature {
     super(map, feature);
     const featureId = this.id;
 
-    const options = Object.assign({},
-      defaultPolygonOptions,
-      polygonOptions,
-    );
+    const options = mergeDeep(defaultPolygonOptions, polygonOptions) as RadarPolygonOptions;
 
     // use a callback to account for the async loading of the map
     const addFeatureToMap = () => {

@@ -75,7 +75,6 @@
             $('#map').show();
             $('#geojson').val(geojsonText);
 
-
             Radar.initialize(publishableKey, { debug: true });
 
             // prevent duplicate maps
@@ -97,7 +96,6 @@
               $('#error-alert').show();
             });
           };
-
 
           $('#geojson').on('change', () => {
             geojsonText = $('#geojson').val();
