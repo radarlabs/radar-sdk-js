@@ -63,6 +63,17 @@
         $('#customStyleID').val(styleId);
         $('#customStyleID').trigger('change');
       }
+
+      const center = map.getCenter();
+      console.log(center);
+      Radar.ui.marker({
+        popup: {
+          text: "Hello world!",
+        }
+      })
+        .setLngLat([center.lng, center.lat])
+        .addTo(map);
+
     });
 
     map.on('error', (err) => {

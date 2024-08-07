@@ -2,12 +2,22 @@ import maplibregl from 'maplibre-gl';
 
 import SDK_VERSION from '../version';
 import RadarMarker from './RadarMarker';
+import RadarMapFeature from './RadarMapFeature';
+import RadarLineFeature from './RadarLineFeature';
+import RadarPolygonFeature from './RadarPolygonFeature';
 import RadarLogoControl from './RadarLogoControl';
+import { getAllCoords } from '../util/geojson';
 
 import Config from '../config';
 import Logger from '../logger';
 
-import type { RadarOptions, RadarMapOptions } from '../types';
+import type {
+  RadarOptions,
+  RadarMapOptions,
+  RadarLineOptions,
+  RadarPolylineOptions,
+  RadarPolygonOptions,
+} from '../types';
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
@@ -69,6 +79,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
+  _features: RadarMapFeature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
@@ -169,6 +180,54 @@ class RadarMap extends maplibregl.Map {
 
     const options = Object.assign(defaultFitMarkersOptions, fitBoundsOptions);
     this.fitBounds(bounds, options);
+  }
+
+  clearMarkers() {
+    this._markers.forEach((marker) => {
+      marker.remove();
+    });
+  }
+
+  getFeatures() {
+    return this._features;
+  }
+
+  fitToFeatures(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideFeatures?: RadarMapFeature[]) {
+    const features = (overrideFeatures || this._features).map((mapFeature) => mapFeature._feature);
+    const coords = getAllCoords(features);
+
+    if (coords.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      coords.forEach((coord: any) => {
+        bounds.extend(coord);
+      });
+      this.fitBounds(bounds, fitBoundsOptions);
+    }
+  }
+
+  // remove all features from the map
+  clearFeatures() {
+    this._features.forEach((feature) => {
+      feature.remove();
+    });
+  }
+
+  addPolygon(polygon: GeoJSON.Feature<GeoJSON.Polygon|GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
+    const feature = new RadarPolygonFeature(this, polygon, polygonOptions);
+    this._features.push(feature);
+    return feature;
+  }
+
+  addLine(line: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
+    const feature = new RadarLineFeature(this, line, lineOptions);
+    this._features.push(feature);
+    return feature;
+  }
+
+  addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
+    const feature = RadarLineFeature.fromPolyline(this, polyline, polylineOptions);
+    this._features.push(feature);
+    return feature;
   }
 };
 
