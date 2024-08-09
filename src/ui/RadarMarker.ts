@@ -29,6 +29,34 @@ interface ImageOptions {
   height?: number | string;
 }
 
+// cache URL loaded markers
+const IMAGE_CACHE = new Map<string, 'pending' | 'failed' | Blob>();
+
+const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<Blob> => new Promise((resolve, reject) => {
+  if (!IMAGE_CACHE.has(url)) { // nothing in cache
+    IMAGE_CACHE.set(url, 'pending'); // request in flight
+    return reject('miss');
+  }
+
+  const start = Date.now();
+  const interval = setInterval(() => {
+    const cachedData = IMAGE_CACHE.get(url);
+    if (cachedData === 'pending') {
+      if ((Date.now() - start) > timeoutMS) { // cache lookup took too long
+        clearInterval(interval);
+        reject('timed out');
+      }
+    } else if (cachedData === 'failed') { // request failed
+      clearInterval(interval);
+      reject('failed');
+
+    } else { // return data
+      clearInterval(interval);
+      resolve(cachedData as Blob);
+    }
+  }, 100);
+});
+
 const createImageElement = (options: ImageOptions) => {
   const element = document.createElement('img');
   element.src = options.url!;
@@ -97,33 +125,64 @@ class RadarMarker extends maplibregl.Marker {
 
       const onError = (err: any) => {
         Logger.error(`Could not load marker: ${err.message} - falling back to default marker`);
+        IMAGE_CACHE.set(markerOptions.url as string, 'failed'); // mark as failed
         this._element.replaceChildren(...Array.from(originalElement.childNodes));
       }
 
+      // custom URL image
       if (markerOptions.url) {
-        fetch(markerOptions.url)
-          .then(res => {
-            if (res.status === 200) {
-              res.blob()
-                .then(onSuccess)
-                .catch(onError);
-            } else {
-              onError(new Error(res.statusText));
+        const loadImage = () => { // fetch marker data from URL
+          fetch(markerOptions.url as string)
+            .then(res => {
+              if (res.status === 200) {
+                res.blob()
+                  .then((data) => {
+                    IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
+                    onSuccess(data);
+                  })
+                  .catch(onError);
+              } else {
+                onError(new Error(res.statusText));
+              }
+            })
+            .catch(onError)
+        };
+
+        // attempt to use cached data, otherwise fetch marker image data from URL
+        useCachedImage(markerOptions.url)
+          .then(onSuccess)
+          .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
+            if (reason !== 'miss') {
+              Logger.debug(`RadarMarker: cache lookup for ${markerOptions.url}: ${reason}`);
             }
-          })
-          .catch(onError)
+            loadImage();
+          });
       }
 
+      // Radar hosted image
       if (markerOptions.marker) {
-        // fetch custom marker
-        Http.request({
-          method: 'GET',
-          version: 'maps',
-          path: `markers/${markerOptions.marker}`,
-          responseType: 'blob',
-        })
-          .then(({ data }) => onSuccess(data))
-          .catch(onError);
+        const loadMarker = () => {
+          Http.request({
+            method: 'GET',
+            version: 'maps',
+            path: `markers/${markerOptions.marker}`,
+            responseType: 'blob',
+          })
+            .then(({ data }) => {
+              IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
+              onSuccess(data)
+            })
+            .catch(onError);
+        };
+
+        useCachedImage(markerOptions.marker as string)
+          .then(onSuccess)
+          .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
+            if (reason !== 'miss') {
+              Logger.debug(`RadarMarker: cache lookup for ${markerOptions.marker} ${reason}`);
+            }
+            loadMarker();
+          });
       }
     }
 
