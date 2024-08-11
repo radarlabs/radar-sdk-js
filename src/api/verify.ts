@@ -8,7 +8,7 @@ import Storage from '../storage';
 
 import type { RadarStartTrackingVerifiedParams, RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
 
-let timeoutId: any | null = null;
+let tokenTimeoutId: any | null = null;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
 let lastToken: RadarTrackVerifiedResponse | null = null;
 let lastTokenNow: number = 0;
@@ -125,11 +125,11 @@ class VerifyAPI {
         minInterval = 10;
       }
 
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (tokenTimeoutId) {
+        clearTimeout(tokenTimeoutId);
       }
 
-      timeoutId = setTimeout(() => {
+      tokenTimeoutId = setTimeout(() => {
         doTrackVerified();
       }, minInterval * 1000);
     };
@@ -138,8 +138,8 @@ class VerifyAPI {
   }
 
   static stopTrackingVerified() {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    if (tokenTimeoutId) {
+      clearTimeout(tokenTimeoutId);
     }
   }
 
