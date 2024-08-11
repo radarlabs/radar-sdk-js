@@ -125,10 +125,16 @@ class VerifyAPI {
         minInterval = 10;
       }
 
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
       timeoutId = setTimeout(() => {
         doTrackVerified();
       }, minInterval * 1000);
     };
+
+    doTrackVerified();
   }
 
   static stopTrackingVerified() {
@@ -138,7 +144,7 @@ class VerifyAPI {
   }
 
   static async getVerifiedLocationToken() {
-    const lastTokenElapsed = (performance.now() - lastTokenNow) * 1000;
+    const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
 
     if (lastToken) {
       if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
