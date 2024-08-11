@@ -6,7 +6,12 @@ import Logger from '../logger';
 import Session from '../session';
 import Storage from '../storage';
 
-import type { RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
+import type { RadarStartTrackingVerifiedParams, RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
+
+let timeoutId: any | null = null;
+let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
+let lastToken: RadarTrackVerifiedResponse | null = null;
+let lastTokenNow: number = 0;
 
 class VerifyAPI {
   static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
@@ -84,7 +89,68 @@ class VerifyAPI {
       trackRes.response = response;
     }
 
+    lastToken = trackRes;
+    lastTokenNow = performance.now();
+
+    if (tokenCallback) {
+      tokenCallback(trackRes);
+    }
+
     return trackRes;
+  }
+
+  static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    const doTrackVerified = async () => {
+      const trackRes = await this.trackVerified({});
+
+      const { interval } = params;
+
+      let expiresIn = 0;
+      let minInterval = interval;
+
+      if (trackRes) {
+        expiresIn = (trackRes.expiresIn || expiresIn);
+
+        // if expiresIn is shorter than interval, override interval
+        minInterval = Math.min(expiresIn, interval);
+      }
+
+      // re-request early to maximize the likelihood that a cached token is available
+      if (minInterval > 20) {
+        minInterval = minInterval - 10;
+      }
+
+      // min interval is 10 seconds
+      if (minInterval < 10) {
+        minInterval = 10;
+      }
+
+      timeoutId = setTimeout(() => {
+        doTrackVerified();
+      }, minInterval * 1000);
+    };
+  }
+
+  static stopTrackingVerified() {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  static async getVerifiedLocationToken() {
+    const lastTokenElapsed = (performance.now() - lastTokenNow) * 1000;
+
+    if (lastToken) {
+      if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
+        return lastToken;
+      }
+    }
+
+    return this.trackVerified({});
+  }
+
+  static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
+    tokenCallback = callback;
   }
 }
 
