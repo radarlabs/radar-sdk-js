@@ -127,9 +127,7 @@ class VerifyAPI {
         clearTimeout(tokenTimeoutId);
       }
 
-      tokenTimeoutId = setTimeout(() => {
-        doTrackVerified();
-      }, minInterval * 1000);
+      tokenTimeoutId = setTimeout(doTrackVerified, minInterval * 1000);
     };
 
     doTrackVerified();
