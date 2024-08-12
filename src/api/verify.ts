@@ -12,6 +12,8 @@ let tokenTimeoutId: any | null = null;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
 let lastToken: RadarTrackVerifiedResponse | null = null;
 let lastTokenNow: number = 0;
+let expectedCountryCode: string | null = null;
+let expectedStateCode: string | null = null;
 
 class VerifyAPI {
   static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
@@ -46,6 +48,8 @@ class VerifyAPI {
       stopped: true,
       userId,
       encrypted,
+      expectedCountryCode,
+      expectedStateCode,
     };
 
     let userAgent = navigator.userAgent;
@@ -149,6 +153,11 @@ class VerifyAPI {
     }
 
     return this.trackVerified({});
+  }
+
+  static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
+    expectedCountryCode = countryCode;
+    expectedStateCode = stateCode;
   }
 
   static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {

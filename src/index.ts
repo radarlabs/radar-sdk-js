@@ -162,6 +162,10 @@ class Radar {
     return VerifyAPI.getVerifiedLocationToken();
   }
 
+  public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
+    VerifyAPI.setExpectedJurisdiction(countryCode, stateCode);
+  }
+
   public static getContext(params: Location) {
     return ContextAPI.getContext(params);
   }
