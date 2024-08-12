@@ -58,7 +58,7 @@ class VerifyAPI {
       host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
     });
 
-    let { _id, user, events, token, expiresAt, expiresIn, passed, failureReasons } = response;
+    let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
     let location;
     if (user && user.location && user.location.coordinates && user.locationAccuracy) {
       location = {
@@ -72,7 +72,6 @@ class VerifyAPI {
     }
 
     const trackRes = {
-      _id,
       user,
       events,
       location,
@@ -80,6 +79,8 @@ class VerifyAPI {
       expiresAt,
       expiresIn,
       passed,
+      failureReasons,
+      _id,
     } as RadarTrackVerifiedResponse;
 
     if (options.debug) {
