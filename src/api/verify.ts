@@ -156,8 +156,8 @@ class VerifyAPI {
   }
 
   static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
-    expectedCountryCode = countryCode;
-    expectedStateCode = stateCode;
+    expectedCountryCode = countryCode || null;
+    expectedStateCode = stateCode || null;
   }
 
   static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
