@@ -218,10 +218,12 @@ export interface RadarTrackResponse extends RadarResponse {
 }
 
 export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
+  _id?: string;
   token?: String;
   expiresAt?: Date;
   expiresIn?: number;
   passed?: boolean;
+  failureReasons?: string[];
 }
 
 export interface RadarContextResponse extends RadarResponse {

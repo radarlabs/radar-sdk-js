@@ -58,7 +58,7 @@ class VerifyAPI {
       host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
     });
 
-    let { user, events, token, expiresAt } = response;
+    let { _id, user, events, token, expiresAt, expiresIn, passed, failureReasons } = response;
     let location;
     if (user && user.location && user.location.coordinates && user.locationAccuracy) {
       location = {
@@ -67,15 +67,12 @@ class VerifyAPI {
         accuracy: user.locationAccuracy,
       };
     }
-    let passed;
-    let expiresIn;
     if (expiresAt) {
       expiresAt = new Date(expiresAt);
-      passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
-      expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
     }
 
     const trackRes = {
+      _id,
       user,
       events,
       location,
