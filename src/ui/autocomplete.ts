@@ -329,6 +329,7 @@ class AutocompleteUI {
 
       const radarLogo = document.createElement('span');
       radarLogo.id = 'radar-powered-logo';
+      radarLogo.textContent = 'Radar';
       link.appendChild(radarLogo);
 
       const poweredByContainer = document.createElement('div');
@@ -401,12 +402,17 @@ class AutocompleteUI {
   }
 
   public handleKeyboardNavigation(event: KeyboardEvent) {
-    const key = event.key;
+    let key = event.key;
 
     // allow event to propagate if result list is not open
     if (!this.isOpen) {
       return;
     }
+
+    // treat shift+tab as up key
+    if (key === 'Tab' && event.shiftKey) {
+      key = 'ArrowUp';
+    };
 
     switch (key) {
       // Next item
