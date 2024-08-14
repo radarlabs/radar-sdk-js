@@ -2,8 +2,9 @@ import maplibregl from 'maplibre-gl';
 
 import RadarMap from './RadarMap';
 import RadarMarker from './RadarMarker';
+import RadarPopup from './RadarPopup';
 
-import type { RadarMapOptions, RadarMarkerOptions } from '../types';
+import type { RadarMapOptions, RadarMarkerOptions, RadarPopupOptions } from '../types';
 
 class MapUI {
   public static getMapLibre() {
@@ -18,6 +19,11 @@ class MapUI {
   public static createMarker(markerOptions: RadarMarkerOptions = {}): RadarMarker {
     const radarMarker = new RadarMarker(markerOptions);
     return radarMarker;
+  }
+
+  public static createPopup(popupOptions: RadarPopupOptions): maplibregl.Popup {
+    const popup = new RadarPopup(popupOptions);
+    return popup;
   }
 }
 

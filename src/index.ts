@@ -61,6 +61,7 @@ class Radar {
       maplibregl: MapUI.getMapLibre(),
       map: MapUI.createMap,
       marker: MapUI.createMarker,
+      popup: MapUI.createPopup,
       autocomplete: AutocompleteUI.createAutocomplete,
     };
   }
