@@ -162,14 +162,10 @@ class TrackAPI {
         };
       }
 
-      let { user, events, token, expiresAt } = response;
+      let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
       const location = { latitude, longitude, accuracy };
-      let passed;
-      let expiresIn;
       if (expiresAt) {
         expiresAt = new Date(expiresAt);
-        passed = user?.fraud?.passed && user?.country?.passed && user?.state?.passed;
-        expiresIn = (expiresAt.getTime() - Date.now()) / 1000;
       }
 
       const trackRes = {
@@ -180,6 +176,8 @@ class TrackAPI {
         expiresAt,
         expiresIn,
         passed,
+        failureReasons,
+        _id,
       } as RadarTrackVerifiedResponse;
 
       if (options.debug) {

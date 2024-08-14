@@ -76,6 +76,10 @@ export interface RadarTrackParams {
   fraud?: boolean;
 }
 
+export interface RadarStartTrackingVerifiedParams {
+  interval: number;
+}
+
 export enum RadarEventConfidence {
   none = 0,
   low = 1,
@@ -218,9 +222,11 @@ export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
   expiresAt?: Date;
   expiresIn?: number;
   passed?: boolean;
+  failureReasons?: string[];
+  _id?: string;
 }
 
-export interface RadarContextResponse  extends RadarResponse {
+export interface RadarContextResponse extends RadarResponse {
   location?: Location;
   geofences?: RadarGeofence[];
   place?: RadarPlace;
