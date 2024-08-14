@@ -4,12 +4,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" crossorigin="anonymous">
-    <link href="https://js.radar.com/v4.3.5/radar.css" rel="stylesheet">
+    <link href="https://js.radar.com/v4.4.0/radar.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" crossorigin="anonymous"></script>
-    <script src="https://js.radar.com/v4.3.5/radar.min.js"></script>
+    <script src="https://js.radar.com/v4.4.0/radar.min.js"></script>
   </head>
   <body>
     <main>
@@ -17,7 +17,7 @@
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
           <a href="/" class="d-flex align-items-baseline pb-1 mb-3 link-dark text-decoration-none border-bottom">
             <span class="fs-5 fw-semibold">Radar JS SDK</span>
-            <span style="font-size: 10px; margin-left: 10px;">v4.3.5</span>
+            <span style="font-size: 10px; margin-left: 10px;">v4.4.0</span>
           </a>
           <ul class="list-unstyled ps-0">
             <li class="mb-1">
@@ -33,6 +33,8 @@
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                   <li><a href="./display-a-map" class="link-dark rounded">Display a map</a></li>
                   <li><a href="./add-a-marker" class="link-dark rounded">Add a marker</a></li>
+                  <li><a href="./add-a-polyline" class="link-dark rounded">Add a polyline</a></li>
+                  <li><a href="./add-geojson" class="link-dark rounded">Add geojson</a></li>
                   <li><a href="./create-autocomplete" class="link-dark rounded">Address autocomplete</a></li>
                   <li><a href="./custom-autocomplete" class="link-dark rounded">Custom autocomplete input</a></li>
                   <li><a href="./search-near-location" class="link-dark rounded">Search near location</a></li>
@@ -117,46 +119,35 @@
               container: 'map',
             });
 
+            let url;
             let marker;
             map.on('load', () => {
               const { lat, lng } = map.getCenter();
 
-              marker = Radar.ui.marker({
-                popup: {
-                  text: `${lat}, ${lng}`,
-                  },
-                })
-                .setLngLat([lng, lat])
-                .addTo(map);
+              map.on('click', (e) => {
+              console.log('MAP CLICK', e);
+                const { lng, lat } = e.lngLat;
 
-              marker.on('click', (e) => {
-                console.log('MARKER CLICK', e);
+                // create marker from click location
+                const marker = Radar.ui.marker({ url })
+                  .setLngLat([lng, lat])
+                  .addTo(map);
+
+                // fit map to markers
+                map.fitToMarkers({ maxZoom: 14, padding: 80 });
+
+                // add listener to remove marker on click
+                marker.on('click', (e) => {
+                  console.log('MARKER CLICK', e);
+                  marker.remove();
+                  map.fitToMarkers({ maxZoom: 14, padding: 80 }); // refit after marker removed
+                });
               });
 
               // use custom marker from URL
               $('#imageUrl').on('change', (e) => {
-                const url = e.target.value;
-                if (marker) {
-                  marker.remove();
-                }
-                const { lat, lng } = map.getCenter();
-                marker = Radar.ui.marker({
-                  url,
-                  popup: {
-                    text: `${lat}, ${lng}`,
-                  },
-                })
-                  .setLngLat([lng, lat])
-                  .addTo(map);
-
-                marker.on('click', (e) => {
-                  console.log('MARKER CLICK', e);
-                });
+                url = e.target.value;
               });
-            });
-
-            map.on('click', (e) => {
-              console.log('MAP CLICK', e);
             });
 
             map.on('error', (err) => {
