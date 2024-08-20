@@ -29,7 +29,9 @@ import type {
   RadarReverseGeocodeParams,
   RadarSearchGeofencesParams,
   RadarSearchPlacesParams,
+  RadarStartTrackingVerifiedParams,
   RadarTrackParams,
+  RadarTrackVerifiedResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
 } from './types';
@@ -88,7 +90,7 @@ class Radar {
   }
 
   ///////////////////////
-  // geofencing platform
+  // Geofencing Platform
   ///////////////////////
 
   public static setUserId(userId?: string) {
@@ -131,6 +133,22 @@ class Radar {
     return VerifyAPI.trackVerified(params);
   }
 
+  public static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    return VerifyAPI.startTrackingVerified(params);
+  }
+
+  public static stopTrackingVerified() {
+    return VerifyAPI.stopTrackingVerified();
+  }
+
+  public static getVerifiedLocationToken() {
+    return VerifyAPI.getVerifiedLocationToken();
+  }
+
+  public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
+    VerifyAPI.setExpectedJurisdiction(countryCode, stateCode);
+  }
+
   public static getContext(params: Location) {
     return ContextAPI.getContext(params);
   }
@@ -167,9 +185,16 @@ class Radar {
     return ConversionsAPI.logConversion(params);
   }
 
+  ///////////////////////
+  // Listeners
+  ///////////////////////
+  public static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
+    VerifyAPI.onTokenUpdated(callback);
+  }
+
 
   /////////////////
-  // maps platform
+  // Maps Platform
   /////////////////
 
   public static forwardGeocode(params: RadarForwardGeocodeParams) {

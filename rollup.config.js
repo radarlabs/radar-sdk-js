@@ -79,7 +79,7 @@ export default [
 
   // IIFE (core SDK feature - no maps)
   {
-    input: 'src/core.ts',
+    input: 'src/api.ts',
     output: [
       {
         file: 'cdn/radar-core.js',
