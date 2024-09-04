@@ -20,6 +20,7 @@ class SearchAPI {
       near,
       limit,
       layers,
+      country,
       countryCode,
       expandUnits,
       mailable,
@@ -33,6 +34,11 @@ class SearchAPI {
       }
     }
 
+    // replace countryCode with country
+    if (countryCode && !country) {
+      country = countryCode;
+    }
+
     const response: any = await Http.request({
       method: 'GET',
       path: 'search/autocomplete',
@@ -41,7 +47,7 @@ class SearchAPI {
         near,
         limit,
         layers,
-        countryCode,
+        country,
         expandUnits,
         mailable,
       },

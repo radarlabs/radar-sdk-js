@@ -348,6 +348,8 @@ export interface RadarAutocompleteParams {
   near?: Location | string;
   limit?: number;
   layers?: RadarGeocodeLayer[];
+  country?: string;
+  /** @deprecated use country */
   countryCode?: string;
   /** @deprecated this is always true, regardless of the value passed here */
   expandUnits?: boolean;
@@ -535,10 +537,13 @@ export interface RadarAutocompleteUIOptions {
   container: string | HTMLElement;
   near?: string | Location; // bias for location results
   debounceMS?: number, // Debounce time in milliseconds
-  threshold?: number, // DEPRECATED(use minCharacters instead)
+  /** deprecated use minCharacters */
+  threshold?: number,
   minCharacters?: number, // Minimum number of characters to trigger autocomplete
   limit?: number, // Maximum number of autocomplete results
   layers?: RadarGeocodeLayer[];
+  country?: string;
+  /** @deprecated use country */
   countryCode?: string;
   expandUnits?: boolean;
   mailable?: boolean;

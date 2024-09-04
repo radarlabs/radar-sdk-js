@@ -247,13 +247,17 @@ class AutocompleteUI {
   }
 
   public async fetchResults(query: string) {
-    const { limit, layers, countryCode, expandUnits, mailable, onRequest } = this.config;
+    let { limit, layers, country, countryCode, expandUnits, mailable, onRequest } = this.config;
+
+    if (countryCode && !country) {
+      country = countryCode;
+    }
 
     const params: RadarAutocompleteParams = {
       query,
       limit,
       layers,
-      countryCode,
+      country,
       expandUnits,
       mailable,
     }
