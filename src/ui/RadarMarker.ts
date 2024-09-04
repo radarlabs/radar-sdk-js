@@ -249,11 +249,14 @@ class RadarMarker extends maplibregl.Marker {
   addTo(map: RadarMap) {
     // use default marker associated with map style, if none is provided in options
     // (and custom style has an associated marker)
-    if (!this._options.url && !this._options.marker && map._defaultMarker) {
-      this.getCustomImage({
-        ...this._options,
-        marker: map._defaultMarker,
-      });
+    const markerOptions = this._options;
+    if (!markerOptions.url && !markerOptions.marker && !markerOptions.color) {
+      if (map._defaultMarker) {
+        this.getCustomImage({
+          ...markerOptions,
+          marker: map._defaultMarker,
+        });
+      }
     }
 
     map.addMarker(this);
