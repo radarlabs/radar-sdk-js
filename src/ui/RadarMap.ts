@@ -80,6 +80,7 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
   _features: RadarMapFeature[] = [];
+  _defaultMarker?: string;
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
@@ -152,6 +153,16 @@ class RadarMap extends maplibregl.Map {
     };
     this.on('resize', onResize);
     this.on('load', onResize);
+
+    // parse radar metadata from style
+    this.on('style.load', () => {
+      const style = this.getStyle();
+      const metadata: any = style.metadata || {};
+
+      if (metadata['radar:marker']) { // default marker associated with custom style
+        this._defaultMarker = metadata['radar:marker'];
+      }
+    });
   }
 
   addMarker(marker: RadarMarker) {
