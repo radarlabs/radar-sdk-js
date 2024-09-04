@@ -89,6 +89,7 @@ const defaultMarkerOptions: RadarMarkerOptions = {
 };
 
 class RadarMarker extends maplibregl.Marker {
+  _options: RadarMarkerOptions;
   _map!: RadarMap;
 
   constructor(markerOptions: RadarMarkerOptions) {
@@ -107,83 +108,11 @@ class RadarMarker extends maplibregl.Marker {
 
     super(maplibreOptions);
 
+    this._options = markerOptions;
+
     // handle marker images (Radar marker, or custom URL)
     if (markerOptions.marker || markerOptions.url) {
-      const originalElement = this._element.cloneNode(true);
-      this._element.childNodes.forEach((child) => {
-        child.remove();
-      });
-
-      const onSuccess = (blob: Blob) => {
-        const markerObject = URL.createObjectURL(blob);
-        this._element.replaceChildren(createImageElement({
-          width: markerOptions.width,
-          height: markerOptions.height,
-          url: markerObject,
-        }));
-      };
-
-      const onError = (err: any) => {
-        Logger.error(`Could not load marker: ${err.message} - falling back to default marker`);
-        IMAGE_CACHE.set(markerOptions.url as string, 'failed'); // mark as failed
-        this._element.replaceChildren(...Array.from(originalElement.childNodes));
-      }
-
-      // custom URL image
-      if (markerOptions.url) {
-        const loadImage = () => { // fetch marker data from URL
-          fetch(markerOptions.url as string)
-            .then(res => {
-              if (res.status === 200) {
-                res.blob()
-                  .then((data) => {
-                    IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
-                    onSuccess(data);
-                  })
-                  .catch(onError);
-              } else {
-                onError(new Error(res.statusText));
-              }
-            })
-            .catch(onError)
-        };
-
-        // attempt to use cached data, otherwise fetch marker image data from URL
-        useCachedImage(markerOptions.url)
-          .then(onSuccess)
-          .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
-            if (reason !== 'miss') {
-              Logger.debug(`RadarMarker: cache lookup for ${markerOptions.url}: ${reason}`);
-            }
-            loadImage();
-          });
-      }
-
-      // Radar hosted image
-      if (markerOptions.marker) {
-        const loadMarker = () => {
-          Http.request({
-            method: 'GET',
-            version: 'maps',
-            path: `markers/${markerOptions.marker}`,
-            responseType: 'blob',
-          })
-            .then(({ data }) => {
-              IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
-              onSuccess(data)
-            })
-            .catch(onError);
-        };
-
-        useCachedImage(markerOptions.marker as string)
-          .then(onSuccess)
-          .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
-            if (reason !== 'miss') {
-              Logger.debug(`RadarMarker: cache lookup for ${markerOptions.marker} ${reason}`);
-            }
-            loadMarker();
-          });
-      }
+      this.getCustomImage(markerOptions);
     }
 
     // handle deprecated popup options
@@ -238,7 +167,95 @@ class RadarMarker extends maplibregl.Marker {
     }
   }
 
+  // load marker image from a URL or as a Radar asset (custom styles)
+  getCustomImage(markerOptions: RadarMarkerOptions) {
+    const originalElement = this._element.cloneNode(true);
+    this._element.childNodes.forEach((child) => {
+      child.remove();
+    });
+
+    const onSuccess = (blob: Blob) => {
+      const markerObject = URL.createObjectURL(blob);
+      this._element.replaceChildren(createImageElement({
+        width: markerOptions.width,
+        height: markerOptions.height,
+        url: markerObject,
+      }));
+    };
+
+    const onError = (err: any) => {
+      Logger.error(`Could not load marker: ${err.message} - falling back to default marker`);
+      IMAGE_CACHE.set(markerOptions.url as string, 'failed'); // mark as failed
+      this._element.replaceChildren(...Array.from(originalElement.childNodes));
+    }
+
+    // custom URL image
+    if (markerOptions.url) {
+      const loadImage = () => { // fetch marker data from URL
+        fetch(markerOptions.url as string)
+          .then(res => {
+            if (res.status === 200) {
+              res.blob()
+                .then((data) => {
+                  IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
+                  onSuccess(data);
+                })
+                .catch(onError);
+            } else {
+              onError(new Error(res.statusText));
+            }
+          })
+          .catch(onError)
+      };
+
+      // attempt to use cached data, otherwise fetch marker image data from URL
+      useCachedImage(markerOptions.url)
+        .then(onSuccess)
+        .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
+          if (reason !== 'miss') {
+            Logger.debug(`RadarMarker: cache lookup for ${markerOptions.url}: ${reason}`);
+          }
+          loadImage();
+        });
+    }
+
+    // Radar hosted image
+    if (markerOptions.marker) {
+      const loadMarker = () => {
+        Http.request({
+          method: 'GET',
+          version: 'maps',
+          path: `markers/${markerOptions.marker}`,
+          responseType: 'blob',
+        })
+          .then(({ data }) => {
+            IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
+            onSuccess(data)
+          })
+          .catch(onError);
+      };
+
+      useCachedImage(markerOptions.marker as string)
+        .then(onSuccess)
+        .catch((reason: 'miss' | 'timedout' | 'failed' | Error) => {
+          if (reason !== 'miss') {
+            Logger.debug(`RadarMarker: cache lookup for ${markerOptions.marker} ${reason}`);
+          }
+          loadMarker();
+        });
+    }
+  }
+
   addTo(map: RadarMap) {
+    // use default marker associated with map style, if none is provided in options
+    // (and custom style has an associated marker)
+    if (!this._options.url && !this._options.marker && map._defaultMarker) {
+      this.getCustomImage({
+        ...this._options,
+        marker: map._defaultMarker,
+      });
+    }
+
     map.addMarker(this);
     return super.addTo(map);
   }
