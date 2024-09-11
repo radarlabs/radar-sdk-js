@@ -227,7 +227,7 @@ class RadarMarker extends maplibregl.Marker {
         if (this.getPopup()) {
           // close any other open popups
           (this._map.getMarkers() || []).forEach((otherMarker) => {
-            if (otherMarker.getPopup().isOpen()) {
+            if (otherMarker.getPopup()?.isOpen()) {
               otherMarker.togglePopup();
             }
           });
