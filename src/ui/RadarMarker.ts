@@ -229,7 +229,7 @@ class RadarMarker extends maplibregl.Marker {
           responseType: 'blob',
         })
           .then(({ data }) => {
-            IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
+            IMAGE_CACHE.set(markerOptions.marker as string, data); // cache data
             onSuccess(data)
           })
           .catch(onError);
