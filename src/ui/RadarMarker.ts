@@ -30,9 +30,9 @@ interface ImageOptions {
 }
 
 // cache URL loaded markers
-const IMAGE_CACHE = new Map<string, 'pending' | 'failed' | Blob>();
+const IMAGE_CACHE = new Map<string, string>();
 
-const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<Blob> => new Promise((resolve, reject) => {
+const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<string> => new Promise((resolve, reject) => {
   if (!IMAGE_CACHE.has(url)) { // nothing in cache
     IMAGE_CACHE.set(url, 'pending'); // request in flight
     return reject('miss');
@@ -50,9 +50,9 @@ const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<Blob> =>
       clearInterval(interval);
       reject('failed');
 
-    } else { // return data
+    } else if (cachedData !== undefined) { // return data
       clearInterval(interval);
-      resolve(cachedData as Blob);
+      resolve(cachedData);
     }
   }, 100);
 });
@@ -114,12 +114,11 @@ class RadarMarker extends maplibregl.Marker {
         child.remove();
       });
 
-      const onSuccess = (blob: Blob) => {
-        const markerObject = URL.createObjectURL(blob);
+      const onSuccess = (url: string) => {
         this._element.replaceChildren(createImageElement({
           width: markerOptions.width,
           height: markerOptions.height,
-          url: markerObject,
+          url,
         }));
       };
 
@@ -137,8 +136,9 @@ class RadarMarker extends maplibregl.Marker {
               if (res.status === 200) {
                 res.blob()
                   .then((data) => {
-                    IMAGE_CACHE.set(markerOptions.url as string, data); // cache data
-                    onSuccess(data);
+                    const url = URL.createObjectURL(data);
+                    IMAGE_CACHE.set(markerOptions.url as string, url); // cache data
+                    onSuccess(url);
                   })
                   .catch(onError);
               } else {
@@ -169,8 +169,9 @@ class RadarMarker extends maplibregl.Marker {
             responseType: 'blob',
           })
             .then(({ data }) => {
-              IMAGE_CACHE.set(markerOptions.marker as string, data); // cache data
-              onSuccess(data)
+              const url = URL.createObjectURL(data);
+              IMAGE_CACHE.set(markerOptions.marker as string, url); // cache data
+              onSuccess(url)
             })
             .catch(onError);
         };
