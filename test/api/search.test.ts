@@ -13,7 +13,6 @@ describe('Search', () => {
   const radius = 100;
   const chains = ['dunkin', 'sbucks'];
   const categories = ['coffee-shop'];
-  const groups = ['airport'];
   const tags = ['geofence-tag'];
   const metadata = { 'geofence-metadata-key': 'geofence-metadata-value' };
   const layers: RadarGeocodeLayer[] = ['address'];
@@ -69,7 +68,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.searchPlaces({ near, radius, chains, categories, groups, limit })
+        const response = await Search.searchPlaces({ near, radius, chains, categories, limit })
         const validateResponse = getResponseWithDebug(options.debug, placesResponse, placesResponse);
         expect(response).toEqual(validateResponse);
       });
