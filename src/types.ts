@@ -270,6 +270,7 @@ export type RadarGeocodeLayer =
   | 'address'
   | 'postalCode'
   | 'locality'
+  | 'neighborhood'
   | 'county'
   | 'state'
   | 'country'
@@ -302,8 +303,22 @@ export interface RadarAddress {
   street?: string;
 }
 
+export interface RadarTimeZone {
+  id: string;
+  name: string;
+  code: string;
+  currentTime: string;
+  utcOffset: number;
+  dstOffset: number;
+}
+
 export interface RadarAutocompleteAddress extends RadarAddress {
   unit?: string;
+}
+
+export interface RadarGeocodeAddress extends RadarAddress {
+  unit?: string;
+  timeZone?: RadarTimeZone;
 }
 
 export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F' | undefined;
@@ -325,6 +340,7 @@ export interface RadarForwardGeocodeParams {
   query: string;
   layers?: RadarGeocodeLayer[];
   country?: string;
+  lang?: string;
 }
 
 export interface RadarReverseGeocodeParams {
@@ -333,13 +349,13 @@ export interface RadarReverseGeocodeParams {
   layers?: RadarGeocodeLayer[];
 }
 
-export interface RadarGeocodeResponse  extends RadarResponse {
-  addresses: RadarAddress[];
+export interface RadarGeocodeResponse extends RadarResponse {
+  addresses: RadarGeocodeAddress[];
 }
 
 export interface RadarIPGeocodeResponse extends RadarResponse {
   ip: string;
-  address?: RadarAddress;
+  address?: RadarGeocodeAddress;
   proxy?: boolean;
 }
 
@@ -352,6 +368,7 @@ export interface RadarAutocompleteParams {
   /** @deprecated this is always true, regardless of the value passed here */
   expandUnits?: boolean;
   mailable?: boolean;
+  lang?: string;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
