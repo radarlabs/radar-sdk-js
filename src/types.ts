@@ -548,17 +548,12 @@ export interface RadarPolygonOptions {
     'border-opacity'?: number;
   },
 }
-export interface RadarAutocompleteUIOptions {
+export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams, 'query'> {
   container: string | HTMLElement;
-  near?: string | Location; // bias for location results
   debounceMS?: number, // Debounce time in milliseconds
-  threshold?: number, // DEPRECATED(use minCharacters instead)
+  /** @deprecated use minCharacters instead */
+  threshold?: number,
   minCharacters?: number, // Minimum number of characters to trigger autocomplete
-  limit?: number, // Maximum number of autocomplete results
-  layers?: RadarGeocodeLayer[];
-  countryCode?: string;
-  expandUnits?: boolean;
-  mailable?: boolean;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
   onRequest?: (params: RadarAutocompleteParams) => void,
@@ -574,7 +569,6 @@ export interface RadarAutocompleteUIOptions {
 }
 
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
-  container: string | HTMLElement;
   debounceMS: number, // Debounce time in milliseconds
   threshold: number, // DEPRECATED(use minCharacters instead)
   minCharacters: number, // Minimum number of characters to trigger autocomplete
