@@ -13,7 +13,7 @@ class Geocoding {
   static async forwardGeocode(params: RadarForwardGeocodeParams): Promise<RadarGeocodeResponse> {
     const options = Config.get();
 
-    const { query, layers, country, lang} = params;
+    const { query, layers, country, lang } = params;
 
     const response: any = await Http.request({
       method: 'GET',
