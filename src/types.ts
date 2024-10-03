@@ -270,6 +270,7 @@ export type RadarGeocodeLayer =
   | 'address'
   | 'postalCode'
   | 'locality'
+  | 'neighborhood'
   | 'county'
   | 'state'
   | 'country'
@@ -302,8 +303,22 @@ export interface RadarAddress {
   street?: string;
 }
 
+export interface RadarTimeZone {
+  id: string;
+  name: string;
+  code: string;
+  currentTime: string;
+  utcOffset: number;
+  dstOffset: number;
+}
+
 export interface RadarAutocompleteAddress extends RadarAddress {
   unit?: string;
+}
+
+export interface RadarGeocodeAddress extends RadarAddress {
+  unit?: string;
+  timeZone?: RadarTimeZone;
 }
 
 export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F' | undefined;
@@ -325,6 +340,7 @@ export interface RadarForwardGeocodeParams {
   query: string;
   layers?: RadarGeocodeLayer[];
   country?: string;
+  lang?: string;
 }
 
 export interface RadarReverseGeocodeParams {
@@ -333,13 +349,13 @@ export interface RadarReverseGeocodeParams {
   layers?: RadarGeocodeLayer[];
 }
 
-export interface RadarGeocodeResponse  extends RadarResponse {
-  addresses: RadarAddress[];
+export interface RadarGeocodeResponse extends RadarResponse {
+  addresses: RadarGeocodeAddress[];
 }
 
 export interface RadarIPGeocodeResponse extends RadarResponse {
   ip: string;
-  address?: RadarAddress;
+  address?: RadarGeocodeAddress;
   proxy?: boolean;
 }
 
@@ -352,6 +368,7 @@ export interface RadarAutocompleteParams {
   /** @deprecated this is always true, regardless of the value passed here */
   expandUnits?: boolean;
   mailable?: boolean;
+  lang?: string;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
@@ -531,17 +548,12 @@ export interface RadarPolygonOptions {
     'border-opacity'?: number;
   },
 }
-export interface RadarAutocompleteUIOptions {
+export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams, 'query'> {
   container: string | HTMLElement;
-  near?: string | Location; // bias for location results
   debounceMS?: number, // Debounce time in milliseconds
-  threshold?: number, // DEPRECATED(use minCharacters instead)
+  /** @deprecated use minCharacters instead */
+  threshold?: number,
   minCharacters?: number, // Minimum number of characters to trigger autocomplete
-  limit?: number, // Maximum number of autocomplete results
-  layers?: RadarGeocodeLayer[];
-  countryCode?: string;
-  expandUnits?: boolean;
-  mailable?: boolean;
   placeholder?: string, // Placeholder text for the input field
   onSelection?: (selection: any) => void,
   onRequest?: (params: RadarAutocompleteParams) => void,
@@ -557,7 +569,6 @@ export interface RadarAutocompleteUIOptions {
 }
 
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
-  container: string | HTMLElement;
   debounceMS: number, // Debounce time in milliseconds
   threshold: number, // DEPRECATED(use minCharacters instead)
   minCharacters: number, // Minimum number of characters to trigger autocomplete

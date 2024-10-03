@@ -23,6 +23,7 @@ class SearchAPI {
       countryCode,
       expandUnits,
       mailable,
+      lang,
     } = params;
 
     // near can be provided as a string or Location object
@@ -44,6 +45,7 @@ class SearchAPI {
         countryCode,
         expandUnits,
         mailable,
+        lang,
       },
       requestId,
     });
