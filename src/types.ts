@@ -76,8 +76,16 @@ export interface RadarTrackParams {
   fraud?: boolean;
 }
 
+export interface RadarTrackVerifiedParams {
+  userId?: string;
+  description?: string;
+  metadata?: RadarMetadata;
+  skipVerifyApp?: boolean;
+}
+
 export interface RadarStartTrackingVerifiedParams {
   interval: number;
+  skipVerifyApp?: boolean;
 }
 
 export enum RadarEventConfidence {
