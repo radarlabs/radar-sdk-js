@@ -158,7 +158,7 @@ class VerifyAPI {
     }
   }
 
-  static async getVerifiedLocationToken() {
+  static async getVerifiedLocationToken(params: RadarTrackVerifiedParams) {
     const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
 
     if (lastToken) {
@@ -167,7 +167,7 @@ class VerifyAPI {
       }
     }
 
-    return this.trackVerified({});
+    return this.trackVerified(params);
   }
 
   static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {

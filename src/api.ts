@@ -142,8 +142,8 @@ class Radar {
     return VerifyAPI.stopTrackingVerified();
   }
 
-  public static getVerifiedLocationToken() {
-    return VerifyAPI.getVerifiedLocationToken();
+  public static getVerifiedLocationToken(params: RadarTrackVerifiedParams = {}) {
+    return VerifyAPI.getVerifiedLocationToken(params);
   }
 
   public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
