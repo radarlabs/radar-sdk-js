@@ -5,8 +5,9 @@ import Http from '../http';
 import Logger from '../logger';
 import Session from '../session';
 import Storage from '../storage';
+import TrackAPI from './track';
 
-import type { RadarStartTrackingVerifiedParams, RadarTrackParams, RadarTrackVerifiedResponse } from '../types';
+import type { RadarStartTrackingVerifiedParams, RadarTrackVerifiedParams, RadarTrackVerifiedResponse } from '../types';
 
 let tokenTimeoutId: any | null = null;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
@@ -16,13 +17,15 @@ let expectedCountryCode: string | null = null;
 let expectedStateCode: string | null = null;
 
 class VerifyAPI {
-  static async trackVerified(params: RadarTrackParams, encrypted: Boolean = false) {
+  static async trackVerified(params: RadarTrackVerifiedParams, encrypted: Boolean = false) {
     const options = Config.get();
+
+    const { skipVerifyApp } = params;
 
     // user indentification fields
     const userId = params.userId || Storage.getItem(Storage.USER_ID);
-    const deviceId = params.deviceId || Device.getDeviceId();
-    const installId = params.installId || Device.getInstallId();
+    const deviceId = Device.getDeviceId();
+    const installId = Device.getInstallId();
     const sessionId = Session.getSessionId();
     const description = params.description || Storage.getItem(Storage.DESCRIPTION);
 
@@ -36,59 +39,69 @@ class VerifyAPI {
     // other info
     const metadata = params.metadata || Storage.getJSON(Storage.METADATA);
 
-    const body = {
-      ...params,
-      description,
-      deviceId,
-      foreground: true,
-      installId,
-      sessionId,
-      metadata,
-      sdkVersion: SDK_VERSION,
-      stopped: true,
-      userId,
-      encrypted,
-      expectedCountryCode,
-      expectedStateCode,
-    };
-
-    let userAgent = navigator.userAgent;
-    const apple = userAgent && (userAgent.toLowerCase().includes('mac') || userAgent.toLowerCase().includes('iphone') || userAgent.toLowerCase().includes('ipod') || userAgent.toLowerCase().includes('ipad'));
-
-    const response: any = await Http.request({
-      method: 'GET',
-      path: 'verify',
-      data: body,
-      host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
-    });
-
-    let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
-    let location;
-    if (user && user.location && user.location.coordinates && user.locationAccuracy) {
-      location = {
-        latitude: user.location.coordinates[1],
-        longitude: user.location.coordinates[0],
-        accuracy: user.locationAccuracy,
+    let trackRes: RadarTrackVerifiedResponse;
+    if (skipVerifyApp) {
+      trackRes = await TrackAPI.trackOnce({
+        userId: userId ?? undefined,
+        description: description ?? undefined,
+        metadata: metadata,
+        fraud: true,
+      });
+    } else {
+      const body = {
+        ...params,
+        description,
+        deviceId,
+        foreground: true,
+        installId,
+        sessionId,
+        metadata,
+        sdkVersion: SDK_VERSION,
+        stopped: true,
+        userId,
+        encrypted,
+        expectedCountryCode,
+        expectedStateCode,
       };
-    }
-    if (expiresAt) {
-      expiresAt = new Date(expiresAt);
-    }
-
-    const trackRes = {
-      user,
-      events,
-      location,
-      token,
-      expiresAt,
-      expiresIn,
-      passed,
-      failureReasons,
-      _id,
-    } as RadarTrackVerifiedResponse;
-
-    if (options.debug) {
-      trackRes.response = response;
+  
+      let userAgent = navigator.userAgent;
+      const apple = userAgent && (userAgent.toLowerCase().includes('mac') || userAgent.toLowerCase().includes('iphone') || userAgent.toLowerCase().includes('ipod') || userAgent.toLowerCase().includes('ipad'));
+  
+      const response: any = await Http.request({
+        method: 'GET',
+        path: 'verify',
+        data: body,
+        host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
+      });
+  
+      let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
+      let location;
+      if (user && user.location && user.location.coordinates && user.locationAccuracy) {
+        location = {
+          latitude: user.location.coordinates[1],
+          longitude: user.location.coordinates[0],
+          accuracy: user.locationAccuracy,
+        };
+      }
+      if (expiresAt) {
+        expiresAt = new Date(expiresAt);
+      }
+  
+      trackRes = {
+        user,
+        events,
+        location,
+        token,
+        expiresAt,
+        expiresIn,
+        passed,
+        failureReasons,
+        _id,
+      } as RadarTrackVerifiedResponse;
+  
+      if (options.debug) {
+        trackRes.response = response;
+      }
     }
 
     lastToken = trackRes;
@@ -103,7 +116,9 @@ class VerifyAPI {
 
   static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
     const doTrackVerified = async () => {
-      const trackRes = await this.trackVerified({});
+      const trackRes = await this.trackVerified({
+        ...params,
+      });
 
       const { interval } = params;
 

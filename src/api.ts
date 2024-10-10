@@ -31,6 +31,7 @@ import type {
   RadarSearchPlacesParams,
   RadarStartTrackingVerifiedParams,
   RadarTrackParams,
+  RadarTrackVerifiedParams,
   RadarTrackVerifiedResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
@@ -129,7 +130,7 @@ class Radar {
     }
   }
 
-  public static trackVerified(params: RadarTrackParams = {}) {
+  public static trackVerified(params: RadarTrackVerifiedParams = {}) {
     return VerifyAPI.trackVerified(params);
   }
 
