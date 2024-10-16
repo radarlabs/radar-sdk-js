@@ -1,6 +1,6 @@
 ## Migrating from 3.x to 4.x
 
-Radar JS SDK 4.0 is a complete re-write of the existing SDK in Typescript, with exposed bindings to all functions and objects. It's also written to take advantage of modern JS best pracices such as ES Modules, and using `async/await` for Promise-based functions.
+Radar JS SDK 4.0 is a complete re-write of the existing SDK in Typescript, with exposed bindings to all functions and objects. It's also written to take advantage of modern JS best practices such as ES Modules, and using `async/await` for Promise-based functions.
 
 In addition, 4.0 also introduces Radar UI Kits. These are out-of-the-box components that allow you to easily create web-based experiences that leverage Radar apis, including Maps and Autocomplete inputs, with more to come in future releases.
 
@@ -66,7 +66,7 @@ Radar.trackOnce()
 ### Error handling
 
 As mentioned in the async/await examples above, errors are now `thrown` objects to be handled instead of strings returned with the response. As such, Errors now contain more helpful debugging info including:
-* Strack trace of where error occured
+* Stack trace of where error occurred
 * More descriptive error messages (`err.message`)
 * HTTP Error codes (`err.code`)
 * API response details about what failed (`err.response`)

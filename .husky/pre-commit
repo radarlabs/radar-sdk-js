@@ -1,0 +1,1 @@
+npm exec --no -- lint-staged --no-stash
