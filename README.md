@@ -30,7 +30,7 @@
 
 ### With npm
 
-> **Note:** The Radar JS SDK has a peer depdendency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
+> **Note:** The Radar JS SDK has a peer dependency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
 
 Add the `radar-sdk-js` and `maplibre-gl` packages
 ```bash
