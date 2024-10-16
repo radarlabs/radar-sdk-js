@@ -159,7 +159,7 @@ class VerifyAPI {
   static async getVerifiedLocationToken(params: RadarTrackVerifiedParams) {
     const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
 
-    if (lastToken) {
+    if (lastToken && lastToken.passed) {
       if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
         return lastToken;
       }
