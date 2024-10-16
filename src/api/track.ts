@@ -111,6 +111,7 @@ class TrackAPI {
 
       let sclVal = -1;
       let cslVal = -1;
+      /*
       try {
         const [sclRes, csl] = await Promise.all([
           Http.request({
@@ -126,6 +127,7 @@ class TrackAPI {
       } catch (err) {
         // do nothing, send scl = -1 and csl = -1
       }
+        */
 
       const payload = {
         payload: JSON.stringify({
