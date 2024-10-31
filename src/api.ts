@@ -76,7 +76,7 @@ class Radar {
 
     Logger.info(`initialized with ${live ? 'live' : 'test'} publishableKey.`);
     if (options.debug) {
-      Logger.info(`using options: ${JSON.stringify(options)}`);
+      Logger.debug('using options', options);
     }
 
     // NOTE(jasonl): this allows us to run jest tests
