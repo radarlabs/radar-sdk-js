@@ -77,17 +77,6 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   return mapOptions.style; // style object or URL
 };
 
-const logMapOptions = (options: RadarOptions, mapOptions: RadarMapOptions) => {
-  if (options.debug) {
-    const optionsCopy: any = structuredClone(mapOptions);
-    if (typeof optionsCopy?.container !== 'string') {
-      // BUGFIX: remove circular references when using react ref as container
-      delete optionsCopy.container;
-    }
-    Logger.debug(`initialize map with options: ${JSON.stringify(optionsCopy)}`);
-  }
-};
-
 class RadarMap extends maplibregl.Map {
   _markers: RadarMarker[] = [];
   _features: RadarMapFeature[] = [];
@@ -107,7 +96,7 @@ class RadarMap extends maplibregl.Map {
       radarMapOptions,
       { style },
     );
-    logMapOptions(config, mapOptions);
+    Logger.debug('map initailized with options', mapOptions);
 
     (mapOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
       // this handles when a style is switched

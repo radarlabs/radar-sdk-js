@@ -27,9 +27,9 @@ const getLevel = (): number => {
 }
 
 class Logger {
-  public static debug(message: string) {
+  public static debug(message: string, options?: any) {
     if (getLevel() === LOG_LEVELS.debug) {
-      console.log(`Radar SDK (debug): ${message.trim()}`);
+      console.log(`Radar SDK (debug): ${message.trim()}`, options);
     }
   }
 

@@ -186,7 +186,7 @@ class AutocompleteUI {
       this.inputField.addEventListener('blur', this.close.bind(this), true);
     }
 
-    Logger.debug(`AutocompleteUI iniailized with options: ${JSON.stringify(this.config)}`);
+    Logger.debug('AutocompleteUI initialized with options', this.config);
   }
 
   public handleInput() {
