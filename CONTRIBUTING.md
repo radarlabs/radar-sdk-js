@@ -46,7 +46,7 @@ Then in your project that has `radar-sdk-js` in its `package.json`
 ```bash
 npm link radar-sdk-js
 ```
-This will point the pakage in your project to use the local version of the SDK.
+This will point the package in your project to use the local version of the SDK.
 
 **Note**: Make sure you're using the node.js & npm installations in both projects, especially if you're using a node manager like `nvm` or `n`.
 
