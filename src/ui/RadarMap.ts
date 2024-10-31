@@ -96,7 +96,7 @@ class RadarMap extends maplibregl.Map {
       radarMapOptions,
       { style },
     );
-    Logger.debug(`initialize map with options: ${JSON.stringify(mapOptions)}`);
+    Logger.debug('map initailized with options', mapOptions);
 
     (mapOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
       // this handles when a style is switched

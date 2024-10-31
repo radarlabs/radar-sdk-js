@@ -31,6 +31,7 @@ import type {
   RadarSearchPlacesParams,
   RadarStartTrackingVerifiedParams,
   RadarTrackParams,
+  RadarTrackVerifiedParams,
   RadarTrackVerifiedResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
@@ -75,7 +76,7 @@ class Radar {
 
     Logger.info(`initialized with ${live ? 'live' : 'test'} publishableKey.`);
     if (options.debug) {
-      Logger.info(`using options: ${JSON.stringify(options)}`);
+      Logger.debug('using options', options);
     }
 
     // NOTE(jasonl): this allows us to run jest tests
@@ -129,7 +130,7 @@ class Radar {
     }
   }
 
-  public static trackVerified(params: RadarTrackParams = {}) {
+  public static trackVerified(params: RadarTrackVerifiedParams = {}) {
     return VerifyAPI.trackVerified(params);
   }
 
@@ -141,8 +142,8 @@ class Radar {
     return VerifyAPI.stopTrackingVerified();
   }
 
-  public static getVerifiedLocationToken() {
-    return VerifyAPI.getVerifiedLocationToken();
+  public static getVerifiedLocationToken(params: RadarTrackVerifiedParams = {}) {
+    return VerifyAPI.getVerifiedLocationToken(params);
   }
 
   public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
