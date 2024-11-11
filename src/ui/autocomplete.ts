@@ -247,7 +247,7 @@ class AutocompleteUI {
   }
 
   public async fetchResults(query: string) {
-    const { limit, layers, countryCode, expandUnits, mailable, onRequest } = this.config;
+    const { limit, layers, countryCode, expandUnits, mailable, lang, postalCode, onRequest } = this.config;
 
     const params: RadarAutocompleteParams = {
       query,
@@ -256,6 +256,8 @@ class AutocompleteUI {
       countryCode,
       expandUnits,
       mailable,
+      lang,
+      postalCode,
     }
 
     if (this.near) {
@@ -527,6 +529,24 @@ class AutocompleteUI {
 
   public setLimit(limit: number) {
     this.config.limit = limit;
+    return this;
+  }
+
+  public setLang(lang: string | undefined | null) {
+    if (lang === undefined || lang === null) {
+      this.config.lang = undefined;
+    } else if (typeof lang === 'string') {
+      this.config.lang = lang;
+    }
+    return this;
+  }
+
+  public setPostalCode(postalCode: string | undefined | null) {
+    if (postalCode === undefined || postalCode === null) {
+      this.config.postalCode = undefined;
+    } else if (typeof postalCode === 'string') {
+      this.config.postalCode = postalCode;
+    }
     return this;
   }
 
