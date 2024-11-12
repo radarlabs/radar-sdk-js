@@ -509,14 +509,22 @@ class AutocompleteUI {
     return this;
   }
 
-  public setWidth(width: number | string) {
-    this.config.width = width;
+  public setWidth(width: number | string | null) {
+    if (width === null) {
+      this.config.width = undefined;
+    } else if (typeof width === 'string' || typeof width === 'number') {
+      this.config.width = width;
+    }
     setWidth(this.wrapper, this.config);
     return this;
   }
 
-  public setMaxHeight(height: number | string) {
-    this.config.maxHeight = height;
+  public setMaxHeight(height: number | string | null) {
+    if (height === null) {
+      this.config.maxHeight = undefined;
+    } else if (typeof height === 'string' || typeof height === 'number') {
+      this.config.maxHeight = height;
+    }
     setHeight(this.resultsList, this.config);
     return this;
   }
@@ -532,8 +540,8 @@ class AutocompleteUI {
     return this;
   }
 
-  public setLang(lang: string | undefined | null) {
-    if (lang === undefined || lang === null) {
+  public setLang(lang: string | null) {
+    if (lang === null) {
       this.config.lang = undefined;
     } else if (typeof lang === 'string') {
       this.config.lang = lang;
@@ -541,8 +549,8 @@ class AutocompleteUI {
     return this;
   }
 
-  public setPostalCode(postalCode: string | undefined | null) {
-    if (postalCode === undefined || postalCode === null) {
+  public setPostalCode(postalCode: string | null) {
+    if (postalCode === null) {
       this.config.postalCode = undefined;
     } else if (typeof postalCode === 'string') {
       this.config.postalCode = postalCode;
