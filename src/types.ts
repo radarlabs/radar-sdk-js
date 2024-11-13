@@ -377,6 +377,7 @@ export interface RadarAutocompleteParams {
   expandUnits?: boolean;
   mailable?: boolean;
   lang?: string;
+  postalCode?: string;
 }
 
 export interface RadarAutocompleteResponse extends RadarResponse {
