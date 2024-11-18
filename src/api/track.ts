@@ -182,6 +182,10 @@ class TrackAPI {
         _id,
       } as RadarTrackVerifiedResponse;
 
+      if (user) {
+        Storage.setItem(Storage.ID, user._id);
+      }
+
       if (options.debug) {
         trackRes.response = response;
       }
@@ -189,6 +193,7 @@ class TrackAPI {
       return trackRes;
     }
 
+    // unverified track
     response = await Http.request({
       method: 'POST',
       path: 'track',
@@ -204,6 +209,8 @@ class TrackAPI {
       location,
     } as RadarTrackResponse;
 
+    Storage.setItem(Storage.ID, user?._id);
+    
     if (options.debug) {
       trackRes.response = response;
     }
