@@ -36,6 +36,7 @@ class TrackAPI {
     }
 
     // user indentification fields
+    const id = Storage.getItem(Storage.ID) || undefined; // `undefined` so it's removed from any fields
     const userId = params.userId || Storage.getItem(Storage.USER_ID);
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
@@ -84,6 +85,7 @@ class TrackAPI {
       userId,
       tripOptions,
       timeZone,
+      id,
     };
 
     let response: any;
@@ -99,6 +101,7 @@ class TrackAPI {
         method: 'GET',
         path: 'config',
         data: {
+          id,
           deviceId,
           installId,
           sessionId,
