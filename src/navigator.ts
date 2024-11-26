@@ -11,7 +11,7 @@ interface PositionOptionOverrides {
 
 const DEFAULT_POSITION_OPTIONS: PositionOptions = {
   maximumAge: 0,
-  timeout: 1000 * 30, // 30 seconds
+  timeout: 1000 * 10, // 10 seconds
   enableHighAccuracy: true,
 };
 
