@@ -119,8 +119,8 @@ class VerifyAPI {
       let trackRes;
       try {
         trackRes = await this.trackVerified(params);
-      } catch {
-        
+      } catch (err: any) {
+        Logger.error(`trackVerified error: ${err.message}`);
       }
       
       const { interval } = params;
