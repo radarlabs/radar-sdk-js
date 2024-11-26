@@ -116,8 +116,13 @@ class VerifyAPI {
 
   static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
     const doTrackVerified = async () => {
-      const trackRes = await this.trackVerified(params);
-
+      let trackRes;
+      try {
+        trackRes = await this.trackVerified(params);
+      } catch (err: any) {
+        Logger.error(`trackVerified error: ${err.message}`);
+      }
+      
       const { interval } = params;
 
       let expiresIn = 0;
