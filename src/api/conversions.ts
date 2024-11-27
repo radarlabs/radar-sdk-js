@@ -10,17 +10,20 @@ class ConversionsAPI {
     const options = Config.get();
 
     const name = params.name;
-    const userId = params.userId || Storage.getItem(Storage.USER_ID);
-    const deviceId = params.deviceId || Device.getDeviceId();
-    const installId = params.installId || Device.getInstallId();
     const metadata = params.metadata || {};
     const createdAt = params.createdAt;
 
+    const id = Storage.getItem(Storage.ID);
+    const userId = params.userId || Storage.getItem(Storage.USER_ID);
+    const deviceId = params.deviceId || Device.getDeviceId();
+    const installId = params.installId || Device.getInstallId();
+    
     if (params.revenue) {
       metadata.revenue = params.revenue;
     }
 
     const data: any = {
+      id,
       name,
       userId,
       deviceId,
