@@ -81,6 +81,7 @@ export interface RadarTrackVerifiedParams {
   description?: string;
   metadata?: RadarMetadata;
   skipVerifyApp?: boolean;
+  ipChanges?: boolean;
 }
 
 export interface RadarStartTrackingVerifiedParams {
