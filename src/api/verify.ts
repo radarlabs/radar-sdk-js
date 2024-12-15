@@ -103,11 +103,6 @@ class VerifyAPI {
       if (expiresAt) {
         expiresAt = new Date(expiresAt);
       }
-
-      if (params.ipChanges && user?.ip) {
-        lastIp = user?.ip;
-        Logger.info(`Setting ip to ${lastIp}`);
-      }
   
       trackRes = {
         user,
@@ -124,6 +119,11 @@ class VerifyAPI {
       if (options.debug) {
         trackRes.response = response;
       }
+    }
+
+    if (params.ipChanges && trackRes?.user?.ip) {
+      lastIp = trackRes?.user?.ip;
+      Logger.info(`Setting ip to ${lastIp}`);
     }
 
     lastToken = trackRes;
