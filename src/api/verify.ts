@@ -103,6 +103,11 @@ class VerifyAPI {
       if (expiresAt) {
         expiresAt = new Date(expiresAt);
       }
+
+      if (params.ipChanges && user?.ip) {
+        lastIp = user?.ip;
+        Logger.info(`Setting ip to ${lastIp}`);
+      }
   
       trackRes = {
         user,
@@ -151,11 +156,6 @@ class VerifyAPI {
 
       if (trackRes) {
         expiresIn = (trackRes.expiresIn || expiresIn);
-
-        if (params.ipChanges && trackRes.user?.ip) {
-          lastIp = trackRes.user?.ip;
-          Logger.info(`Setting ip to ${lastIp}`);
-        }
 
         // if expiresIn is shorter than interval, override interval
         minInterval = Math.min(expiresIn, interval);
