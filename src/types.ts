@@ -87,6 +87,7 @@ export interface RadarTrackVerifiedParams {
 export interface RadarStartTrackingVerifiedParams {
   interval: number;
   skipVerifyApp?: boolean;
+  ipChanges?: boolean;
 }
 
 export enum RadarEventConfidence {
@@ -218,6 +219,7 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  ip?: string;
 }
 
 export interface RadarTrackResponse extends RadarResponse {

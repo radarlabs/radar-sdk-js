@@ -132,6 +132,12 @@ class VerifyAPI {
   }
 
   static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    let { interval } = params;
+    if (!interval) {
+      interval = 60;
+      Logger.info(`interval not provided, using 60 seconds`);
+    }
+
     const doTrackVerified = async () => {
       let trackRes;
       try {
@@ -139,14 +145,17 @@ class VerifyAPI {
       } catch (err: any) {
         Logger.error(`trackVerified error: ${err.message}`);
       }
-      
-      const { interval } = params;
 
       let expiresIn = 0;
       let minInterval = interval;
 
       if (trackRes) {
         expiresIn = (trackRes.expiresIn || expiresIn);
+
+        if (params.ipChanges && trackRes.user?.ip) {
+          lastIp = trackRes.user?.ip;
+          Logger.info(`Setting ip to ${lastIp}`);
+        }
 
         // if expiresIn is shorter than interval, override interval
         minInterval = Math.min(expiresIn, interval);
