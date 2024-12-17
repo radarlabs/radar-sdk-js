@@ -15,8 +15,25 @@ let lastToken: RadarTrackVerifiedResponse | null = null;
 let lastTokenNow: number = 0;
 let expectedCountryCode: string | null = null;
 let expectedStateCode: string | null = null;
+let lastIp: string | null = null;
 
 class VerifyAPI {
+  static async ipChanged() {
+    const { ip }: any = await Http.request({
+      method: 'GET',
+      path: 'ping',
+    });
+
+    const ipChanged = ip !== lastIp;
+    if (ipChanged) {
+      Logger.info(`IP changed from ${lastIp} to ${ip}`);
+    }
+
+    lastIp = ip;
+
+    return ipChanged;
+  } 
+
   static async trackVerified(params: RadarTrackVerifiedParams, encrypted: Boolean = false) {
     const options = Config.get();
 
@@ -104,6 +121,11 @@ class VerifyAPI {
       }
     }
 
+    if (params.ipChanges && trackRes?.user?.ip) {
+      lastIp = trackRes?.user?.ip;
+      Logger.info(`Setting ip to ${lastIp}`);
+    }
+
     lastToken = trackRes;
     lastTokenNow = performance.now();
 
@@ -115,6 +137,12 @@ class VerifyAPI {
   }
 
   static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    let { interval } = params;
+    if (!interval) {
+      interval = 60;
+      Logger.info(`interval not provided, using 60 seconds`);
+    }
+
     const doTrackVerified = async () => {
       let trackRes;
       try {
@@ -122,8 +150,6 @@ class VerifyAPI {
       } catch (err: any) {
         Logger.error(`trackVerified error: ${err.message}`);
       }
-      
-      const { interval } = params;
 
       let expiresIn = 0;
       let minInterval = interval;
@@ -164,7 +190,12 @@ class VerifyAPI {
   static async getVerifiedLocationToken(params: RadarTrackVerifiedParams) {
     const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
 
-    if (lastToken && lastToken.passed) {
+    let ipChanged = false;
+    if (params.ipChanges) {
+      ipChanged = await this.ipChanged();
+    }
+
+    if (lastToken && lastToken.passed && !ipChanged) {
       if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
         return lastToken;
       }
