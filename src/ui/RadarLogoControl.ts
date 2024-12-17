@@ -12,6 +12,7 @@ class RadarLogoControl {
     this.link.id = 'radar-map-logo';
     this.link.href = 'https://radar.com?ref=powered_by_radar';
     this.link.target = '_blank';
+    this.link.style.pointerEvents = "auto";
     this.link.appendChild(img);
 
     return this.link;
