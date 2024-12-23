@@ -189,12 +189,16 @@ class Http {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
           reject(new RadarVerifyAppError());
         } else {
-          reject(new RadarServerError());
+          reject(new RadarNetworkError());
         }
       }
 
       xhr.ontimeout = function () {
-        reject(new RadarVerifyAppError());
+        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
+          reject(new RadarVerifyAppError());
+        } else {
+          reject(new RadarNetworkError());
+        }
       }
 
       xhr.send(JSON.stringify(body));
