@@ -18,7 +18,7 @@ let expectedStateCode: string | null = null;
 let lastIp: string | null = null;
 
 class VerifyAPI {
-  static async ipChanged() {
+  static async checkIpChanges() {
     const { ip }: any = await Http.request({
       method: 'GET',
       path: 'ping',
@@ -27,6 +27,8 @@ class VerifyAPI {
     const ipChanged = ip !== lastIp;
     if (ipChanged) {
       Logger.info(`IP changed from ${lastIp} to ${ip}`);
+      
+      lastToken = null;
     }
 
     lastIp = ip;
@@ -190,12 +192,11 @@ class VerifyAPI {
   static async getVerifiedLocationToken(params: RadarTrackVerifiedParams) {
     const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
 
-    let ipChanged = false;
     if (params.ipChanges) {
-      ipChanged = await this.ipChanged();
+      await this.checkIpChanges();
     }
 
-    if (lastToken && lastToken.passed && !ipChanged) {
+    if (lastToken && lastToken.passed) {
       if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
         return lastToken;
       }
