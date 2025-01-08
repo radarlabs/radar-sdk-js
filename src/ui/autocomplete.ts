@@ -182,8 +182,10 @@ class AutocompleteUI {
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
+    this.inputField.addEventListener('focus', this.handleFocus.bind(this));
+    // Handle blur to hide results, unless clicking on results
     if (this.config.hideResultsOnBlur) {
-      this.inputField.addEventListener('blur', this.close.bind(this), true);
+      this.inputField.addEventListener('blur', this.handleBlur.bind(this), true);
     }
 
     Logger.debug('AutocompleteUI initialized with options', this.config);
@@ -211,6 +213,38 @@ class AutocompleteUI {
           onError(error);
         }
       });
+  }
+
+  
+  
+  // Add the handleFocus method
+  public handleFocus() {
+    if (this.inputField.value.length >= this.config.minCharacters && this.results.length > 0) {
+      this.displayResults(this.results); // Redisplay previous results
+    }
+  }
+
+  // Update the blur handler to ensure it does not prematurely clear results
+  public handleBlur(event: FocusEvent) {
+    const relatedTarget = event.relatedTarget as HTMLElement;
+    const isClickOnResults = relatedTarget && this.resultsList.contains(relatedTarget);
+
+    if (!isClickOnResults) {
+      this.close();
+    }
+  }
+
+  // Modify the close method to avoid clearing results unnecessarily
+  public close() {
+    if (!this.isOpen) {
+      return;
+    }
+
+    this.inputField.setAttribute('aria-expanded', 'false');
+    this.inputField.setAttribute('aria-activedescendant', '');
+    this.resultsList.setAttribute('hidden', '');
+    this.highlightedIndex = -1;
+    this.isOpen = false;
   }
 
   public debounce(fn: Function, delay: number) {
@@ -355,24 +389,6 @@ class AutocompleteUI {
     this.inputField.setAttribute('aria-expanded', 'true');
     this.resultsList.removeAttribute('hidden');
     this.isOpen = true;
-  }
-
-  public close(e?: FocusEvent) {
-    if (!this.isOpen) {
-      return;
-    }
-
-    // run this code async to allow link click to propagate before blur
-    // (add 100ms delay if closed from link click)
-    const linkClick = e && (e.relatedTarget === this.poweredByLink);
-    setTimeout(() => {
-      this.inputField.setAttribute('aria-expanded', 'false');
-      this.inputField.setAttribute('aria-activedescendant', '');
-      this.resultsList.setAttribute('hidden', '');
-      this.highlightedIndex = -1;
-      this.isOpen = false;
-      this.clearResultsList();
-    }, linkClick ? 100 : 0);
   }
 
   public goTo(index: number) {
