@@ -89,7 +89,6 @@ class TrackAPI {
     let response: any;
     if (fraud) {
       const host = 'https://api-verified.radar.io';
-      const pingHost = 'ping.radar-verify.com';
 
       const lang = navigator.language;
       const langs = navigator.languages;
@@ -109,31 +108,9 @@ class TrackAPI {
         },
       });
 
-      let sclVal = -1;
-      let cslVal = -1;
-      /*
-      try {
-        const [sclRes, csl] = await Promise.all([
-          Http.request({
-            host: `https://${pingHost}`,
-            method: 'GET',
-            path: 'ping',
-          }),
-          ping(`wss://${pingHost}`),
-        ]);
-        const { scl }: any = sclRes;
-        sclVal = scl;
-        cslVal = csl;
-      } catch (err) {
-        // do nothing, send scl = -1 and csl = -1
-      }
-        */
-
       const payload = {
         payload: JSON.stringify({
           ...body,
-          scl: sclVal,
-          csl: cslVal,
           lang,
           langs,
         }),
@@ -152,17 +129,6 @@ class TrackAPI {
           'X-Radar-Body-Is-Token': 'true',
         },
       });
-
-      if (options.debug && response && response.user) {
-        if (!response.user.metadata) {
-          response.user.metadata = {};
-        }
-        
-        response.user.metadata['radar:debug'] = {
-          sclVal,
-          cslVal,
-        };
-      }
 
       let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
       const location = { latitude, longitude, accuracy };

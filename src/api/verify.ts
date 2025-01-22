@@ -114,31 +114,23 @@ class VerifyAPI {
     return trackRes;
   }
 
-  static async startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
-    const doTrackVerified = async () => {
-      let trackRes;
-      try {
-        trackRes = await this.trackVerified(params);
-      } catch (err: any) {
-        Logger.error(`trackVerified error: ${err.message}`);
-      }
-      
+  static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    const scheduleNextIntervalWithLastToken = async () => {
       const { interval } = params;
 
-      let expiresIn = 0;
       let minInterval = interval;
 
-      if (trackRes) {
-        expiresIn = (trackRes.expiresIn || expiresIn);
+      if (lastToken) {
+        const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
+
+        const expiresIn = (lastToken.expiresIn || 0);
 
         // if expiresIn is shorter than interval, override interval
-        minInterval = Math.min(expiresIn, interval);
+        // re-request early to maximize the likelihood that a cached token is available
+        minInterval = Math.min(expiresIn - lastTokenElapsed, interval);
       }
 
-      // re-request early to maximize the likelihood that a cached token is available
-      if (minInterval > 20) {
-        minInterval = minInterval - 10;
-      }
+      minInterval = minInterval - 10;
 
       // min interval is 10 seconds
       if (minInterval < 10) {
@@ -150,9 +142,23 @@ class VerifyAPI {
       }
 
       tokenTimeoutId = setTimeout(doTrackVerified, minInterval * 1000);
+    }
+
+    const doTrackVerified = async () => {
+      try {
+        await this.trackVerified(params);
+      } catch (err: any) {
+        Logger.error(`trackVerified error: ${err.message}`);
+      }
+
+      scheduleNextIntervalWithLastToken();
     };
 
-    doTrackVerified();
+    if (this.isLastTokenValid()) {
+      scheduleNextIntervalWithLastToken();
+    } else {
+      doTrackVerified();
+    }
   }
 
   static stopTrackingVerified() {
@@ -162,15 +168,25 @@ class VerifyAPI {
   }
 
   static async getVerifiedLocationToken(params: RadarTrackVerifiedParams) {
-    const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
-
-    if (lastToken && lastToken.passed) {
-      if (lastTokenElapsed < (lastToken.expiresIn || 0)) {
-        return lastToken;
-      }
+    if (this.isLastTokenValid()) {
+      return lastToken;
     }
 
     return this.trackVerified(params);
+  }
+
+  static clearVerifiedLocationToken() {
+    lastToken = null;
+  }
+
+  static isLastTokenValid() {
+    if (!lastToken) {
+      return false;
+    }
+
+    const lastTokenElapsed = (performance.now() - lastTokenNow) / 1000;
+
+    return lastToken.passed && lastTokenElapsed < (lastToken.expiresIn || 0);
   }
 
   static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
