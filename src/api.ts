@@ -135,15 +135,19 @@ class Radar {
   }
 
   public static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
-    return VerifyAPI.startTrackingVerified(params);
+    VerifyAPI.startTrackingVerified(params);
   }
 
   public static stopTrackingVerified() {
-    return VerifyAPI.stopTrackingVerified();
+    VerifyAPI.stopTrackingVerified();
   }
 
   public static getVerifiedLocationToken(params: RadarTrackVerifiedParams = {}) {
     return VerifyAPI.getVerifiedLocationToken(params);
+  }
+
+  public static clearVerifiedLocationToken() {
+    VerifyAPI.clearVerifiedLocationToken();
   }
 
   public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {

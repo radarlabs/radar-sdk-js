@@ -142,7 +142,7 @@ describe('Http', () => {
         try {
           await Http.request(httpRequestParams);
         } catch (e: any) {
-          expect(e.status).toEqual('ERROR_SERVER');
+          expect(e.status).toEqual('ERROR_NETWORK');
         }
       });
 
