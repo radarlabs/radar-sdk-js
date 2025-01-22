@@ -389,7 +389,6 @@ export interface RadarSearchPlacesParams {
   radius?: number;
   chains?: string[] | string;
   categories?: string[] | string;
-  groups?: string[] | string;
   limit?: number;
 }
 
