@@ -45,7 +45,8 @@ export type RadarTravelMode =
 export type RadarAvoidOption =
   | 'tolls'
   | 'highways'
-  | 'ferries';
+  | 'ferries'
+  | 'borderCrossings';
 
 export interface RadarTripOptions {
   userId?: string;
@@ -401,13 +402,15 @@ export interface RadarSearchPlacesResponse extends RadarResponse {
   places: RadarSearchPlace[];
 }
 
+export type RadarDistanceGeometryType = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
+
 export interface RadarDistanceParams {
   origin?: Location | string;
   destination: Location | string;
   modes: RadarTravelMode[] | string;
   units?: 'metric' | 'imperial';
-  geometry?: boolean;
-  geometryPoints?: boolean;
+  geometry?: RadarDistanceGeometryType;
+  geometryPoints?: number;
   avoid?: RadarAvoidOption[] | string;
 }
 
