@@ -578,6 +578,9 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   showMarkers?: boolean;
   markerColor?: string;
   hideResultsOnBlur?: boolean;
+  ariaLabel?: string; // Custom aria-label for input
+  instructionsText?: string; // Instructions for screen readers
+  announceResults?: boolean; // Announce results count to screen readers
 }
 
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
