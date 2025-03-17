@@ -104,6 +104,9 @@ class RadarMarker extends maplibregl.Marker {
     if (markerOptions.scale) {
       maplibreOptions.scale = markerOptions.scale;
     }
+    if (markerOptions.draggable) {
+      maplibreOptions.draggable = markerOptions.draggable;
+    }
 
     super(maplibreOptions);
 
