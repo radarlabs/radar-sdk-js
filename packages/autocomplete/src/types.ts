@@ -36,6 +36,12 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   markerColor?: string;
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
+  /** Custom aria-label for input */
+  ariaLabel?: string;
+  /** Instructions for screen readers */
+  instructionsText?: string;
+  /** Announce results count to screen readers */
+  announceResults?: boolean;
 }
 
 /** resolved configuration with required defaults */
