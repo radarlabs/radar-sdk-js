@@ -94,6 +94,8 @@
   opacity: 1;
   border: 1px solid var(--radar-gray3);
   box-shadow: 0px 0px 4px #81BEFF;
+  outline: 2px solid #4d90fe;
+  outline-offset: 2px;
 }
 
 .radar-autocomplete-search-icon {
@@ -163,6 +165,11 @@
   background-color: var(--radar-gray1);
 }
 
+.radar-autocomplete-results-item:focus {
+  outline: 2px solid #4d90fe;
+  outline-offset: -2px;
+}
+
 .radar-autocomplete-results-item[aria-selected="true"] {
   background-color: var(--radar-gray2);
 }
@@ -204,6 +211,19 @@
 
 .radar-no-results {
   padding: 8px 16px;
+}
+
+/* screen reader only class for autocomplete */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .maplibregl-marker:hover {

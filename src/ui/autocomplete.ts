@@ -26,6 +26,11 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   disabled: false,
   showMarkers: true,
   hideResultsOnBlur: true,
+
+  // accessibility options
+  ariaLabel: 'Search for an address', // Custom aria-label for input
+  instructionsText: 'Start typing to search for addresses', // Instructions for screen readers
+  announceResults: true, // Announce results count to screen readers
 };
 
 // determine whether to use px or CSS string
@@ -61,7 +66,7 @@ const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions
 
 const getMarkerIcon = (color: string = "#ACBDC8") => {
   const fill = color.replace('#', '%23');
-  const svg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location marker">
     <path d="M12.5704 6.57036C12.5704 4.11632 10.6342 2.11257 8.21016 2C8.14262 2 8.06757 2 8.00003 2C7.93249 2 7.85744 2 7.7899 2C5.35838 2.11257 3.42967 4.11632 3.42967 6.57036C3.42967 6.60037 3.42967 6.6379 3.42967 6.66792C3.42967 6.69794 3.42967 6.73546 3.42967 6.76548C3.42967 9.46717 7.09196 13.3621 7.4672 13.7598C7.61729 13.9174 7.84994 14 8.00003 14C8.15012 14 8.38277 13.9174 8.53286 13.7598C8.9156 13.3621 12.5704 9.46717 12.5704 6.76548C12.5704 6.72795 12.5704 6.69794 12.5704 6.66792C12.5704 6.6379 12.5704 6.60037 12.5704 6.57036ZM7.99252 8.28893C7.04693 8.28893 6.27395 7.52345 6.27395 6.57036C6.27395 5.61726 7.03943 4.85178 7.99252 4.85178C8.94562 4.85178 9.7111 5.61726 9.7111 6.57036C9.7111 7.52345 8.94562 8.28893 7.99252 8.28893Z" fill="${fill}"/>
   </svg>`.trim();
   return `data:image/svg+xml;charset=utf-8,${svg}`;
@@ -178,6 +183,16 @@ class AutocompleteUI {
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
+    this.inputField.setAttribute('aria-owns', CLASSNAMES.RESULTS_LIST);
+    this.inputField.setAttribute('aria-describedby', 'autocomplete-instructions');
+
+    // screen reader instructions
+    const srInstructions = document.createElement('div');
+    srInstructions.id = 'autocomplete-instructions';
+    srInstructions.className = 'sr-only'; // screen reader only class
+    srInstructions.textContent = 'When results appear, use up and down arrow keys to navigate and Enter to select';
+    this.wrapper.appendChild(srInstructions);
+
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
@@ -185,6 +200,18 @@ class AutocompleteUI {
     if (this.config.hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this.close.bind(this), true);
     }
+
+    // mobile accessibility - touch support
+    this.resultsList.addEventListener('touchstart', (event) => {
+      const target = event.target as HTMLElement;
+      const li = target.closest('li');
+      if (li) {
+        const index = Array.from(this.resultsList.children).indexOf(li);
+        if (index !== -1) {
+          this.select(index);
+        }
+      }
+    });
 
     Logger.debug('AutocompleteUI initialized with options', this.config);
   }
@@ -273,15 +300,33 @@ class AutocompleteUI {
   }
 
   public displayResults(results: any[]) {
-    // Clear the previous results
+    // clear the previous results
     this.clearResultsList();
     this.results = results;
+
+    // create status announcement for screen readers
+    const statusAnnouncement = document.createElement('div');
+    statusAnnouncement.setAttribute('role', 'status');
+    statusAnnouncement.className = 'sr-only';
+    if (results.length > 0) {
+      statusAnnouncement.textContent = `${results.length} results available. Use arrow keys to navigate.`;
+    } else {
+      statusAnnouncement.textContent = 'No results found.';
+    }
+    this.wrapper.appendChild(statusAnnouncement);
+
+    // Remove the announcement after it's been read
+    setTimeout(() => {
+      statusAnnouncement.remove();
+    }, 2000);
 
     let marker: HTMLElement;
     if (this.config.showMarkers) {
       marker = document.createElement('img');
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+      marker.setAttribute('alt', 'Location marker'); // add alt text for screen readers
+      marker.setAttribute('aria-hidden', 'true'); // hide from screen readers when decorative
     }
 
     // Create and append list items for each result
@@ -290,6 +335,9 @@ class AutocompleteUI {
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
       li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
+      li.setAttribute('aria-selected', 'false'); // default state
+
+      li.setAttribute('tabindex', '-1'); // make focusable but not in tab order
 
       // construct result with bolded label
       let listContent;
@@ -312,6 +360,14 @@ class AutocompleteUI {
       // add click handler to each result, use mousedown to fire before blur event
       li.addEventListener('mousedown', () => {
         this.select(index);
+      });
+
+      // add keyboard event for each item for better interaction
+      li.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          this.select(index);
+        }
       });
 
       this.resultsList.appendChild(li);
@@ -392,13 +448,18 @@ class AutocompleteUI {
     if (this.highlightedIndex > -1) {
       // clear class names on previously highlighted item
       resultItems[this.highlightedIndex].classList.remove(CLASSNAMES.SELECTED_ITEM);
+      resultItems[this.highlightedIndex].setAttribute('aria-selected', 'false');
     }
 
     // add class name to newly highlighted item
     resultItems[index].classList.add(CLASSNAMES.SELECTED_ITEM);
+    resultItems[index].setAttribute('aria-selected', 'true');
 
     // set aria active descendant
     this.inputField.setAttribute('aria-activedescendant', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
+
+    // Make sure the selected item is visible (scroll into view if needed)
+    resultItems[index].scrollIntoView({ block: 'nearest' });
 
     this.highlightedIndex = index;
   }
@@ -436,8 +497,11 @@ class AutocompleteUI {
         break;
 
       // Close
+      case 'Escape':
       case 'Esc':
+        event.preventDefault();
         this.close();
+        setTimeout(() => this.inputField.focus(), 0); // return focus to input
         break;
     }
   }
@@ -458,10 +522,25 @@ class AutocompleteUI {
     }
     this.inputField.value = inputValue;
 
+    // announce selection to screen readers
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.className = 'sr-only';
+    announcement.textContent = `Selected: ${inputValue}`;
+    this.wrapper.appendChild(announcement);
+
+    // remove announcement after it's been read
+    setTimeout(() => {
+      announcement.remove();
+    }, 1000);
+
     const onSelection = this.config.onSelection;
     if (onSelection) {
       onSelection(result);
     }
+
+    // Return focus to input after selection
+    this.inputField.focus();
 
     // clear results list
     this.close();
