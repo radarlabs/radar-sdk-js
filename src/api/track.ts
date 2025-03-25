@@ -8,7 +8,7 @@ import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
 import { signJWT } from '../util/jwt';
-import { ping } from '../util/net';
+import { detectIncognito } from "detectincognitojs";
 
 import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
 
@@ -66,6 +66,17 @@ class TrackAPI {
       tripOptions.version = '2';
     }
 
+    let incognito = false;
+    if (fraud) {
+      try {
+        const result = await detectIncognito();
+        incognito = result.isPrivate;
+      } catch (err: any) {
+        Logger.warn(`Error detecting incognito mode: ${err.message}`);
+        incognito = true;
+      }
+    }
+
     const body = {
       ...params,
       locationAuthorization,
@@ -84,6 +95,7 @@ class TrackAPI {
       userId,
       tripOptions,
       timeZone,
+      incognito,
     };
 
     let response: any;
