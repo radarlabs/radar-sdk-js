@@ -95,6 +95,7 @@ class RadarMap extends maplibregl.Map {
       defaultMaplibreOptions,
       radarMapOptions,
       { style },
+      { validateStyle: !config.live },
     );
     Logger.debug('map initialized with options', mapOptions);
 
