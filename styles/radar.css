@@ -36,7 +36,7 @@
 
 .radar-autocomplete-wrapper {
   position: relative;
-  font-family: 'Graphik';
+  font-family: 'Graphik', sans-serif;
 }
 
 .radar-autocomplete-input {
