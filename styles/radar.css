@@ -25,18 +25,18 @@
 @font-face {
   font-family: 'Graphik';
   font-weight: 400;
-  src: url('https://radar.com/static/font/Graphik-Regular.woff') format('woff');
+  src: url('https://static.radar.com/fonts/Graphik-Regular.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Graphik';
   font-weight: 600;
-  src: url('https://radar.com/static/font/Graphik-Semibold.woff') format('woff');
+  src: url('https://static.radar.com/fonts/Graphik-Semibold.woff') format('woff');
 }
 
 .radar-autocomplete-wrapper {
   position: relative;
-  font-family: 'Graphik';
+  font-family: 'Graphik', sans-serif;
 }
 
 .radar-autocomplete-input {
