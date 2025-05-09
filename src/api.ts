@@ -242,7 +242,7 @@ class Radar {
   // Fraud
   ///////////////////////
 
-  public static setFraudProduct(product?: string) {
+  public static setProduct(product?: string) {
     if (!product) {
       Storage.removeItem(Storage.FRAUD_PRODUCT);
       return;
