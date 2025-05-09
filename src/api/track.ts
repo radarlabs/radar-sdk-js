@@ -117,6 +117,15 @@ class TrackAPI {
       };
       
       const reqToken = await signJWT(payload, dk);
+      const product = Storage.getItem(Storage.FRAUD_PRODUCT)
+
+      var reqHeaders: { 'X-Radar-Body-Is-Token':string, 'X-Radar-Product'?:string } = {
+          'X-Radar-Body-Is-Token': 'true'
+      }
+
+      if( product ){
+        reqHeaders['X-Radar-Product'] = product
+      }
 
       response = await Http.request({
         host,
@@ -125,9 +134,7 @@ class TrackAPI {
         data: {
           token: reqToken,
         },
-        headers: {
-          'X-Radar-Body-Is-Token': 'true',
-        },
+        headers: reqHeaders,
       });
 
       let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;

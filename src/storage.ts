@@ -28,6 +28,10 @@ class Storage {
     return 'radar-trip-options';
   }
 
+  public static get FRAUD_PRODUCT() {
+    return 'radar-fraud-product';
+  }
+
   private static getStorage() {
     const storage = window?.localStorage;
     if (!storage) {

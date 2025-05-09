@@ -237,6 +237,18 @@ class Radar {
   public static matrix(params: RadarMatrixParams) {
     return RoutingAPI.matrix(params);
   }
+
+  ///////////////////////
+  // Fraud
+  ///////////////////////
+
+  public static setFraudProduct(product?: string) {
+    if (!product) {
+      Storage.removeItem(Storage.FRAUD_PRODUCT);
+      return;
+    }
+    Storage.setItem(Storage.FRAUD_PRODUCT, String(product).trim());
+  }
 }
 
 export default Radar;
