@@ -71,7 +71,7 @@ class TrackAPI {
       tripOptions.version = '2';
     }
 
-    var headers: TrackRequestHeaders = {}
+    const headers: TrackRequestHeaders = {}
 
     const product = Storage.getItem(Storage.PRODUCT)
     if (product) {
