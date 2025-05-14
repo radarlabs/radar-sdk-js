@@ -75,6 +75,7 @@ export interface RadarTrackParams {
   tripOptions?: RadarTripOptions;
   desiredAccuracy?: 'high' | 'medium' | 'low';
   fraud?: boolean;
+  reason?: string;
 }
 
 export interface RadarTrackVerifiedParams {
