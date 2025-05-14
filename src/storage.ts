@@ -28,8 +28,8 @@ class Storage {
     return 'radar-trip-options';
   }
 
-  public static get FRAUD_PRODUCT() {
-    return 'radar-fraud-product';
+  public static get PRODUCT() {
+    return 'radar-product';
   }
 
   private static getStorage() {

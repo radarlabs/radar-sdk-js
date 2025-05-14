@@ -190,6 +190,14 @@ class Radar {
     return ConversionsAPI.logConversion(params);
   }
 
+  public static setProduct(product?: string) {
+    if (!product) {
+      Storage.removeItem(Storage.PRODUCT);
+      return;
+    }
+    Storage.setItem(Storage.PRODUCT, String(product).trim());
+  }
+
   ///////////////////////
   // Listeners
   ///////////////////////
@@ -236,18 +244,6 @@ class Radar {
 
   public static matrix(params: RadarMatrixParams) {
     return RoutingAPI.matrix(params);
-  }
-
-  ///////////////////////
-  // Fraud
-  ///////////////////////
-
-  public static setProduct(product?: string) {
-    if (!product) {
-      Storage.removeItem(Storage.FRAUD_PRODUCT);
-      return;
-    }
-    Storage.setItem(Storage.FRAUD_PRODUCT, String(product).trim());
   }
 }
 
