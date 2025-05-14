@@ -190,6 +190,14 @@ class Radar {
     return ConversionsAPI.logConversion(params);
   }
 
+  public static setProduct(product?: string) {
+    if (!product) {
+      Storage.removeItem(Storage.PRODUCT);
+      return;
+    }
+    Storage.setItem(Storage.PRODUCT, String(product).trim());
+  }
+
   ///////////////////////
   // Listeners
   ///////////////////////

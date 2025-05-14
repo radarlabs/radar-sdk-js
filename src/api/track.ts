@@ -12,6 +12,11 @@ import { ping } from '../util/net';
 
 import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
 
+type TrackRequestHeaders = {
+  'X-Radar-Body-Is-Token'?: string;
+  'X-Radar-Product'?: string;
+}
+
 class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
@@ -66,6 +71,13 @@ class TrackAPI {
       tripOptions.version = '2';
     }
 
+    const headers: TrackRequestHeaders = {}
+
+    const product = Storage.getItem(Storage.PRODUCT)
+    if (product) {
+      headers['X-Radar-Product'] = product
+    }
+
     const body = {
       ...params,
       locationAuthorization,
@@ -117,6 +129,7 @@ class TrackAPI {
       };
       
       const reqToken = await signJWT(payload, dk);
+      headers['X-Radar-Body-Is-Token'] = 'true'
 
       response = await Http.request({
         host,
@@ -125,9 +138,7 @@ class TrackAPI {
         data: {
           token: reqToken,
         },
-        headers: {
-          'X-Radar-Body-Is-Token': 'true',
-        },
+        headers,
       });
 
       let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
@@ -159,6 +170,7 @@ class TrackAPI {
       method: 'POST',
       path: 'track',
       data: body,
+      headers,
     });
 
     const { user, events } = response;
