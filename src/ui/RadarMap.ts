@@ -33,7 +33,6 @@ const defaultRadarMapOptions: Partial<RadarMapOptions> = {
 };
 
 const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
-  minZoom: 1,
   maxZoom: 20,
   attributionControl: false,
   dragRotate: false,
