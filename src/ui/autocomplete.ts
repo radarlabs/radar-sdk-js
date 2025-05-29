@@ -75,6 +75,8 @@ class AutocompleteUI {
   highlightedIndex: number;
   debouncedFetchResults: (...args: any[]) => Promise<any>;
   near?: string;
+  // ADDED: Cache for storing results by query
+  private resultsCache: Map<string, any[]> = new Map();
 
   // DOM elements
   container: HTMLElement;
@@ -194,17 +196,38 @@ class AutocompleteUI {
   public handleInput() {
     // Fetch autocomplete results and display them
     const query = this.inputField.value;
+    
+    // CHANGED: Clear results immediately if query is too short
     if (query.length < this.config.minCharacters) {
+      this.clearResultsList();
+      this.close();
+      return;
+    }
+
+    // ADDED: Check cache first
+    const cachedResults = this.resultsCache.get(query);
+    if (cachedResults) {
+      const onResults = this.config.onResults;
+      if (onResults) {
+        onResults(cachedResults);
+      }
+      this.displayResults(cachedResults);
       return;
     }
 
     this.debouncedFetchResults(query)
       .then((results: any[]) => {
-        const onResults = this.config.onResults;
-        if (onResults) {
-          onResults(results);
+        // ADDED: Only display results if the query still matches current input
+        if (query === this.inputField.value) {
+          // ADDED: Cache the results
+          this.resultsCache.set(query, results);
+          
+          const onResults = this.config.onResults;
+          if (onResults) {
+            onResults(results);
+          }
+          this.displayResults(results);
         }
-        this.displayResults(results);
       })
       .catch((error) => {
         Logger.warn(`Autocomplete ui error: ${error.message}`);
@@ -234,7 +257,7 @@ class AutocompleteUI {
     }
   }
 
-  // Modify the close method to avoid clearing results unnecessarily
+  // CHANGED: Don't clear results, just hide them
   public close() {
     if (!this.isOpen) {
       return;
