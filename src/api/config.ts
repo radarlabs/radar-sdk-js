@@ -4,6 +4,7 @@ import Http from '../http';
 import Logger from '../logger';
 import Session from '../session';
 import Navigator from '../navigator';
+import Storage from '../storage';
 
 import type { RadarTrackParams } from '../types';
 
@@ -16,12 +17,14 @@ class ConfigAPI {
       return;
     }
 
+    const id = Storage.getItem(Storage.ID) || undefined;
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
     const locationAuthorization = await Navigator.getPermissionStatus();
 
-    const data = {
+    const data: any = {
+      id,
       deviceId,
       installId,
       sessionId,
