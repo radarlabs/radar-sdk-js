@@ -19,7 +19,14 @@ class ConfigAPI {
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
-    const locationAuthorization = await Navigator.getPermissionStatus();
+
+    // location authorization
+    let locationAuthorization;
+    try {
+      locationAuthorization = await Navigator.getPermissionStatus();
+    } catch (err: any) {
+      Logger.warn(`Location authorization error: ${err.message}`);
+    }
 
     const data = {
       deviceId,
