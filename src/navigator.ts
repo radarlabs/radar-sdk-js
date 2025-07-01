@@ -103,13 +103,13 @@ class Navigator {
 
   public static async getPermissionStatus(): Promise<LocationAuthorization> {
     return new Promise((resolve, reject) => {
+      let locationAuthorization: LocationAuthorization = 'NOT_DETERMINED';
+
       if (!navigator || !navigator.permissions) {
-        return reject(new RadarLocationError('navigator.permissions is not available.'));
+        return resolve(locationAuthorization);
       }
 
       navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
-        let locationAuthorization: LocationAuthorization = 'NOT_DETERMINED';
-
         switch(permissionsStatus.state) {
           case 'granted':
             locationAuthorization = 'GRANTED_FOREGROUND'
@@ -124,7 +124,7 @@ class Navigator {
             break;
         }
 
-        return resolve(locationAuthorization)
+        return resolve(locationAuthorization);
       });
     });
   }
