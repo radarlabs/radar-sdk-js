@@ -58,6 +58,10 @@ class Radar {
       throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
     }
 
+    if (Config.isInitialized()) {
+      Logger.error('Radar.initialize() called more than once.');
+    }
+
     // store settings in global config
     const live = isLiveKey(publishableKey);
     const logLevel = live ? 'error' : 'info';
@@ -79,11 +83,15 @@ class Radar {
       Logger.debug('using options', options);
     }
 
-    // NOTE(jasonl): this allows us to run jest tests
-    // without having to mock the ConfigAPI.getConfig call
-    if (!(window as any)?.RADAR_TEST_ENV) {
-      ConfigAPI.getConfig();
+    if (!Config.isInitialized()) { // only call getConfig on first initialization
+      // NOTE(jasonl): this allows us to run jest tests
+      // without having to mock the ConfigAPI.getConfig call
+      if (!(window as any)?.RADAR_TEST_ENV) {
+        ConfigAPI.getConfig();
+      }
     }
+
+    Config.setInitialized();
   }
 
   public static clear() {

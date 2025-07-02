@@ -2,6 +2,7 @@ import type { RadarOptions } from './types';
 
 class Config {
   static options: RadarOptions;
+  static initialized: boolean = false;
 
   static defaultOptions = {
     live: false,
@@ -13,6 +14,14 @@ class Config {
 
   public static setup(options: RadarOptions = {}) {
     Config.options = options;
+  }
+
+  public static setInitialized() {
+    Config.initialized = true;
+  }
+
+  public static isInitialized(): boolean {
+    return Config.initialized;
   }
 
   public static get(): RadarOptions {
