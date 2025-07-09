@@ -1,4 +1,4 @@
-class RadarError extends Error {
+export class RadarError extends Error {
   status: string;
 
   constructor(message: string) {

@@ -8,6 +8,7 @@ import Storage from '../storage';
 import TrackAPI from './track';
 
 import type { RadarStartTrackingVerifiedParams, RadarTrackVerifiedParams, RadarTrackVerifiedResponse } from '../types';
+import {RadarVerifyAppError} from "../errors";
 
 let tokenTimeoutId: any | null = null;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
@@ -148,7 +149,11 @@ class VerifyAPI {
       try {
         await this.trackVerified(params);
       } catch (err: any) {
-        Logger.error(`trackVerified error: ${err.message}`);
+        if (Config.getOnErrorCallback()) {
+          Config.getOnErrorCallback()!(new RadarVerifyAppError());
+        } else {
+          Logger.error(`trackVerified error: ${err.message}`);
+        }
       }
 
       scheduleNextIntervalWithLastToken();
