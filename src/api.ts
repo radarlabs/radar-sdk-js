@@ -2,7 +2,7 @@ import Config from './config';
 import Logger from './logger';
 import Storage from './storage';
 import Navigator from './navigator';
-import { RadarPublishableKeyError } from './errors';
+import { RadarError, RadarPublishableKeyError } from './errors';
 
 import AddressesAPI from './api/addresses';
 import ConfigAPI from './api/config';
@@ -201,10 +201,14 @@ class Radar {
   ///////////////////////
   // Listeners
   ///////////////////////
+
   public static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
     VerifyAPI.onTokenUpdated(callback);
   }
 
+  public static onError(callback: (error: RadarError) => void) {
+    Config.onError(callback);
+  }
 
   /////////////////
   // Maps Platform
