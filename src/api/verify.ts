@@ -11,6 +11,7 @@ import type { RadarError } from '../errors';
 import type { RadarStartTrackingVerifiedParams, RadarTrackVerifiedParams, RadarTrackVerifiedResponse } from '../types';
 
 let tokenTimeoutId: any | null = null;
+let isTrackingVerified = true;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
 let lastToken: RadarTrackVerifiedResponse | null = null;
 let lastTokenNow: number = 0;
@@ -121,8 +122,14 @@ class VerifyAPI {
   }
 
   static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
+    isTrackingVerified = true;
+    
     const scheduleNextIntervalWithLastToken = async () => {
-      const { interval } = params;
+      let { interval } = params;
+
+      if (!interval) {
+        interval = 20;
+      }
 
       let minInterval = interval;
 
@@ -147,8 +154,10 @@ class VerifyAPI {
         clearTimeout(tokenTimeoutId);
       }
 
-      tokenTimeoutId = setTimeout(doTrackVerified, minInterval * 1000);
-    }
+      if (isTrackingVerified) {
+        tokenTimeoutId = setTimeout(doTrackVerified, minInterval * 1000);
+      }
+    };
 
     const doTrackVerified = async () => {
       try {
@@ -168,6 +177,8 @@ class VerifyAPI {
   }
 
   static stopTrackingVerified() {
+    isTrackingVerified = false;
+
     if (tokenTimeoutId) {
       clearTimeout(tokenTimeoutId);
     }
