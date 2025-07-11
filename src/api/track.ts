@@ -8,7 +8,6 @@ import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
 import { signJWT } from '../util/jwt';
-import { ping } from '../util/net';
 
 import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
 
@@ -33,12 +32,7 @@ class TrackAPI {
     }
 
     // location authorization
-    let locationAuthorization;
-    try {
-      locationAuthorization = await Navigator.getPermissionStatus();
-    } catch (err: any) {
-      Logger.warn(`Location authorization error: ${err.message}`);
-    }
+    const locationAuthorization = await Navigator.getPermissionStatus();
 
     // user indentification fields
     const userId = params.userId || Storage.getItem(Storage.USER_ID);
