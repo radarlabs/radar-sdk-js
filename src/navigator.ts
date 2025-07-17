@@ -128,6 +128,10 @@ class Navigator {
       });
     });
   }
+
+  public static online(): Boolean {
+    return navigator && navigator.onLine;
+  }
 }
 
 export default Navigator;
