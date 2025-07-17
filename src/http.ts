@@ -187,7 +187,7 @@ class Http {
 
       xhr.onerror = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(navigator.onLine ? new RadarVerifyAppError() : new RadarNetworkError());
+          reject(navigator && navigator.onLine ? new RadarVerifyAppError() : new RadarNetworkError());
         } else {
           reject(new RadarNetworkError());
         }
@@ -195,7 +195,7 @@ class Http {
 
       xhr.ontimeout = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(navigator.onLine ? new RadarVerifyAppError() : new RadarNetworkError());
+          reject(navigator && navigator.onLine ? new RadarVerifyAppError() : new RadarNetworkError());
         } else {
           reject(new RadarNetworkError());
         }
