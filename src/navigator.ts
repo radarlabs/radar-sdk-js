@@ -102,7 +102,7 @@ class Navigator {
   }
 
   public static async getPermissionStatus(): Promise<LocationAuthorization> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       let locationAuthorization: LocationAuthorization = 'NOT_DETERMINED';
 
       if (!navigator || !navigator.permissions) {
@@ -127,6 +127,10 @@ class Navigator {
         return resolve(locationAuthorization);
       });
     });
+  }
+
+  public static online(): Boolean {
+    return navigator && navigator.onLine;
   }
 }
 

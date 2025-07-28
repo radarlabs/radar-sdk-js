@@ -1,6 +1,7 @@
 import SDK_VERSION from './version';
 import Config from './config';
 import Logger from './logger';
+import Navigator from './navigator';
 
 import {
   RadarBadRequestError,
@@ -187,7 +188,7 @@ class Http {
 
       xhr.onerror = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(new RadarVerifyAppError());
+          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
         } else {
           reject(new RadarNetworkError());
         }
@@ -195,7 +196,7 @@ class Http {
 
       xhr.ontimeout = function () {
         if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(new RadarVerifyAppError());
+          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
         } else {
           reject(new RadarNetworkError());
         }
