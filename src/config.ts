@@ -1,10 +1,9 @@
 import { RadarError } from './errors';
 import type { RadarOptions } from './types';
 
-let errorCallback: ((error: RadarError) => void) | null = null;
-
 class Config {
   static options: RadarOptions;
+  static errorCallback: ((error: RadarError) => void) | null = null;
 
   static defaultOptions = {
     live: false,
@@ -24,15 +23,16 @@ class Config {
 
   public static clear() {
     Config.options = {};
+    Config.errorCallback = null;
   }
 
   public static onError(callback: (error: RadarError) => void) {
-    errorCallback = callback;
+    Config.errorCallback = callback;
   }
 
   public static sendError(error: any) {
-    if (errorCallback && error) {
-      errorCallback(error);
+    if (Config.errorCallback && error) {
+      Config.errorCallback(error);
     }
   }
 }
