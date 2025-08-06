@@ -141,12 +141,12 @@ describe('Routing', () => {
       it('should return a directions response', async () => {
         mockRequest(200, routingResponse);
 
-        const locations : Location[] = [ origin, destination];
+        const locations: Location[] = [origin, destination];
 
         const response = await Routing.directions({locations, mode, units, avoid, geometry});
-        const validateReponse = getResponseWithDebug(options.debug, routingResponse, routingResponse)
+        const validateResponse = getResponseWithDebug(options.debug, routingResponse, routingResponse)
 
-        expect(response).toEqual(validateReponse);
+        expect(response).toEqual(validateResponse);
       })
     })
   });

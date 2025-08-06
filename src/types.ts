@@ -97,7 +97,7 @@ export enum RadarEventConfidence {
   high = 3
 }
 
-export type RadarManueverType =
+export type RadarManeuverType =
     | 'none'
     | 'start'
     | 'start-right'
@@ -534,7 +534,7 @@ export interface RadarDirectionsStep extends RadarDirectionsLeg{
   bannerInstructions: string;
   voiceInstructions: string;
   mode: RadarTravelMode;
-  manuever: RadarManueverType;
+  manuever: RadarManeuverType;
   streetName: string;
 }
 export interface RadarDirectionsRoute extends RadarRoute {
