@@ -148,8 +148,6 @@ class RoutingAPI {
       avoid = avoid.join(',');
     }
 
-    const lowerGeometry = geometry?.toLowerCase();
-
     const response: any = await Http.request({
       method: 'GET',
       path: 'route/directions',
@@ -158,7 +156,7 @@ class RoutingAPI {
         mode,
         units,
         avoid,
-        lowerGeometry,
+        geometry: geometry?.toLowerCase(),
       },
     });
 
