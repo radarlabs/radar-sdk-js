@@ -49,7 +49,7 @@
                 const { lng, lat } = e.lngLat;
 
                 // create marker from click location
-                const marker = Radar.ui.marker({ url })
+                const marker = Radar.ui.marker({ url, draggable: true })
                   .setLngLat([lng, lat])
                   .addTo(map);
 
@@ -57,11 +57,13 @@
                 map.fitToMarkers({ maxZoom: 14, padding: 80 });
 
                 // add listener to remove marker on click
+                /*
                 marker.on('click', (e) => {
                   console.log('MARKER CLICK', e);
                   marker.remove();
                   map.fitToMarkers({ maxZoom: 14, padding: 80 }); // refit after marker removed
                 });
+                */
               });
 
               // use custom marker from URL
