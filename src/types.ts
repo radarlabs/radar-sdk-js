@@ -97,6 +97,52 @@ export enum RadarEventConfidence {
   high = 3
 }
 
+export type RadarManueverType =
+    | 'none'
+    | 'start'
+    | 'start-right'
+    | 'start-left'
+    | 'destination'
+    | 'destination-right'
+    | 'destination-left'
+    | 'becomes'
+    | 'continue'
+    | 'slight-right'
+    | 'right'
+    | 'sharp-right'
+    | 'uturn-right'
+    | 'uturn-left'
+    | 'sharp-left'
+    | 'left'
+    | 'slight-left'
+    | 'ramp-straight'
+    | 'ramp-right'
+    | 'ramp-left'
+    | 'exit-right'
+    | 'exit-left'
+    | 'stay-straight'
+    | 'stay-right'
+    | 'stay-left'
+    | 'merge'
+    | 'roundabout-enter'
+    | 'roundabout-exit'
+    | 'ferry-enter'
+    | 'ferry-exit'
+    | 'transit'
+    | 'transit-transfer'
+    | 'transit-remain-on'
+    | 'transit-connection-start'
+    | 'transit-connection-transfer'
+    | 'transit-connection-destination'
+    | 'post-transit-connection-destination'
+    | 'merge-right'
+    | 'merge-left'
+    | 'elevator-enter'
+    | 'steps-enter'
+    | 'escalator-enter'
+    | 'building-enter'
+    | 'building-exit';
+
 export type RadarEventType =
   | 'unknown'
   | 'user.entered_geofence'
@@ -462,6 +508,40 @@ export interface RadarMatrixResponse extends RadarResponse {
   origins: Location[];
   destinations: Location[];
   matrix: RadarMatrixRoute[];
+}
+
+export interface RadarDirectionsParams {
+  locations: Location[] | string;
+  mode?: RadarTravelMode;
+  units?: 'metric' | 'imperial';
+  avoid?: RadarAvoidOption[] | string;
+  geometry?: RadarDistanceGeometryType;
+}
+
+export interface RadarDirectionsLeg {
+  startLocation: Location;
+  endLocation: Location;
+  duration: RadarRouteDuration;
+  distance: RadarRouteDistance;
+  geometry: GeoJSON.LineString;
+  steps: RadarDirectionsStep[];
+}
+
+export interface RadarDirectionsStep extends RadarDirectionsLeg{
+  bearingBefore: number;
+  bearingAfter: number;
+  instructions: string;
+  bannerInstructions: string;
+  voiceInstructions: string;
+  mode: RadarTravelMode;
+  manuever: RadarManueverType;
+  streetName: string;
+}
+export interface RadarDirectionsRoute extends RadarRoute {
+  legs?: RadarDirectionsLeg[];
+}
+export interface RadarDirectionsResponse extends RadarResponse {
+  routes: RadarDirectionsRoute[];
 }
 
 export interface RadarValidateAddressParams {

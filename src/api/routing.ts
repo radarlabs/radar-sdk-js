@@ -2,11 +2,13 @@ import Config from '../config';
 import Http from '../http';
 import Navigator from '../navigator';
 
-import type {
+import {
   RadarDistanceParams,
   RadarRouteResponse,
   RadarMatrixParams,
   RadarMatrixResponse,
+  RadarDirectionsParams,
+  RadarDirectionsResponse,
 } from '../types';
 
 class RoutingAPI {
@@ -125,6 +127,48 @@ class RoutingAPI {
     }
 
     return matrixRes;
+  }
+
+  static async directions(params: RadarDirectionsParams): Promise<RadarDirectionsResponse> {
+    const options = Config.get();
+
+    let {
+      locations,
+      mode,
+      units,
+      avoid,
+      geometry,
+    } = params;
+
+    if( Array.isArray(locations) ) {
+      locations = locations.map((location) => `${location.latitude},${location.longitude}`).join('|');
+    }
+
+    if (Array.isArray(avoid)) {
+      avoid = avoid.join(',');
+    }
+
+    const response: any = await Http.request({
+      method: 'GET',
+      path: 'route/directions',
+      data: {
+        locations,
+        mode,
+        units,
+        avoid,
+        geometry,
+      },
+    });
+
+    const directionsRes = {
+      routes: response.routes,
+    } as RadarDirectionsResponse;
+
+    if (options.debug) {
+      directionsRes.response = response;
+    }
+
+    return directionsRes;
   }
 }
 
