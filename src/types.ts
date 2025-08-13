@@ -6,6 +6,9 @@ export interface Location {
   accuracy?: number;
 }
 
+export interface Polyline {
+  polyline: string;
+}
 export interface NavigatorPosition {
   latitude: number;
   longitude: number;
@@ -449,14 +452,14 @@ export interface RadarSearchPlacesResponse extends RadarResponse {
   places: RadarSearchPlace[];
 }
 
-export type RadarDistanceGeometryType = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
+export type RadarRoutingGeometry = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
 
 export interface RadarDistanceParams {
   origin?: Location | string;
   destination: Location | string;
   modes: RadarTravelMode[] | string;
   units?: 'metric' | 'imperial';
-  geometry?: RadarDistanceGeometryType;
+  geometry?: RadarRoutingGeometry;
   geometryPoints?: number;
   avoid?: RadarAvoidOption[] | string;
 }
@@ -515,35 +518,66 @@ export interface RadarDirectionsParams {
   mode?: RadarTravelMode;
   units?: 'metric' | 'imperial';
   avoid?: RadarAvoidOption[] | string;
-  geometry?: RadarDistanceGeometryType;
+  geometry?: RadarRoutingGeometry;
+}
+
+export interface RadarDirectionsResponse extends RadarResponse {
+  routes: RadarDirectionsRoute[];
+}
+
+export interface RadarDirectionsRoute extends RadarRoute {
+  duration: {
+    value: number;
+    text: string;
+  },
+  distance?:{
+    value: number;
+    text: string;
+  };
+  geometry?: GeoJSON.LineString;
+  legs?: RadarDirectionsLeg[];
 }
 
 export interface RadarDirectionsLeg {
-  startLocation: Location;
-  endLocation: Location;
-  duration: RadarRouteDuration;
-  distance: RadarRouteDistance;
-  geometry: GeoJSON.LineString;
-  steps: RadarDirectionsStep[];
+  startLocation: {
+    latitude:number;
+    longitude:number;
+  };
+  endLocation: {
+    longitude:number;
+    latitude:number;
+  };
+  duration: {
+    value: number;
+    text: string;
+  };
+  distance: RadarRouteDistance | undefined;
+  geometry: GeoJSON.LineString | undefined;
+  steps?: RadarDirectionsStep[];
 }
 
-export interface RadarDirectionsStep extends RadarDirectionsLeg{
+export interface RadarDirectionsStep {
+  distance: number;
+  duration: number;
+  startLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  endLocation: {
+    latitude: number;
+    longitude: number;
+  };
   bearingBefore: number;
   bearingAfter: number;
   instructions: string;
   bannerInstructions: string;
   voiceInstructions: string;
+  geometry: GeoJSON.LineString | Polyline | undefined;
   mode: RadarTravelMode;
-  manuever: RadarManeuverType;
+  maneuver: RadarManeuverType;
   streetName: string;
+  exitName: string | undefined;
 }
-export interface RadarDirectionsRoute extends RadarRoute {
-  legs?: RadarDirectionsLeg[];
-}
-export interface RadarDirectionsResponse extends RadarResponse {
-  routes: RadarDirectionsRoute[];
-}
-
 export interface RadarValidateAddressParams {
   city: string;
   stateCode: string;
