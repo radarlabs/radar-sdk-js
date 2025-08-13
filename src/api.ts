@@ -24,6 +24,7 @@ import type {
   RadarDistanceParams,
   RadarForwardGeocodeParams,
   RadarMatrixParams,
+  RadarDirectionsParams,
   RadarMetadata,
   RadarOptions,
   RadarReverseGeocodeParams,
@@ -248,6 +249,10 @@ class Radar {
 
   public static matrix(params: RadarMatrixParams) {
     return RoutingAPI.matrix(params);
+  }
+
+  public static directions(params: RadarDirectionsParams) {
+    return RoutingAPI.directions(params);
   }
 }
 

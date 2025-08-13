@@ -6,7 +6,7 @@ import Navigator from '../../src/navigator';
 import Routing from '../../src/api/routing';
 import Radar from '../../src';
 import Config from '../../src/config';
-import { RadarOptions, RadarTravelMode } from '../../src/types';
+import {Location, RadarOptions, RadarTravelMode} from '../../src/types';
 import { getResponseWithDebug, mockRequest } from '../utils';
 
 describe('Routing', () => {
@@ -37,6 +37,10 @@ describe('Routing', () => {
     { latitude: 40.73237, longitude: -73.94884 }
   ];
   const matrixResponse = { meta: {}, origins: {}, destinations: {}, matrix: {} };
+
+  const mode: RadarTravelMode = 'car';
+  const avoid = 'ferries';
+  const geometry = 'linestring';
 
   let options: RadarOptions = {};
 
@@ -130,5 +134,20 @@ describe('Routing', () => {
         });
       });
     });
+  });
+
+  describe( 'getDirections', () =>{
+    describe( 'all args given', () => {
+      it('should return a directions response', async () => {
+        mockRequest(200, routingResponse);
+
+        const locations: Location[] = [origin, destination];
+
+        const response = await Routing.directions({locations, mode, units, avoid, geometry});
+        const validateResponse = getResponseWithDebug(options.debug, routingResponse, routingResponse)
+
+        expect(response).toEqual(validateResponse);
+      })
+    })
   });
 });
