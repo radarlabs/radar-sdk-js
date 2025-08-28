@@ -189,6 +189,10 @@ class VerifyAPI {
     };
 
     if (params?.ipChanges) {
+      if (ipChangesIntervalId) {
+        clearInterval(ipChangesIntervalId);
+      }
+
       ipChangesIntervalId = setInterval(async () => {
         const ipChanged = await VerifyAPI.checkIpChanges();
 
