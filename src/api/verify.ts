@@ -21,21 +21,27 @@ let lastIp: string | null = null;
 
 class VerifyAPI {
   static async checkIpChanges() {
-    const { ip }: any = await Http.request({
-      method: 'GET',
-      path: 'ping',
-    });
+    try {
+      const { ip }: any = await Http.request({
+        method: 'GET',
+        path: 'ping',
+      });
 
-    const ipChanged = lastIp && ip !== lastIp;
-    if (ipChanged) {
-      Logger.info(`IP changed from ${lastIp} to ${ip}`);
+      const ipChanged = lastIp && ip !== lastIp;
+      if (ipChanged) {
+        Logger.info(`IP changed from ${lastIp} to ${ip}`);
 
-      lastToken = null;
+        lastToken = null;
+      }
+
+      lastIp = ip;
+
+      return ipChanged;
+    } catch (err) {
+      Logger.error(`Error checking IP: ${err}`);
     }
 
-    lastIp = ip;
-
-    return ipChanged;
+    return false;
   } 
 
   static async trackVerified(params: RadarTrackVerifiedParams, encrypted: Boolean = false) {
