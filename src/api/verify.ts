@@ -7,18 +7,43 @@ import Session from '../session';
 import Storage from '../storage';
 import TrackAPI from './track';
 
-import type { RadarError } from '../errors';
 import type { RadarStartTrackingVerifiedParams, RadarTrackVerifiedParams, RadarTrackVerifiedResponse } from '../types';
 
 let tokenTimeoutId: any | null = null;
+let ipChangesIntervalId: any | null = null;
 let isTrackingVerified = true;
 let tokenCallback: ((token: RadarTrackVerifiedResponse) => void) | null = null;
 let lastToken: RadarTrackVerifiedResponse | null = null;
 let lastTokenNow: number = 0;
 let expectedCountryCode: string | null = null;
 let expectedStateCode: string | null = null;
+let lastIp: string | null = null;
 
 class VerifyAPI {
+  static async checkIpChanges() {
+    try {
+      const { ip }: any = await Http.request({
+        method: 'GET',
+        path: 'ping',
+      });
+
+      const ipChanged = lastIp && ip !== lastIp;
+      if (ipChanged) {
+        Logger.info(`IP changed from ${lastIp} to ${ip}`);
+
+        lastToken = null;
+      }
+
+      lastIp = ip;
+
+      return ipChanged;
+    } catch (err) {
+      Logger.error(`Error checking IP: ${err}`);
+    }
+
+    return false;
+  } 
+
   static async trackVerified(params: RadarTrackVerifiedParams, encrypted: Boolean = false) {
     try {
       const options = Config.get();
@@ -169,6 +194,20 @@ class VerifyAPI {
       scheduleNextIntervalWithLastToken();
     };
 
+    if (params?.ipChanges) {
+      if (ipChangesIntervalId) {
+        clearInterval(ipChangesIntervalId);
+      }
+
+      ipChangesIntervalId = setInterval(async () => {
+        const ipChanged = await VerifyAPI.checkIpChanges();
+
+        if (ipChanged) {
+          doTrackVerified();
+        }
+      }, 10000);
+    }
+
     if (this.isLastTokenValid()) {
       scheduleNextIntervalWithLastToken();
     } else {
@@ -181,6 +220,10 @@ class VerifyAPI {
 
     if (tokenTimeoutId) {
       clearTimeout(tokenTimeoutId);
+    }
+
+    if (ipChangesIntervalId) {
+      clearInterval(ipChangesIntervalId);
     }
   }
 
