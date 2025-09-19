@@ -291,6 +291,7 @@ export type RadarGeocodeLayer =
 export interface RadarAddress {
   addressLabel?: string;
   borough?: string;
+  categories?: string[];
   city?: string;
   confidence?: 'exact' | 'interpolated' | 'fallback';
   country?: string;
