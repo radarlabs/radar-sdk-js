@@ -88,6 +88,7 @@ export interface RadarTrackVerifiedParams {
 export interface RadarStartTrackingVerifiedParams {
   interval: number;
   skipVerifyApp?: boolean;
+  ipChanges?: boolean;
 }
 
 export enum RadarEventConfidence {
