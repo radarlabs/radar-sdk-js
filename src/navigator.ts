@@ -16,10 +16,12 @@ const radarGeolocation = (() => {
     return null;
   }
 
+  const emptyFn = () => {};
+
   return Object.freeze({
-    getCurrentPosition: g.getCurrentPosition.bind(g),
-    watchPosition: g.watchPosition.bind(g),
-    clearWatch: g.clearWatch.bind(g)
+    getCurrentPosition: g.getCurrentPosition ? g.getCurrentPosition.bind(g) : emptyFn,
+    watchPosition: g.watchPosition ? g.watchPosition.bind(g) : emptyFn,
+    clearWatch: g.clearWatch ? g.clearWatch.bind(g) : emptyFn,
   });
 })();
 
