@@ -25,7 +25,7 @@ class TrackAPI {
     // if latitude & longitude are not provided,
     // try and retrieve device location (will prompt for location permissions)
     if (!latitude || !longitude) {
-      const deviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy });
+      const deviceLocation = await Navigator.getCurrentPosition({ desiredAccuracy }, fraud);
       latitude = deviceLocation.latitude;
       longitude = deviceLocation.longitude;
       accuracy = deviceLocation.accuracy;
