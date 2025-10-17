@@ -6,12 +6,16 @@ import { RadarLocationError, RadarPermissionsError } from './errors';
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
 const radarGeolocation = (() => {
+  if (!navigator) {
+    return null;
+  }
+
   const g = navigator.geolocation;
 
   if (!g) {
     return null;
   }
-  
+
   return Object.freeze({
     getCurrentPosition: g.getCurrentPosition.bind(g),
     watchPosition: g.watchPosition.bind(g),
