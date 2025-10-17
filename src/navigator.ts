@@ -5,6 +5,26 @@ import { RadarLocationError, RadarPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
+const radarGeolocation = (() => {
+  if (!navigator) {
+    return null;
+  }
+
+  const g = navigator.geolocation;
+
+  if (!g) {
+    return null;
+  }
+
+  const emptyFn = () => {};
+
+  return Object.freeze({
+    getCurrentPosition: g.getCurrentPosition ? g.getCurrentPosition.bind(g) : emptyFn,
+    watchPosition: g.watchPosition ? g.watchPosition.bind(g) : emptyFn,
+    clearWatch: g.clearWatch ? g.clearWatch.bind(g) : emptyFn,
+  });
+})();
+
 interface PositionOptionOverrides {
   desiredAccuracy?: string;
 }
@@ -21,11 +41,13 @@ const useHighAccuracy = (desiredAccuracy?: string) => (
 );
 
 class Navigator {
-  public static async getCurrentPosition(overrides: PositionOptionOverrides = {}): Promise<NavigatorPosition> {
+  public static async getCurrentPosition(overrides: PositionOptionOverrides = {}, fraud: Boolean = false): Promise<NavigatorPosition> {
     return new Promise((resolve, reject) => {
       const options = Config.get();
 
-      if (!navigator || !navigator.geolocation) {
+      const g =  fraud ? radarGeolocation : navigator.geolocation;
+
+      if (!g) {
         return reject(new RadarLocationError('navigator.geolocation is not available.'));
       }
 
@@ -67,7 +89,7 @@ class Navigator {
       Logger.info(`Using geolocation options: ${JSON.stringify(positionOptions)}`);
 
       // get current location from browser
-      navigator.geolocation.getCurrentPosition(
+      g.getCurrentPosition(
         (position) => {
           if (!position || !position.coords) {
             return reject(new RadarLocationError('device location return empty coordinates.'));
