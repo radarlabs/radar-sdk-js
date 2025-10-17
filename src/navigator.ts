@@ -5,6 +5,20 @@ import { RadarLocationError, RadarPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
+const radarGeolocation = (() => {
+  const g = navigator.geolocation;
+
+  if (!g) {
+    return null;
+  }
+  
+  return Object.freeze({
+    getCurrentPosition: g.getCurrentPosition.bind(g),
+    watchPosition: g.watchPosition.bind(g),
+    clearWatch: g.clearWatch.bind(g)
+  });
+})();
+
 interface PositionOptionOverrides {
   desiredAccuracy?: string;
 }
@@ -25,7 +39,7 @@ class Navigator {
     return new Promise((resolve, reject) => {
       const options = Config.get();
 
-      if (!navigator || !navigator.geolocation) {
+      if (!radarGeolocation) {
         return reject(new RadarLocationError('navigator.geolocation is not available.'));
       }
 
@@ -67,7 +81,7 @@ class Navigator {
       Logger.info(`Using geolocation options: ${JSON.stringify(positionOptions)}`);
 
       // get current location from browser
-      navigator.geolocation.getCurrentPosition(
+      radarGeolocation.getCurrentPosition(
         (position) => {
           if (!position || !position.coords) {
             return reject(new RadarLocationError('device location return empty coordinates.'));
