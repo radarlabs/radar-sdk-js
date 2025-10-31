@@ -48,7 +48,7 @@ class VerifyAPI {
     try {
       const options = Config.get();
 
-      const { skipVerifyApp } = params;
+      const { skipVerifyApp, reason } = params;
 
       // user indentification fields
       const userId = params.userId || Storage.getItem(Storage.USER_ID);
@@ -74,6 +74,7 @@ class VerifyAPI {
           description: description ?? undefined,
           metadata: metadata,
           fraud: true,
+          reason,
         });
       } else {
         const body = {
