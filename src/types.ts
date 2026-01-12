@@ -76,6 +76,7 @@ export interface RadarTrackParams {
   desiredAccuracy?: 'high' | 'medium' | 'low';
   fraud?: boolean;
   reason?: string;
+  transactionId?: string;
 }
 
 export interface RadarTrackVerifiedParams {
@@ -84,6 +85,7 @@ export interface RadarTrackVerifiedParams {
   metadata?: RadarMetadata;
   skipVerifyApp?: boolean;
   reason?: string;
+  transactionId?: string;
 }
 
 export interface RadarStartTrackingVerifiedParams {
