@@ -3,7 +3,10 @@ export type LogLevel = 'none' | 'info' | 'warn' | 'error'
 export interface Location {
   latitude: number;
   longitude: number;
+  /** Meters */
   accuracy?: number;
+  /** Unix time in seconds */
+  timestamp?: number; 
 }
 
 export interface NavigatorPosition {
