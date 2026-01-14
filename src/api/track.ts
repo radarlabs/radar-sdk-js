@@ -115,6 +115,7 @@ class TrackAPI {
         },
       }) as RadarConfigResponse;
 
+      // If the project does not have fraud enabled and calls config, the server will not send a desktop key
       const { dk } = configResponse;
       if (!dk) {
         throw new RadarPaymentRequiredError(configResponse);
