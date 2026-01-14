@@ -474,7 +474,7 @@ export interface RadarMatrixRoute {
 export interface RadarMatrixResponse extends RadarResponse {
   origins: Location[];
   destinations: Location[];
-  matrix: RadarMatrixRoute[];
+  matrix: RadarMatrixRoute[][];
 }
 
 export interface RadarValidateAddressParams {
