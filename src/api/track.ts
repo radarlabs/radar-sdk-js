@@ -115,9 +115,9 @@ class TrackAPI {
         },
       }) as RadarConfigResponse;
 
-      const {dk} = configResponse;
+      const { dk } = configResponse;
       if (!dk) {
-        throw new RadarPaymentRequiredError(configResponse)
+        throw new RadarPaymentRequiredError(configResponse);
       }
 
       const payload = {
