@@ -243,7 +243,7 @@ export interface RadarTrackResponse extends RadarResponse {
 }
 
 export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
-  token?: String;
+  token?: string;
   expiresAt?: Date;
   expiresIn?: number;
   passed?: boolean;
