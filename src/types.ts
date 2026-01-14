@@ -225,6 +225,14 @@ export interface RadarUser {
   fraud?: RadarFraud;
 }
 
+export interface RadarConfigResponse extends RadarResponse {
+  nonce?: string;
+  googleCloudProjectNumber?: number;
+  // desktop key for signing trackVerified requests
+  dk?: string;
+  scl?: number;
+}
+
 export interface RadarTrackResponse extends RadarResponse {
   location?: Location;
   user?: RadarUser;
