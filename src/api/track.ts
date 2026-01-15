@@ -9,7 +9,8 @@ import Storage from '../storage';
 import TripsAPI from './trips';
 import { signJWT } from '../util/jwt';
 
-import type { RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
+import type { RadarConfigResponse, RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
+import { RadarPaymentRequiredError } from '../errors';
 
 type TrackRequestHeaders = {
   'X-Radar-Body-Is-Token'?: string;
@@ -99,7 +100,7 @@ class TrackAPI {
       const lang = navigator.language;
       const langs = navigator.languages;
 
-      const { dk }: any = await Http.request({
+      const configResponse = await Http.request({
         host,
         method: 'GET',
         path: 'config',
@@ -112,7 +113,13 @@ class TrackAPI {
         headers: {
           'X-Radar-Desktop-Device-Type': 'Web',
         },
-      });
+      }) as RadarConfigResponse;
+
+      // If the project does not have fraud enabled and calls config, the server will not send a desktop key
+      const { dk } = configResponse;
+      if (!dk) {
+        throw new RadarPaymentRequiredError(configResponse);
+      }
 
       const payload = {
         payload: JSON.stringify({
