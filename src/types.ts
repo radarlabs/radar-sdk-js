@@ -6,7 +6,7 @@ export interface Location {
   /** Meters */
   accuracy?: number;
   /** Unix time in seconds */
-  timestamp?: number; 
+  timestamp?: number;
 }
 
 export interface NavigatorPosition {
