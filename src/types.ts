@@ -137,12 +137,27 @@ export type RadarEventType =
   | 'user.exited_beacon'
   | 'user.failed_fraud';
 
+export type RadarGeofenceType = 'circle' | 'polygon' | 'isochrone';
+
+export type Position = [x: number, y: number];
+
 export interface RadarGeofence {
   _id: string;
   description: string;
   tag?: string;
   externalId?: string;
   metadata?: RadarMetadata;
+  live: boolean;
+  type: RadarGeofenceType;
+  geometryRadius?: number;
+  geometry?: {
+    type: "Polygon" | "MultiPolygon";
+    coordinates: Position[][];
+  };
+  geometryCenter?: {
+    type: "Point";
+    coordinates: Position;
+  };
 }
 
 export interface RadarTripEta {
