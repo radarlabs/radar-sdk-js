@@ -24,7 +24,7 @@ class TripsAPI {
     if (tripOptions) {
       tripOptions = JSON.parse(tripOptions);
     }
-    return tripOptions as RadarTripOptions;
+    return tripOptions as unknown as RadarTripOptions;
   }
 
   static clearTripOptions() {

@@ -53,7 +53,7 @@ export type RadarAvoidOption =
 
 export interface RadarTripOptions {
   userId?: string;
-  externalId?: string;
+  externalId: string;
   mode?: RadarTravelMode;
   destinationGeofenceTag?: string;
   destinationGeofenceExternalId?: string;
@@ -166,7 +166,6 @@ export interface RadarTripEta {
 }
 
 export type RadarTripStatus =
-  | 'pending'
   | 'started'
   | 'approaching'
   | 'arrived'
@@ -175,6 +174,12 @@ export type RadarTripStatus =
   | 'expired'
   | 'pending';
 
+export type RadarTripIssueType = 'app_killed' |'network_error' |'delayed';
+
+export interface RadarTripIssue {
+  issue: RadarTripIssueType;
+  timestamp: Date;
+}
 
 export interface RadarTrip {
   _id: string;
@@ -182,10 +187,12 @@ export interface RadarTrip {
   metadata?: RadarMetadata;
   destinationGeofenceTag?: string;
   destinationGeofenceExternalId?: string;
-  mode?: RadarTravelMode;
+  mode: RadarTravelMode;
   eta?: RadarTripEta;
   status: RadarTripStatus;
   scheduledArrivalAt?: Date;
+  issues: RadarTripIssue[];
+  live: boolean;
 }
 
 export interface RadarFraud {
