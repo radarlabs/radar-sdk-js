@@ -113,6 +113,8 @@ export type RadarEventType =
   | 'user.entered_region_country'
   | 'user.entered_region_dma'
   | 'user.entered_region_state'
+  | 'user.entered_region_postal_code'
+  | 'user.dwelled_in_geofence'
   | 'user.exited_geofence'
   | 'user.exited_home'
   | 'user.exited_office'
@@ -120,6 +122,7 @@ export type RadarEventType =
   | 'user.exited_region_country'
   | 'user.exited_region_dma'
   | 'user.exited_region_state'
+  | 'exited_region_postal_code'
   | 'user.nearby_place_chain'
   | 'user.started_traveling'
   | 'user.stopped_traveling'
@@ -130,6 +133,8 @@ export type RadarEventType =
   | 'user.approaching_trip_destination'
   | 'user.arrived_at_trip_destination'
   | 'user.stopped_trip'
+  | 'user.entered_beacon'
+  | 'user.exited_beacon'
   | 'user.failed_fraud';
 
 export interface RadarGeofence {
