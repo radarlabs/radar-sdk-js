@@ -9,6 +9,9 @@ export interface Location {
   timestamp?: number;
 }
 
+export interface Polyline {
+  polyline: string;
+}
 export interface NavigatorPosition {
   latitude: number;
   longitude: number;
@@ -103,6 +106,52 @@ export enum RadarEventConfidence {
   medium = 2,
   high = 3
 }
+
+export type RadarManeuverType =
+    | 'none'
+    | 'start'
+    | 'start-right'
+    | 'start-left'
+    | 'destination'
+    | 'destination-right'
+    | 'destination-left'
+    | 'becomes'
+    | 'continue'
+    | 'slight-right'
+    | 'right'
+    | 'sharp-right'
+    | 'uturn-right'
+    | 'uturn-left'
+    | 'sharp-left'
+    | 'left'
+    | 'slight-left'
+    | 'ramp-straight'
+    | 'ramp-right'
+    | 'ramp-left'
+    | 'exit-right'
+    | 'exit-left'
+    | 'stay-straight'
+    | 'stay-right'
+    | 'stay-left'
+    | 'merge'
+    | 'roundabout-enter'
+    | 'roundabout-exit'
+    | 'ferry-enter'
+    | 'ferry-exit'
+    | 'transit'
+    | 'transit-transfer'
+    | 'transit-remain-on'
+    | 'transit-connection-start'
+    | 'transit-connection-transfer'
+    | 'transit-connection-destination'
+    | 'post-transit-connection-destination'
+    | 'merge-right'
+    | 'merge-left'
+    | 'elevator-enter'
+    | 'steps-enter'
+    | 'escalator-enter'
+    | 'building-enter'
+    | 'building-exit';
 
 export type RadarEventType =
   | 'unknown'
@@ -419,14 +468,14 @@ export interface RadarSearchPlacesResponse extends RadarResponse {
   places: RadarSearchPlace[];
 }
 
-export type RadarDistanceGeometryType = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
+export type RadarRoutingGeometry = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
 
 export interface RadarDistanceParams {
   origin?: Location | string;
   destination: Location | string;
   modes: RadarTravelMode[] | string;
   units?: 'metric' | 'imperial';
-  geometry?: RadarDistanceGeometryType;
+  geometry?: RadarRoutingGeometry;
   geometryPoints?: number;
   avoid?: RadarAvoidOption[] | string;
 }
@@ -480,6 +529,71 @@ export interface RadarMatrixResponse extends RadarResponse {
   matrix: RadarMatrixRoute[][];
 }
 
+export interface RadarDirectionsParams {
+  locations: Location[] | string;
+  mode?: RadarTravelMode;
+  units?: 'metric' | 'imperial';
+  avoid?: RadarAvoidOption[] | string;
+  geometry?: RadarRoutingGeometry;
+}
+
+export interface RadarDirectionsResponse extends RadarResponse {
+  routes: RadarDirectionsRoute[];
+}
+
+export interface RadarDirectionsRoute extends RadarRoute {
+  duration: {
+    value: number;
+    text: string;
+  },
+  distance?:{
+    value: number;
+    text: string;
+  };
+  geometry?: GeoJSON.LineString;
+  legs?: RadarDirectionsLeg[];
+}
+
+export interface RadarDirectionsLeg {
+  startLocation: {
+    latitude:number;
+    longitude:number;
+  };
+  endLocation: {
+    longitude:number;
+    latitude:number;
+  };
+  duration: {
+    value: number;
+    text: string;
+  };
+  distance: RadarRouteDistance | undefined;
+  geometry: GeoJSON.LineString | undefined;
+  steps?: RadarDirectionsStep[];
+}
+
+export interface RadarDirectionsStep {
+  distance: number;
+  duration: number;
+  startLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  endLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  bearingBefore: number;
+  bearingAfter: number;
+  instructions: string;
+  bannerInstructions: string;
+  voiceInstructions: string;
+  geometry: GeoJSON.LineString | Polyline | undefined;
+  mode: RadarTravelMode;
+  maneuver: RadarManeuverType;
+  streetName: string;
+  exitName: string | undefined;
+}
 export interface RadarValidateAddressParams {
   city: string;
   stateCode: string;
