@@ -138,20 +138,20 @@ class RadarMap extends maplibregl.Map {
     });
     this.addControl(nav, 'bottom-right');
 
-    // handle map resize actions
-    const onResize = () => {
-      const attrib = document.querySelector('.maplibregl-ctrl-attrib');
-      if (attrib) {
-        const width = this.getContainer().clientWidth;
-        if (width < 380) {
-          attrib.classList.add('hidden');
-        } else {
-          attrib.classList.remove('hidden');
-        }
+    this.on('resize', this.#onResize.bind(this));
+    this.on('load', this.#onResize.bind(this));
+  }
+
+  #onResize(): void {
+    const attrib = document.querySelector('.maplibregl-ctrl-attrib');
+    if (attrib) {
+      const width = this.getContainer().clientWidth; // Memory leak here
+      if (width < 380) {
+        attrib.classList.add('hidden');
+      } else {
+        attrib.classList.remove('hidden');
       }
-    };
-    this.on('resize', onResize);
-    this.on('load', onResize);
+    }
   }
 
   addMarker(marker: RadarMarker) {
