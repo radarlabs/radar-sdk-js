@@ -226,6 +226,7 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  passed?: boolean;
 }
 
 export interface RadarConfigResponse extends RadarResponse {
