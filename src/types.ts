@@ -3,7 +3,10 @@ export type LogLevel = 'none' | 'info' | 'warn' | 'error'
 export interface Location {
   latitude: number;
   longitude: number;
+  /** Meters */
   accuracy?: number;
+  /** Unix time in seconds */
+  timestamp?: number;
 }
 
 export interface NavigatorPosition {
@@ -240,7 +243,7 @@ export interface RadarTrackResponse extends RadarResponse {
 }
 
 export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
-  token?: String;
+  token?: string;
   expiresAt?: Date;
   expiresIn?: number;
   passed?: boolean;
@@ -474,7 +477,7 @@ export interface RadarMatrixRoute {
 export interface RadarMatrixResponse extends RadarResponse {
   origins: Location[];
   destinations: Location[];
-  matrix: RadarMatrixRoute[];
+  matrix: RadarMatrixRoute[][];
 }
 
 export interface RadarValidateAddressParams {
