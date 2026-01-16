@@ -36,6 +36,7 @@ class TrackAPI {
     const locationAuthorization = await Navigator.getPermissionStatus();
 
     // user indentification fields
+    const id = Storage.getItem(Storage.ID) || undefined; // `undefined` so it's removed from any fields
     const userId = params.userId || Storage.getItem(Storage.USER_ID);
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
@@ -91,6 +92,7 @@ class TrackAPI {
       userId,
       tripOptions,
       timeZone,
+      id,
     };
 
     let response: any;
@@ -105,6 +107,7 @@ class TrackAPI {
         method: 'GET',
         path: 'config',
         data: {
+          id,
           deviceId,
           installId,
           sessionId,
@@ -160,6 +163,10 @@ class TrackAPI {
         _id,
       } as RadarTrackVerifiedResponse;
 
+      if (user) {
+        Storage.setItem(Storage.ID, user._id);
+      }
+
       if (options.debug) {
         trackRes.response = response;
       }
@@ -167,6 +174,7 @@ class TrackAPI {
       return trackRes;
     }
 
+    // unverified track
     response = await Http.request({
       method: 'POST',
       path: 'track',
@@ -183,6 +191,8 @@ class TrackAPI {
       location,
     } as RadarTrackResponse;
 
+    Storage.setItem(Storage.ID, user?._id);
+    
     if (options.debug) {
       trackRes.response = response;
     }

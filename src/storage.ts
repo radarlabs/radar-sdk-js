@@ -3,6 +3,9 @@ import Logger from './logger';
 class Storage {
 
   // local storage key definitions for identifying track users
+  public static get ID() {
+    return 'radar-id';
+  }
   public static get USER_ID() {
     return 'radar-userId';
   }
@@ -44,6 +47,14 @@ class Storage {
     const storage = this.getStorage();
     if (!storage) {
       return;
+    }
+    // clear id if user_id doesn't match previous
+    if (key == this.USER_ID) {
+      const previousUserId = this.getItem(this.USER_ID);
+      if (previousUserId !== value) {
+        storage.removeItem(this.ID);
+        console.log("User id mismatch, removing ID");
+      }
     }
     if (value === undefined || value === null) {
       return;
