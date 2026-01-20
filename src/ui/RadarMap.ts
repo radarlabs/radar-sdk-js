@@ -77,8 +77,8 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 };
 
 class RadarMap extends maplibregl.Map {
-  private _markers: RadarMarker[] = [];
-  private _features: RadarMapFeature[] = [];
+  _markers: RadarMarker[] = [];
+  _features: RadarMapFeature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
