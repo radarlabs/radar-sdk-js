@@ -37,7 +37,7 @@ jobs:
             const variables = {
               teamId: process.env.LINEAR_TEAM_ID,
               title: context.payload.issue.title,
-              description: `${context.payload.issue.body}\n\nOriginal GitHub Issue: ${context.payload.issue.html_url}`
+              description: `${context.payload.issue.body || "No description provided"}\n\nOriginal GitHub Issue: ${context.payload.issue.html_url}`
             };
 
             const postData = JSON.stringify({
