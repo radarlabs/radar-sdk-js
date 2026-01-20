@@ -77,8 +77,8 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
 };
 
 class RadarMap extends maplibregl.Map {
-  _markers: RadarMarker[] = [];
-  _features: RadarMapFeature[] = [];
+  private _markers: RadarMarker[] = [];
+  private _features: RadarMapFeature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions) {
     const config = Config.get();
@@ -138,11 +138,11 @@ class RadarMap extends maplibregl.Map {
     });
     this.addControl(nav, 'bottom-right');
 
-    this.on('resize', this.#onResize.bind(this));
-    this.on('load', this.#onResize.bind(this));
+    this.on('resize', this._onResize.bind(this));
+    this.on('load', this._onResize.bind(this));
   }
 
-  #onResize(): void {
+  private _onResize(): void {
     const attrib = document.querySelector('.maplibregl-ctrl-attrib');
     if (attrib) {
       const width = this.getContainer().clientWidth; // Memory leak here
