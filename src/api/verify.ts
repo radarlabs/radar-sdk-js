@@ -78,6 +78,12 @@ class VerifyAPI {
           transactionId,
         });
       } else {
+        const headers: { 'X-Radar-Product'?: string } = {};
+        const product = Storage.getItem(Storage.PRODUCT);
+        if (product) {
+          headers['X-Radar-Product'] = product;
+        }
+
         const body = {
           ...params,
           description,
@@ -101,6 +107,7 @@ class VerifyAPI {
           method: 'GET',
           path: 'verify',
           data: body,
+          headers,
           host: apple ? 'https://radar-verify.com:52516' : 'http://localhost:52516',
         });
     
