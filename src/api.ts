@@ -13,7 +13,6 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import VerifyAPI from './api/verify';
 
 import SDK_VERSION from './version';
 
@@ -29,10 +28,7 @@ import type {
   RadarReverseGeocodeParams,
   RadarSearchGeofencesParams,
   RadarSearchPlacesParams,
-  RadarStartTrackingVerifiedParams,
   RadarTrackParams,
-  RadarTrackVerifiedParams,
-  RadarTrackVerifiedResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
 } from './types';
@@ -130,30 +126,6 @@ class Radar {
     }
   }
 
-  public static trackVerified(params: RadarTrackVerifiedParams = {}) {
-    return VerifyAPI.trackVerified(params);
-  }
-
-  public static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
-    VerifyAPI.startTrackingVerified(params);
-  }
-
-  public static stopTrackingVerified() {
-    VerifyAPI.stopTrackingVerified();
-  }
-
-  public static getVerifiedLocationToken(params: RadarTrackVerifiedParams = {}) {
-    return VerifyAPI.getVerifiedLocationToken(params);
-  }
-
-  public static clearVerifiedLocationToken() {
-    VerifyAPI.clearVerifiedLocationToken();
-  }
-
-  public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
-    VerifyAPI.setExpectedJurisdiction(countryCode, stateCode);
-  }
-
   public static getContext(params: Location) {
     return ContextAPI.getContext(params);
   }
@@ -201,10 +173,6 @@ class Radar {
   ///////////////////////
   // Listeners
   ///////////////////////
-
-  public static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
-    VerifyAPI.onTokenUpdated(callback);
-  }
 
   public static onError(callback: (error: RadarError) => void) {
     Config.onError(callback);

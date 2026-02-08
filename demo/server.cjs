@@ -33,18 +33,24 @@ app.use((req, res, next) => {
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/cdn', express.static('./cdn'));
 
-// create a route for each handelbars view
+// pages that require the fraud bundle
+const fraudPages = ['track-verified', 'start-tracking-verified'];
+
+// create a route for each handlebars view
 const views = fs.readdirSync(path.join(__dirname, 'views'));
 views.forEach((view) => {
   const name = path.basename(view).split('.hbs')[0];
   const title = name.replace(/-/g, ' ');
+
+  // use fraud bundle for pages that need verify methods
+  const js_file = fraudPages.includes(name) ? '/cdn/radar-core-fraud.min.js' : '/cdn/radar.js';
 
   app.get(`/${name}`, (req, res) => {
     res.render(name, {
       name,
       title,
       sdk_version,
-      js_file: '/cdn/radar.js',
+      js_file,
       css_file: '/cdn/radar.css',
     });
   });

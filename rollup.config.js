@@ -1,9 +1,25 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import typescript from 'rollup-plugin-typescript2';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import alias from '@rollup/plugin-alias';
+import obfuscator from 'rollup-plugin-obfuscator';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const obfuscatorConfig = {
+  compact: true,
+  controlFlowFlattening: true,
+  deadCodeInjection: true,
+  stringArray: true,
+  stringArrayRotate: true,
+  stringArrayShuffle: true,
+  stringArrayThreshold: 0.75,
+};
 
 
 // remove typescript declarations from file in the CDN output folder
@@ -99,6 +115,33 @@ export default [
       nodeResolve(),
       commonjs(),
       json(),
+    ],
+  },
+
+  // IIFE (core SDK + fraud, obfuscated)
+  {
+    input: 'plugins/radar-sdk-js-fraud/src/index.ts',
+    output: [
+      {
+        file: 'cdn/radar-core-fraud.min.js',
+        format: 'iife',
+        name: 'Radar',
+        plugins: [terser(), onlyEmitFile()],
+      },
+    ],
+    plugins: [
+      alias({
+        entries: [
+          { find: /^\.\.\/\.\.\/src\/(.*)/, replacement: path.resolve(__dirname, 'src/$1') },
+        ],
+      }),
+      typescript({
+        check: false,
+      }),
+      nodeResolve(),
+      commonjs(),
+      json(),
+      obfuscator({ options: obfuscatorConfig }),
     ],
   }
 ];

@@ -77,7 +77,6 @@ export interface RadarTrackParams {
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
   desiredAccuracy?: 'high' | 'medium' | 'low';
-  fraud?: boolean;
   reason?: string;
   transactionId?: string;
 }

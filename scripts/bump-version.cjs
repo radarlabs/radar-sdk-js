@@ -1,5 +1,6 @@
 const fs = require('fs');
 const package = require('../package.json');
+const packageFraud = require('../package.fraud.json');
 const lockfile = require('../package-lock.json');
 const srcfile = fs.readFileSync('./src/version.ts').toString();
 
@@ -34,6 +35,10 @@ fs.writeFileSync('./package.json', JSON.stringify(package, null, 2) + '\n');
 // update package-lock.json
 lockfile.version = version;
 fs.writeFileSync('./package-lock.json', JSON.stringify(lockfile, null, 2) + '\n');
+
+// update package.fraud.json
+packageFraud.version = version;
+fs.writeFileSync('./package.fraud.json', JSON.stringify(packageFraud, null, 2) + '\n');
 
 // update versions in readme
 const reg = new RegExp(`js.radar.com\/v([^/]+)\/`, 'g');

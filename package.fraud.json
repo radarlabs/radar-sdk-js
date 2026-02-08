@@ -1,0 +1,12 @@
+{
+  "name": "@radarlabs/radar-sdk-js-fraud",
+  "version": "5.0.0-beta.0",
+  "description": "Radar fraud detection SDK for web apps.",
+  "homepage": "https://radar.com",
+  "main": "radar-core-fraud.min.js",
+  "files": [
+    "radar-core-fraud.min.js"
+  ],
+  "author": "",
+  "license": "ISC"
+}

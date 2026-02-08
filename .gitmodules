@@ -1,0 +1,3 @@
+[submodule "plugins/radar-sdk-js-fraud"]
+	path = plugins/radar-sdk-js-fraud
+	url = https://github.com/radarlabs/radar-sdk-js-fraud.git

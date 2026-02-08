@@ -6,11 +6,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
         with:
-          node-version: '16.x'
+          submodules: recursive
+          token: ${{ secrets.FRAUD_SUBMODULE_PAT }}
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -20,6 +23,15 @@ jobs:
       - run: npm run test
       - run: npm run check-latest-tag
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Publish fraud package
+      - run: |
+          cp package.fraud.json cdn/package.json
+          cd cdn
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: js.radar.com
