@@ -8,4 +8,7 @@ export default {
   moduleNameMapper: {
     "\\.css$": "<rootDir>/test/mock-data/styles.js"
   },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
+  },
 };
