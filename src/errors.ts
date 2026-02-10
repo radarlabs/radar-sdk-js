@@ -31,14 +31,6 @@ export class RadarPermissionsError extends RadarError {
   }
 }
 
-export class RadarVerifyAppError extends RadarError {
-  constructor() {
-    super('Radar Verify app not running.');
-    this.name = 'RadarVerifyAppError';
-    this.status = 'ERROR_VERIFY_APP';
-  }
-}
-
 // HTTP Errors
 export class RadarBadRequestError extends RadarError {
   code: number;

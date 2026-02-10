@@ -7,13 +7,10 @@ import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
 import TripsAPI from './trips';
-import { signJWT } from '../util/jwt';
 
-import type { RadarConfigResponse, RadarTrackParams, RadarTrackResponse, RadarTrackVerifiedResponse } from '../types';
-import { RadarPaymentRequiredError } from '../errors';
+import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
 type TrackRequestHeaders = {
-  'X-Radar-Body-Is-Token'?: string;
   'X-Radar-Product'?: string;
 }
 
@@ -21,7 +18,7 @@ class TrackAPI {
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
 
-    let { latitude, longitude, accuracy, desiredAccuracy, fraud } = params;
+    let { latitude, longitude, accuracy, desiredAccuracy } = params;
 
     // if latitude & longitude are not provided,
     // try and retrieve device location (will prompt for location permissions)
@@ -93,81 +90,7 @@ class TrackAPI {
       timeZone,
     };
 
-    let response: any;
-    if (fraud) {
-      const host = 'https://api-verified.radar.io';
-
-      const lang = navigator.language;
-      const langs = navigator.languages;
-
-      const configResponse = await Http.request({
-        host,
-        method: 'GET',
-        path: 'config',
-        data: {
-          deviceId,
-          installId,
-          sessionId,
-          locationAuthorization,
-        },
-        headers: {
-          'X-Radar-Desktop-Device-Type': 'Web',
-        },
-      }) as RadarConfigResponse;
-
-      // If the project does not have fraud enabled and calls config, the server will not send a desktop key
-      const { dk } = configResponse;
-      if (!dk) {
-        throw new RadarPaymentRequiredError(configResponse);
-      }
-
-      const payload = {
-        payload: JSON.stringify({
-          ...body,
-          lang,
-          langs,
-        }),
-      };
-      
-      const reqToken = await signJWT(payload, dk);
-      headers['X-Radar-Body-Is-Token'] = 'true'
-
-      response = await Http.request({
-        host,
-        method: 'POST',
-        path: 'track',
-        data: {
-          token: reqToken,
-        },
-        headers,
-      });
-
-      let { user, events, token, expiresAt, expiresIn, passed, failureReasons, _id } = response;
-      const location = { latitude, longitude, accuracy };
-      if (expiresAt) {
-        expiresAt = new Date(expiresAt);
-      }
-
-      const trackRes = {
-        user,
-        events,
-        location,
-        token,
-        expiresAt,
-        expiresIn,
-        passed,
-        failureReasons,
-        _id,
-      } as RadarTrackVerifiedResponse;
-
-      if (options.debug) {
-        trackRes.response = response;
-      }
-
-      return trackRes;
-    }
-
-    response = await Http.request({
+    const response: any = await Http.request({
       method: 'POST',
       path: 'track',
       data: body,

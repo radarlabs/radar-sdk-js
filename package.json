@@ -1,11 +1,21 @@
 {
   "name": "radar-sdk-js",
-  "version": "4.5.8",
+  "version": "5.0.0",
   "description": "Web Javascript SDK for Radar, location infrastructure for mobile and web apps.",
   "homepage": "https://radar.com",
   "type": "module",
   "module": "dist/radar.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/radar.js"
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js"
+    }
+  },
   "style": "dist/radar.css",
   "build": "rollup -c",
   "prepublish": "npm run build",

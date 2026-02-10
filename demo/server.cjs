@@ -33,6 +33,10 @@ app.use((req, res, next) => {
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/cdn', express.static('./cdn'));
 
+// serve verify plugin cdn from sibling repo
+const verifyPluginCdn = path.join(__dirname, '../../radar-sdk-js-verify/cdn');
+app.use('/cdn/plugins', express.static(verifyPluginCdn));
+
 // create a route for each handelbars view
 const views = fs.readdirSync(path.join(__dirname, 'views'));
 views.forEach((view) => {

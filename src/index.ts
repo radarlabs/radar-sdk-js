@@ -20,3 +20,8 @@ class Radar extends RadarAPI {
 }
 
 export default Radar;
+export { Radar };
+
+export type { RadarError } from './errors';
+export type * from './types';
+export type { RadarPlugin, RadarPluginContext } from './plugin';

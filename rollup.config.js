@@ -50,7 +50,7 @@ export default [
 
   // IIFE (browser bundles, written to /cdn)
   {
-    input: 'src/index.ts',
+    input: 'src/iife-entry.ts',
     output: [
       {
         file: 'cdn/radar.js',
@@ -77,9 +77,27 @@ export default [
     ],
   },
 
+  // ESM plugin types entry (for plugin authors)
+  {
+    input: 'src/plugin.ts',
+    output: [
+      {
+        file: 'dist/plugin.js',
+        format: 'esm',
+        sourcemap: true,
+      },
+    ],
+    plugins: [
+      typescript(),
+      nodeResolve(),
+      commonjs(),
+      json(),
+    ],
+  },
+
   // IIFE (core SDK feature - no maps)
   {
-    input: 'src/api.ts',
+    input: 'src/iife-core-entry.ts',
     output: [
       {
         file: 'cdn/radar-core.js',

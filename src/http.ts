@@ -16,7 +16,6 @@ import {
   RadarServerError,
   RadarUnauthorizedError,
   RadarUnknownError,
-  RadarVerifyAppError,
 } from './errors';
 
 export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -29,6 +28,12 @@ interface HttpResponse {
 const inFlightRequests = new Map<string, XMLHttpRequest>();
 
 class Http {
+  static errorInterceptors: Map<string, (online: boolean) => Error> = new Map();
+
+  static registerErrorInterceptor(hostPattern: string, handler: (online: boolean) => Error) {
+    Http.errorInterceptors.set(hostPattern, handler);
+  }
+
   static async request({
     method,
     path,
@@ -186,21 +191,19 @@ class Http {
         }
       }
 
-      xhr.onerror = function () {
-        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
-        } else {
-          reject(new RadarNetworkError());
+      const handleNetworkError = () => {
+        if (host) {
+          for (const [pattern, handler] of Http.errorInterceptors) {
+            if (host.includes(pattern)) {
+              return reject(handler(!!Navigator.online()));
+            }
+          }
         }
-      }
+        reject(new RadarNetworkError());
+      };
 
-      xhr.ontimeout = function () {
-        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
-        } else {
-          reject(new RadarNetworkError());
-        }
-      }
+      xhr.onerror = handleNetworkError;
+      xhr.ontimeout = handleNetworkError;
 
       xhr.send(JSON.stringify(body));
     });

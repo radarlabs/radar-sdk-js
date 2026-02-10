@@ -2,7 +2,11 @@ import Config from './config';
 import Logger from './logger';
 import Storage from './storage';
 import Navigator from './navigator';
+import Device from './device';
+import Session from './session';
+import Http from './http';
 import { RadarError, RadarPublishableKeyError } from './errors';
+import * as errors from './errors';
 
 import AddressesAPI from './api/addresses';
 import ConfigAPI from './api/config';
@@ -13,9 +17,10 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import VerifyAPI from './api/verify';
 
 import SDK_VERSION from './version';
+
+import type { RadarPlugin, RadarPluginContext, RadarStatic } from './plugin';
 
 import type {
   Location,
@@ -29,10 +34,7 @@ import type {
   RadarReverseGeocodeParams,
   RadarSearchGeofencesParams,
   RadarSearchPlacesParams,
-  RadarStartTrackingVerifiedParams,
   RadarTrackParams,
-  RadarTrackVerifiedParams,
-  RadarTrackVerifiedResponse,
   RadarTripOptions,
   RadarValidateAddressParams,
 } from './types';
@@ -45,8 +47,52 @@ const isLiveKey = (key: string): boolean => (
 );
 
 class Radar {
+  private static _plugins: Map<string, RadarPlugin> = new Map();
+  private static _pendingPlugins: RadarPlugin[] = [];
+  private static _initialized = false;
+
   public static get VERSION() {
     return SDK_VERSION;
+  }
+
+  public static registerPlugin(plugin: RadarPlugin) {
+    if (Radar._plugins.has(plugin.name)) {
+      Logger.warn(`plugin "${plugin.name}" already registered.`);
+      return;
+    }
+
+    if (Radar._initialized) {
+      plugin.install(Radar._getPluginContext());
+      Radar._plugins.set(plugin.name, plugin);
+    } else {
+      Radar._pendingPlugins.push(plugin);
+    }
+  }
+
+  private static _getPluginContext(): RadarPluginContext {
+    return {
+      Radar: Radar as RadarStatic,
+      Config,
+      Http,
+      Storage,
+      Device,
+      Session,
+      Logger,
+      Navigator,
+      SDK_VERSION,
+      errors,
+      apis: {
+        Addresses: AddressesAPI,
+        Config: ConfigAPI,
+        Context: ContextAPI,
+        Conversions: ConversionsAPI,
+        Geocoding: GeocodingAPI,
+        Routing: RoutingAPI,
+        Search: SearchAPI,
+        Track: TrackAPI,
+        Trips: TripsAPI,
+      },
+    };
   }
 
   public static initialize(publishableKey: string, options: RadarOptions = {}) {
@@ -84,6 +130,17 @@ class Radar {
     if (!(window as any)?.RADAR_TEST_ENV) {
       ConfigAPI.getConfig();
     }
+
+    // NOTE(jasonl): install any plugins that were registered before initialize
+    Radar._initialized = true;
+    const ctx = Radar._getPluginContext();
+    for (const plugin of Radar._pendingPlugins) {
+      if (!Radar._plugins.has(plugin.name)) {
+        plugin.install(ctx);
+        Radar._plugins.set(plugin.name, plugin);
+      }
+    }
+    Radar._pendingPlugins = [];
   }
 
   public static clear() {
@@ -128,30 +185,6 @@ class Radar {
     } finally {
       ConfigAPI.getConfig(params); // call with updated permissions
     }
-  }
-
-  public static trackVerified(params: RadarTrackVerifiedParams = {}) {
-    return VerifyAPI.trackVerified(params);
-  }
-
-  public static startTrackingVerified(params: RadarStartTrackingVerifiedParams) {
-    VerifyAPI.startTrackingVerified(params);
-  }
-
-  public static stopTrackingVerified() {
-    VerifyAPI.stopTrackingVerified();
-  }
-
-  public static getVerifiedLocationToken(params: RadarTrackVerifiedParams = {}) {
-    return VerifyAPI.getVerifiedLocationToken(params);
-  }
-
-  public static clearVerifiedLocationToken() {
-    VerifyAPI.clearVerifiedLocationToken();
-  }
-
-  public static setExpectedJurisdiction(countryCode?: string, stateCode?: string) {
-    VerifyAPI.setExpectedJurisdiction(countryCode, stateCode);
   }
 
   public static getContext(params: Location) {
@@ -202,10 +235,6 @@ class Radar {
   // Listeners
   ///////////////////////
 
-  public static onTokenUpdated(callback: (token: RadarTrackVerifiedResponse) => void) {
-    VerifyAPI.onTokenUpdated(callback);
-  }
-
   public static onError(callback: (error: RadarError) => void) {
     Config.onError(callback);
   }
@@ -252,3 +281,8 @@ class Radar {
 }
 
 export default Radar;
+export { Radar };
+
+export type { RadarError } from './errors';
+export type * from './types';
+export type { RadarPlugin, RadarPluginContext } from './plugin';

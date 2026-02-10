@@ -82,21 +82,6 @@ export interface RadarTrackParams {
   transactionId?: string;
 }
 
-export interface RadarTrackVerifiedParams {
-  userId?: string;
-  description?: string;
-  metadata?: RadarMetadata;
-  skipVerifyApp?: boolean;
-  reason?: string;
-  transactionId?: string;
-}
-
-export interface RadarStartTrackingVerifiedParams {
-  interval: number;
-  skipVerifyApp?: boolean;
-  ipChanges?: boolean;
-}
-
 export enum RadarEventConfidence {
   none = 0,
   low = 1,
@@ -231,7 +216,7 @@ export interface RadarUser {
 export interface RadarConfigResponse extends RadarResponse {
   nonce?: string;
   googleCloudProjectNumber?: number;
-  // desktop key for signing trackVerified requests
+  /** Desktop key for signing trackVerified requests */
   dk?: string;
   scl?: number;
 }
@@ -240,15 +225,6 @@ export interface RadarTrackResponse extends RadarResponse {
   location?: Location;
   user?: RadarUser;
   events?: RadarEvent[];
-}
-
-export interface RadarTrackVerifiedResponse extends RadarTrackResponse {
-  token?: string;
-  expiresAt?: Date;
-  expiresIn?: number;
-  passed?: boolean;
-  failureReasons?: string[];
-  _id?: string;
 }
 
 export interface RadarContextResponse extends RadarResponse {
