@@ -213,14 +213,6 @@ export interface RadarUser {
   fraud?: RadarFraud;
 }
 
-export interface RadarConfigResponse extends RadarResponse {
-  nonce?: string;
-  googleCloudProjectNumber?: number;
-  /** Desktop key for signing trackVerified requests */
-  dk?: string;
-  scl?: number;
-}
-
 export interface RadarTrackResponse extends RadarResponse {
   location?: Location;
   user?: RadarUser;
@@ -486,4 +478,3 @@ export interface RadarSearchGeofencesParams {
 export interface RadarSearchGeofencesResponse extends RadarResponse {
   geofences: RadarGeofence[];
 }
-
