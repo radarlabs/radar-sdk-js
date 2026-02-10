@@ -61,24 +61,21 @@ const isLiveKey = (key: string): boolean => (
 
 class Radar {
   private static _plugins: Map<string, RadarPlugin> = new Map();
-  private static _pendingPlugins: RadarPlugin[] = [];
-  private static _initialized = false;
 
   public static get VERSION() {
     return SDK_VERSION;
   }
 
-  public static registerPlugin(plugin: RadarPlugin) {
-    if (Radar._plugins.has(plugin.name)) {
-      Logger.warn(`plugin "${plugin.name}" already registered.`);
-      return;
-    }
+  public static registerPlugin(...plugins: RadarPlugin[]) {
+    const ctx = Radar._getPluginContext();
+    for (const plugin of plugins) {
+      if (Radar._plugins.has(plugin.name)) {
+        Logger.warn(`plugin "${plugin.name}" already registered.`);
+        continue;
+      }
 
-    if (Radar._initialized) {
-      plugin.install(Radar._getPluginContext());
+      plugin.install(ctx);
       Radar._plugins.set(plugin.name, plugin);
-    } else {
-      Radar._pendingPlugins.push(plugin);
     }
   }
 
@@ -144,16 +141,6 @@ class Radar {
       ConfigAPI.getConfig();
     }
 
-    // NOTE(jasonl): install any plugins that were registered before initialize
-    Radar._initialized = true;
-    const ctx = Radar._getPluginContext();
-    for (const plugin of Radar._pendingPlugins) {
-      if (!Radar._plugins.has(plugin.name)) {
-        plugin.install(ctx);
-        Radar._plugins.set(plugin.name, plugin);
-      }
-    }
-    Radar._pendingPlugins = [];
   }
 
   public static clear() {
