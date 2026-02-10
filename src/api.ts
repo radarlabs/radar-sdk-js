@@ -24,19 +24,32 @@ import type { RadarPlugin, RadarPluginContext, RadarStatic } from './plugin';
 
 import type {
   Location,
+  NavigatorPosition,
   RadarAutocompleteParams,
+  RadarAutocompleteResponse,
+  RadarContextResponse,
   RadarConversionParams,
+  RadarConversionResponse,
   RadarDistanceParams,
   RadarForwardGeocodeParams,
+  RadarGeocodeResponse,
+  RadarIPGeocodeResponse,
   RadarMatrixParams,
+  RadarMatrixResponse,
   RadarMetadata,
   RadarOptions,
   RadarReverseGeocodeParams,
+  RadarRouteResponse,
   RadarSearchGeofencesParams,
+  RadarSearchGeofencesResponse,
   RadarSearchPlacesParams,
+  RadarSearchPlacesResponse,
   RadarTrackParams,
+  RadarTrackResponse,
   RadarTripOptions,
+  RadarTripResponse,
   RadarValidateAddressParams,
+  RadarValidateAddressResponse,
 } from './types';
 
 const isSecretKey = (key: string): boolean => (
@@ -175,11 +188,11 @@ class Radar {
     Storage.setItem(Storage.METADATA, JSON.stringify(metadata));
   }
 
-  public static getLocation() {
+  public static getLocation(): Promise<NavigatorPosition> {
     return Navigator.getCurrentPosition();
   }
 
-  public static trackOnce(params: RadarTrackParams = {}) {
+  public static trackOnce(params: RadarTrackParams = {}): Promise<RadarTrackResponse> {
     try {
       return TrackAPI.trackOnce(params);
     } finally {
@@ -187,7 +200,7 @@ class Radar {
     }
   }
 
-  public static getContext(params: Location) {
+  public static getContext(params: Location): Promise<RadarContextResponse> {
     return ContextAPI.getContext(params);
   }
 
@@ -199,27 +212,27 @@ class Radar {
     TripsAPI.clearTripOptions();
   }
 
-  public static getTripOptions() {
+  public static getTripOptions(): RadarTripOptions {
     return TripsAPI.getTripOptions();
   }
 
-  public static startTrip(tripOptions: RadarTripOptions) {
+  public static startTrip(tripOptions: RadarTripOptions): Promise<RadarTripResponse> {
     return TripsAPI.startTrip(tripOptions);
   }
 
-  public static updateTrip(tripOptions: RadarTripOptions) {
+  public static updateTrip(tripOptions: RadarTripOptions): Promise<RadarTripResponse> {
     return TripsAPI.updateTrip(tripOptions);
   }
 
-  public static completeTrip() {
+  public static completeTrip(): Promise<RadarTripResponse> {
     return TripsAPI.completeTrip();
   }
 
-  public static cancelTrip() {
+  public static cancelTrip(): Promise<RadarTripResponse> {
     return TripsAPI.cancelTrip();
   }
 
-  public static logConversion(params: RadarConversionParams) {
+  public static logConversion(params: RadarConversionParams): Promise<RadarConversionResponse> {
     return ConversionsAPI.logConversion(params);
   }
 
@@ -243,39 +256,39 @@ class Radar {
   // Maps Platform
   /////////////////
 
-  public static forwardGeocode(params: RadarForwardGeocodeParams) {
+  public static forwardGeocode(params: RadarForwardGeocodeParams): Promise<RadarGeocodeResponse> {
     return GeocodingAPI.forwardGeocode(params);
   }
 
-  public static reverseGeocode(params: RadarReverseGeocodeParams) {
+  public static reverseGeocode(params: RadarReverseGeocodeParams): Promise<RadarGeocodeResponse> {
     return GeocodingAPI.reverseGeocode(params);
   }
 
-  public static ipGeocode() {
+  public static ipGeocode(): Promise<RadarIPGeocodeResponse> {
     return GeocodingAPI.ipGeocode();
   }
 
-  public static autocomplete(params: RadarAutocompleteParams) {
+  public static autocomplete(params: RadarAutocompleteParams): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete(params);
   }
 
-  public static searchGeofences(params: RadarSearchGeofencesParams) {
+  public static searchGeofences(params: RadarSearchGeofencesParams): Promise<RadarSearchGeofencesResponse> {
     return SearchAPI.searchGeofences(params);
   }
 
-  public static searchPlaces(params: RadarSearchPlacesParams) {
+  public static searchPlaces(params: RadarSearchPlacesParams): Promise<RadarSearchPlacesResponse> {
     return SearchAPI.searchPlaces(params);
   }
 
-  public static validateAddress(params: RadarValidateAddressParams) {
+  public static validateAddress(params: RadarValidateAddressParams): Promise<RadarValidateAddressResponse> {
     return AddressesAPI.validateAddress(params);
   }
 
-  public static distance(params: RadarDistanceParams) {
+  public static distance(params: RadarDistanceParams): Promise<RadarRouteResponse> {
     return RoutingAPI.distance(params);
   }
 
-  public static matrix(params: RadarMatrixParams) {
+  public static matrix(params: RadarMatrixParams): Promise<RadarMatrixResponse> {
     return RoutingAPI.matrix(params);
   }
 }
