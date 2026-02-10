@@ -2,7 +2,6 @@ import typescript from 'rollup-plugin-typescript2';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
-import postcss from 'rollup-plugin-postcss';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 
@@ -35,16 +34,11 @@ export default [
         sourcemap: true,
       },
     ],
-    external: ['maplibre-gl'],
     plugins: [
       typescript(),
       nodeResolve(),
       commonjs(),
       json(),
-      postcss({
-        extract: 'radar.css',
-        minimize: true,
-      }),
     ],
   },
 
@@ -70,10 +64,6 @@ export default [
       nodeResolve(),
       commonjs(),
       json(),
-      postcss({
-        extract: 'radar.css',
-        minimize: true,
-      }),
     ],
   },
 
@@ -94,29 +84,4 @@ export default [
       json(),
     ],
   },
-
-  // IIFE (core SDK feature - no maps)
-  {
-    input: 'src/iife-core-entry.ts',
-    output: [
-      {
-        file: 'cdn/radar-core.js',
-        format: 'iife',
-        name: 'Radar',
-        plugins: [onlyEmitFile()],
-      },
-      {
-        file: 'cdn/radar-core.min.js',
-        format: 'iife',
-        name: 'Radar',
-        plugins: [terser(), onlyEmitFile()],
-      },
-    ],
-    plugins: [
-      typescript(),
-      nodeResolve(),
-      commonjs(),
-      json(),
-    ],
-  }
 ];

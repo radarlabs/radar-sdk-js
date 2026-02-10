@@ -55,11 +55,11 @@ describe('Radar', () => {
 
   describe('initialize', () => {
     beforeEach(() => {
-      (window as any).RADAR_TEST_ENV = false;
+      window.RADAR_TEST_ENV = false;
     });
 
     afterEach(() => {
-      (window as any).RADAR_TEST_ENV = true;
+      window.RADAR_TEST_ENV = true;
       jest.restoreAllMocks();
     });
 

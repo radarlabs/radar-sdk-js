@@ -137,7 +137,7 @@ class Radar {
 
     // NOTE(jasonl): this allows us to run jest tests
     // without having to mock the ConfigAPI.getConfig call
-    if (!(window as any)?.RADAR_TEST_ENV) {
+    if (!(window)?.RADAR_TEST_ENV) {
       ConfigAPI.getConfig();
     }
 
@@ -283,6 +283,6 @@ class Radar {
 export default Radar;
 export { Radar };
 
-export type { RadarError } from './errors';
+export { RadarError } from './errors';
 export type * from './types';
 export type { RadarPlugin, RadarPluginContext } from './plugin';

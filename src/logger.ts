@@ -12,7 +12,7 @@ const LOG_LEVELS = {
 const getLevel = (): number => {
 
   // disable logging in tests
-  if (window && (window as any).RADAR_TEST_ENV) {
+  if (window && window.RADAR_TEST_ENV) {
     return LOG_LEVELS.none;
   }
 
