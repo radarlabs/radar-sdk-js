@@ -8,6 +8,14 @@ import '../styles/radar-autocomplete.css';
 
 export type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 
+declare module 'radar-sdk-js' {
+  namespace Radar {
+    let ui: {
+      autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
+    };
+  }
+}
+
 export function createAutocompletePlugin(): RadarPlugin {
   return {
     name: 'autocomplete',

@@ -1,3 +1,4 @@
+import type maplibregl from 'maplibre-gl';
 import type { RadarPlugin } from 'radar-sdk-js';
 
 import MapUI from './MapUI';
@@ -6,10 +7,25 @@ import version from './version';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '../styles/radar-maps.css';
 
+import type { RadarMapOptions, RadarMarkerOptions, RadarPopupOptions } from './types';
+import type RadarMap from './RadarMap';
+import type RadarMarker from './RadarMarker';
+
 export type { RadarMapOptions, RadarMarkerOptions, RadarPopupOptions, RadarLineOptions, RadarPolylineOptions, RadarPolygonOptions } from './types';
 export type { default as RadarMap } from './RadarMap';
 export type { default as RadarMarker } from './RadarMarker';
 export type { default as RadarPopup } from './RadarPopup';
+
+declare module 'radar-sdk-js' {
+  namespace Radar {
+    let ui: {
+      maplibregl: typeof maplibregl;
+      map(options: RadarMapOptions): RadarMap;
+      marker(options?: RadarMarkerOptions): RadarMarker;
+      popup(options: RadarPopupOptions): maplibregl.Popup;
+    };
+  }
+}
 
 export function createMapsPlugin(): RadarPlugin {
   return {
