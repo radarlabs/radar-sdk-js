@@ -1,8 +1,8 @@
-import maplibregl from 'maplibre-gl';
+import { Popup } from 'maplibre-gl';
 
-import { RadarPopupOptions } from './types';
+import type { RadarPopupOptions } from './types';
 
-class RadarPopup extends maplibregl.Popup {
+class RadarPopup extends Popup {
   constructor(popupOptions: RadarPopupOptions) {
     super(popupOptions);
 

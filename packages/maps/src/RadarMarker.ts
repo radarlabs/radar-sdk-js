@@ -1,16 +1,17 @@
-import maplibregl from 'maplibre-gl';
+import { Marker, Popup } from 'maplibre-gl';
 
 import type RadarMap from './RadarMap';
 
 import type { RadarMarkerOptions } from './types';
 import type { RadarPluginContext } from 'radar-sdk-js';
+import type { LngLat, Point2D } from 'maplibre-gl';
 
 class RadarMarkerMouseEvent {
   type: 'click';
   target: RadarMarker;
   originalEvent: MouseEvent;
-  lngLat: maplibregl.LngLat;
-  point: maplibregl.Point2D;
+  lngLat: LngLat;
+  point: Point2D;
 
   constructor(type: 'click', marker: RadarMarker, originalEvent: MouseEvent) {
     this.target = marker;
@@ -86,7 +87,7 @@ const defaultMarkerOptions: RadarMarkerOptions = {
   color: '#000257',
 };
 
-class RadarMarker extends maplibregl.Marker {
+class RadarMarker extends Marker {
   _map!: RadarMap;
 
   constructor(markerOptions: RadarMarkerOptions, ctx: RadarPluginContext) {
@@ -200,7 +201,7 @@ class RadarMarker extends maplibregl.Marker {
 
     // set popup text or HTML
     if (markerOptions.popup) {
-      const popup = new maplibregl.Popup(markerOptions.popup);
+      const popup = new Popup(markerOptions.popup);
 
       if (markerOptions.popup.text) {
         popup.setText(markerOptions.popup.text);

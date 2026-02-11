@@ -32,7 +32,7 @@
     "build:autocomplete": "npm -w packages/autocomplete run build",
     "build:maps": "npm -w packages/maps run build",
     "build:all": "npm run build && npm run build:autocomplete && npm run build:maps",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
     "check-beta-tag": "node ./scripts/check-beta-tag.cjs",
     "bump-version": "node ./scripts/bump-version.cjs",
@@ -50,7 +50,6 @@
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",

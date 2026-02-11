@@ -1,4 +1,4 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 
 import RadarMap from './RadarMap';
 import RadarMarker from './RadarMarker';
@@ -26,7 +26,7 @@ class MapUI {
     return new RadarMarker(markerOptions, this.ctx);
   }
 
-  public createPopup(popupOptions: RadarPopupOptions): maplibregl.Popup {
+  public createPopup(popupOptions: RadarPopupOptions): RadarPopup {
     return new RadarPopup(popupOptions);
   }
 }

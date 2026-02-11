@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "Node",
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "resolveJsonModule": true,
   },
   "include": ["src/**/*", "test/**/*"]
 }

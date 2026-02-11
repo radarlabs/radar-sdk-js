@@ -1,4 +1,4 @@
-import maplibregl from 'maplibre-gl';
+import { Map, AttributionControl, LngLatBounds, NavigationControl } from 'maplibre-gl';
 
 import RadarMarker from './RadarMarker';
 import RadarMapFeature from './RadarMapFeature';
@@ -14,6 +14,7 @@ import type {
   RadarPolygonOptions,
 } from './types';
 import type { RadarPluginContext } from 'radar-sdk-js';
+import type { FitBoundsOptions } from 'maplibre-gl';
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
@@ -72,7 +73,7 @@ const getStyle = (options: any, mapOptions: RadarMapOptions) => {
   return mapOptions.style; // style object or URL
 };
 
-class RadarMap extends maplibregl.Map {
+class RadarMap extends Map {
   _markers: RadarMarker[] = [];
   _features: RadarMapFeature[] = [];
 
@@ -125,11 +126,11 @@ class RadarMap extends maplibregl.Map {
     this.addControl(radarLogo, 'bottom-left');
 
     // add attribution
-    const attribution = new maplibregl.AttributionControl({ compact: false });
+    const attribution = new AttributionControl({ compact: false });
     this.addControl(attribution, 'bottom-right');
 
     // add zoom controls
-    const nav = new maplibregl.NavigationControl({
+    const nav = new NavigationControl({
       showCompass: false,
       showZoom: mapOptions.showZoomControls,
     });
@@ -170,7 +171,7 @@ class RadarMap extends maplibregl.Map {
       return;
     }
 
-    const bounds = new maplibregl.LngLatBounds();
+    const bounds = new LngLatBounds();
     markers.forEach((marker) => {
       bounds.extend(marker.getLngLat());
     });
@@ -189,12 +190,12 @@ class RadarMap extends maplibregl.Map {
     return this._features;
   }
 
-  fitToFeatures(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideFeatures?: RadarMapFeature[]) {
+  fitToFeatures(fitBoundsOptions: FitBoundsOptions = {}, overrideFeatures?: RadarMapFeature[]) {
     const features = (overrideFeatures || this._features).map((mapFeature) => mapFeature._feature);
     const coords = getAllCoords(features);
 
     if (coords.length > 0) {
-      const bounds = new maplibregl.LngLatBounds();
+      const bounds = new LngLatBounds();
       coords.forEach((coord: any) => {
         bounds.extend(coord);
       });

@@ -28,7 +28,8 @@
     "directory": "packages/autocomplete"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "radar-sdk-js": ">=5.0.0-beta.1"

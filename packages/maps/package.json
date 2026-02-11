@@ -28,7 +28,8 @@
     "directory": "packages/maps"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "maplibre-gl": "^2.4.0 || ^3.0.0 || ^4.0.0 || ^5.0.1",
