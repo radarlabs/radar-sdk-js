@@ -20,7 +20,7 @@ const config = [
       typescript({ declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       postcss({
-        extract: 'radar.css',
+        extract: 'radar-map.css',
         minimize: true,
       }),
     ],
@@ -54,7 +54,7 @@ const config = [
       nodeResolve(),
       commonjs(),
       postcss({
-        extract: 'radar-maps.css',
+        extract: 'radar-map.css',
         minimize: true,
       }),
     ],
