@@ -4,7 +4,8 @@ import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 
-export default [
+/** @type {import("rollup").RollupOptions[]} */
+const config = [
   // ESM
   {
     input: 'src/index.ts',
@@ -33,14 +34,21 @@ export default [
         file: 'cdn/radar-maps.js',
         format: 'iife',
         name: 'RadarMaps',
+        globals: {
+          "radar-sdk-js": "Radar",
+        },
       },
       {
         file: 'cdn/radar-maps.min.js',
         format: 'iife',
         name: 'RadarMaps',
         plugins: [terser()],
+        globals: {
+          "radar-sdk-js": "Radar",
+        },
       },
     ],
+    external: ['radar-sdk-js'],
     plugins: [
       typescript({ declaration: false, declarationDir: undefined, outDir: './cdn' }),
       nodeResolve(),
@@ -52,3 +60,5 @@ export default [
     ],
   },
 ];
+
+export default config;

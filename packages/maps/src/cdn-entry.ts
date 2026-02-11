@@ -1,7 +1,5 @@
 import { createMapsPlugin } from './index';
+import Radar from "radar-sdk-js"
 
-declare const Radar: typeof import('radar-sdk-js').default | undefined;
+Radar.registerPlugin(createMapsPlugin());
 
-if (typeof Radar !== 'undefined' && Radar?.registerPlugin) {
-  Radar.registerPlugin(createMapsPlugin());
-}

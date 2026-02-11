@@ -3,7 +3,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 
-export default [
+/** @type {import("rollup").RollupOptions[]} */
+const config = [
   // ESM
   {
     input: 'src/index.ts',
@@ -32,14 +33,21 @@ export default [
         file: 'cdn/radar-autocomplete.js',
         format: 'iife',
         name: 'RadarAutocomplete',
+        globals: {
+          "radar-sdk-js": "Radar",
+        },
       },
       {
         file: 'cdn/radar-autocomplete.min.js',
         format: 'iife',
         name: 'RadarAutocomplete',
         plugins: [terser()],
+        globals: {
+          "radar-sdk-js": "Radar",
+        },
       },
     ],
+    external: ['radar-sdk-js'],
     plugins: [
       typescript({ declaration: false, declarationDir: undefined, outDir: './cdn' }),
       nodeResolve(),
@@ -50,3 +58,5 @@ export default [
     ],
   },
 ];
+
+export default config
