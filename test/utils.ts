@@ -76,7 +76,7 @@ export const getRequest = () => {
 export const mockNetworkError = () => {
   const prevHandler = MockXhr.onSend;
 
-  MockXhr.onSend = (request: MockXhrRequest) => {
+  MockXhr.onSend = (request: any) => {
     request.setResponseHeaders(200, responseHeaders);
     request.setNetworkError();
 
