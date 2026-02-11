@@ -1,4 +1,4 @@
-import typescript from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
@@ -29,13 +29,14 @@ export default [
     input: 'src/index.ts',
     output: [
       {
-        file: 'dist/radar.js',
+        dir: 'dist',
+        entryFileNames: 'radar.js',
         format: 'esm',
         sourcemap: true,
       },
     ],
     plugins: [
-      typescript(),
+      typescript({ declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       commonjs(),
       json(),
@@ -60,7 +61,7 @@ export default [
       },
     ],
     plugins: [
-      typescript(),
+      typescript({ declaration: false, outDir: './cdn' }),
       nodeResolve(),
       commonjs(),
       json(),
@@ -72,13 +73,14 @@ export default [
     input: 'src/plugin.ts',
     output: [
       {
-        file: 'dist/plugin.js',
+        dir: 'dist',
+        entryFileNames: 'plugin.js',
         format: 'esm',
         sourcemap: true,
       },
     ],
     plugins: [
-      typescript(),
+      typescript({ declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       commonjs(),
       json(),

@@ -27,6 +27,7 @@ export const enableLocation = (position: NavigatorPosition, callback?: any) => {
       success({
         coords: position as GeolocationCoordinates,
         timestamp: Date.now(),
+        toJSON() { return this; },
       });
 
       // callback used for testing passed arguments
