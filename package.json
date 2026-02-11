@@ -26,6 +26,7 @@
   ],
   "scripts": {
     "build": "rollup -c",
+    "typecheck": "tsc --noEmit",
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
     "check-beta-tag": "node ./scripts/check-beta-tag.cjs",
     "bump-version": "node ./scripts/bump-version.cjs",
