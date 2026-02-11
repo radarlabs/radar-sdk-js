@@ -4,8 +4,6 @@ import Http, { HttpMethod } from '../src/http';
 import SDK_VERSION from '../src/version';
 import { getRequest, mockNetworkError, mockRequest } from './utils';
 
-import type MockXhrRequest from 'mock-xmlhttprequest/dist/types/MockXhrRequest';
-
 
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
@@ -36,7 +34,7 @@ describe('Http', () => {
         mockRequest(200, successResponse);
 
         const response = await Http.request(httpRequestParams);
-        const request: MockXhrRequest = getRequest();
+        const request = getRequest();
 
         expect(request.requestHeaders.getHeader('X-Radar-Device-Type')).toEqual('Web');
         expect(request.requestHeaders.getHeader('X-Radar-SDK-Version')).toEqual(SDK_VERSION);
@@ -48,7 +46,7 @@ describe('Http', () => {
         mockRequest(200, successResponse);
 
         const response = await Http.request(httpRequestParams);
-        const request: MockXhrRequest = getRequest();
+        const request = getRequest();
 
         expect(request.body).toEqual('{"valid":true}');
         expect(response.code).toEqual(200);
@@ -163,7 +161,7 @@ describe('Http', () => {
 
       it('should return a publishable key error if not set', async () => {
         Config.clear();
-        
+
         try {
           await Http.request({ method: 'PUT', path: 'users/userId', data: {} });
         } catch (e: any) {
@@ -189,7 +187,7 @@ describe('Http', () => {
       mockRequest(200, successResponse);
 
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
-      const request: MockXhrRequest = getRequest();
+      const request = getRequest();
 
       const urlencodedData = `query=${encodeURIComponent(data.query)}`;
       expect(request.url).toContain(`?${urlencodedData}`);
@@ -200,7 +198,7 @@ describe('Http', () => {
     it('should not append querystring of no params', async () => {
       mockRequest(200, successResponse);
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data: {} });
-      const request: MockXhrRequest = getRequest();
+      const request = getRequest();
 
       expect(request.url).not.toContain('?');
       expect(response.code).toEqual(200);
@@ -226,7 +224,7 @@ describe('Http', () => {
       mockRequest(200, successResponse);
 
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
-      const request: MockXhrRequest = getRequest();
+      const request = getRequest();
 
       expect(response.code).toEqual(200);
       expect(request.requestHeaders.getHeader('X-Radar-Device-Type')).toEqual('Web');
