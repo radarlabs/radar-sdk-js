@@ -1,7 +1,5 @@
 import { NavigatorPosition } from '../src/types';
 
-import type MockXhrRequest from 'mock-xmlhttprequest/dist/types/MockXhrRequest';
-
 export const nycOffice: NavigatorPosition = {
   latitude: 40.7342422,
   longitude: -73.9910959,
@@ -54,7 +52,7 @@ const responseHeaders = { 'Content-Type': 'application/json' };
 export const mockRequest = (status: number, response: any) => {
   const prevHandler = MockXhr.onSend;
 
-  MockXhr.onSend = (request: MockXhrRequest) => {
+  MockXhr.onSend = (request: any) => {
     // default handler for config calls
     MockXhr.request = request;
 
