@@ -73,7 +73,8 @@
     "xcworkspace",
     "yourapp",
     "lookback",
-    "jailbroken"
+    "jailbroken",
+    "subclassing"
   ],
   "ignoreRegExpList": [
     "/^\\s*```[\\s\\S]*?^\\s*```/gm",
