@@ -1,0 +1,49 @@
+name: Publish plugin package to npmjs
+on:
+  release:
+    types: [ released ]
+jobs:
+  build:
+    if: ${{ !startsWith(github.ref_name, 'v') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Parse plugin tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          PLUGIN_NAME="${TAG%-v*}"
+          PLUGIN_VERSION="${TAG#*-v}"
+          MAJOR_VERSION="${PLUGIN_VERSION%%.*}"
+          echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_ENV
+          echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+          echo "Parsed tag: plugin=$PLUGIN_NAME version=$PLUGIN_VERSION major=$MAJOR_VERSION"
+      - run: npm ci --force
+      - run: npm run build
+      - run: npm run build:${{ env.PLUGIN_NAME }}
+      - run: node scripts/check-plugin-tag.cjs ${{ env.PLUGIN_NAME }} ${{ env.PLUGIN_VERSION }} stable
+      - run: npm publish -w packages/${{ env.PLUGIN_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: js.radar.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: packages/${{ env.PLUGIN_NAME }}/cdn/
+          DEST_DIR: ${{ env.PLUGIN_NAME }}/v${{ env.PLUGIN_VERSION }}
+      - uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: js.radar.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: packages/${{ env.PLUGIN_NAME }}/cdn/
+          DEST_DIR: ${{ env.PLUGIN_NAME }}/${{ env.MAJOR_VERSION }}

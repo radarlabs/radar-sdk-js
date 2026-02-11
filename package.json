@@ -16,6 +16,9 @@
       "import": "./dist/plugin.js"
     }
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "build": "rollup -c",
   "prepublish": "npm run build",
   "files": [
@@ -26,10 +29,15 @@
   ],
   "scripts": {
     "build": "rollup -c",
+    "build:autocomplete": "npm -w packages/autocomplete run build",
+    "build:maps": "npm -w packages/maps run build",
+    "build:all": "npm run build && npm run build:autocomplete && npm run build:maps",
     "typecheck": "tsc --noEmit",
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
     "check-beta-tag": "node ./scripts/check-beta-tag.cjs",
     "bump-version": "node ./scripts/bump-version.cjs",
+    "check-plugin-tag": "node ./scripts/check-plugin-tag.cjs",
+    "bump-plugin-version": "node ./scripts/bump-plugin-version.cjs",
     "test": "jest --collect-coverage --runInBand",
     "test:watch": "jest --watch",
     "demo": "npm run build && node ./demo/server.cjs",
