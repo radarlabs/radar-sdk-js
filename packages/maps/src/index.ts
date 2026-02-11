@@ -17,13 +17,14 @@ export type { default as RadarMarker } from './RadarMarker';
 export type { default as RadarPopup } from './RadarPopup';
 
 declare module 'radar-sdk-js' {
+  interface RadarUI {
+    maplibregl: typeof maplibregl;
+    map(options: RadarMapOptions): RadarMap;
+    marker(options?: RadarMarkerOptions): RadarMarker;
+    popup(options: RadarPopupOptions): maplibregl.Popup;
+  }
   namespace Radar {
-    let ui: {
-      maplibregl: typeof maplibregl;
-      map(options: RadarMapOptions): RadarMap;
-      marker(options?: RadarMarkerOptions): RadarMarker;
-      popup(options: RadarPopupOptions): maplibregl.Popup;
-    };
+    let ui: RadarUI;
   }
 }
 

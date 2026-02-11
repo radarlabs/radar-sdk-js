@@ -9,10 +9,11 @@ import '../styles/radar-autocomplete.css';
 export type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 
 declare module 'radar-sdk-js' {
+  interface RadarUI {
+    autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
+  }
   namespace Radar {
-    let ui: {
-      autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
-    };
+    let ui: RadarUI;
   }
 }
 
