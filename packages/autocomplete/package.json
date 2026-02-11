@@ -1,6 +1,6 @@
 {
   "name": "@radarlabs/autocomplete-ui-plugin",
-  "version": "5.0.0-beta.2",
+  "version": "5.0.0-beta.3",
   "description": "Autocomplete UI plugin for radar-sdk-js",
   "type": "module",
   "exports": {
