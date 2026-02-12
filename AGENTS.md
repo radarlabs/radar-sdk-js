@@ -8,6 +8,8 @@ npm run build:autocomplete             # autocomplete plugin only
 npm test                               # jest --collect-coverage --runInBand
 npm run test:watch                     # jest --watch
 npx jest test/api/geocoding.test.ts    # run a single test file
+npm run lint                           # oxlint --type-aware --type-check
+npm run fmt                            # oxfmt
 npm run typecheck                      # tsc --noEmit (root + all workspaces)
 npm run demo                           # build + local demo server
 ```
@@ -45,7 +47,7 @@ Plugins declare `radar-sdk-js` as a peer dep (`>=5.0.0-beta.1`) and use `"radar-
 
 - Jest + ts-jest, jsdom environment
 - Tests in `test/` mirror `src/` structure; API tests in `test/api/`
-- Mock XHR via `mock-xmlhttprequest`; globals in `test/mock-data/globals.js`
+- Mock fetch via `jest-fetch-mock`; globals in `test/mock-data/globals.ts`
 - CSS imports mocked via `test/mock-data/styles.js`
 - `(window as any).RADAR_TEST_ENV = true` is set in globals to skip ConfigAPI.getConfig calls
 
@@ -63,7 +65,7 @@ Version is tracked in 3 places that must stay in sync:
 
 - **All Radar methods are static** — no instances, singleton config
 - **State**: `Config` singleton + `Storage` (typed localStorage with `radar-*` keys)
-- **HTTP**: `Http.request({ method, path, data })` — XHR-based, deduplicates in-flight requests
+- **HTTP**: `Http.request({ method, path, data })` — fetch-based, deduplicates in-flight requests via AbortController
 - **Errors**: `RadarError` hierarchy with a custom class per HTTP status (BadRequest, Unauthorized, RateLimit, etc.)
 - **Initialization**: `Radar.initialize(publishableKey, options?)` — validates key format, rejects secret keys, auto-detects live/test mode
 
