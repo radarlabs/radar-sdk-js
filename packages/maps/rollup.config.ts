@@ -1,11 +1,11 @@
 import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 import postcss from 'rollup-plugin-postcss';
+import type { RollupOptions } from 'rollup';
 
-/** @type {import("rollup").RollupOptions[]} */
-const config = [
-  // ESM
+const config: RollupOptions[] = [
   {
     input: 'src/index.ts',
     output: {
@@ -14,33 +14,33 @@ const config = [
       format: 'esm',
       sourcemap: true,
     },
-    external: ['radar-sdk-js'],
+    external: ['radar-sdk-js', 'maplibre-gl'],
     plugins: [
       typescript({ declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       postcss({
-        extract: 'radar-autocomplete.css',
+        extract: 'radar-map.css',
         minimize: true,
       }),
     ],
   },
 
-  // IIFE (CDN)
+  // IIFE (CDN) — bundles maplibre-gl
   {
     input: 'src/cdn-entry.ts',
     output: [
       {
-        file: 'cdn/radar-autocomplete.js',
+        file: 'cdn/radar-maps.js',
         format: 'iife',
-        name: 'RadarAutocomplete',
+        name: 'RadarMaps',
         globals: {
           "radar-sdk-js": "Radar",
         },
       },
       {
-        file: 'cdn/radar-autocomplete.min.js',
+        file: 'cdn/radar-maps.min.js',
         format: 'iife',
-        name: 'RadarAutocomplete',
+        name: 'RadarMaps',
         plugins: [terser()],
         globals: {
           "radar-sdk-js": "Radar",
@@ -51,12 +51,13 @@ const config = [
     plugins: [
       typescript({ declaration: false, declarationDir: undefined, outDir: './cdn' }),
       nodeResolve(),
+      commonjs(),
       postcss({
-        extract: 'radar-autocomplete.css',
+        extract: 'radar-map.css',
         minimize: true,
       }),
     ],
   },
 ];
 
-export default config
+export default config;

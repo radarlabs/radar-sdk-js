@@ -79,6 +79,7 @@ export interface RadarTrackParams {
   desiredAccuracy?: 'high' | 'medium' | 'low';
   reason?: string;
   transactionId?: string;
+  fraud?: boolean;
 }
 
 export enum RadarEventConfidence {
