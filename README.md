@@ -51,7 +51,7 @@ Radar.initialize('prj_test_pk_...', { /* options */ });
 
 Add the following to your HTML:
 ```html
-<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+<script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
 
 <script>
   Radar.initialize('prj_test_pk_...', { /* options */ });
@@ -67,13 +67,13 @@ only need the API.
 ### Maps plugin (npm)
 
 ```bash
-npm install @radarlabs/maps-plugin maplibre-gl
+npm install @radarlabs/plugin-maps maplibre-gl
 ```
 
 ```js
 import Radar from 'radar-sdk-js';
-import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import '@radarlabs/maps-plugin/dist/radar-maps.css';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.initialize('prj_test_pk_...');
@@ -86,13 +86,13 @@ const map = Radar.ui.map({
 ### Autocomplete plugin (npm)
 
 ```bash
-npm install @radarlabs/autocomplete-ui-plugin
+npm install @radarlabs/plugin-autocomplete
 ```
 
 ```js
 import Radar from 'radar-sdk-js';
-import { createAutocompletePlugin } from '@radarlabs/autocomplete-ui-plugin';
-import '@radarlabs/autocomplete-ui-plugin/dist/radar-autocomplete.css';
+import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
+import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
 
 Radar.registerPlugin(createAutocompletePlugin());
 Radar.initialize('prj_test_pk_...');
@@ -128,7 +128,7 @@ the core SDK first, then any plugins you need:
 <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
 <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
 
-<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+<script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
 <script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
@@ -145,7 +145,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
-    <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
     <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
   </head>
 
@@ -172,7 +172,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
-    <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
     <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
   </head>
 
@@ -206,7 +206,7 @@ are needed for geofencing.
 ```html
 <html>
   <head>
-    <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
   </head>
 
   <body>
@@ -227,8 +227,8 @@ are needed for geofencing.
 | Package | npm | Description |
 |---------|-----|-------------|
 | `radar-sdk-js` | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js) | Core SDK — tracking, geocoding, search, routing |
-| `@radarlabs/maps-plugin` | [![npm](https://img.shields.io/npm/v/@radarlabs/maps-plugin.svg)](https://www.npmjs.com/package/@radarlabs/maps-plugin) | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
-| `@radarlabs/autocomplete-ui-plugin` | [![npm](https://img.shields.io/npm/v/@radarlabs/autocomplete-ui-plugin.svg)](https://www.npmjs.com/package/@radarlabs/autocomplete-ui-plugin) | Autocomplete UI widget |
+| `@radarlabs/plugin-maps` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-maps.svg)](https://www.npmjs.com/package/@radarlabs/plugin-maps) | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
+| `@radarlabs/plugin-autocomplete` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg)](https://www.npmjs.com/package/@radarlabs/plugin-autocomplete) | Autocomplete UI widget |
 | `@radarlabs/fraud-plugin` | — | Fraud detection — verified tracking, location tokens |
 
 ## Plugin system
@@ -239,8 +239,8 @@ plugins before or after calling `Radar.initialize()`:
 
 ```js
 import Radar from 'radar-sdk-js';
-import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import { createAutocompletePlugin } from '@radarlabs/autocomplete-ui-plugin';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
 import { createFraudPlugin } from '@radarlabs/fraud-plugin';
 
 Radar.registerPlugin(createMapsPlugin());

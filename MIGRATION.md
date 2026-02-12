@@ -21,10 +21,10 @@ If you use Maps or Autocomplete UI, install the corresponding plugins:
 
 ```bash
 # maps (requires maplibre-gl as a peer dep)
-npm install @radarlabs/maps-plugin maplibre-gl
+npm install @radarlabs/plugin-maps maplibre-gl
 
 # autocomplete
-npm install @radarlabs/autocomplete-ui-plugin
+npm install @radarlabs/plugin-autocomplete
 ```
 
 ### Plugin registration
@@ -43,8 +43,8 @@ const map = Radar.ui.map({ container: 'map' });
 
 // v5
 import Radar from 'radar-sdk-js';
-import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import '@radarlabs/maps-plugin/dist/radar-maps.css';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.initialize('prj_test_pk_...');
@@ -97,8 +97,8 @@ In v5, each plugin ships its own CSS. Import only the styles you need:
 import 'radar-sdk-js/dist/radar.css';
 
 // v5
-import '@radarlabs/maps-plugin/dist/radar-maps.css';
-import '@radarlabs/autocomplete-ui-plugin/dist/radar-autocomplete.css';
+import '@radarlabs/plugin-maps/dist/radar-maps.css';
+import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
 ```
 
 The core SDK no longer ships a CSS file.
@@ -197,8 +197,8 @@ import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
 
 | Change | v4 | v5 |
 |--------|----|----|
-| Maps UI | Built into core | `@radarlabs/maps-plugin` |
-| Autocomplete UI | Built into core | `@radarlabs/autocomplete-ui-plugin` |
+| Maps UI | Built into core | `@radarlabs/plugin-maps` |
+| Autocomplete UI | Built into core | `@radarlabs/plugin-autocomplete` |
 | Fraud/Verify API | Built into core | `@radarlabs/fraud-plugin` (`Radar.fraud.*`) |
 | `maplibre-gl` peer dep | Required by core | Required by maps plugin only |
 | CSS | Single `radar.css` | Per-plugin CSS files |

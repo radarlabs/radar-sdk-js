@@ -1,4 +1,4 @@
-# @radarlabs/autocomplete-ui-plugin
+# @radarlabs/plugin-autocomplete
 
 Autocomplete UI plugin for
 [radar-sdk-js](https://www.npmjs.com/package/radar-sdk-js). Provides a
@@ -11,13 +11,13 @@ results powered by the
 ### With npm
 
 ```bash
-npm install radar-sdk-js @radarlabs/autocomplete-ui-plugin
+npm install radar-sdk-js @radarlabs/plugin-autocomplete
 ```
 
 ```js
 import Radar from 'radar-sdk-js';
-import { createAutocompletePlugin } from '@radarlabs/autocomplete-ui-plugin';
-import '@radarlabs/autocomplete-ui-plugin/dist/radar-autocomplete.css';
+import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
+import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
 
 Radar.registerPlugin(createAutocompletePlugin());
 Radar.initialize('prj_test_pk_...');

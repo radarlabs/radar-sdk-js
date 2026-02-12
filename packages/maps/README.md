@@ -1,4 +1,4 @@
-# @radarlabs/maps-plugin
+# @radarlabs/plugin-maps
 
 Maps UI plugin for [radar-sdk-js](https://www.npmjs.com/package/radar-sdk-js).
 Provides `Radar.ui.map()`, `Radar.ui.marker()`, and `Radar.ui.popup()` powered
@@ -9,13 +9,13 @@ by [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/).
 ### With npm
 
 ```bash
-npm install radar-sdk-js @radarlabs/maps-plugin maplibre-gl
+npm install radar-sdk-js @radarlabs/plugin-maps maplibre-gl
 ```
 
 ```js
 import Radar from 'radar-sdk-js';
-import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import '@radarlabs/maps-plugin/dist/radar-maps.css';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.initialize('prj_test_pk_...');

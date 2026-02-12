@@ -19,8 +19,8 @@ npm workspaces with core SDK at root and plugins in `packages/`:
 | Package | npm name | Notes |
 |---------|----------|-------|
 | root | `radar-sdk-js` | Core SDK — API methods, HTTP, config, storage, errors |
-| `packages/maps` | `@radarlabs/maps-plugin` | MapLibre GL wrappers (RadarMap, RadarMarker, RadarPopup) |
-| `packages/autocomplete` | `@radarlabs/autocomplete-ui-plugin` | Autocomplete UI widget |
+| `packages/maps` | `@radarlabs/plugin-maps` | MapLibre GL wrappers (RadarMap, RadarMarker, RadarPopup) |
+| `packages/autocomplete` | `@radarlabs/plugin-autocomplete` | Autocomplete UI widget |
 
 Plugins declare `radar-sdk-js` as a peer dep (`>=5.0.0-beta.1`) and use `"radar-sdk-js": "file:../../"` in devDeps for local linking.
 

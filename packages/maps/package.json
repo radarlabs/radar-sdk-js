@@ -1,6 +1,6 @@
 {
-  "name": "@radarlabs/maps-plugin",
-  "version": "5.0.0-beta.4",
+  "name": "@radarlabs/plugin-maps",
+  "version": "5.0.0-beta.5",
   "description": "Maps plugin for radar-sdk-js",
   "type": "module",
   "exports": {

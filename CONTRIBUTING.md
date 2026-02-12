@@ -8,8 +8,8 @@ This project is a monorepo managed with [npm workspaces](https://docs.npmjs.com/
 radar-sdk-js/
 ├── src/                  # core SDK source
 ├── packages/
-│   ├── maps/             # @radarlabs/maps-plugin
-│   └── autocomplete/     # @radarlabs/autocomplete-ui-plugin
+│   ├── maps/             # @radarlabs/plugin-maps
+│   └── autocomplete/     # @radarlabs/plugin-autocomplete
 ├── demo/                 # local demo app
 └── test/                 # core SDK tests
 ```
@@ -87,7 +87,7 @@ npm run build:maps
 cd packages/maps && npm link
 
 # in your project
-npm link @radarlabs/maps-plugin
+npm link @radarlabs/plugin-maps
 ```
 
 > **Note:** Make sure you're using the same Node.js and npm installation in both projects, especially if you're using a version manager like `nvm` or `n`.
