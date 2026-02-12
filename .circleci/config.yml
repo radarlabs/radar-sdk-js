@@ -40,6 +40,12 @@ jobs:
       - run:
           name: Build all packages
           command: npm run build:all
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+            - packages/maps/dist
+            - packages/autocomplete/dist
 
   test:
     docker:
