@@ -36,7 +36,7 @@ export interface RadarPluginContext {
   Radar: RadarStatic;
   /** SDK configuration singleton */
   Config: typeof Config;
-  /** XHR-based HTTP client */
+  /** fetch-based HTTP client */
   Http: typeof Http;
   /** typed localStorage wrapper */
   Storage: typeof Storage;
