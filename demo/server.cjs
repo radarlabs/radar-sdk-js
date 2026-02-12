@@ -5,6 +5,11 @@ const express = require('express');
 const { engine }  = require('express-handlebars');
 
 const sdk_version = require('../package.json').version;
+const maps_version = require('../packages/maps/package.json').version;
+const autocomplete_version = require('../packages/autocomplete/package.json').version;
+
+const fraudPkgPath = path.join(__dirname, '../../radar-sdk-js-fraud/package.json');
+const fraud_version = fs.existsSync(fraudPkgPath) ? require(fraudPkgPath).version : sdk_version;
 
 const app = express();
 const PORT = 9001;
@@ -32,6 +37,14 @@ app.use((req, res, next) => {
 // serve static files
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/cdn', express.static('./cdn'));
+app.use('/cdn/plugins', express.static('./packages/maps/cdn'));
+app.use('/cdn/plugins', express.static('./packages/autocomplete/cdn'));
+
+// NOTE(jasonl): fraud plugin lives in separate repo — serve if locally built
+const fraudCdnPath = path.join(__dirname, '../../radar-sdk-js-fraud/cdn');
+if (fs.existsSync(fraudCdnPath)) {
+  app.use('/cdn/plugins', express.static(fraudCdnPath));
+}
 
 // create a route for each handelbars view
 const views = fs.readdirSync(path.join(__dirname, 'views'));
@@ -44,8 +57,10 @@ views.forEach((view) => {
       name,
       title,
       sdk_version,
+      maps_version,
+      autocomplete_version,
+      fraud_version,
       js_file: '/cdn/radar.js',
-      css_file: '/cdn/radar.css',
     });
   });
 });

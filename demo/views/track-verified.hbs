@@ -62,8 +62,10 @@
   &lt;head&gt;
     &lt;meta charset="utf-8" /&gt;
     &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
-    &lt;link href="https://js.radar.com/v{{sdk_version}}/radar.css" rel="stylesheet"&gt;
+    &lt;link href="https://js.radar.com/maps/v{{maps_version}}/radar-map.css" rel="stylesheet"&gt;
     &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
+    &lt;script src="https://js.radar.com/maps/v{{maps_version}}/radar-maps.min.js"&gt;&lt;/script&gt;
+    &lt;script src="https://js.radar.com/fraud/v{{fraud_version}}/radar-fraud.min.js"&gt;&lt;/script&gt;
   &lt;/head&gt;
 
   &lt;body&gt;
@@ -138,7 +140,7 @@
           <p>${location.latitude},${location.longitude}</p>
         `.trim();
 
-        const marker = Radar.ui.marker({ html })
+        const marker = Radar.ui.marker({ popup: { html } })
           .setLngLat([location.longitude, location.latitude])
           .addTo(map);
 
