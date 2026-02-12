@@ -51,7 +51,7 @@ Radar.initialize('prj_test_pk_...', { /* options */ });
 
 Add the following to your HTML:
 ```html
-<script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
+<script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
 
 <script>
   Radar.initialize('prj_test_pk_...', { /* options */ });
@@ -128,7 +128,7 @@ the core SDK first, then any plugins you need:
 <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
 <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
 
-<script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
+<script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
 <script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
@@ -145,7 +145,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
-    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
     <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
   </head>
 
@@ -172,7 +172,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
-    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
     <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
   </head>
 
@@ -206,7 +206,7 @@ are needed for geofencing.
 ```html
 <html>
   <head>
-    <script src="https://js.radar.com/v5.0.0-beta.4/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
   </head>
 
   <body>
