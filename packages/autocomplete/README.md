@@ -29,7 +29,7 @@ Load the core SDK first, then the autocomplete plugin. The CDN bundle
 auto-registers with the core SDK.
 
 ```html
-<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
+<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
 <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
 ```
@@ -56,30 +56,30 @@ creating a new one.
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `container` | `string \| HTMLElement` | `'autocomplete'` | Container element or ID |
-| `onSelection` | `(result) => void` | — | Called when the user selects a result |
-| `onResults` | `(results) => void` | — | Called after results are fetched |
-| `onRequest` | `(params) => void` | — | Called before each API request |
-| `onError` | `(error) => void` | — | Called on fetch errors |
-| `placeholder` | `string` | `'Search address'` | Input placeholder text |
-| `minCharacters` | `number` | `3` | Minimum characters before searching |
-| `debounceMS` | `number` | `200` | Debounce delay in milliseconds |
-| `limit` | `number` | `8` | Maximum number of results |
-| `responsive` | `boolean` | `true` | Use 100% width (with optional `maxWidth`) |
-| `width` | `string \| number` | `400` | Fixed width, or max-width if responsive |
-| `maxHeight` | `string \| number` | — | Max height for the results dropdown |
-| `disabled` | `boolean` | `false` | Disable the input |
-| `showMarkers` | `boolean` | `true` | Show marker icons next to results |
-| `markerColor` | `string` | `'#ACBDC8'` | Color of result marker icons |
-| `hideResultsOnBlur` | `boolean` | `true` | Close results when input loses focus |
-| `near` | `Location \| string` | — | Bias results near a location |
-| `layers` | `string[]` | — | Filter by geocode layers |
-| `countryCode` | `string` | — | Filter results by country |
-| `lang` | `string` | — | Language for results |
-| `postalCode` | `string` | — | Filter results by postal code |
-| `mailable` | `boolean` | — | Only return mailable addresses |
+| Option              | Type                    | Default            | Description                               |
+| ------------------- | ----------------------- | ------------------ | ----------------------------------------- |
+| `container`         | `string \| HTMLElement` | `'autocomplete'`   | Container element or ID                   |
+| `onSelection`       | `(result) => void`      | —                  | Called when the user selects a result     |
+| `onResults`         | `(results) => void`     | —                  | Called after results are fetched          |
+| `onRequest`         | `(params) => void`      | —                  | Called before each API request            |
+| `onError`           | `(error) => void`       | —                  | Called on fetch errors                    |
+| `placeholder`       | `string`                | `'Search address'` | Input placeholder text                    |
+| `minCharacters`     | `number`                | `3`                | Minimum characters before searching       |
+| `debounceMS`        | `number`                | `200`              | Debounce delay in milliseconds            |
+| `limit`             | `number`                | `8`                | Maximum number of results                 |
+| `responsive`        | `boolean`               | `true`             | Use 100% width (with optional `maxWidth`) |
+| `width`             | `string \| number`      | `400`              | Fixed width, or max-width if responsive   |
+| `maxHeight`         | `string \| number`      | —                  | Max height for the results dropdown       |
+| `disabled`          | `boolean`               | `false`            | Disable the input                         |
+| `showMarkers`       | `boolean`               | `true`             | Show marker icons next to results         |
+| `markerColor`       | `string`                | `'#ACBDC8'`        | Color of result marker icons              |
+| `hideResultsOnBlur` | `boolean`               | `true`             | Close results when input loses focus      |
+| `near`              | `Location \| string`    | —                  | Bias results near a location              |
+| `layers`            | `string[]`              | —                  | Filter by geocode layers                  |
+| `countryCode`       | `string`                | —                  | Filter results by country                 |
+| `lang`              | `string`                | —                  | Language for results                      |
+| `postalCode`        | `string`                | —                  | Filter results by postal code             |
+| `mailable`          | `boolean`               | —                  | Only return mailable addresses            |
 
 ### Chainable setters
 
@@ -119,8 +119,8 @@ The autocomplete widget includes ARIA attributes for screen readers:
 
 ## Peer dependencies
 
-| Package | Version |
-|---------|---------|
+| Package        | Version          |
+| -------------- | ---------------- |
 | `radar-sdk-js` | `>=5.0.0-beta.1` |
 
 ## Support

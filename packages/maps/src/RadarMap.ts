@@ -1,28 +1,19 @@
 import { Map, AttributionControl, LngLatBounds, NavigationControl } from 'maplibre-gl';
 
-import RadarMarker from './RadarMarker';
-import RadarMapFeature from './RadarMapFeature';
 import RadarLineFeature from './RadarLineFeature';
-import RadarPolygonFeature from './RadarPolygonFeature';
 import RadarLogoControl from './RadarLogoControl';
+import RadarMapFeature from './RadarMapFeature';
+import RadarMarker from './RadarMarker';
+import RadarPolygonFeature from './RadarPolygonFeature';
 import { getAllCoords } from './util/geojson';
 
-import type {
-  RadarMapOptions,
-  RadarLineOptions,
-  RadarPolylineOptions,
-  RadarPolygonOptions,
-} from './types';
-import type { RadarOptions, RadarPluginContext } from 'radar-sdk-js';
+import type { RadarMapOptions, RadarLineOptions, RadarPolylineOptions, RadarPolygonOptions } from './types';
 import type { FitBoundsOptions } from 'maplibre-gl';
+import type { RadarOptions, RadarPluginContext } from 'radar-sdk-js';
 
 const DEFAULT_STYLE = 'radar-default-v1';
 
-const RADAR_STYLES = [
-  'radar-default-v1',
-  'radar-light-v1',
-  'radar-dark-v1',
-];
+const RADAR_STYLES = ['radar-default-v1', 'radar-light-v1', 'radar-dark-v1'];
 
 // Radar specific configs
 const defaultRadarMapOptions: Partial<RadarMapOptions> = {
@@ -42,21 +33,23 @@ const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
 };
 
 const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
-  const style = mapOptions.style as string || DEFAULT_STYLE;
+  const style = (mapOptions.style as string) || DEFAULT_STYLE;
 
-  let url = `${options.host}/maps/styles/${style}`
+  let url = `${options.host}/maps/styles/${style}`;
   if (mapOptions.language) {
-    url += `?language=${mapOptions.language}`
+    url += `?language=${mapOptions.language}`;
   }
   return url;
 };
 
 // check if style is a Radar style or a custom style
 const isRadarStyle = (style: string) => {
-  if (RADAR_STYLES.includes(style)) { // Radar built-in style
+  if (RADAR_STYLES.includes(style)) {
+    // Radar built-in style
     return true;
   }
-  if (!/^(http:|https:)/.test(style)) { // Radar custom style (not a URL)
+  if (!/^(http:|https:)/.test(style)) {
+    // Radar custom style (not a URL)
     return true;
   }
   return false;
@@ -88,7 +81,8 @@ class RadarMap extends Map {
 
     // configure map options
     const style = getStyle(config, radarMapOptions);
-    const mapOptions: RadarMapOptions = Object.assign({},
+    const mapOptions: RadarMapOptions = Object.assign(
+      {},
       defaultRadarMapOptions,
       defaultMaplibreOptions,
       radarMapOptions,
@@ -104,7 +98,7 @@ class RadarMap extends Map {
       }
 
       let headers = {
-        'Authorization': config.publishableKey,
+        Authorization: config.publishableKey,
         'X-Radar-Device-Type': 'Web',
         'X-Radar-SDK-Version': SDK_VERSION,
       };
@@ -235,7 +229,7 @@ class RadarMap extends Map {
    * @param polygonOptions - optional polygon styling
    * @returns the created polygon feature
    */
-  addPolygon(polygon: GeoJSON.Feature<GeoJSON.Polygon|GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
+  addPolygon(polygon: GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
     const feature = new RadarPolygonFeature(this, polygon, polygonOptions);
     this._features.push(feature);
     return feature;
@@ -266,6 +260,6 @@ class RadarMap extends Map {
     this._features.push(feature);
     return feature;
   }
-};
+}
 
 export default RadarMap;

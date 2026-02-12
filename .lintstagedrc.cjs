@@ -1,5 +1,5 @@
 module.exports = {
-  '*.{ts,tsx}': () => 'npm run lint',
+  '*.{ts,tsx,js,jsx,cjs,mjs,css,json}': (filenames) => [`oxfmt --write ${filenames.join(' ')}`, 'npm run lint'],
   '*.md': [
     (filenames) => {
       if (filenames.length === 0) {
@@ -11,4 +11,4 @@ module.exports = {
       return [`cspell ${fileNames} -c cspell.json`];
     },
   ],
-}
+};

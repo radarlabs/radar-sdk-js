@@ -54,4 +54,4 @@ export const decodePolyline = (str: string, precision: number = 6): number[][] =
   }
 
   return coordinates;
-}
+};

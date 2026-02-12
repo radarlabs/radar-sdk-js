@@ -1,8 +1,4 @@
-import SDK_VERSION from './version';
 import Config from './config';
-import Logger from './logger';
-import Navigator from './navigator';
-
 import {
   RadarBadRequestError,
   RadarForbiddenError,
@@ -17,6 +13,9 @@ import {
   RadarUnauthorizedError,
   RadarUnknownError,
 } from './errors';
+import Logger from './logger';
+import Navigator from './navigator';
+import SDK_VERSION from './version';
 
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -81,7 +80,9 @@ class Http {
    * @throws {RadarNetworkError} on network failures
    */
   static async request(options: HttpRequestOptions & { responseType: 'blob' }): Promise<RadarBlobResponse>;
-  static async request<T extends Record<string, any> = RadarApiResponse>(options: HttpRequestOptions): Promise<T & { meta?: RadarApiMeta }>;
+  static async request<T extends Record<string, any> = RadarApiResponse>(
+    options: HttpRequestOptions,
+  ): Promise<T & { meta?: RadarApiMeta }>;
   static async request<T extends Record<string, any> = RadarApiResponse>({
     method,
     path,
@@ -104,16 +105,12 @@ class Http {
     let url = `${urlHost}/${urlVersion}/${path}`;
 
     // filter out undefined values from request data
-    const filtered = Object.fromEntries(
-      Object.entries(data ?? {}).filter(([, v]) => v !== undefined)
-    );
+    const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
 
     let body: string | undefined;
 
     if (method === 'GET') {
-      const params = new URLSearchParams(
-        Object.entries(filtered).map(([k, v]) => [k, String(v)])
-      );
+      const params = new URLSearchParams(Object.entries(filtered).map(([k, v]) => [k, String(v)]));
       const qs = params.toString();
       if (qs) {
         url = `${url}?${qs}`;
@@ -134,7 +131,7 @@ class Http {
     }
 
     const defaultHeaders: Record<string, string> = {
-      'Authorization': publishableKey,
+      Authorization: publishableKey,
       'Content-Type': 'application/json',
       'X-Radar-Device-Type': 'Web',
       'X-Radar-SDK-Version': SDK_VERSION,
@@ -179,7 +176,7 @@ class Http {
       if (responseType === 'blob') {
         parsed = { code: response.status, data: await response.blob() };
       } else {
-        parsed = await response.json() as RadarApiResponse;
+        parsed = (await response.json()) as RadarApiResponse;
       }
     } catch {
       throw new RadarServerError(parsed);

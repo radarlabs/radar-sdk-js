@@ -1,7 +1,7 @@
 import Config from './config';
+import { RadarLocationError, RadarPermissionsError } from './errors';
 import Logger from './logger';
 import Storage from './storage';
-import { RadarLocationError, RadarPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
@@ -16,9 +16,7 @@ const DEFAULT_POSITION_OPTIONS: PositionOptions = {
 };
 
 // set "enableHighAccuracy" for navigator only when desiredAccuracy is "high"
-const useHighAccuracy = (desiredAccuracy?: string) => (
-  Boolean(desiredAccuracy === 'high')
-);
+const useHighAccuracy = (desiredAccuracy?: string) => Boolean(desiredAccuracy === 'high');
 
 /** browser geolocation wrapper with caching and permission checks */
 class Navigator {
@@ -87,7 +85,7 @@ class Navigator {
           if (options.cacheLocationMinutes) {
             const cacheLocationMinutes = Number.parseFloat(options.cacheLocationMinutes as any);
             const updatedAt = Date.now();
-            const expiresAt = updatedAt + (cacheLocationMinutes * 60 * 1000); // convert to ms
+            const expiresAt = updatedAt + cacheLocationMinutes * 60 * 1000; // convert to ms
 
             const lastLocation = { latitude, longitude, accuracy, updatedAt, expiresAt };
             Storage.setItem(Storage.CACHED_LOCATION, JSON.stringify(lastLocation));
@@ -95,7 +93,8 @@ class Navigator {
 
           return resolve({ latitude, longitude, accuracy });
         },
-        (err: GeolocationPositionError) => { // location call failed or user did not grant permission
+        (err: GeolocationPositionError) => {
+          // location call failed or user did not grant permission
           if (err && err.code === 1) {
             // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
             // code 1 means location permissions denied
@@ -122,12 +121,12 @@ class Navigator {
       }
 
       void navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
-        switch(permissionsStatus.state) {
+        switch (permissionsStatus.state) {
           case 'granted':
-            locationAuthorization = 'GRANTED_FOREGROUND'
+            locationAuthorization = 'GRANTED_FOREGROUND';
             break;
           case 'denied':
-            locationAuthorization = 'DENIED'
+            locationAuthorization = 'DENIED';
             break;
           case 'prompt':
             locationAuthorization = 'NOT_DETERMINED';

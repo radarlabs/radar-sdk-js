@@ -5,25 +5,25 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   /** element ID or HTMLElement to mount the widget into */
   container: string | HTMLElement;
   /** debounce delay in milliseconds before fetching results */
-  debounceMS?: number,
+  debounceMS?: number;
   /**
    * @deprecated use minCharacters instead
    */
-  threshold?: number,
+  threshold?: number;
   /** minimum number of characters to trigger autocomplete */
-  minCharacters?: number,
+  minCharacters?: number;
   /** placeholder text for the input field */
-  placeholder?: string,
+  placeholder?: string;
   /** callback invoked when a result is selected */
-  onSelection?: (selection: RadarAutocompleteAddress) => void,
+  onSelection?: (selection: RadarAutocompleteAddress) => void;
   /** callback invoked before each autocomplete request */
-  onRequest?: (params: RadarAutocompleteParams) => void,
+  onRequest?: (params: RadarAutocompleteParams) => void;
   /** callback invoked when results are returned */
-  onResults?: (results: RadarAutocompleteAddress[]) => void,
+  onResults?: (results: RadarAutocompleteAddress[]) => void;
   /** callback invoked on autocomplete errors */
-  onError?: (error: Error) => void,
+  onError?: (error: Error) => void;
   /** whether the input is disabled */
-  disabled?: boolean,
+  disabled?: boolean;
   /** whether to use responsive width (100% with optional max-width) */
   responsive?: boolean;
   /** fixed width or max-width (px number or CSS string) */
@@ -41,17 +41,17 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
 /** resolved configuration with required defaults */
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
   /** debounce delay in milliseconds */
-  debounceMS: number,
+  debounceMS: number;
   /**
    * @deprecated use minCharacters instead
    */
-  threshold: number,
+  threshold: number;
   /** minimum characters to trigger autocomplete */
-  minCharacters: number,
+  minCharacters: number;
   /** maximum number of autocomplete results */
-  limit: number,
+  limit: number;
   /** placeholder text for the input field */
-  placeholder: string,
+  placeholder: string;
   /** whether the input is disabled */
-  disabled: boolean,
+  disabled: boolean;
 }

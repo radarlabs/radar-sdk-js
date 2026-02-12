@@ -1,4 +1,3 @@
-import SDK_VERSION from '../version';
 import Config from '../config';
 import Device from '../device';
 import Http from '../http';
@@ -6,13 +5,14 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 import Session from '../session';
 import Storage from '../storage';
+import SDK_VERSION from '../version';
 import TripsAPI from './trips';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
 type TrackRequestHeaders = {
   'X-Radar-Product'?: string;
-}
+};
 
 /** @internal tracking API — use {@link Radar.trackOnce} instead */
 class TrackAPI {
@@ -70,11 +70,11 @@ class TrackAPI {
       tripOptions.version = '2';
     }
 
-    const headers: TrackRequestHeaders = {}
+    const headers: TrackRequestHeaders = {};
 
-    const product = Storage.getItem(Storage.PRODUCT)
+    const product = Storage.getItem(Storage.PRODUCT);
     if (product) {
-      headers['X-Radar-Product'] = product
+      headers['X-Radar-Product'] = product;
     }
 
     const body = {

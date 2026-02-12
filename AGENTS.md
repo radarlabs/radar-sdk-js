@@ -16,11 +16,11 @@ npm run demo                           # build + local demo server
 
 npm workspaces with core SDK at root and plugins in `packages/`:
 
-| Package | npm name | Notes |
-|---------|----------|-------|
-| root | `radar-sdk-js` | Core SDK — API methods, HTTP, config, storage, errors |
-| `packages/maps` | `@radarlabs/plugin-maps` | MapLibre GL wrappers (RadarMap, RadarMarker, RadarPopup) |
-| `packages/autocomplete` | `@radarlabs/plugin-autocomplete` | Autocomplete UI widget |
+| Package                 | npm name                         | Notes                                                    |
+| ----------------------- | -------------------------------- | -------------------------------------------------------- |
+| root                    | `radar-sdk-js`                   | Core SDK — API methods, HTTP, config, storage, errors    |
+| `packages/maps`         | `@radarlabs/plugin-maps`         | MapLibre GL wrappers (RadarMap, RadarMarker, RadarPopup) |
+| `packages/autocomplete` | `@radarlabs/plugin-autocomplete` | Autocomplete UI widget                                   |
 
 Plugins declare `radar-sdk-js` as a peer dep (`>=5.0.0-beta.1`) and use `"radar-sdk-js": "file:../../"` in devDeps for local linking.
 
@@ -52,6 +52,7 @@ Plugins declare `radar-sdk-js` as a peer dep (`>=5.0.0-beta.1`) and use `"radar-
 ## Version tracking
 
 Version is tracked in 3 places that must stay in sync:
+
 1. `src/version.ts` — default export string
 2. `package.json` — `version` field
 3. `package-lock.json` — both top-level `version` and `packages[""].version`

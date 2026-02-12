@@ -3,6 +3,17 @@
   "version": "5.0.0-beta.5",
   "description": "Web Javascript SDK for Radar, location infrastructure for mobile and web apps.",
   "homepage": "https://radar.com",
+  "license": "ISC",
+  "author": "",
+  "workspaces": [
+    "packages/*"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "module": "dist/radar.js",
   "types": "dist/index.d.ts",
@@ -16,17 +27,6 @@
       "import": "./dist/plugin.js"
     }
   },
-  "workspaces": [
-    "packages/*"
-  ],
-  "build": "rollup -c",
-  "prepublish": "npm run build",
-  "files": [
-    "dist",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
     "build": "rollup -c",
     "build:autocomplete": "npm -w packages/autocomplete run build",
@@ -34,6 +34,8 @@
     "build:all": "npm run build && npm run build:autocomplete && npm run build:maps",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --type-aware --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "check-latest-tag": "node ./scripts/check-latest-tag.cjs",
     "check-beta-tag": "node ./scripts/check-beta-tag.cjs",
@@ -48,8 +50,6 @@
     "prepare": "husky",
     "knip": "knip"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -68,6 +68,7 @@
     "jest-fetch-mock": "^3.0.3",
     "knip": "^5.83.1",
     "lint-staged": "^15.2.10",
+    "oxfmt": "^0.32.0",
     "oxlint": "^1.47.0",
     "oxlint-tsgolint": "^0.12.1",
     "rollup": "^4.57.1",
@@ -79,5 +80,7 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  }
+  },
+  "build": "rollup -c",
+  "prepublish": "npm run build"
 }

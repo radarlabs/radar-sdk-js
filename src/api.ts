@@ -1,13 +1,3 @@
-import Config from './config';
-import Logger from './logger';
-import Storage from './storage';
-import Navigator from './navigator';
-import Device from './device';
-import Session from './session';
-import Http from './http';
-import { RadarError, RadarPublishableKeyError } from './errors';
-import * as errors from './errors';
-
 import AddressesAPI from './api/addresses';
 import ConfigAPI from './api/config';
 import ContextAPI from './api/context';
@@ -17,11 +7,18 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-
+import Config from './config';
+import Device from './device';
+import { RadarError, RadarPublishableKeyError } from './errors';
+import * as errors from './errors';
+import Http from './http';
+import Logger from './logger';
+import Navigator from './navigator';
+import Session from './session';
+import Storage from './storage';
 import SDK_VERSION from './version';
 
 import type { RadarPlugin, RadarPluginContext, RadarStatic } from './plugin';
-
 import type {
   Location,
   NavigatorPosition,
@@ -52,12 +49,8 @@ import type {
   RadarValidateAddressResponse,
 } from './types';
 
-const isSecretKey = (key: string): boolean => (
-  key.includes('_sk_')
-);
-const isLiveKey = (key: string): boolean => (
-  key.includes('_live_')
-);
+const isSecretKey = (key: string): boolean => key.includes('_sk_');
+const isLiveKey = (key: string): boolean => key.includes('_live_');
 
 /**
  * main entry point for the Radar SDK. all methods are static — do not instantiate.
@@ -154,10 +147,9 @@ class Radar {
 
     // NOTE(jasonl): this allows us to run jest tests
     // without having to mock the ConfigAPI.getConfig call
-    if (!(window)?.RADAR_TEST_ENV) {
+    if (!window?.RADAR_TEST_ENV) {
       void ConfigAPI.getConfig();
     }
-
   }
 
   /** clear all SDK state and configuration */

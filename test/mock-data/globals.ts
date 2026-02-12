@@ -27,7 +27,13 @@ const nav = {
   appName: 'RadarSDKTest',
   geolocation: {
     getCurrentPosition: (_success: PositionCallback, error: PositionErrorCallback) => {
-      error({ code: 1, message: 'User denied Geolocation', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 } as GeolocationPositionError);
+      error({
+        code: 1,
+        message: 'User denied Geolocation',
+        PERMISSION_DENIED: 1,
+        POSITION_UNAVAILABLE: 2,
+        TIMEOUT: 3,
+      } as GeolocationPositionError);
     },
   },
   permissions: {

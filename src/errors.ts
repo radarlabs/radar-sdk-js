@@ -1,4 +1,4 @@
-import type { RadarResponse } from "./http";
+import type { RadarResponse } from './http';
 
 /** base error class for all Radar SDK errors */
 export class RadarError extends Error {

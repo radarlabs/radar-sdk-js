@@ -47,6 +47,16 @@ jobs:
             - packages/maps/dist
             - packages/autocomplete/dist
 
+  fmt:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Format check
+          command: npm run fmt:check
+
   lint:
     docker:
       - image: cimg/node:24.13.1
@@ -74,6 +84,9 @@ workflows:
   ci:
     jobs:
       - install
+      - fmt:
+          requires:
+            - install
       - lint:
           requires:
             - install

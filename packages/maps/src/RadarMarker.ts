@@ -1,10 +1,9 @@
 import { Marker, Popup } from 'maplibre-gl';
 
 import type RadarMap from './RadarMap';
-
 import type { RadarMarkerOptions } from './types';
-import type { RadarPluginContext } from 'radar-sdk-js';
 import type { LngLat, Point2D } from 'maplibre-gl';
+import type { RadarPluginContext } from 'radar-sdk-js';
 
 class RadarMarkerMouseEvent {
   type: 'click';
@@ -31,30 +30,34 @@ interface ImageOptions {
 // cache URL loaded markers
 const IMAGE_CACHE = new Map<string, string>();
 
-const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<string> => new Promise((resolve, reject) => {
-  if (!IMAGE_CACHE.has(url)) { // nothing in cache
-    IMAGE_CACHE.set(url, 'pending'); // request in flight
-    return reject('miss');
-  }
-
-  const start = Date.now();
-  const interval = setInterval(() => {
-    const cachedData = IMAGE_CACHE.get(url);
-    if (cachedData === 'pending') {
-      if ((Date.now() - start) > timeoutMS) { // cache lookup took too long
-        clearInterval(interval);
-        reject('timed out');
-      }
-    } else if (cachedData === 'failed') { // request failed
-      clearInterval(interval);
-      reject('failed');
-
-    } else if (cachedData !== undefined) { // return data
-      clearInterval(interval);
-      resolve(cachedData);
+const useCachedImage = (url: string, timeoutMS: number = 5000): Promise<string> =>
+  new Promise((resolve, reject) => {
+    if (!IMAGE_CACHE.has(url)) {
+      // nothing in cache
+      IMAGE_CACHE.set(url, 'pending'); // request in flight
+      return reject('miss');
     }
-  }, 100);
-});
+
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const cachedData = IMAGE_CACHE.get(url);
+      if (cachedData === 'pending') {
+        if (Date.now() - start > timeoutMS) {
+          // cache lookup took too long
+          clearInterval(interval);
+          reject('timed out');
+        }
+      } else if (cachedData === 'failed') {
+        // request failed
+        clearInterval(interval);
+        reject('failed');
+      } else if (cachedData !== undefined) {
+        // return data
+        clearInterval(interval);
+        resolve(cachedData);
+      }
+    }, 100);
+  });
 
 const createImageElement = (options: ImageOptions) => {
   const element = document.createElement('img');
@@ -81,7 +84,7 @@ const createImageElement = (options: ImageOptions) => {
     element.style.height = '100%';
   }
   return element;
-}
+};
 
 const defaultMarkerOptions: RadarMarkerOptions = {
   color: '#000257',
@@ -116,26 +119,30 @@ class RadarMarker extends Marker {
       });
 
       const onSuccess = (url: string) => {
-        this._element.replaceChildren(createImageElement({
-          width: markerOptions.width,
-          height: markerOptions.height,
-          url,
-        }));
+        this._element.replaceChildren(
+          createImageElement({
+            width: markerOptions.width,
+            height: markerOptions.height,
+            url,
+          }),
+        );
       };
 
       const onError = (err: any) => {
         Logger.error(`Could not load marker: ${err.message} - falling back to default marker`);
         IMAGE_CACHE.set(markerOptions.url as string, 'failed'); // mark as failed
         this._element.replaceChildren(...Array.from(originalElement.childNodes));
-      }
+      };
 
       // custom URL image
       if (markerOptions.url) {
-        const loadImage = () => { // fetch marker data from URL
+        const loadImage = () => {
+          // fetch marker data from URL
           fetch(markerOptions.url as string)
-            .then(res => {
+            .then((res) => {
               if (res.status === 200) {
-                res.blob()
+                res
+                  .blob()
                   .then((data) => {
                     const url = URL.createObjectURL(data);
                     IMAGE_CACHE.set(markerOptions.url as string, url); // cache data
@@ -146,7 +153,7 @@ class RadarMarker extends Marker {
                 onError(new Error(res.statusText));
               }
             })
-            .catch(onError)
+            .catch(onError);
         };
 
         // attempt to use cached data, otherwise fetch marker image data from URL
@@ -172,7 +179,7 @@ class RadarMarker extends Marker {
             .then(({ data }) => {
               const url = URL.createObjectURL(data);
               IMAGE_CACHE.set(markerOptions.marker as string, url); // cache data
-              onSuccess(url)
+              onSuccess(url);
             })
             .catch(onError);
         };

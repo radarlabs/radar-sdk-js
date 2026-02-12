@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "printWidth": 120,
+  "ignorePatterns": ["**/*.hbs"],
+  "experimentalSortImports": {
+    "groups": [["builtin", "external"], "internal", ["parent", "sibling", "index"], "type"],
+    "internalPattern": ["~/", "@/"],
+    "newlinesBetween": true,
+    "order": "asc",
+    "ignoreCase": true,
+    "sortSideEffects": true
+  }
+}

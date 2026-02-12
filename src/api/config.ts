@@ -2,8 +2,8 @@ import Config from '../config';
 import Device from '../device';
 import Http from '../http';
 import Logger from '../logger';
-import Session from '../session';
 import Navigator from '../navigator';
+import Session from '../session';
 
 import type { RadarTrackParams } from '../types';
 
@@ -46,7 +46,6 @@ class ConfigAPI {
         path: 'config',
         data,
       });
-
     } catch (err: any) {
       Logger.warn(`Error calling /config: ${err.message}`);
     }

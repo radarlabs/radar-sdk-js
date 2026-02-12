@@ -30,14 +30,7 @@ class ContextAPI {
       },
     });
 
-    const {
-      geofences,
-      place,
-      country,
-      state,
-      dma,
-      postalCode,
-    } = response;
+    const { geofences, place, country, state, dma, postalCode } = response;
 
     const contextRes: RadarContextResponse = {
       location,

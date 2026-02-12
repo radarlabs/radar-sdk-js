@@ -6,7 +6,6 @@ const srcfile = fs.readFileSync('./src/version.ts').toString();
 const current = packageJson.version;
 let version = process.argv[2];
 
-
 // if version not provided, just bump the smallest increment
 if (!version) {
   const parts = current.split('.');

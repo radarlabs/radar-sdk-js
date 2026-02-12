@@ -26,11 +26,12 @@ class ConversionsAPI {
       metadata.revenue = params.revenue;
     }
 
-    const createdAtValue = typeof createdAt === 'string'
-      ? createdAt
-      : createdAt instanceof Date
-        ? createdAt.toISOString()
-        : new Date().toISOString();
+    const createdAtValue =
+      typeof createdAt === 'string'
+        ? createdAt
+        : createdAt instanceof Date
+          ? createdAt.toISOString()
+          : new Date().toISOString();
 
     const data = {
       name,

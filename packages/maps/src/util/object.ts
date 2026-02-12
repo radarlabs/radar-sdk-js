@@ -1,9 +1,9 @@
 // Fields whose type includes undefined become optional (with undefined stripped);
 // fields that can never be undefined stay required.
 type Defined<T extends object> = {
-  [K in keyof T as undefined extends T[K] ? never : K]: T[K]
+  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
 } & {
-  [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>
+  [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>;
 };
 
 // remove fields with undefined values from object

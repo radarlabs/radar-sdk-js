@@ -2,12 +2,7 @@ import Config from '../config';
 import Http from '../http';
 import Navigator from '../navigator';
 
-import type {
-  RadarDistanceParams,
-  RadarRouteResponse,
-  RadarMatrixParams,
-  RadarMatrixResponse,
-} from '../types';
+import type { RadarDistanceParams, RadarRouteResponse, RadarMatrixParams, RadarMatrixResponse } from '../types';
 
 /** @internal routing API — use Radar.distance / matrix instead */
 class RoutingAPI {
@@ -26,7 +21,8 @@ class RoutingAPI {
     if (!origin) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       origin = `${latitude},${longitude}`;
-    } else if (typeof origin !== 'string') { // origin is "Location" object
+    } else if (typeof origin !== 'string') {
+      // origin is "Location" object
       const { latitude, longitude } = origin;
       origin = `${latitude},${longitude}`;
     }
@@ -88,7 +84,8 @@ class RoutingAPI {
         originStrings.push(`${latitude},${longitude}`);
       }
       origins = originStrings.join('|');
-    } else if (Array.isArray(origins)) { // origin is a list of "Location" objects
+    } else if (Array.isArray(origins)) {
+      // origin is a list of "Location" objects
       origins = origins.map((location) => `${location.latitude},${location.longitude}`).join('|');
     }
 

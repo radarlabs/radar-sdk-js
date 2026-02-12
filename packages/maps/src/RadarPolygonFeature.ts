@@ -11,13 +11,16 @@ const defaultPolygonOptions: Partial<RadarPolygonOptions> = {
     'border-color': '#FF6F00',
     'border-opacity': 1,
     'border-width': 2,
-  }
+  },
 };
-
 
 /** polygon feature rendered on a RadarMap with fill and border support */
 class RadarPolygonFeature extends RadarMapFeature {
-  constructor(map: RadarMap, feature: GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
+  constructor(
+    map: RadarMap,
+    feature: GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon>,
+    polygonOptions?: RadarPolygonOptions,
+  ) {
     super(map, feature);
     const featureId = this.id;
 
@@ -66,7 +69,8 @@ class RadarPolygonFeature extends RadarMapFeature {
     if (map.loaded()) {
       addFeatureToMap();
     } else {
-      void map.once('data',() => { // wait for map to be ready
+      void map.once('data', () => {
+        // wait for map to be ready
         addFeatureToMap();
       });
     }

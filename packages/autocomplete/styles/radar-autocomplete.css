@@ -1,11 +1,11 @@
 :root {
-  --radar-gray1: #F6FAFC;
-  --radar-gray2: #EAF1F6;
-  --radar-gray3: #DBE5EB;
-  --radar-gray5: #ACBDC8;
-  --radar-gray6: #5A6872;
+  --radar-gray1: #f6fafc;
+  --radar-gray2: #eaf1f6;
+  --radar-gray3: #dbe5eb;
+  --radar-gray5: #acbdc8;
+  --radar-gray6: #5a6872;
   --radar-gray8: #051723;
-  --radar-sapphire: #0005FB;
+  --radar-sapphire: #0005fb;
   --radar-midnight: #000257;
 }
 
@@ -47,7 +47,8 @@
   -webkit-transition: all -webkit-transform 0.3s ease;
 }
 
-.radar-autocomplete-input:disabled, .radar-autocomplete-input:hover:disabled {
+.radar-autocomplete-input:disabled,
+.radar-autocomplete-input:hover:disabled {
   opacity: 1;
   background: var(--radar-gray3);
   cursor: not-allowed;
@@ -80,7 +81,7 @@
 .radar-autocomplete-input:focus {
   opacity: 1;
   border: 1px solid var(--radar-gray3);
-  box-shadow: 0px 0px 4px #81BEFF;
+  box-shadow: 0px 0px 4px #81beff;
 }
 
 .radar-autocomplete-search-icon {
@@ -150,7 +151,7 @@
   background-color: var(--radar-gray1);
 }
 
-.radar-autocomplete-results-item[aria-selected="true"] {
+.radar-autocomplete-results-item[aria-selected='true'] {
   background-color: var(--radar-gray2);
 }
 

@@ -1,11 +1,9 @@
-import { latitude, longitude } from '../common';
-
 import Radar from '../../src';
+import Context from '../../src/api/context';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-
-import Context from '../../src/api/context';
 import { RadarContextResponse } from '../../src/types';
+import { latitude, longitude } from '../common';
 import { mockRequest } from '../utils';
 
 describe('Context', () => {

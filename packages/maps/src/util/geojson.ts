@@ -19,11 +19,11 @@ export const getCoords = (feature: GeoJSON.Feature): GeoJSON.Position[] => {
       break;
     case 'MultiLineString':
     case 'Polygon':
-      geometry.coordinates.forEach(coords => append(coordinates, coords));
+      geometry.coordinates.forEach((coords) => append(coordinates, coords));
       break;
     case 'MultiPolygon':
-      geometry.coordinates.forEach(polygon => {
-        polygon.forEach(coords => append(coordinates, coords));
+      geometry.coordinates.forEach((polygon) => {
+        polygon.forEach((coords) => append(coordinates, coords));
       });
       break;
     default:

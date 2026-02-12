@@ -2,7 +2,6 @@ import Logger from './logger';
 
 /** typed localStorage wrapper with `radar-*` namespaced keys */
 class Storage {
-
   /** localStorage key for user ID */
   public static get USER_ID() {
     return 'radar-userId';
@@ -89,7 +88,7 @@ class Storage {
    * @returns the parsed object, or null if not found or parse fails
    */
   public static getJSON(key: string) {
-    const item = this.getItem(key)
+    const item = this.getItem(key);
     if (!item) {
       return null;
     }

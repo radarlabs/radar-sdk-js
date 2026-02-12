@@ -59,7 +59,6 @@ class SearchAPI {
     }
 
     return autocompleteRes;
-
   }
 
   /**
@@ -77,7 +76,8 @@ class SearchAPI {
     if (!near) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       near = `${latitude},${longitude}`;
-    } else if (typeof near !== 'string') { // near is "Location" object
+    } else if (typeof near !== 'string') {
+      // near is "Location" object
       const { latitude, longitude } = near;
       near = `${latitude},${longitude}`;
     }
@@ -126,7 +126,8 @@ class SearchAPI {
     if (!near) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       near = `${latitude},${longitude}`;
-    } else if (typeof near !== 'string') { // near is "Location" object
+    } else if (typeof near !== 'string') {
+      // near is "Location" object
       const { latitude, longitude } = near;
       near = `${latitude},${longitude}`;
     }

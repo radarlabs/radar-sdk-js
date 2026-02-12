@@ -4,7 +4,6 @@ import Http from '../src/http';
 import SDK_VERSION from '../src/version';
 import { getRequest, mockNetworkError, mockRequest } from './utils';
 
-
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
 
@@ -21,7 +20,6 @@ describe('Http', () => {
     });
 
     describe('success', () => {
-
       it('should return api response on success', async () => {
         mockRequest(200, successResponse);
 
@@ -146,7 +144,7 @@ describe('Http', () => {
 
       it('should return a server error on invalid JSON', async () => {
         const jsonErrorResponse = '"invalid_json": true}';
-        mockRequest(200, jsonErrorResponse)
+        mockRequest(200, jsonErrorResponse);
 
         try {
           await Http.request(httpRequestParams);
@@ -177,7 +175,6 @@ describe('Http', () => {
     afterEach(() => {
       Radar.clear();
     });
-
 
     it('should inject GET parameters into the url querystring', async () => {
       mockRequest(200, successResponse);

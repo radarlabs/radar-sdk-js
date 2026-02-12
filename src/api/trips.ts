@@ -6,7 +6,8 @@ import Storage from '../storage';
 import type { RadarTripOptions, RadarTripStatus, RadarTripResponse } from '../types';
 
 // https://stackoverflow.com/a/44198641
-const isValidDate = (date: any): Date | undefined => date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
+const isValidDate = (date: any): Date | undefined =>
+  date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
 
 /** @internal trips API — use Radar.startTrip / updateTrip / completeTrip / cancelTrip instead */
 class TripsAPI {

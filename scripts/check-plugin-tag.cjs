@@ -31,18 +31,23 @@ if (!fs.existsSync(pkgPath)) {
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
 if (pkg.version !== version) {
-  console.error(`VERSION MISMATCH - tag version "${version}" does not match packages/${pluginName}/package.json version "${pkg.version}"`);
+  console.error(
+    `VERSION MISMATCH - tag version "${version}" does not match packages/${pluginName}/package.json version "${pkg.version}"`,
+  );
   process.exit(1);
 }
 
-const fileVersion = fs.readFileSync(path.resolve(__dirname, '..', 'packages', pluginName, 'src', 'version.ts'), 'utf8')
+const fileVersion = fs
+  .readFileSync(path.resolve(__dirname, '..', 'packages', pluginName, 'src', 'version.ts'), 'utf8')
   .replace('export default', '')
   .replaceAll("'", '')
   .replace(';', '')
   .trim();
 
 if (fileVersion !== version) {
-  console.error(`VERSION MISMATCH - tag version "${version}" does not match packages/${pluginName}/src/version.ts version "${fileVersion}"`);
+  console.error(
+    `VERSION MISMATCH - tag version "${version}" does not match packages/${pluginName}/src/version.ts version "${fileVersion}"`,
+  );
   process.exit(1);
 }
 

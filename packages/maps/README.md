@@ -27,7 +27,7 @@ Load the core SDK first, then the maps plugin. The CDN bundle auto-registers
 with the core SDK.
 
 ```html
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
 <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 ```
@@ -57,10 +57,10 @@ are resolved automatically. You can also pass a [custom style](https://docs.rada
 [`maplibregl.MapOptions`](https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/)
 with these additions:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `language` | `string` | — | Language code for map labels |
-| `showZoomControls` | `boolean` | `true` | Show zoom in/out buttons |
+| Option             | Type      | Default | Description                  |
+| ------------------ | --------- | ------- | ---------------------------- |
+| `language`         | `string`  | —       | Language code for map labels |
+| `showZoomControls` | `boolean` | `true`  | Show zoom in/out buttons     |
 
 ### Add markers
 
@@ -68,26 +68,27 @@ with these additions:
 [`maplibregl.Marker`](https://maplibre.org/maplibre-gl-js/docs/API/classes/Marker/).
 
 ```js
-const marker = Radar.ui.marker({
-  color: '#000257',
-  popup: {
-    text: 'Radar HQ',
-  },
-})
+const marker = Radar.ui
+  .marker({
+    color: '#000257',
+    popup: {
+      text: 'Radar HQ',
+    },
+  })
   .setLngLat([-73.991, 40.735])
   .addTo(map);
 ```
 
 #### Marker options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `color` | `string` | `'#000257'` | Marker fill color |
-| `marker` | `string` | — | Radar-hosted marker image name |
-| `url` | `string` | — | Custom marker image URL |
-| `width` | `number \| string` | — | Marker image width |
-| `height` | `number \| string` | — | Marker image height |
-| `popup` | `RadarPopupOptions` | — | Popup to display on click |
+| Option   | Type                | Default     | Description                    |
+| -------- | ------------------- | ----------- | ------------------------------ |
+| `color`  | `string`            | `'#000257'` | Marker fill color              |
+| `marker` | `string`            | —           | Radar-hosted marker image name |
+| `url`    | `string`            | —           | Custom marker image URL        |
+| `width`  | `number \| string`  | —           | Marker image width             |
+| `height` | `number \| string`  | —           | Marker image height            |
+| `popup`  | `RadarPopupOptions` | —           | Popup to display on click      |
 
 All standard
 [`maplibregl.MarkerOptions`](https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MarkerOptions/)
@@ -133,9 +134,10 @@ map.clearFeatures();
 `Radar.ui.popup()` returns a `maplibregl.Popup` instance:
 
 ```js
-const popup = Radar.ui.popup({
-  text: 'Hello world',
-})
+const popup = Radar.ui
+  .popup({
+    text: 'Hello world',
+  })
   .setLngLat([-73.991, 40.735])
   .addTo(map);
 ```
@@ -150,10 +152,10 @@ const bounds = new Radar.ui.maplibregl.LngLatBounds(sw, ne);
 
 ## Peer dependencies
 
-| Package | Version |
-|---------|---------|
-| `radar-sdk-js` | `>=5.0.0-beta.1` |
-| `maplibre-gl` | `^2.4.0 \|\| ^3.0.0 \|\| ^4.0.0 \|\| ^5.0.1` |
+| Package        | Version                                      |
+| -------------- | -------------------------------------------- |
+| `radar-sdk-js` | `>=5.0.0-beta.1`                             |
+| `maplibre-gl`  | `^2.4.0 \|\| ^3.0.0 \|\| ^4.0.0 \|\| ^5.0.1` |
 
 ## Support
 

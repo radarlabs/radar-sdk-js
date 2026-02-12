@@ -1,4 +1,5 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
+
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
 
@@ -57,14 +58,13 @@ const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions
   }
 };
 
-const getMarkerIcon = (color: string = "#ACBDC8") => {
+const getMarkerIcon = (color: string = '#ACBDC8') => {
   const fill = color.replace('#', '%23');
   const svg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12.5704 6.57036C12.5704 4.11632 10.6342 2.11257 8.21016 2C8.14262 2 8.06757 2 8.00003 2C7.93249 2 7.85744 2 7.7899 2C5.35838 2.11257 3.42967 4.11632 3.42967 6.57036C3.42967 6.60037 3.42967 6.6379 3.42967 6.66792C3.42967 6.69794 3.42967 6.73546 3.42967 6.76548C3.42967 9.46717 7.09196 13.3621 7.4672 13.7598C7.61729 13.9174 7.84994 14 8.00003 14C8.15012 14 8.38277 13.9174 8.53286 13.7598C8.9156 13.3621 12.5704 9.46717 12.5704 6.76548C12.5704 6.72795 12.5704 6.69794 12.5704 6.66792C12.5704 6.6379 12.5704 6.60037 12.5704 6.57036ZM7.99252 8.28893C7.04693 8.28893 6.27395 7.52345 6.27395 6.57036C6.27395 5.61726 7.03943 4.85178 7.99252 4.85178C8.94562 4.85178 9.7111 5.61726 9.7111 6.57036C9.7111 7.52345 8.94562 8.28893 7.99252 8.28893Z" fill="${fill}"/>
   </svg>`.trim();
   return `data:image/svg+xml;charset=utf-8,${svg}`;
 };
-
 
 /** address autocomplete UI widget with keyboard navigation and result display */
 class AutocompleteUI {
@@ -112,13 +112,17 @@ class AutocompleteUI {
 
     // get container element
     let containerEL;
-    if (typeof this.config.container === 'string') { // lookup container element by ID
+    if (typeof this.config.container === 'string') {
+      // lookup container element by ID
       containerEL = document.getElementById(this.config.container);
-    } else { // use provided element
+    } else {
+      // use provided element
       containerEL = this.config.container; // HTMLElement
     }
     if (!containerEL) {
-      throw new RadarAutocompleteContainerNotFound(`Could not find container element: ${this.config.container as string}`);
+      throw new RadarAutocompleteContainerNotFound(
+        `Could not find container element: ${this.config.container as string}`,
+      );
     }
     this.container = containerEL;
 
@@ -145,7 +149,6 @@ class AutocompleteUI {
       // append to dom
       this.wrapper.appendChild(this.resultsList);
       containerEL.parentNode?.appendChild(this.wrapper);
-
     } else {
       // if container is not an input, create new input and append to container
 
@@ -261,7 +264,7 @@ class AutocompleteUI {
       mailable,
       lang,
       postalCode,
-    }
+    };
 
     if (this.near) {
       params.near = this.near;
@@ -373,15 +376,18 @@ class AutocompleteUI {
 
     // run this code async to allow link click to propagate before blur
     // (add 100ms delay if closed from link click)
-    const linkClick = e && (e.relatedTarget === this.poweredByLink);
-    setTimeout(() => {
-      this.inputField.setAttribute('aria-expanded', 'false');
-      this.inputField.setAttribute('aria-activedescendant', '');
-      this.resultsList.setAttribute('hidden', '');
-      this.highlightedIndex = -1;
-      this.isOpen = false;
-      this.clearResultsList();
-    }, linkClick ? 100 : 0);
+    const linkClick = e && e.relatedTarget === this.poweredByLink;
+    setTimeout(
+      () => {
+        this.inputField.setAttribute('aria-expanded', 'false');
+        this.inputField.setAttribute('aria-activedescendant', '');
+        this.resultsList.setAttribute('hidden', '');
+        this.highlightedIndex = -1;
+        this.isOpen = false;
+        this.clearResultsList();
+      },
+      linkClick ? 100 : 0,
+    );
   }
 
   /**
@@ -427,7 +433,7 @@ class AutocompleteUI {
     // treat shift+tab as up key
     if (key === 'Tab' && event.shiftKey) {
       key = 'ArrowUp';
-    };
+    }
 
     switch (key) {
       // Next item

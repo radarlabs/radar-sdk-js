@@ -40,7 +40,6 @@ import 'radar-sdk-js/dist/radar.css';
 Radar.initialize('prj_test_pk_...');
 const map = Radar.ui.map({ container: 'map' });
 
-
 // v5
 import Radar from 'radar-sdk-js';
 import { createMapsPlugin } from '@radarlabs/plugin-maps';
@@ -61,7 +60,7 @@ In v4, a single script and CSS file provided everything:
 
 ```html
 <!-- v4 -->
-<link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet">
+<link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet" />
 <script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
 ```
 
@@ -74,11 +73,11 @@ auto-register with the core SDK when loaded:
 <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
 
 <!-- maps plugin (auto-registers) -->
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 
 <!-- autocomplete plugin (auto-registers) -->
-<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
+<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
 
 <!-- fraud plugin (auto-registers) -->
@@ -158,19 +157,19 @@ try {
 
 The following error classes are available:
 
-| Class | Status code |
-|-------|-------------|
-| `RadarPublishableKeyError` | `ERROR_PUBLISHABLE_KEY` |
-| `RadarLocationError` | `ERROR_LOCATION` |
-| `RadarPermissionsError` | `ERROR_PERMISSIONS` |
-| `RadarBadRequestError` | 400 |
-| `RadarUnauthorizedError` | 401 |
-| `RadarPaymentRequiredError` | 402 |
-| `RadarForbiddenError` | 403 |
-| `RadarNotFoundError` | 404 |
-| `RadarRateLimitError` | 429 |
-| `RadarServerError` | 500 |
-| `RadarNetworkError` | timeout |
+| Class                       | Status code             |
+| --------------------------- | ----------------------- |
+| `RadarPublishableKeyError`  | `ERROR_PUBLISHABLE_KEY` |
+| `RadarLocationError`        | `ERROR_LOCATION`        |
+| `RadarPermissionsError`     | `ERROR_PERMISSIONS`     |
+| `RadarBadRequestError`      | 400                     |
+| `RadarUnauthorizedError`    | 401                     |
+| `RadarPaymentRequiredError` | 402                     |
+| `RadarForbiddenError`       | 403                     |
+| `RadarNotFoundError`        | 404                     |
+| `RadarRateLimitError`       | 429                     |
+| `RadarServerError`          | 500                     |
+| `RadarNetworkError`         | timeout                 |
 
 ### Type exports
 
@@ -178,12 +177,7 @@ All types are now re-exported from the main entry point. Import them
 directly instead of reaching into internal paths:
 
 ```ts
-import type {
-  RadarTrackParams,
-  RadarTrackResponse,
-  RadarAddress,
-  RadarOptions,
-} from 'radar-sdk-js';
+import type { RadarTrackParams, RadarTrackResponse, RadarAddress, RadarOptions } from 'radar-sdk-js';
 ```
 
 Plugin types for building custom plugins are available from the `plugin`
@@ -195,13 +189,13 @@ import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
 
 ### Summary of breaking changes
 
-| Change | v4 | v5 |
-|--------|----|----|
-| Maps UI | Built into core | `@radarlabs/plugin-maps` |
-| Autocomplete UI | Built into core | `@radarlabs/plugin-autocomplete` |
-| Fraud/Verify API | Built into core | `@radarlabs/fraud-plugin` (`Radar.fraud.*`) |
-| `maplibre-gl` peer dep | Required by core | Required by maps plugin only |
-| CSS | Single `radar.css` | Per-plugin CSS files |
-| CDN scripts | Single `radar.min.js` | Core + plugin scripts |
-| Error classes | Not exported | Exported from `radar-sdk-js` |
-| Plugin system | N/A | `Radar.registerPlugin()` |
+| Change                 | v4                    | v5                                          |
+| ---------------------- | --------------------- | ------------------------------------------- |
+| Maps UI                | Built into core       | `@radarlabs/plugin-maps`                    |
+| Autocomplete UI        | Built into core       | `@radarlabs/plugin-autocomplete`            |
+| Fraud/Verify API       | Built into core       | `@radarlabs/fraud-plugin` (`Radar.fraud.*`) |
+| `maplibre-gl` peer dep | Required by core      | Required by maps plugin only                |
+| CSS                    | Single `radar.css`    | Per-plugin CSS files                        |
+| CDN scripts            | Single `radar.min.js` | Core + plugin scripts                       |
+| Error classes          | Not exported          | Exported from `radar-sdk-js`                |
+| Plugin system          | N/A                   | `Radar.registerPlugin()`                    |

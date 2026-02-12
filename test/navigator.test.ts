@@ -1,7 +1,6 @@
 import Config from '../src/config';
-import Storage from '../src/storage';
 import Navigator from '../src/navigator';
-
+import Storage from '../src/storage';
 import { nycOffice, enableLocation } from './utils';
 
 describe('Navigator', () => {

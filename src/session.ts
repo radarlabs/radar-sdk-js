@@ -7,7 +7,7 @@ const isValid = (sessionId: string): boolean => {
   const session = Number.parseInt(sessionId);
   const diff = Math.abs(now - session);
   return diff < SESSION_TIMEOUT_SECS;
-}
+};
 
 /** session ID manager with a 5-minute timeout */
 class Session {

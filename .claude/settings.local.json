@@ -6,7 +6,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run build:maps:*)",
       "Bash(npm run build:all:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(npm run fmt:check:*)"
     ]
   }
 }

@@ -1,10 +1,9 @@
-import type { RadarPlugin } from 'radar-sdk-js';
-
+import '../styles/radar-autocomplete.css';
 import AutocompleteUI from './autocomplete';
 import version from './version';
-import type { RadarAutocompleteUIOptions } from './types';
 
-import '../styles/radar-autocomplete.css';
+import type { RadarAutocompleteUIOptions } from './types';
+import type { RadarPlugin } from 'radar-sdk-js';
 
 export type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 

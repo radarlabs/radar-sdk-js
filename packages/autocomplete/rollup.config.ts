@@ -1,7 +1,8 @@
-import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
+
 import type { RollupOptions } from 'rollup';
 
 const config: RollupOptions[] = [
@@ -34,7 +35,7 @@ const config: RollupOptions[] = [
         format: 'iife',
         name: 'RadarAutocomplete',
         globals: {
-          "radar-sdk-js": "Radar",
+          'radar-sdk-js': 'Radar',
         },
       },
       {
@@ -43,7 +44,7 @@ const config: RollupOptions[] = [
         name: 'RadarAutocomplete',
         plugins: [terser()],
         globals: {
-          "radar-sdk-js": "Radar",
+          'radar-sdk-js': 'Radar',
         },
       },
     ],
@@ -59,4 +60,4 @@ const config: RollupOptions[] = [
   },
 ];
 
-export default config
+export default config;

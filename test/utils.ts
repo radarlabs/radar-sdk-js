@@ -21,12 +21,18 @@ export const enableLocation = (position: NavigatorPosition, callback?: (args: an
   window.navigator.permissions.query = () => Promise.resolve({ state: 'granted' } as PermissionStatus);
 
   // stub out getCurrentPosition
-  window.navigator.geolocation.getCurrentPosition = ((success: PositionCallback, _err: PositionErrorCallback, args: PositionOptions) => {
+  window.navigator.geolocation.getCurrentPosition = ((
+    success: PositionCallback,
+    _err: PositionErrorCallback,
+    args: PositionOptions,
+  ) => {
     try {
       success({
         coords: position as GeolocationCoordinates,
         timestamp: Date.now(),
-        toJSON() { return this; },
+        toJSON() {
+          return this;
+        },
       });
 
       if (typeof callback === 'function') {
@@ -39,7 +45,7 @@ export const enableLocation = (position: NavigatorPosition, callback?: (args: an
       window.navigator.permissions.query = defaultPermissionFn;
     }
   }) as typeof defaultFn;
-}
+};
 
 // mock a single API response — config calls are handled by the default
 // handler in globals.ts, so this only needs to cover the test request.
@@ -50,7 +56,7 @@ export const mockRequest = (status: number, response: unknown) => {
     }
     return { body: JSON.stringify(response), status: status || 200 };
   });
-}
+};
 
 export const getRequest = () => {
   // find the last non-config fetch call
@@ -63,11 +69,11 @@ export const getRequest = () => {
     body: lastCall?.[1]?.body as string | undefined,
     headers: (lastCall?.[1]?.headers ?? {}) as Record<string, string>,
   };
-}
+};
 
 export const mockNetworkError = () => {
   fetchMock.mockRejectOnce(new TypeError('Network error'));
-}
+};
 
 /**
  * Appends a `response` property to the given response object if `isDebug` is true.
@@ -79,4 +85,4 @@ export const getResponseWithDebug = (isDebug: boolean | undefined, httpResponse:
     res.response = { ...baseResponse };
   }
   return res;
-}
+};

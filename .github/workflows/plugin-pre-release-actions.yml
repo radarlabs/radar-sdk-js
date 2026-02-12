@@ -1,7 +1,7 @@
 name: Publish beta plugin package to npmjs
 on:
   release:
-    types: [ prereleased ]
+    types: [prereleased]
 jobs:
   build:
     if: ${{ !startsWith(github.ref_name, 'v') }}

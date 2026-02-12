@@ -12,7 +12,7 @@ class RadarFeatureMouseEvent {
     this.feature = feature;
     this.originalEvent = originalEvent;
   }
-};
+}
 
 /** abstract base class for map features (lines, polygons) with source/layer management */
 abstract class RadarMapFeature {
@@ -61,9 +61,7 @@ abstract class RadarMapFeature {
     });
 
     // remove reference from map
-    this._map._features = this._map._features.filter(
-      (other) => other.id !== this.id
-    );
+    this._map._features = this._map._features.filter((other) => other.id !== this.id);
   }
 
   /**

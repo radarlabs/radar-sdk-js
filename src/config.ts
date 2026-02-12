@@ -1,4 +1,5 @@
 import { RadarError } from './errors';
+
 import type { RadarOptions } from './types';
 
 /** global SDK configuration singleton */
@@ -46,4 +47,4 @@ class Config {
   }
 }
 
-export default Config
+export default Config;

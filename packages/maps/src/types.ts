@@ -60,7 +60,7 @@ export interface RadarLineOptions {
     'border-width'?: number;
     'border-color'?: string;
     'border-opacity'?: number;
-  },
+  };
 }
 
 /** options for encoded polyline features */
@@ -82,5 +82,5 @@ export interface RadarPolygonOptions {
     'border-width'?: number;
     'border-color'?: string;
     'border-opacity'?: number;
-  },
+  };
 }

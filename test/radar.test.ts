@@ -1,19 +1,31 @@
-import Config from '../src/config';
-import Radar from '../src/index';
-import Storage from '../src/storage';
-import Navigator from '../src/navigator';
-import SDK_VERSION from '../src/version';
-
-import type { NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
-
-import Geocoding from '../src/api/geocoding';
+import ConfigAPI from '../src/api/config';
 import ContextAPI from '../src/api/context';
+import Geocoding from '../src/api/geocoding';
+import RoutingAPI from '../src/api/routing';
 import SearchAPI from '../src/api/search';
 import TrackAPI from '../src/api/track';
-import RoutingAPI from '../src/api/routing';
-import ConfigAPI from '../src/api/config';
-
+import Config from '../src/config';
+import Radar from '../src/index';
+import Navigator from '../src/navigator';
+import Storage from '../src/storage';
+import SDK_VERSION from '../src/version';
 import { latitude, longitude } from './common';
+
+import type {
+  NavigatorPosition,
+  RadarAddress,
+  RadarAutocompleteResponse,
+  RadarContextResponse,
+  RadarEvent,
+  RadarGeocodeResponse,
+  RadarIPGeocodeResponse,
+  RadarRouteResponse,
+  RadarSearchGeofencesResponse,
+  RadarSearchPlacesResponse,
+  RadarTrackResponse,
+  RadarTravelMode,
+  RadarUser,
+} from '../src/types';
 
 describe('Radar', () => {
   const accuracy = 5;
@@ -41,9 +53,7 @@ describe('Radar', () => {
 
   // geocoding
   const query = 'mock-query';
-  const addresses: RadarAddress[] = [
-    { geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude },
-  ];
+  const addresses: RadarAddress[] = [{ geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude }];
 
   // routing
   const destination = {

@@ -1,11 +1,9 @@
-import { latitude, longitude } from '../common';
-
 import Radar from '../../src';
+import Geocoding from '../../src/api/geocoding';
 import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import Geocoding from '../../src/api/geocoding';
-
+import { latitude, longitude } from '../common';
 import { getResponseWithDebug, mockRequest } from '../utils';
 
 import type { RadarOptions } from '../../src/types';
@@ -32,7 +30,7 @@ describe('Geocoding', () => {
     it('should return an address', async () => {
       mockRequest(200, baseValidateResponse);
 
-      const response = await Geocoding.forwardGeocode({ query })
+      const response = await Geocoding.forwardGeocode({ query });
 
       const validateResponse = getResponseWithDebug(options.debug, forwardGeocodeResponse, baseValidateResponse);
 
@@ -71,7 +69,12 @@ describe('Geocoding', () => {
   });
 
   describe('ipGeocode', () => {
-    const ipGeocodeResponse = { ip: undefined, proxy: undefined, ...baseValidateResponse, response: baseValidateResponse };
+    const ipGeocodeResponse = {
+      ip: undefined,
+      proxy: undefined,
+      ...baseValidateResponse,
+      response: baseValidateResponse,
+    };
 
     it('should return a geocode response', async () => {
       mockRequest(200, baseValidateResponse);

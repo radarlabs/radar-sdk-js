@@ -21,16 +21,18 @@
 </p>
 
 🔥 Try it! 🔥
-* <a href="https://radar.com/demo/js">Geofencing</a>
-* <a href="https://radar.com/demo/api">Maps APIs</a>
-* <a href="https://radar.com/documentation/maps/maps">Maps UI</a>
-* <a href="https://radar.com/documentation/maps/autocomplete">Autocomplete UI</a>
+
+- <a href="https://radar.com/demo/js">Geofencing</a>
+- <a href="https://radar.com/demo/api">Maps APIs</a>
+- <a href="https://radar.com/documentation/maps/maps">Maps UI</a>
+- <a href="https://radar.com/documentation/maps/autocomplete">Autocomplete UI</a>
 
 ## 🚀 Installation and Usage
 
 ### With npm
 
 Install the core SDK:
+
 ```bash
 # with npm
 npm install radar-sdk-js
@@ -40,21 +42,27 @@ yarn add radar-sdk-js
 ```
 
 Then import and initialize:
+
 ```js
 import Radar from 'radar-sdk-js';
 
 // initialize with your test or live publishable key
-Radar.initialize('prj_test_pk_...', { /* options */ });
+Radar.initialize('prj_test_pk_...', {
+  /* options */
+});
 ```
 
 ### With a script tag
 
 Add the following to your HTML:
+
 ```html
 <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
 
 <script>
-  Radar.initialize('prj_test_pk_...', { /* options */ });
+  Radar.initialize('prj_test_pk_...', {
+    /* options */
+  });
 </script>
 ```
 
@@ -99,7 +107,9 @@ Radar.initialize('prj_test_pk_...');
 
 Radar.ui.autocomplete({
   container: 'autocomplete',
-  onSelection: (result) => { console.log(result); },
+  onSelection: (result) => {
+    console.log(result);
+  },
 });
 ```
 
@@ -125,8 +135,8 @@ Plugin CDN bundles auto-register with the core SDK when loaded. Load
 the core SDK first, then any plugins you need:
 
 ```html
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
-<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
+<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
 
 <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
@@ -144,7 +154,7 @@ by ID or element reference.
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
+    <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
     <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
     <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
   </head>
@@ -171,7 +181,7 @@ by ID or element reference.
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
+    <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
     <script src="https://js.radar.com/v5.0.0-beta.5/radar.min.js"></script>
     <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
   </head>
@@ -181,7 +191,6 @@ by ID or element reference.
 
     <script>
       Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
-
 
       // create autocomplete widget
       Radar.ui.autocomplete({
@@ -213,10 +222,9 @@ are needed for geofencing.
     <script>
       Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
 
-      Radar.trackOnce({ userId: 'example-user-id' })
-        .then(({ location, user, events }) => {
-          // do something with user location or events
-        });
+      Radar.trackOnce({ userId: 'example-user-id' }).then(({ location, user, events }) => {
+        // do something with user location or events
+      });
     </script>
   </body>
 </html>
@@ -224,12 +232,12 @@ are needed for geofencing.
 
 ## Packages
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| `radar-sdk-js` | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js) | Core SDK — tracking, geocoding, search, routing |
-| `@radarlabs/plugin-maps` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-maps.svg)](https://www.npmjs.com/package/@radarlabs/plugin-maps) | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
-| `@radarlabs/plugin-autocomplete` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg)](https://www.npmjs.com/package/@radarlabs/plugin-autocomplete) | Autocomplete UI widget |
-| `@radarlabs/fraud-plugin` | — | Fraud detection — verified tracking, location tokens |
+| Package                          | npm                                                                                                                                     | Description                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `radar-sdk-js`                   | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)                                     | Core SDK — tracking, geocoding, search, routing           |
+| `@radarlabs/plugin-maps`         | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-maps.svg)](https://www.npmjs.com/package/@radarlabs/plugin-maps)                 | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
+| `@radarlabs/plugin-autocomplete` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg)](https://www.npmjs.com/package/@radarlabs/plugin-autocomplete) | Autocomplete UI widget                                    |
+| `@radarlabs/fraud-plugin`        | —                                                                                                                                       | Fraud detection — verified tracking, location tokens      |
 
 ## Plugin system
 
@@ -257,6 +265,7 @@ import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
 ```
 
 ## 🔗 Other links
+
 - [Contributing](CONTRIBUTING.md)
 - [Migrating from 3.x to 4.x](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/MIGRATION.md)
 - [Migrating from 4.x to 5.x](MIGRATION.md)

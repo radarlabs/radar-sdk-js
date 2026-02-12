@@ -1,11 +1,4 @@
 import type Radar from './api';
-import type Config from './config';
-import type Http from './http';
-import type Storage from './storage';
-import type Device from './device';
-import type Session from './session';
-import type Logger from './logger';
-import type Navigator from './navigator';
 import type AddressesAPI from './api/addresses';
 import type ConfigAPI from './api/config';
 import type ContextAPI from './api/context';
@@ -15,7 +8,14 @@ import type RoutingAPI from './api/routing';
 import type SearchAPI from './api/search';
 import type TrackAPI from './api/track';
 import type TripsAPI from './api/trips';
+import type Config from './config';
+import type Device from './device';
 import type * as errors from './errors';
+import type Http from './http';
+import type Logger from './logger';
+import type Navigator from './navigator';
+import type Session from './session';
+import type Storage from './storage';
 
 /** interface that all Radar plugins must implement */
 export interface RadarPlugin {

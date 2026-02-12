@@ -1,5 +1,5 @@
-import packageJSON from '../package.json';
 import packageLockJSON from '../package-lock.json';
+import packageJSON from '../package.json';
 import VERSION from '../src/version';
 
 const RELEASE_TAG = process.env.GITHUB_REF_NAME;

@@ -1,6 +1,6 @@
 import RadarMapFeature from './RadarMapFeature';
-import { decodePolyline } from './util/polyline';
 import { filterUndefined, mergeDeep } from './util/object';
+import { decodePolyline } from './util/polyline';
 
 import type RadarMap from './RadarMap';
 import type { RadarLineOptions, RadarPolylineOptions } from './types';
@@ -12,7 +12,7 @@ const defaultLineOptions: Partial<RadarLineOptions> = {
     'line-width': 4,
     'border-color': '#FFFFFF',
     'border-width': 2,
-  }
+  },
 };
 
 /** line feature rendered on a RadarMap with border support */
@@ -78,7 +78,8 @@ class RadarLineFeature extends RadarMapFeature {
     if (map.loaded()) {
       addFeatureToMap();
     } else {
-      void map.once('data',() => { // wait for map to be ready
+      void map.once('data', () => {
+        // wait for map to be ready
         addFeatureToMap();
       });
     }
@@ -107,7 +108,7 @@ class RadarLineFeature extends RadarMapFeature {
         coordinates,
       },
       properties: polylineOptions?.properties || {},
-    }
+    };
 
     const lineFeature = new RadarLineFeature(map, feature, polylineOptions);
     return lineFeature;

@@ -1,7 +1,6 @@
 import Config from '../config';
 import Http from '../http';
 import Navigator from '../navigator';
-
 import {
   RadarForwardGeocodeParams,
   RadarReverseGeocodeParams,

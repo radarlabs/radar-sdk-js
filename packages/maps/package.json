@@ -2,7 +2,21 @@
   "name": "@radarlabs/plugin-maps",
   "version": "5.0.0-beta.6",
   "description": "Maps plugin for radar-sdk-js",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radarlabs/radar-sdk-js.git",
+    "directory": "packages/maps"
+  },
+  "style": "dist/radar-maps.css",
+  "files": [
+    "dist",
+    "cdn",
+    "src"
+  ],
   "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -10,34 +24,20 @@
     },
     "./dist/*.css": "./dist/*.css"
   },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "style": "dist/radar-maps.css",
-  "files": [
-    "dist",
-    "cdn",
-    "src"
-  ],
-  "license": "ISC",
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/radarlabs/radar-sdk-js.git",
-    "directory": "packages/maps"
   },
   "scripts": {
     "build": "rollup -c",
     "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
-    "maplibre-gl": "^2.4.0 || ^3.0.0 || ^4.0.0 || ^5.0.1",
-    "radar-sdk-js": ">=5.0.0-beta.1"
-  },
   "devDependencies": {
     "maplibre-gl": "^5.3.0",
     "radar-sdk-js": "file:../..",
     "rollup-plugin-postcss": "^4.0.2"
+  },
+  "peerDependencies": {
+    "maplibre-gl": "^2.4.0 || ^3.0.0 || ^4.0.0 || ^5.0.1",
+    "radar-sdk-js": ">=5.0.0-beta.1"
   }
 }

@@ -1,12 +1,10 @@
+import Radar from '../../src';
+import Search from '../../src/api/search';
+import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-
-import Search from '../../src/api/search';
-
-import { latitude, longitude } from '../common';
-import Radar from '../../src';
-import Config from '../../src/config';
 import { RadarGeocodeLayer, RadarOptions } from '../../src/types';
+import { latitude, longitude } from '../common';
 import { getResponseWithDebug, mockRequest } from '../utils';
 
 describe('Search', () => {
@@ -69,7 +67,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.searchPlaces({ near, radius, chains, categories, groups, limit })
+        const response = await Search.searchPlaces({ near, radius, chains, categories, groups, limit });
         const validateResponse = getResponseWithDebug(options.debug, placesResponse, placesResponse);
         expect(response).toEqual(validateResponse);
       });
@@ -108,7 +106,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.searchGeofences({ near, radius, tags, metadata, limit })
+        const response = await Search.searchGeofences({ near, radius, tags, metadata, limit });
         const validateResponse = getResponseWithDebug(options.debug, geofencesResponse, geofencesResponse);
 
         expect(response).toEqual(validateResponse);
@@ -122,10 +120,22 @@ describe('Search', () => {
         mockRequest(200, autocompleteResponse);
         jest.spyOn(Http, 'request');
 
-        const response = await Search.autocomplete({ query })
+        const response = await Search.autocomplete({ query });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined, countryCode: undefined, expandUnits: undefined } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: undefined,
+            limit: undefined,
+            layers: undefined,
+            country: undefined,
+            countryCode: undefined,
+            expandUnits: undefined,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
     });
@@ -137,10 +147,22 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.autocomplete({ near, query, limit, layers, countryCode })
+        const response = await Search.autocomplete({ near, query, limit, layers, countryCode });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['address'], countryCode, country: undefined, expandUnits: undefined } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: `${latitude},${longitude}`,
+            limit: 50,
+            layers: ['address'],
+            countryCode,
+            country: undefined,
+            expandUnits: undefined,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
 
@@ -151,10 +173,22 @@ describe('Search', () => {
         const near = { latitude, longitude };
         const expandUnits = true;
 
-        const response = await Search.autocomplete({ near, query, limit, layers, countryCode, expandUnits })
+        const response = await Search.autocomplete({ near, query, limit, layers, countryCode, expandUnits });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['address'], countryCode, country: undefined, expandUnits: true } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: `${latitude},${longitude}`,
+            limit: 50,
+            layers: ['address'],
+            countryCode,
+            country: undefined,
+            expandUnits: true,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
     });

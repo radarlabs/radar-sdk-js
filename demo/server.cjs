@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { spawn, exec } = require("child_process");
+const { spawn, exec } = require('child_process');
 const express = require('express');
-const { engine }  = require('express-handlebars');
+const { engine } = require('express-handlebars');
 
 const sdk_version = require('../package.json').version;
 const maps_version = require('../packages/maps/package.json').version;
@@ -77,15 +77,15 @@ app.listen(PORT, () => {
   const url = `http://localhost:${PORT}`;
 
   switch (process.platform) {
-      // Windows
+    // Windows
     case 'win32':
       exec(`start ${url}`);
       break;
-      // macOS
+    // macOS
     case 'darwin':
       exec(`open ${url}`);
       break;
-      // Linux
+    // Linux
     case 'linux':
       exec(`xdg-open ${url}`);
       break;

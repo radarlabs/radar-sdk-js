@@ -1,5 +1,5 @@
 /** log verbosity level for the SDK */
-export type LogLevel = 'none' | 'info' | 'warn' | 'error'
+export type LogLevel = 'none' | 'info' | 'warn' | 'error';
 
 /** a geographic coordinate with optional accuracy and timestamp */
 export interface Location {
@@ -20,10 +20,7 @@ export interface NavigatorPosition {
 }
 
 /** browser location permission state */
-export type LocationAuthorization =
-  | 'DENIED'
-  | 'NOT_DETERMINED'
-  | 'GRANTED_FOREGROUND';
+export type LocationAuthorization = 'DENIED' | 'NOT_DETERMINED' | 'GRANTED_FOREGROUND';
 
 /** configuration options passed to {@link Radar.initialize} */
 export interface RadarOptions {
@@ -49,7 +46,7 @@ export interface RadarOptions {
   getRequestHeaders?: () => Record<string, string>;
   /** enable debug logging */
   debug?: boolean;
-};
+}
 
 /** base response shape shared by all API responses */
 export interface RadarResponse {
@@ -58,19 +55,10 @@ export interface RadarResponse {
 }
 
 /** travel mode for routing and trips */
-export type RadarTravelMode =
-  | 'car'
-  | 'foot'
-  | 'bike'
-  | 'motorbike'
-  | 'truck';
+export type RadarTravelMode = 'car' | 'foot' | 'bike' | 'motorbike' | 'truck';
 
 /** road feature to avoid in routing requests */
-export type RadarAvoidOption =
-  | 'tolls'
-  | 'highways'
-  | 'ferries'
-  | 'borderCrossings';
+export type RadarAvoidOption = 'tolls' | 'highways' | 'ferries' | 'borderCrossings';
 
 /** options for creating or updating a trip */
 export interface RadarTripOptions {
@@ -172,15 +160,7 @@ export interface RadarTripEta {
 }
 
 /** lifecycle status of a trip */
-export type RadarTripStatus =
-  | 'pending'
-  | 'started'
-  | 'approaching'
-  | 'arrived'
-  | 'completed'
-  | 'canceled'
-  | 'expired';
-
+export type RadarTripStatus = 'pending' | 'started' | 'approaching' | 'arrived' | 'completed' | 'canceled' | 'expired';
 
 /** a Radar trip with destination, ETA, and status */
 export interface RadarTrip {
@@ -326,7 +306,7 @@ export type RadarGeocodeLayer =
   | 'state'
   | 'country'
   | 'coarse'
-  | 'fine'
+  | 'fine';
 
 /** a geocoded address result */
 export interface RadarAddress {
@@ -510,7 +490,6 @@ export interface RadarDistanceParams {
   avoid?: RadarAvoidOption[] | string;
 }
 
-
 /** a route distance value with human-readable text */
 export interface RadarRouteDistance {
   /** distance in meters (metric) or miles (imperial) */
@@ -599,7 +578,7 @@ export interface RadarValidateAddressResponse extends RadarResponse {
   address?: RadarValidationAddress;
   result?: {
     verificationStatus?: RadarVerificationStatus;
-  }
+  };
 }
 
 /** parameters for {@link Radar.searchGeofences} */

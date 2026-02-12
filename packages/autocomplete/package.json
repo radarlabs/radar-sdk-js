@@ -2,7 +2,21 @@
   "name": "@radarlabs/plugin-autocomplete",
   "version": "5.0.0-beta.6",
   "description": "Autocomplete UI plugin for radar-sdk-js",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radarlabs/radar-sdk-js.git",
+    "directory": "packages/autocomplete"
+  },
+  "style": "dist/radar-autocomplete.css",
+  "files": [
+    "dist",
+    "cdn",
+    "src"
+  ],
   "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -10,32 +24,18 @@
     },
     "./dist/*.css": "./dist/*.css"
   },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "style": "dist/radar-autocomplete.css",
-  "files": [
-    "dist",
-    "cdn",
-    "src"
-  ],
-  "license": "ISC",
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/radarlabs/radar-sdk-js.git",
-    "directory": "packages/autocomplete"
   },
   "scripts": {
     "build": "rollup -c",
     "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
-    "radar-sdk-js": ">=5.0.0-beta.1"
-  },
   "devDependencies": {
     "radar-sdk-js": "file:../..",
     "rollup-plugin-postcss": "^4.0.2"
+  },
+  "peerDependencies": {
+    "radar-sdk-js": ">=5.0.0-beta.1"
   }
 }
