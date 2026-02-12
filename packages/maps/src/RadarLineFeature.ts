@@ -15,6 +15,7 @@ const defaultLineOptions: Partial<RadarLineOptions> = {
   }
 };
 
+/** line feature rendered on a RadarMap with border support */
 class RadarLineFeature extends RadarMapFeature {
   constructor(map: RadarMap, feature: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
     super(map, feature);
@@ -85,6 +86,14 @@ class RadarLineFeature extends RadarMapFeature {
     return this;
   }
 
+  /**
+   * create a line feature from an encoded polyline string
+   *
+   * @param map - the map to add the feature to
+   * @param polyline - encoded polyline string
+   * @param polylineOptions - optional styling and precision
+   * @returns a new line feature
+   */
   static fromPolyline(map: RadarMap, polyline: string, polylineOptions?: RadarPolylineOptions) {
     const featureId = polylineOptions?.id || `polyline-feature-${Date.now()}`;
 

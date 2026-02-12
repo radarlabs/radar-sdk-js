@@ -5,7 +5,13 @@ import Storage from '../storage';
 
 import type { RadarConversionParams, RadarConversionResponse } from '../types';
 
+/** @internal conversions API — use {@link Radar.logConversion} instead */
 class ConversionsAPI {
+  /**
+   * log a conversion event
+   * @param params - conversion name, user info, and optional metadata/revenue
+   * @returns the created event
+   */
   static async logConversion(params: RadarConversionParams): Promise<RadarConversionResponse> {
     const options = Config.get();
 

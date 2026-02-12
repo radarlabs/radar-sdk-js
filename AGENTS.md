@@ -70,4 +70,4 @@ Version is tracked in 3 places that must stay in sync:
 
 - Strict TypeScript (ES2020 target, ESNext modules, bundler module resolution)
 - Shared compiler options in `tsconfig.base.json`, root + each plugin extends it
-- JSDoc on public APIs: short inline `/** does blah */`
+- JSDoc on public APIs

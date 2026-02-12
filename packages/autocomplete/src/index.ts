@@ -17,6 +17,17 @@ declare module 'radar-sdk-js' {
   }
 }
 
+/**
+ * create the Radar autocomplete plugin
+ *
+ * @returns a plugin that adds `Radar.ui.autocomplete()` method
+ *
+ * @example
+ * ```ts
+ * import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
+ * Radar.registerPlugin(createAutocompletePlugin());
+ * ```
+ */
 export function createAutocompletePlugin(): RadarPlugin {
   return {
     name: 'autocomplete',

@@ -87,6 +87,7 @@ const defaultMarkerOptions: RadarMarkerOptions = {
   color: '#000257',
 };
 
+/** MapLibre marker wrapper with Radar image loading and popup support */
 class RadarMarker extends Marker {
   _map!: RadarMap;
 
@@ -239,11 +240,18 @@ class RadarMarker extends Marker {
     }
   }
 
+  /**
+   * add this marker to a map
+   *
+   * @param map - the RadarMap to add this marker to
+   * @returns this marker for chaining
+   */
   addTo(map: RadarMap) {
     map.addMarker(this);
     return super.addTo(map);
   }
 
+  /** remove this marker from its map */
   remove() {
     if (this._map) {
       this._map.removeMarker(this);

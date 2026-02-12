@@ -4,7 +4,13 @@ import Navigator from '../navigator';
 
 import type { RadarContextResponse, Location } from '../types';
 
+/** @internal context API — use {@link Radar.getContext} instead */
 class ContextAPI {
+  /**
+   * get context (geofences, place, region) for a location
+   * @param location - coordinates to get context for
+   * @returns geofences, place, country, state, DMA, and postal code
+   */
   public static async getContext(location: Location): Promise<RadarContextResponse> {
     const options = Config.get();
 

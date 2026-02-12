@@ -1,8 +1,10 @@
 const RADAR_LOGO_URL = 'https://api.radar.io/maps/static/images/logo.svg';
 
+/** MapLibre control that displays the Radar logo */
 class RadarLogoControl {
   link: HTMLAnchorElement | undefined;
 
+  /** add the logo control to a map container */
   onAdd() {
     const img = document.createElement('img');
     img.src = RADAR_LOGO_URL;
@@ -18,6 +20,7 @@ class RadarLogoControl {
     return this.link;
   }
 
+  /** remove the logo control from the map */
   onRemove() {
     this.link?.remove();
   }

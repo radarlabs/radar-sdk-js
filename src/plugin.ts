@@ -17,26 +17,42 @@ import type TrackAPI from './api/track';
 import type TripsAPI from './api/trips';
 import type * as errors from './errors';
 
+/** interface that all Radar plugins must implement */
 export interface RadarPlugin {
+  /** unique plugin name (e.g. `'maps'`, `'autocomplete'`) */
   name: string;
+  /** semver version of the plugin */
   version: string;
+  /** called by `Radar.registerPlugin()` to install the plugin */
   install(ctx: RadarPluginContext): void;
 }
 
 /** NOTE(jasonl): intersection preserves typed static methods while allowing plugin method attachment */
 export type RadarStatic = typeof Radar & Record<string, unknown>;
 
+/** context object passed to {@link RadarPlugin.install} with access to SDK internals */
 export interface RadarPluginContext {
+  /** the Radar static class for attaching new namespaces (e.g. `ctx.Radar.ui`) */
   Radar: RadarStatic;
+  /** SDK configuration singleton */
   Config: typeof Config;
+  /** XHR-based HTTP client */
   Http: typeof Http;
+  /** typed localStorage wrapper */
   Storage: typeof Storage;
+  /** device ID generator */
   Device: typeof Device;
+  /** session management */
   Session: typeof Session;
+  /** SDK logger */
   Logger: typeof Logger;
+  /** browser geolocation wrapper */
   Navigator: typeof Navigator;
+  /** current SDK version string */
   SDK_VERSION: string;
+  /** all Radar error classes */
   errors: typeof errors;
+  /** internal API modules for making Radar API calls */
   apis: {
     Addresses: typeof AddressesAPI;
     Config: typeof ConfigAPI;

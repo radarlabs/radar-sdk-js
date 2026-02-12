@@ -28,6 +28,17 @@ declare module 'radar-sdk-js' {
   }
 }
 
+/**
+ * create the Radar maps plugin
+ *
+ * @returns a plugin that adds `Radar.ui.map()`, `Radar.ui.marker()`, and `Radar.ui.popup()` methods
+ *
+ * @example
+ * ```ts
+ * import { createMapsPlugin } from '@radarlabs/plugin-maps';
+ * Radar.registerPlugin(createMapsPlugin());
+ * ```
+ */
 export function createMapsPlugin(): RadarPlugin {
   return {
     name: 'maps',

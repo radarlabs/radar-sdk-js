@@ -11,7 +11,14 @@ import type {
   RadarSearchGeofencesResponse,
 } from '../types';
 
+/** @internal search API — use Radar.autocomplete / searchGeofences / searchPlaces instead */
 class SearchAPI {
+  /**
+   * autocomplete partial addresses and place names
+   * @param params - query and search configuration
+   * @param requestId - optional ID for deduplicating in-flight requests
+   * @returns matching addresses
+   */
   static async autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
@@ -63,6 +70,11 @@ class SearchAPI {
     return autocompleteRes;
   }
 
+  /**
+   * search for geofences near a location
+   * @param params - location, radius, tags, and filters
+   * @returns matching geofences
+   */
   static async searchGeofences(params: RadarSearchGeofencesParams): Promise<RadarSearchGeofencesResponse> {
     const options = Config.get();
 
@@ -113,6 +125,11 @@ class SearchAPI {
     return geofencesSearchRes;
   }
 
+  /**
+   * search for places near a location
+   * @param params - location, radius, chains, categories, and groups
+   * @returns matching places
+   */
   static async searchPlaces(params: RadarSearchPlacesParams): Promise<RadarSearchPlacesResponse> {
     const options = Config.get();
 

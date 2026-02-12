@@ -1,43 +1,63 @@
+/** log verbosity level for the SDK */
 export type LogLevel = 'none' | 'info' | 'warn' | 'error'
 
+/** a geographic coordinate with optional accuracy and timestamp */
 export interface Location {
   latitude: number;
   longitude: number;
-  /** Meters */
+  /** accuracy in meters */
   accuracy?: number;
-  /** Unix time in seconds */
+  /** unix time in seconds */
   timestamp?: number;
 }
 
+/** position returned by the browser's geolocation API */
 export interface NavigatorPosition {
   latitude: number;
   longitude: number;
+  /** accuracy in meters */
   accuracy: number;
 }
 
+/** browser location permission state */
 export type LocationAuthorization =
   | 'DENIED'
   | 'NOT_DETERMINED'
   | 'GRANTED_FOREGROUND';
 
+/** configuration options passed to {@link Radar.initialize} */
 export interface RadarOptions {
+  /** Radar publishable key (set automatically by `initialize`) */
   publishableKey?: string;
+  /** whether the key is a live key (set automatically) */
   live?: boolean;
+  /** SDK log verbosity */
   logLevel?: LogLevel;
+  /** override the Radar API host */
   host?: string;
+  /** API version string */
   version?: string;
+  /** minutes to cache the device location */
   cacheLocationMinutes?: number;
+  /** max age (ms) of a cached geolocation position */
   locationMaximumAge?: number;
+  /** geolocation timeout in ms */
   locationTimeout?: number;
+  /** geolocation accuracy hint */
   desiredAccuracy?: 'high' | 'medium' | 'low';
+  /** callback that returns extra headers to send with every request */
   getRequestHeaders?: () => {};
+  /** enable debug logging */
   debug?: boolean;
 };
 
+/** base response shape shared by all API responses */
 export interface RadarResponse {
-  response?: any; // DEBUG ONLY
+  /** raw API response body (only present in debug mode) */
+  response?: any;
 }
 
+/** travel mode for routing and trips */
 export type RadarTravelMode =
   | 'car'
   | 'foot'
@@ -45,29 +65,41 @@ export type RadarTravelMode =
   | 'motorbike'
   | 'truck';
 
+/** road feature to avoid in routing requests */
 export type RadarAvoidOption =
   | 'tolls'
   | 'highways'
   | 'ferries'
   | 'borderCrossings';
 
+/** options for creating or updating a trip */
 export interface RadarTripOptions {
   userId?: string;
   externalId?: string;
+  /** travel mode for ETA calculation */
   mode?: RadarTravelMode;
+  /** geofence tag of the trip destination */
   destinationGeofenceTag?: string;
+  /** geofence external ID of the trip destination */
   destinationGeofenceExternalId?: string;
+  /** expected arrival time */
   scheduledArrivalAt?: Date;
+  /** distance threshold (meters) for the "approaching" event */
   approachingThreshold?: number;
   metadata?: RadarMetadata;
   version?: string;
 }
 
+/** arbitrary key-value metadata attached to Radar objects */
 export type RadarMetadata = Record<string, string | number | boolean>;
 
+/** parameters for {@link Radar.trackOnce} */
 export interface RadarTrackParams {
+  /** override latitude (skips device geolocation) */
   latitude?: number;
+  /** override longitude (skips device geolocation) */
   longitude?: number;
+  /** override accuracy in meters */
   accuracy?: number;
   userId?: string;
   deviceId?: string;
@@ -76,12 +108,15 @@ export interface RadarTrackParams {
   deviceType?: string;
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
+  /** geolocation accuracy hint */
   desiredAccuracy?: 'high' | 'medium' | 'low';
   reason?: string;
   transactionId?: string;
+  /** include fraud signals in the response */
   fraud?: boolean;
 }
 
+/** confidence level for Radar events */
 export enum RadarEventConfidence {
   none = 0,
   low = 1,
@@ -89,6 +124,7 @@ export enum RadarEventConfidence {
   high = 3
 }
 
+/** all possible Radar event types */
 export type RadarEventType =
   | 'unknown'
   | 'user.entered_geofence'
@@ -117,6 +153,7 @@ export type RadarEventType =
   | 'user.stopped_trip'
   | 'user.failed_fraud';
 
+/** a Radar geofence */
 export interface RadarGeofence {
   _id: string;
   description: string;
@@ -125,11 +162,15 @@ export interface RadarGeofence {
   metadata?: RadarMetadata;
 }
 
+/** ETA estimate for a trip (distance in meters, duration in minutes) */
 export interface RadarTripEta {
+  /** distance remaining in meters */
   distance?: number;
+  /** time remaining in minutes */
   duration?: number;
 }
 
+/** lifecycle status of a trip */
 export type RadarTripStatus =
   | 'pending'
   | 'started'
@@ -141,6 +182,7 @@ export type RadarTripStatus =
   | 'pending';
 
 
+/** a Radar trip with destination, ETA, and status */
 export interface RadarTrip {
   _id: string;
   externalId: string;
@@ -153,6 +195,7 @@ export interface RadarTrip {
   scheduledArrivalAt?: Date;
 }
 
+/** fraud detection signals for a tracked user */
 export interface RadarFraud {
   passed: boolean;
   bypassed: boolean;
@@ -164,6 +207,7 @@ export interface RadarFraud {
   sharing: boolean;
 }
 
+/** a place chain (e.g. Starbucks, McDonald's) */
 export interface RadarChain {
   name: string;
   slug: string;
@@ -171,6 +215,7 @@ export interface RadarChain {
   metadata?: RadarMetadata;
 }
 
+/** a Radar place (POI) */
 export interface RadarPlace {
   _id: string;
   name: string;
@@ -178,6 +223,7 @@ export interface RadarPlace {
   chain?: RadarChain;
 }
 
+/** a geographic or administrative region */
 export interface RadarRegion {
   _id: string;
   type: string;
@@ -185,6 +231,7 @@ export interface RadarRegion {
   name: string;
 }
 
+/** a Radar event triggered by user location changes */
 export interface RadarEvent {
   _id: string;
   live: boolean;
@@ -197,6 +244,7 @@ export interface RadarEvent {
   trip?: RadarTrip;
 }
 
+/** a tracked Radar user with location context */
 export interface RadarUser {
   _id: string;
   userId?: string;
@@ -213,12 +261,14 @@ export interface RadarUser {
   fraud?: RadarFraud;
 }
 
+/** response from {@link Radar.trackOnce} */
 export interface RadarTrackResponse extends RadarResponse {
   location?: Location;
   user?: RadarUser;
   events?: RadarEvent[];
 }
 
+/** response from {@link Radar.getContext} */
 export interface RadarContextResponse extends RadarResponse {
   location?: Location;
   geofences?: RadarGeofence[];
@@ -229,22 +279,28 @@ export interface RadarContextResponse extends RadarResponse {
   postalCode?: RadarRegion;
 }
 
+/** response from trip operations (start, update, complete, cancel) */
 export interface RadarTripResponse extends RadarResponse {
   trip: RadarTrip;
   events: RadarEvent[];
 }
 
+/** parameters for {@link Radar.logConversion} */
 export interface RadarConversionParams {
+  /** conversion event name */
   name: string;
   metadata?: RadarMetadata;
+  /** revenue amount in dollars */
   revenue?: number;
   userId?: string;
   deviceId?: string;
   installId?: string;
   createdAt?: Date | string;
+  /** event duration in seconds */
   duration?: number;
 }
 
+/** a custom conversion event */
 export interface RadarCustomEvent {
   _id: string;
   createdAt: string;
@@ -254,10 +310,12 @@ export interface RadarCustomEvent {
   user?: RadarUser;
 }
 
+/** response from {@link Radar.logConversion} */
 export interface RadarConversionResponse extends RadarResponse {
   event: RadarCustomEvent;
 }
 
+/** geocode layer filter for forward/reverse geocode and autocomplete */
 export type RadarGeocodeLayer =
   | 'place'
   | 'address'
@@ -270,16 +328,19 @@ export type RadarGeocodeLayer =
   | 'coarse'
   | 'fine'
 
+/** a geocoded address result */
 export interface RadarAddress {
   addressLabel?: string;
   borough?: string;
   categories?: string[];
   city?: string;
+  /** geocode match confidence */
   confidence?: 'exact' | 'interpolated' | 'fallback';
   country?: string;
   countryCode?: string;
   countryFlag?: string;
   county?: string;
+  /** distance from the query point in meters */
   distance?: number;
   dma?: string;
   dmaCode?: string;
@@ -289,6 +350,7 @@ export interface RadarAddress {
   longitude: number;
   layer?: RadarGeocodeLayer;
   neighborhood?: string;
+  /** street number */
   number?: string;
   placeLabel?: string;
   postalCode?: string;
@@ -297,7 +359,9 @@ export interface RadarAddress {
   street?: string;
 }
 
+/** time zone information for a geocoded address */
 export interface RadarTimeZone {
+  /** IANA time zone ID (e.g. `'America/New_York'`) */
   id: string;
   name: string;
   code: string;
@@ -306,21 +370,27 @@ export interface RadarTimeZone {
   dstOffset: number;
 }
 
+/** autocomplete address result with optional unit */
 export interface RadarAutocompleteAddress extends RadarAddress {
   unit?: string;
 }
 
+/** forward/reverse geocode address result with unit and time zone */
 export interface RadarGeocodeAddress extends RadarAddress {
   unit?: string;
   timeZone?: RadarTimeZone;
 }
 
+/** USPS record type code */
 export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F' | undefined;
 
+/** property type for address validation */
 export type RadarValidationPropertyType = 'commercial' | 'residential' | undefined;
 
+/** address verification status */
 export type RadarVerificationStatus = 'verified' | 'partially verified' | 'ambiguous' | 'unverified';
 
+/** validated address with USPS metadata */
 export interface RadarValidationAddress extends RadarAddress {
   unit?: string;
   plus4?: string;
@@ -330,135 +400,201 @@ export interface RadarValidationAddress extends RadarAddress {
   };
 }
 
+/** parameters for {@link Radar.forwardGeocode} */
 export interface RadarForwardGeocodeParams {
+  /** address or place name to geocode */
   query: string;
+  /** filter results by geocode layer */
   layers?: RadarGeocodeLayer[];
+  /** filter by country code */
   country?: string;
+  /** language code for results */
   lang?: string;
 }
 
+/** parameters for {@link Radar.reverseGeocode} */
 export interface RadarReverseGeocodeParams {
+  /** latitude to reverse geocode (defaults to device location) */
   latitude?: number;
+  /** longitude to reverse geocode (defaults to device location) */
   longitude?: number;
+  /** filter results by geocode layer */
   layers?: RadarGeocodeLayer[];
 }
 
+/** response from {@link Radar.forwardGeocode} and {@link Radar.reverseGeocode} */
 export interface RadarGeocodeResponse extends RadarResponse {
   addresses: RadarGeocodeAddress[];
 }
 
+/** response from {@link Radar.ipGeocode} */
 export interface RadarIPGeocodeResponse extends RadarResponse {
+  /** the detected IP address */
   ip: string;
   address?: RadarGeocodeAddress;
+  /** whether the IP is a known proxy */
   proxy?: boolean;
 }
 
+/** parameters for {@link Radar.autocomplete} */
 export interface RadarAutocompleteParams {
+  /** search query string */
   query: string;
+  /** bias results near a location or `'lat,lng'` string */
   near?: Location | string;
+  /** max number of results */
   limit?: number;
+  /** filter results by geocode layer */
   layers?: RadarGeocodeLayer[];
+  /** filter by country code */
   countryCode?: string;
   /** @deprecated this is always true, regardless of the value passed here */
   expandUnits?: boolean;
+  /** only return mailable addresses */
   mailable?: boolean;
+  /** language code for results */
   lang?: string;
+  /** filter by postal code */
   postalCode?: string;
 }
 
+/** response from {@link Radar.autocomplete} */
 export interface RadarAutocompleteResponse extends RadarResponse {
   addresses: RadarAutocompleteAddress[];
 }
 
+/** parameters for {@link Radar.searchPlaces} */
 export interface RadarSearchPlacesParams {
+  /** center point or `'lat,lng'` string (defaults to device location) */
   near?: Location | string;
+  /** search radius in meters */
   radius?: number;
+  /** filter by chain slugs */
   chains?: string[] | string;
+  /** filter by place categories */
   categories?: string[] | string;
+  /** filter by place groups */
   groups?: string[] | string;
+  /** max number of results */
   limit?: number;
 }
 
+/** a place search result with location geometry */
 export interface RadarSearchPlace extends RadarPlace {
   location?: GeoJSON.Point;
 }
 
+/** response from {@link Radar.searchPlaces} */
 export interface RadarSearchPlacesResponse extends RadarResponse {
   places: RadarSearchPlace[];
 }
 
+/** route geometry encoding format */
 export type RadarDistanceGeometryType = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
 
+/** parameters for {@link Radar.distance} */
 export interface RadarDistanceParams {
+  /** origin location or `'lat,lng'` string (defaults to device location) */
   origin?: Location | string;
+  /** destination location or `'lat,lng'` string */
   destination: Location | string;
+  /** travel modes to calculate (e.g. `['car', 'foot']`) */
   modes: RadarTravelMode[] | string;
+  /** distance units */
   units?: 'metric' | 'imperial';
+  /** route geometry encoding */
   geometry?: RadarDistanceGeometryType;
+  /** number of points in the route geometry */
   geometryPoints?: number;
+  /** road features to avoid */
   avoid?: RadarAvoidOption[] | string;
 }
 
 
+/** a route distance value with human-readable text */
 export interface RadarRouteDistance {
+  /** distance in meters (metric) or miles (imperial) */
   value: number;
+  /** human-readable distance string (e.g. `'1.2 km'`) */
   text: string;
 }
 
+/** a route duration value with human-readable text */
 export interface RadarRouteDuration {
+  /** duration in minutes */
   value: number;
+  /** human-readable duration string (e.g. `'5 mins'`) */
   text: string;
 }
 
+/** a single route with distance, duration, and optional geometry */
 export interface RadarRoute {
   distance?: RadarRouteDistance;
   duration?: RadarRouteDuration;
   geometry?: GeoJSON.LineString;
 }
 
+/** routes keyed by travel mode */
 export interface RadarRoutes {
+  /** straight-line (geodesic) route — always present */
   geodesic: RadarRoute;
   foot?: RadarRoute;
   bike?: RadarRoute;
   car?: RadarRoute;
 }
 
+/** response from {@link Radar.distance} */
 export interface RadarRouteResponse extends RadarResponse {
   routes: RadarRoutes;
 }
 
+/** parameters for {@link Radar.matrix} */
 export interface RadarMatrixParams {
+  /** origin locations or pipe-separated `'lat,lng'` strings (defaults to device location) */
   origins?: Location[] | string;
+  /** destination locations or pipe-separated `'lat,lng'` strings */
   destinations: Location[] | string;
+  /** travel mode */
   mode: RadarTravelMode;
+  /** distance units */
   units?: 'metric' | 'imperial';
+  /** road features to avoid */
   avoid?: RadarAvoidOption[] | string;
 }
 
+/** a single origin→destination route in a distance matrix */
 export interface RadarMatrixRoute {
   distance?: RadarRouteDistance;
   duration?: RadarRouteDuration;
+  /** index of the origin in the origins array */
   originIndex: number;
+  /** index of the destination in the destinations array */
   destinationIndex: number;
 }
 
+/** response from {@link Radar.matrix} */
 export interface RadarMatrixResponse extends RadarResponse {
   origins: Location[];
   destinations: Location[];
+  /** 2D array of routes indexed by `[originIndex][destinationIndex]` */
   matrix: RadarMatrixRoute[][];
 }
 
+/** parameters for {@link Radar.validateAddress} */
 export interface RadarValidateAddressParams {
   city: string;
   stateCode: string;
   postalCode: string;
   countryCode: string;
+  /** street number */
   number?: string;
   street?: string;
+  /** apartment/suite/unit */
   unit?: string;
   addressLabel?: string;
 }
 
+/** response from {@link Radar.validateAddress} */
 export interface RadarValidateAddressResponse extends RadarResponse {
   address?: RadarValidationAddress;
   result?: {
@@ -466,15 +602,23 @@ export interface RadarValidateAddressResponse extends RadarResponse {
   }
 }
 
+/** parameters for {@link Radar.searchGeofences} */
 export interface RadarSearchGeofencesParams {
+  /** center point or `'lat,lng'` string (defaults to device location) */
   near?: Location | string;
+  /** search radius in meters */
   radius?: number;
+  /** filter by geofence tags */
   tags?: string[] | string;
+  /** filter by geofence metadata */
   metadata?: RadarMetadata;
+  /** max number of results */
   limit?: number;
+  /** include geofence geometry in results */
   includeGeometry?: boolean;
 }
 
+/** response from {@link Radar.searchGeofences} */
 export interface RadarSearchGeofencesResponse extends RadarResponse {
   geofences: RadarGeofence[];
 }

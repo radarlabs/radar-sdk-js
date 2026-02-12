@@ -1,40 +1,51 @@
 import type maplibregl from 'maplibre-gl';
 
+/** extends MapLibre MapOptions with Radar-specific options */
 export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
+  /** map label language code (e.g. 'en', 'es') */
   language?: string;
+  /** whether to show zoom +/- buttons (default: true) */
   showZoomControls?: boolean;
 }
 
+/** extends MapLibre PopupOptions with content helpers */
 export interface RadarPopupOptions extends maplibregl.PopupOptions {
+  /** plain text content for the popup */
   text?: string;
+  /** HTML string content for the popup */
   html?: string;
+  /** DOM element to use as popup content */
   element?: HTMLElement;
 }
 
+/** extends MapLibre MarkerOptions with Radar features */
 export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
-  /**
-   * @deprecated Use popup.text
-   */
+  /** @deprecated use popup.text */
   text?: string;
 
-  /**
-   * @deprecated Use popup.html
-   */
+  /** @deprecated use popup.html */
   html?: string;
 
-  // marker configs
+  /** custom image URL for the marker */
   url?: string;
+  /** Radar-hosted marker image name */
   marker?: string;
+  /** marker image width (px or CSS string) */
   width?: number | string;
+  /** marker image height (px or CSS string) */
   height?: number | string;
 
-  // popup configs
+  /** popup options to attach to this marker */
   popup?: RadarPopupOptions;
 }
 
+/** styling options for line features on the map */
 export interface RadarLineOptions {
+  /** unique feature identifier */
   id?: string;
+  /** GeoJSON properties */
   properties?: any;
+  /** MapLibre line paint properties plus border styling */
   paint?: {
     'line-color'?: string;
     'line-width'?: number;
@@ -51,13 +62,19 @@ export interface RadarLineOptions {
   },
 }
 
+/** options for encoded polyline features */
 export interface RadarPolylineOptions extends RadarLineOptions {
+  /** polyline encoding precision (default: 5) */
   precision?: number;
 }
 
+/** styling options for polygon features on the map */
 export interface RadarPolygonOptions {
+  /** unique feature identifier */
   id?: string;
+  /** GeoJSON properties */
   properties?: any;
+  /** fill and border paint properties */
   paint?: {
     'fill-color'?: string;
     'fill-opacity'?: number;

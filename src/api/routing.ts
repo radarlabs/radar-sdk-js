@@ -9,7 +9,13 @@ import type {
   RadarMatrixResponse,
 } from '../types';
 
+/** @internal routing API — use Radar.distance / matrix instead */
 class RoutingAPI {
+  /**
+   * calculate travel distance and duration between two points
+   * @param params - origin, destination, modes, and units
+   * @returns routes with distance and duration per mode
+   */
   static async distance(params: RadarDistanceParams): Promise<RadarRouteResponse> {
     const options = Config.get();
 
@@ -70,6 +76,11 @@ class RoutingAPI {
     return distanceRes;
   }
 
+  /**
+   * calculate a distance matrix between multiple origins and destinations
+   * @param params - origins, destinations, mode, and units
+   * @returns matrix of distances and durations
+   */
   static async matrix(params: RadarMatrixParams): Promise<RadarMatrixResponse> {
     const options = Config.get();
 

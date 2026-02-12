@@ -14,9 +14,13 @@ class RadarFeatureMouseEvent {
   }
 };
 
+/** abstract base class for map features (lines, polygons) with source/layer management */
 abstract class RadarMapFeature {
+  /** unique feature identifier */
   id: string;
+  /** GeoJSON geometry of this feature */
   geometry: GeoJSON.Geometry;
+  /** GeoJSON properties of this feature */
   properties: GeoJSON.GeoJsonProperties;
 
   _map: RadarMap;
@@ -40,6 +44,7 @@ abstract class RadarMapFeature {
     this._map = map;
   }
 
+  /** remove this feature and its layers from the map */
   remove() {
     // remove layers
     this._layerIds.forEach((layerId) => {
@@ -61,7 +66,12 @@ abstract class RadarMapFeature {
     );
   }
 
-  // register events with feature layer
+  /**
+   * register an event listener on this feature's map layer
+   *
+   * @param eventType - the event type to listen for
+   * @param callback - handler receiving the feature event
+   */
   on(eventType: RadarFeatureEventType, callback: (event: RadarFeatureMouseEvent) => void) {
     this._map.on(eventType, this.id, (event: any) => {
       callback(new RadarFeatureMouseEvent(eventType, this, event));

@@ -7,7 +7,12 @@ import Navigator from '../navigator';
 
 import type { RadarTrackParams } from '../types';
 
+/** @internal SDK configuration API for fetching remote config */
 class ConfigAPI {
+  /**
+   * fetch remote SDK configuration from the Radar API
+   * @param params - optional tracking params for device/session identification
+   */
   public static async getConfig(params: RadarTrackParams = {}) {
     const options = Config.get();
 

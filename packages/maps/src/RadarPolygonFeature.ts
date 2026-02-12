@@ -15,6 +15,7 @@ const defaultPolygonOptions: Partial<RadarPolygonOptions> = {
 };
 
 
+/** polygon feature rendered on a RadarMap with fill and border support */
 class RadarPolygonFeature extends RadarMapFeature {
   constructor(map: RadarMap, feature: GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
     super(map, feature);

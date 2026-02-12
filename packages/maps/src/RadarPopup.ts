@@ -2,6 +2,7 @@ import { Popup } from 'maplibre-gl';
 
 import type { RadarPopupOptions } from './types';
 
+/** MapLibre popup wrapper with convenience content options */
 class RadarPopup extends Popup {
   constructor(popupOptions: RadarPopupOptions) {
     super(popupOptions);

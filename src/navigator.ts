@@ -20,7 +20,15 @@ const useHighAccuracy = (desiredAccuracy?: string) => (
   Boolean(desiredAccuracy === 'high')
 );
 
+/** browser geolocation wrapper with caching and permission checks */
 class Navigator {
+  /**
+   * get the device's current position via the browser geolocation API
+   * @param overrides - optional accuracy overrides
+   * @returns device coordinates with accuracy
+   * @throws {RadarLocationError} if geolocation is unavailable or times out
+   * @throws {RadarPermissionsError} if location permissions are denied
+   */
   public static async getCurrentPosition(overrides: PositionOptionOverrides = {}): Promise<NavigatorPosition> {
     return new Promise((resolve, reject) => {
       const options = Config.get();
@@ -101,6 +109,10 @@ class Navigator {
     });
   }
 
+  /**
+   * query the current geolocation permission status
+   * @returns the current location authorization state
+   */
   public static async getPermissionStatus(): Promise<LocationAuthorization> {
     return new Promise((resolve) => {
       let locationAuthorization: LocationAuthorization = 'NOT_DETERMINED';
@@ -129,6 +141,7 @@ class Navigator {
     });
   }
 
+  /** check whether the browser reports being online */
   public static online(): Boolean {
     return navigator && navigator.onLine;
   }

@@ -73,6 +73,7 @@ const getStyle = (options: any, mapOptions: RadarMapOptions) => {
   return mapOptions.style; // style object or URL
 };
 
+/** MapLibre GL map wrapper with Radar styling, markers, and feature management */
 class RadarMap extends Map {
   _markers: RadarMarker[] = [];
   _features: RadarMapFeature[] = [];
@@ -152,18 +153,27 @@ class RadarMap extends Map {
     }
   }
 
+  /** add a marker to this map's tracked marker list */
   addMarker(marker: RadarMarker) {
     this._markers.push(marker);
   }
 
+  /** remove a marker from this map's tracked marker list */
   removeMarker(marker: RadarMarker) {
     this._markers = this._markers.filter((mapMarker: RadarMarker) => mapMarker !== marker);
   }
 
+  /** get all markers currently tracked by this map */
   getMarkers(): RadarMarker[] {
     return this._markers;
   }
 
+  /**
+   * fit the map viewport to contain all tracked markers
+   *
+   * @param fitBoundsOptions - MapLibre fit bounds options
+   * @param overrideMarkers - optional subset of markers to fit (defaults to all)
+   */
   fitToMarkers(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideMarkers?: RadarMarker[]) {
     const markers = overrideMarkers || this.getMarkers();
 
@@ -180,16 +190,24 @@ class RadarMap extends Map {
     this.fitBounds(bounds, options);
   }
 
+  /** remove all markers from this map */
   clearMarkers() {
     this._markers.forEach((marker) => {
       marker.remove();
     });
   }
 
+  /** get all features currently added to this map */
   getFeatures() {
     return this._features;
   }
 
+  /**
+   * fit the map viewport to contain all tracked features
+   *
+   * @param fitBoundsOptions - MapLibre fit bounds options
+   * @param overrideFeatures - optional subset of features to fit (defaults to all)
+   */
   fitToFeatures(fitBoundsOptions: FitBoundsOptions = {}, overrideFeatures?: RadarMapFeature[]) {
     const features = (overrideFeatures || this._features).map((mapFeature) => mapFeature._feature);
     const coords = getAllCoords(features);
@@ -203,25 +221,46 @@ class RadarMap extends Map {
     }
   }
 
-  // remove all features from the map
+  /** remove all features from the map */
   clearFeatures() {
     this._features.forEach((feature) => {
       feature.remove();
     });
   }
 
+  /**
+   * add a polygon feature to the map
+   *
+   * @param polygon - GeoJSON polygon or multi-polygon feature
+   * @param polygonOptions - optional polygon styling
+   * @returns the created polygon feature
+   */
   addPolygon(polygon: GeoJSON.Feature<GeoJSON.Polygon|GeoJSON.MultiPolygon>, polygonOptions?: RadarPolygonOptions) {
     const feature = new RadarPolygonFeature(this, polygon, polygonOptions);
     this._features.push(feature);
     return feature;
   }
 
+  /**
+   * add a GeoJSON line feature to the map
+   *
+   * @param line - GeoJSON line string feature
+   * @param lineOptions - optional line styling
+   * @returns the created line feature
+   */
   addLine(line: GeoJSON.Feature<GeoJSON.LineString>, lineOptions?: RadarLineOptions) {
     const feature = new RadarLineFeature(this, line, lineOptions);
     this._features.push(feature);
     return feature;
   }
 
+  /**
+   * add an encoded polyline to the map
+   *
+   * @param polyline - encoded polyline string
+   * @param polylineOptions - optional line styling and precision
+   * @returns the created line feature
+   */
   addPolyline(polyline: string, polylineOptions?: RadarPolylineOptions) {
     const feature = RadarLineFeature.fromPolyline(this, polyline, polylineOptions);
     this._features.push(feature);

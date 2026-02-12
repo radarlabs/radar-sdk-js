@@ -8,7 +8,9 @@ import type { RadarTripOptions, RadarTripStatus, RadarTripResponse } from '../ty
 // https://stackoverflow.com/a/44198641
 const isValidDate = (date: any): Date | undefined => date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
 
+/** @internal trips API — use Radar.startTrip / updateTrip / completeTrip / cancelTrip instead */
 class TripsAPI {
+  /** save trip options to localStorage, pass `undefined` to clear */
   static setTripOptions(tripOptions?: RadarTripOptions) {
     if (!tripOptions) {
       TripsAPI.clearTripOptions();
@@ -19,6 +21,7 @@ class TripsAPI {
     Storage.setItem(Storage.TRIP_OPTIONS, tripOptionsString);
   }
 
+  /** get saved trip options from localStorage */
   static getTripOptions(): RadarTripOptions {
     let tripOptions = Storage.getItem(Storage.TRIP_OPTIONS);
     if (tripOptions) {
@@ -27,10 +30,16 @@ class TripsAPI {
     return tripOptions as RadarTripOptions;
   }
 
+  /** remove saved trip options from localStorage */
   static clearTripOptions() {
     Storage.removeItem(Storage.TRIP_OPTIONS);
   }
 
+  /**
+   * start a new trip
+   * @param tripOptions - trip configuration and destination
+   * @returns the created trip and any triggered events
+   */
   static async startTrip(tripOptions: RadarTripOptions): Promise<RadarTripResponse> {
     const options = Config.get();
     tripOptions = tripOptions || TripsAPI.getTripOptions();
@@ -95,6 +104,12 @@ class TripsAPI {
     return tripRes;
   }
 
+  /**
+   * update an in-progress trip
+   * @param tripOptions - updated trip configuration
+   * @param status - optional trip status override
+   * @returns the updated trip and any triggered events
+   */
   static async updateTrip(tripOptions: RadarTripOptions, status?: RadarTripStatus): Promise<RadarTripResponse> {
     const options = Config.get();
     tripOptions = tripOptions || TripsAPI.getTripOptions();
@@ -150,6 +165,7 @@ class TripsAPI {
     return tripRes;
   }
 
+  /** complete the current trip and clear local trip options */
   static async completeTrip(): Promise<RadarTripResponse> {
     const tripOptions = TripsAPI.getTripOptions();
     const tripResponse = await TripsAPI.updateTrip(tripOptions, 'completed');
@@ -160,6 +176,7 @@ class TripsAPI {
     return tripResponse;
   }
 
+  /** cancel the current trip and clear local trip options */
   static async cancelTrip(): Promise<RadarTripResponse> {
     const tripOptions = TripsAPI.getTripOptions();
     const tripResponse = await TripsAPI.updateTrip(tripOptions, 'canceled');

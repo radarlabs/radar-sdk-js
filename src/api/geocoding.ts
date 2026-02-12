@@ -9,7 +9,13 @@ import {
   RadarIPGeocodeResponse,
 } from '../types';
 
+/** @internal geocoding API — use Radar.forwardGeocode / reverseGeocode / ipGeocode instead */
 class Geocoding {
+  /**
+   * geocode an address or place name to coordinates
+   * @param params - query string, optional layers and country filter
+   * @returns matching addresses
+   */
   static async forwardGeocode(params: RadarForwardGeocodeParams): Promise<RadarGeocodeResponse> {
     const options = Config.get();
 
@@ -37,6 +43,11 @@ class Geocoding {
     return forwardGeocodeRes;
   }
 
+  /**
+   * reverse geocode coordinates to addresses
+   * @param params - latitude/longitude, optional layers filter
+   * @returns matching addresses
+   */
   static async reverseGeocode(params: RadarReverseGeocodeParams): Promise<RadarGeocodeResponse> {
     const options = Config.get();
 
@@ -68,6 +79,10 @@ class Geocoding {
     return reverseGeocodeRes;
   }
 
+  /**
+   * geocode the device's IP address to a rough location
+   * @returns IP address, approximate address, and proxy info
+   */
   static async ipGeocode(): Promise<RadarIPGeocodeResponse> {
     const options = Config.get();
 

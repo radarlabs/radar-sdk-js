@@ -14,7 +14,13 @@ type TrackRequestHeaders = {
   'X-Radar-Product'?: string;
 }
 
+/** @internal tracking API — use {@link Radar.trackOnce} instead */
 class TrackAPI {
+  /**
+   * track the user's current location once
+   * @param params - tracking parameters (location, user info, trip options)
+   * @returns tracked user, events, and location
+   */
   static async trackOnce(params: RadarTrackParams) {
     const options = Config.get();
 

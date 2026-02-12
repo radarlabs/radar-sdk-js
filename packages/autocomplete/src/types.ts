@@ -1,30 +1,57 @@
 import type { RadarAutocompleteParams } from 'radar-sdk-js';
 
+/** configuration options for the autocomplete UI widget */
 export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams, 'query'> {
+  /** element ID or HTMLElement to mount the widget into */
   container: string | HTMLElement;
-  debounceMS?: number, // Debounce time in milliseconds
-  /** @deprecated use minCharacters instead */
+  /** debounce delay in milliseconds before fetching results */
+  debounceMS?: number,
+  /**
+   * @deprecated use minCharacters instead
+   */
   threshold?: number,
-  minCharacters?: number, // Minimum number of characters to trigger autocomplete
-  placeholder?: string, // Placeholder text for the input field
+  /** minimum number of characters to trigger autocomplete */
+  minCharacters?: number,
+  /** placeholder text for the input field */
+  placeholder?: string,
+  /** callback invoked when a result is selected */
   onSelection?: (selection: any) => void,
+  /** callback invoked before each autocomplete request */
   onRequest?: (params: RadarAutocompleteParams) => void,
+  /** callback invoked when results are returned */
   onResults?: (results: any[]) => void,
+  /** callback invoked on autocomplete errors */
   onError?: (error: any) => void,
+  /** whether the input is disabled */
   disabled?: boolean,
+  /** whether to use responsive width (100% with optional max-width) */
   responsive?: boolean;
+  /** fixed width or max-width (px number or CSS string) */
   width?: string | number;
+  /** max height of the results dropdown (px number or CSS string) */
   maxHeight?: string | number;
+  /** whether to show marker icons in results */
   showMarkers?: boolean;
+  /** color for marker icons in results */
   markerColor?: string;
+  /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
 }
 
+/** resolved configuration with required defaults */
 export interface RadarAutocompleteConfig extends RadarAutocompleteUIOptions {
-  debounceMS: number, // Debounce time in milliseconds
-  threshold: number, // DEPRECATED(use minCharacters instead)
-  minCharacters: number, // Minimum number of characters to trigger autocomplete
-  limit: number, // Maximum number of autocomplete results
-  placeholder: string, // Placeholder text for the input field
+  /** debounce delay in milliseconds */
+  debounceMS: number,
+  /**
+   * @deprecated use minCharacters instead
+   */
+  threshold: number,
+  /** minimum characters to trigger autocomplete */
+  minCharacters: number,
+  /** maximum number of autocomplete results */
+  limit: number,
+  /** placeholder text for the input field */
+  placeholder: string,
+  /** whether the input is disabled */
   disabled: boolean,
 }

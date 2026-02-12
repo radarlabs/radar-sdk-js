@@ -18,6 +18,7 @@ import {
   RadarUnknownError,
 } from './errors';
 
+/** HTTP methods supported by the SDK */
 export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
 interface HttpResponse {
@@ -27,13 +28,29 @@ interface HttpResponse {
 
 const inFlightRequests = new Map<string, XMLHttpRequest>();
 
+/** XHR-based HTTP client for Radar API requests */
 class Http {
+  /** map of host patterns to custom error factories for intercepting network errors */
   static errorInterceptors: Map<string, (online: boolean) => Error> = new Map();
 
+  /**
+   * register a custom error factory for network errors matching a host pattern
+   * @param hostPattern - substring matched against the request host
+   * @param handler - factory that receives online status and returns an error
+   */
   static registerErrorInterceptor(hostPattern: string, handler: (online: boolean) => Error) {
     Http.errorInterceptors.set(hostPattern, handler);
   }
 
+  /**
+   * send an HTTP request to the Radar API
+   * @param options - request configuration
+   * @returns response code and parsed data
+   * @throws {RadarPublishableKeyError} if publishable key is not set
+   * @throws {RadarBadRequestError} on 400 responses
+   * @throws {RadarUnauthorizedError} on 401 responses
+   * @throws {RadarNetworkError} on network failures
+   */
   static async request({
     method,
     path,

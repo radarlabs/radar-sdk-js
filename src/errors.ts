@@ -1,4 +1,6 @@
+/** base error class for all Radar SDK errors */
 export class RadarError extends Error {
+  /** legacy status code string (e.g. `'ERROR_PUBLISHABLE_KEY'`) */
   status: string;
 
   constructor(message: string) {
@@ -7,6 +9,7 @@ export class RadarError extends Error {
   }
 }
 
+/** thrown when a publishable key is missing or invalid (e.g. secret key used) */
 export class RadarPublishableKeyError extends RadarError {
   constructor(message: string) {
     super(message);
@@ -15,6 +18,7 @@ export class RadarPublishableKeyError extends RadarError {
   }
 }
 
+/** thrown when the device location cannot be determined */
 export class RadarLocationError extends RadarError {
   constructor(message: string) {
     super(message);
@@ -23,6 +27,7 @@ export class RadarLocationError extends RadarError {
   }
 }
 
+/** thrown when location permissions are denied by the browser */
 export class RadarPermissionsError extends RadarError {
   constructor(message: string) {
     super(message);
@@ -31,7 +36,7 @@ export class RadarPermissionsError extends RadarError {
   }
 }
 
-// HTTP Errors
+/** thrown on HTTP 400 Bad Request responses */
 export class RadarBadRequestError extends RadarError {
   code: number;
   response?: any;
@@ -45,6 +50,7 @@ export class RadarBadRequestError extends RadarError {
   }
 }
 
+/** thrown on HTTP 401 Unauthorized responses */
 export class RadarUnauthorizedError extends RadarError {
   code: number;
   response?: any;
@@ -58,6 +64,7 @@ export class RadarUnauthorizedError extends RadarError {
   }
 }
 
+/** thrown on HTTP 402 Payment Required responses */
 export class RadarPaymentRequiredError extends RadarError {
   code: number;
   response?: any;
@@ -71,6 +78,7 @@ export class RadarPaymentRequiredError extends RadarError {
   }
 }
 
+/** thrown on HTTP 403 Forbidden responses */
 export class RadarForbiddenError extends RadarError {
   code: number;
   response?: any;
@@ -84,6 +92,7 @@ export class RadarForbiddenError extends RadarError {
   }
 }
 
+/** thrown on HTTP 404 Not Found responses */
 export class RadarNotFoundError extends RadarError {
   code: number;
   response?: any;
@@ -97,9 +106,11 @@ export class RadarNotFoundError extends RadarError {
   }
 }
 
+/** thrown on HTTP 429 Rate Limit responses */
 export class RadarRateLimitError extends RadarError {
   code: number;
   response?: any;
+  /** rate limit type from the API response (e.g. `'hourly'`) */
   type: string;
 
   constructor(response?: any) {
@@ -112,6 +123,7 @@ export class RadarRateLimitError extends RadarError {
   }
 }
 
+/** thrown on HTTP 5xx server errors */
 export class RadarServerError extends RadarError {
   response?: any;
 
@@ -123,6 +135,7 @@ export class RadarServerError extends RadarError {
   }
 }
 
+/** thrown when a request times out or the network is unavailable */
 export class RadarNetworkError extends RadarError {
   constructor() {
     super('Request timed out.');
@@ -131,6 +144,7 @@ export class RadarNetworkError extends RadarError {
   }
 }
 
+/** thrown for unexpected/unclassified errors */
 export class RadarUnknownError extends RadarError {
   response?: any;
 
@@ -141,4 +155,3 @@ export class RadarUnknownError extends RadarError {
     this.status = 'ERROR_UNKNOWN';
   }
 }
-

@@ -66,6 +66,7 @@ const getMarkerIcon = (color: string = "#ACBDC8") => {
 };
 
 
+/** address autocomplete UI widget with keyboard navigation and result display */
 class AutocompleteUI {
   private ctx: RadarPluginContext;
   config: RadarAutocompleteConfig;
@@ -185,6 +186,7 @@ class AutocompleteUI {
     Logger.debug('AutocompleteUI initialized with options', this.config);
   }
 
+  /** handle input field changes and trigger debounced search */
   public handleInput() {
     const { Logger } = this.ctx;
 
@@ -244,6 +246,11 @@ class AutocompleteUI {
     };
   }
 
+  /**
+   * fetch autocomplete results from the Radar API
+   * @param query - the search query string
+   * @returns matching addresses
+   */
   public async fetchResults(query: string) {
     const { apis } = this.ctx;
     const { limit, layers, countryCode, expandUnits, mailable, lang, postalCode, onRequest } = this.config;
@@ -271,6 +278,10 @@ class AutocompleteUI {
     return addresses;
   }
 
+  /**
+   * render autocomplete results in the dropdown
+   * @param results - array of address results to display
+   */
   public displayResults(results: any[]) {
     // Clear the previous results
     this.clearResultsList();
@@ -346,6 +357,7 @@ class AutocompleteUI {
     }
   }
 
+  /** open the results dropdown */
   public open() {
     if (this.isOpen) {
       return;
@@ -356,6 +368,7 @@ class AutocompleteUI {
     this.isOpen = true;
   }
 
+  /** close the results dropdown and clear highlighted state */
   public close(e?: FocusEvent) {
     if (!this.isOpen) {
       return;
@@ -374,6 +387,10 @@ class AutocompleteUI {
     }, linkClick ? 100 : 0);
   }
 
+  /**
+   * highlight a result by index with wrap-around navigation
+   * @param index - the result index to highlight
+   */
   public goTo(index: number) {
     if (!this.isOpen || !this.results.length) {
       return;
@@ -441,6 +458,10 @@ class AutocompleteUI {
     }
   }
 
+  /**
+   * select a result by index and populate the input field
+   * @param index - the result index to select
+   */
   public select(index: number) {
     const { Logger } = this.ctx;
     const result = this.results[index];
@@ -467,12 +488,13 @@ class AutocompleteUI {
     this.close();
   }
 
+  /** clear the results list DOM and reset results array */
   public clearResultsList() {
     this.resultsList.innerHTML = '';
     this.results = [];
   }
 
-  // remove elements from DOM
+  /** remove the autocomplete widget from the DOM */
   public remove() {
     const { Logger } = this.ctx;
     Logger.debug('AutocompleteUI removed.');
@@ -481,6 +503,11 @@ class AutocompleteUI {
     this.wrapper.remove();
   }
 
+  /**
+   * set the `near` location bias for autocomplete requests
+   * @param near - location string, Location object, or null to clear
+   * @returns this instance for chaining
+   */
   public setNear(near: string | Location | undefined | null) {
     if (near === undefined || near === null) {
       this.near = undefined;
@@ -492,24 +519,44 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * set the input placeholder text
+   * @param placeholder - new placeholder string
+   * @returns this instance for chaining
+   */
   public setPlaceholder(placeholder: string) {
     this.config.placeholder = placeholder;
     this.inputField.placeholder = placeholder;
     return this;
   }
 
+  /**
+   * set the disabled state of the input
+   * @param disabled - whether to disable the input
+   * @returns this instance for chaining
+   */
   public setDisabled(disabled: boolean) {
     this.config.disabled = disabled;
     this.inputField.disabled = disabled;
     return this;
   }
 
+  /**
+   * toggle responsive width mode
+   * @param responsive - whether to use responsive layout
+   * @returns this instance for chaining
+   */
   public setResponsive(responsive: boolean) {
     this.config.responsive = responsive;
     setWidth(this.wrapper, this.config);
     return this;
   }
 
+  /**
+   * set the widget width
+   * @param width - width in px, CSS string, or null to reset
+   * @returns this instance for chaining
+   */
   public setWidth(width: number | string | null) {
     if (width === null) {
       this.config.width = undefined;
@@ -520,6 +567,11 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * set the max height of the results dropdown
+   * @param height - height in px, CSS string, or null to reset
+   * @returns this instance for chaining
+   */
   public setMaxHeight(height: number | string | null) {
     if (height === null) {
       this.config.maxHeight = undefined;
@@ -530,17 +582,32 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * set the minimum character count to trigger autocomplete
+   * @param minCharacters - character threshold
+   * @returns this instance for chaining
+   */
   public setMinCharacters(minCharacters: number) {
     this.config.minCharacters = minCharacters;
     this.config.threshold = minCharacters;
     return this;
   }
 
+  /**
+   * set the maximum number of results
+   * @param limit - result count limit
+   * @returns this instance for chaining
+   */
   public setLimit(limit: number) {
     this.config.limit = limit;
     return this;
   }
 
+  /**
+   * set the language for autocomplete results
+   * @param lang - language code or null to clear
+   * @returns this instance for chaining
+   */
   public setLang(lang: string | null) {
     if (lang === null) {
       this.config.lang = undefined;
@@ -550,6 +617,11 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * set a postal code bias for autocomplete requests
+   * @param postalCode - postal code string or null to clear
+   * @returns this instance for chaining
+   */
   public setPostalCode(postalCode: string | null) {
     if (postalCode === null) {
       this.config.postalCode = undefined;
@@ -559,6 +631,11 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * toggle marker icons in result items
+   * @param showMarkers - whether to show markers
+   * @returns this instance for chaining
+   */
   public setShowMarkers(showMarkers: boolean) {
     this.config.showMarkers = showMarkers;
     if (showMarkers) {
@@ -584,6 +661,11 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * set the color of marker icons in result items
+   * @param color - CSS color string
+   * @returns this instance for chaining
+   */
   public setMarkerColor(color: string) {
     this.config.markerColor = color;
     const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER);
@@ -593,6 +675,11 @@ class AutocompleteUI {
     return this;
   }
 
+  /**
+   * toggle hiding results when input loses focus
+   * @param hideResultsOnBlur - whether to hide on blur
+   * @returns this instance for chaining
+   */
   public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
     this.config.hideResultsOnBlur = hideResultsOnBlur;
     if (hideResultsOnBlur) {

@@ -3,7 +3,13 @@ import Http from '../http';
 
 import type { RadarValidateAddressParams, RadarValidateAddressResponse } from '../types';
 
+/** @internal address validation API — use {@link Radar.validateAddress} instead */
 class AddressesAPI {
+  /**
+   * validate a structured address
+   * @param params - address fields to validate
+   * @returns validated address and verification result
+   */
   static async validateAddress(params: RadarValidateAddressParams): Promise<RadarValidateAddressResponse> {
     const options = Config.get();
 
