@@ -74,7 +74,8 @@
     "yourapp",
     "lookback",
     "jailbroken",
-    "subclassing"
+    "subclassing",
+    "maplibregl"
   ],
   "ignoreRegExpList": [
     "/^\\s*```[\\s\\S]*?^\\s*```/gm",

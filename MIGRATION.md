@@ -1,72 +1,201 @@
-## Migrating from 3.x to 4.x
+## Migrating from 4.x to 5.x
 
-Radar JS SDK 4.0 is a complete re-write of the existing SDK in Typescript, with exposed bindings to all functions and objects. It's also written to take advantage of modern JS best practices such as ES Modules, and using `async/await` for Promise-based functions.
+Radar JS SDK 5.0 introduces a plugin architecture that separates UI components
+(Maps, Autocomplete) from the core SDK. The core package (`radar-sdk-js`) is
+now a lightweight API-only library. Maps, Autocomplete, and Fraud
+functionality are provided by standalone plugins that you install and register
+separately.
 
-In addition, 4.0 also introduces Radar UI Kits. These are out-of-the-box components that allow you to easily create web-based experiences that leverage Radar apis, including Maps and Autocomplete inputs, with more to come in future releases.
+This guide covers all breaking changes and how to update your code.
 
-Follow the instructions below for installing the latest version, and any updates to previous implementations.
+### Installation
 
-### Setup and installation
+The core SDK no longer depends on `maplibre-gl`. If you only use the Radar API
+(geocoding, tracking, search, routing), install the core SDK alone:
 
-The Radar JS SDK now has a dependency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) to power Radar Maps functionality. This is included as a `peerDependency` in the project, so if you're installing the Radar SDK as an ES Module, you'll need to install MapLibre as an additional package.
 ```bash
-npm install --save radar-sdk-js maplibre-gl
+npm install radar-sdk-js
 ```
 
-### Initialization
+If you use Maps or Autocomplete UI, install the corresponding plugins:
 
-Calls to initialize the Radar SDK have not changed, except there are now additional configuration options that can be set upon initialization.
-```js
-Radar.initialize('<RADAR_PUBLISHABLE_KEY>', {
-  logLevel: 'info',        // none | info | warn | error
-  desiredAccuracy: 'high', // high | medium | low
-  cacheLocationMinutes: 5, // don't re-prompt for location permissions for 5 minutes
-  locationTimeout: 10000,  // timeout fetching device location after 10s
-  debug: false,            // include additional console logging of debug info
-});
+```bash
+# maps (requires maplibre-gl as a peer dep)
+npm install @radarlabs/maps-plugin maplibre-gl
+
+# autocomplete
+npm install @radarlabs/autocomplete-ui-plugin
 ```
 
-`Radar.initialize` needs to be called with a publishableKey before any other functions are called.
+### Plugin registration
 
-### Async / await
+In v4, `Radar.ui.map()` and `Radar.ui.autocomplete()` were built into the core
+SDK. In v5, you must register plugins before using `Radar.ui`:
 
-Version 3.0 of the SDK was mostly callback based, whereas 4.0 is now Promise based. Each function that performs an async action will return a `Promise`, or throw an `Error` in the case of a failure.
-
-Example change:
 ```js
-// previous version
-Radar.trackOnce(function(err, result) {
-  if (!err) {
-    // do something with result.location, result.events, result.user
-  }
-});
+// v4
+import Radar from 'radar-sdk-js';
+import 'radar-sdk-js/dist/radar.css';
+
+Radar.initialize('prj_test_pk_...');
+const map = Radar.ui.map({ container: 'map' });
 
 
-// updated with async/await
+// v5
+import Radar from 'radar-sdk-js';
+import { createMapsPlugin } from '@radarlabs/maps-plugin';
+import '@radarlabs/maps-plugin/dist/radar-map.css';
+
+Radar.registerPlugin(createMapsPlugin());
+Radar.initialize('prj_test_pk_...');
+const map = Radar.ui.map({ container: 'map' });
+```
+
+The `Radar.ui` namespace is only available after a plugin that provides it
+has been registered. Calling `Radar.ui.map()` without the maps plugin
+registered is a runtime error.
+
+### CDN usage
+
+In v4, a single script and CSS file provided everything:
+
+```html
+<!-- v4 -->
+<link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet">
+<script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
+```
+
+In v5, the core SDK script tag no longer includes UI components. Load
+plugins as separate scripts after the core SDK. CDN plugin bundles
+auto-register with the core SDK when loaded:
+
+```html
+<!-- v5 -->
+<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+
+<!-- maps plugin (auto-registers) -->
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
+<script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
+
+<!-- autocomplete plugin (auto-registers) -->
+<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
+<script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+```
+
+### CSS imports
+
+In v4, a single `radar.css` file bundled all styles for maps, markers,
+autocomplete, and popups.
+
+In v5, each plugin ships its own CSS. Import only the styles you need:
+
+```js
+// v4
+import 'radar-sdk-js/dist/radar.css';
+
+// v5
+import '@radarlabs/maps-plugin/dist/radar-maps.css';
+import '@radarlabs/autocomplete-ui-plugin/dist/radar-autocomplete.css';
+```
+
+The core SDK no longer ships a CSS file.
+
+### Fraud API
+
+The Fraud API methods have moved to a separate plugin. If you use any of
+the following methods, install and register the Fraud plugin:
+
+- `Radar.trackVerified()`
+- `Radar.startTrackingVerified()`
+- `Radar.stopTrackingVerified()`
+- `Radar.getVerifiedLocationToken()`
+- `Radar.clearVerifiedLocationToken()`
+- `Radar.setExpectedJurisdiction()`
+- `Radar.onTokenUpdated()`
+
+```js
+// v4
+Radar.initialize('prj_test_pk_...');
+Radar.trackVerified();
+
+// v5
+import { createVerifyPlugin } from '@radarlabs/verify-plugin';
+Radar.registerPlugin(createVerifyPlugin());
+Radar.initialize('prj_test_pk_...');
+Radar.trackVerified();
+```
+
+### Error exports
+
+`RadarError` and all error subclasses are now exported directly from the
+main entry point:
+
+```js
+// v4 — errors were not easily importable
 try {
-  const { location, events, user } = await Radar.trackOnce();
-  // do something with location, events, user
-
+  await Radar.trackOnce();
 } catch (err) {
-  // handle error
+  console.log(err.status); // 'ERROR_LOCATION'
 }
 
-// OR
+// v5 — import error classes for instanceof checks
+import { RadarError } from 'radar-sdk-js';
 
-// updated with Promises
-Radar.trackOnce()
-  .then(({ location, events, user }) => {
-    // do something with location, events, user
-  })
-  .catch((err) => {
-    // handle error
-  });
+try {
+  await Radar.trackOnce();
+} catch (err) {
+  if (err instanceof RadarError) {
+    console.log(err.status);
+  }
+}
 ```
 
-### Error handling
+The following error classes are available:
 
-As mentioned in the async/await examples above, errors are now `thrown` objects to be handled instead of strings returned with the response. As such, Errors now contain more helpful debugging info including:
-* Stack trace of where error occurred
-* More descriptive error messages (`err.message`)
-* HTTP Error codes (`err.code`)
-* API response details about what failed (`err.response`)
+| Class | Status code |
+|-------|-------------|
+| `RadarPublishableKeyError` | `ERROR_PUBLISHABLE_KEY` |
+| `RadarLocationError` | `ERROR_LOCATION` |
+| `RadarPermissionsError` | `ERROR_PERMISSIONS` |
+| `RadarBadRequestError` | 400 |
+| `RadarUnauthorizedError` | 401 |
+| `RadarPaymentRequiredError` | 402 |
+| `RadarForbiddenError` | 403 |
+| `RadarNotFoundError` | 404 |
+| `RadarRateLimitError` | 429 |
+| `RadarServerError` | 500 |
+| `RadarNetworkError` | timeout |
+
+### Type exports
+
+All types are now re-exported from the main entry point. Import them
+directly instead of reaching into internal paths:
+
+```ts
+import type {
+  RadarTrackParams,
+  RadarTrackResponse,
+  RadarAddress,
+  RadarOptions,
+} from 'radar-sdk-js';
+```
+
+Plugin types for building custom plugins are available from the `plugin`
+subpath:
+
+```ts
+import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
+```
+
+### Summary of breaking changes
+
+| Change | v4 | v5 |
+|--------|----|----|
+| Maps UI | Built into core | `@radarlabs/maps-plugin` |
+| Autocomplete UI | Built into core | `@radarlabs/autocomplete-ui-plugin` |
+| Fraud API | Built into core | Separate verify plugin |
+| `maplibre-gl` peer dep | Required by core | Required by maps plugin only |
+| CSS | Single `radar.css` | Per-plugin CSS files |
+| CDN scripts | Single `radar.min.js` | Core + plugin scripts |
+| Error classes | Not exported | Exported from `radar-sdk-js` |
+| Plugin system | N/A | `Radar.registerPlugin()` |
