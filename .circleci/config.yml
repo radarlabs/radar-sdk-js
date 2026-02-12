@@ -84,18 +84,18 @@ workflows:
   ci:
     jobs:
       - install
+      - build:
+          requires:
+            - install
       - fmt:
+          requires:
+            - install
+      - test:
           requires:
             - install
       - lint:
           requires:
-            - install
-      - build:
-          requires:
-            - install
+            - build
       - typecheck:
           requires:
             - build
-      - test:
-          requires:
-            - install
