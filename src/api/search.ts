@@ -22,17 +22,8 @@ class SearchAPI {
   static async autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
-    let {
-      query,
-      near,
-      limit,
-      layers,
-      countryCode,
-      expandUnits,
-      mailable,
-      lang,
-      postalCode,
-    } = params;
+    const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode } = params;
+    let { near } = params;
 
     // near can be provided as a string or Location object
     // if "near" is not provided, request will fallback to IP based location
@@ -79,14 +70,8 @@ class SearchAPI {
   static async searchGeofences(params: RadarSearchGeofencesParams): Promise<RadarSearchGeofencesResponse> {
     const options = Config.get();
 
-    let {
-      near,
-      radius,
-      tags,
-      metadata,
-      limit,
-      includeGeometry,
-    } = params;
+    const { radius, metadata, limit, includeGeometry } = params;
+    let { near, tags } = params;
 
     // use browser location if "near" not provided
     if (!near) {
@@ -134,14 +119,8 @@ class SearchAPI {
   static async searchPlaces(params: RadarSearchPlacesParams): Promise<RadarSearchPlacesResponse> {
     const options = Config.get();
 
-    let {
-      near,
-      radius,
-      chains,
-      categories,
-      groups,
-      limit,
-    } = params;
+    const { radius, limit } = params;
+    let { near, chains, categories, groups } = params;
 
     // use browser location if "near" not provided
     if (!near) {

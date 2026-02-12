@@ -47,6 +47,16 @@ jobs:
             - packages/maps/dist
             - packages/autocomplete/dist
 
+  lint:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Lint
+          command: npm run lint
+
   test:
     docker:
       - image: cimg/node:24.13.1
@@ -64,6 +74,9 @@ workflows:
   ci:
     jobs:
       - install
+      - lint:
+          requires:
+            - install
       - build:
           requires:
             - install

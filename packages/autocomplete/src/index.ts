@@ -13,7 +13,7 @@ declare module 'radar-sdk-js' {
     autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
   }
   namespace Radar {
-    let ui: RadarUI;
+    let ui: RadarUI; // eslint-disable-line no-unused-vars
   }
 }
 

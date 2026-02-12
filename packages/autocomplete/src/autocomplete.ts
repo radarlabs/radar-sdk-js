@@ -75,6 +75,7 @@ class AutocompleteUI {
   highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[]>;
   near?: string;
+  private _boundClose: () => void;
 
   // DOM elements
   container: HTMLElement;
@@ -90,6 +91,7 @@ class AutocompleteUI {
 
     // setup state
     this.isOpen = false;
+    this._boundClose = this.close.bind(this);
     this.debouncedFetchResults = this.debounce(this.fetchResults.bind(this), this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
@@ -116,7 +118,7 @@ class AutocompleteUI {
       containerEL = this.config.container; // HTMLElement
     }
     if (!containerEL) {
-      throw new RadarAutocompleteContainerNotFound(`Could not find container element: ${this.config.container}`);
+      throw new RadarAutocompleteContainerNotFound(`Could not find container element: ${this.config.container as string}`);
     }
     this.container = containerEL;
 
@@ -180,7 +182,7 @@ class AutocompleteUI {
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
     if (this.config.hideResultsOnBlur) {
-      this.inputField.addEventListener('blur', this.close.bind(this), true);
+      this.inputField.addEventListener('blur', this._boundClose, true);
     }
 
     Logger.debug('AutocompleteUI initialized with options', this.config);
@@ -402,11 +404,11 @@ class AutocompleteUI {
 
     if (this.highlightedIndex > -1) {
       // clear class names on previously highlighted item
-      resultItems[this.highlightedIndex].classList.remove(CLASSNAMES.SELECTED_ITEM);
+      resultItems[this.highlightedIndex]?.classList.remove(CLASSNAMES.SELECTED_ITEM);
     }
 
     // add class name to newly highlighted item
-    resultItems[index].classList.add(CLASSNAMES.SELECTED_ITEM);
+    resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
 
     // set aria active descendant
     this.inputField.setAttribute('aria-activedescendant', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
@@ -639,15 +641,15 @@ class AutocompleteUI {
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
       const resultItems = this.resultsList.getElementsByTagName('li');
       for (let i = 0; i < resultItems.length; i++) {
-        const currentMarker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        const currentMarker = resultItems[i]?.getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
         if (!currentMarker) {
-          resultItems[i].prepend(marker.cloneNode());
+          resultItems[i]?.prepend(marker.cloneNode());
         }
       }
     } else {
       const resultItems = this.resultsList.getElementsByTagName('li');
       for (let i = 0; i < resultItems.length; i++) {
-        const marker = resultItems[i].getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
+        const marker = resultItems[i]?.getElementsByClassName(CLASSNAMES.RESULTS_MARKER)[0];
         if (marker) {
           marker.remove();
         }
@@ -665,7 +667,7 @@ class AutocompleteUI {
     this.config.markerColor = color;
     const marker = this.resultsList.getElementsByClassName(CLASSNAMES.RESULTS_MARKER);
     for (let i = 0; i < marker.length; i++) {
-      marker[i].setAttribute('src', getMarkerIcon(color));
+      marker[i]?.setAttribute('src', getMarkerIcon(color));
     }
     return this;
   }
@@ -678,9 +680,9 @@ class AutocompleteUI {
   public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
     this.config.hideResultsOnBlur = hideResultsOnBlur;
     if (hideResultsOnBlur) {
-      this.inputField.addEventListener('blur', this.close.bind(this), true);
+      this.inputField.addEventListener('blur', this._boundClose, true);
     } else {
-      this.inputField.removeEventListener('blur', this.close.bind(this), true);
+      this.inputField.removeEventListener('blur', this._boundClose, true);
     }
     return this;
   }

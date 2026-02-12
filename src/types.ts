@@ -117,12 +117,13 @@ export interface RadarTrackParams {
 }
 
 /** confidence level for Radar events */
-export enum RadarEventConfidence {
-  none = 0,
-  low = 1,
-  medium = 2,
-  high = 3
-}
+export const RadarEventConfidence = {
+  none: 0,
+  low: 1,
+  medium: 2,
+  high: 3,
+} as const;
+export type RadarEventConfidence = (typeof RadarEventConfidence)[keyof typeof RadarEventConfidence];
 
 /** all possible Radar event types */
 export type RadarEventType =
@@ -178,8 +179,7 @@ export type RadarTripStatus =
   | 'arrived'
   | 'completed'
   | 'canceled'
-  | 'expired'
-  | 'pending';
+  | 'expired';
 
 
 /** a Radar trip with destination, ETA, and status */

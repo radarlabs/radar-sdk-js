@@ -24,7 +24,7 @@ declare module 'radar-sdk-js' {
     popup(options: RadarPopupOptions): maplibregl.Popup;
   }
   namespace Radar {
-    let ui: RadarUI;
+    let ui: RadarUI; // eslint-disable-line no-unused-vars
   }
 }
 

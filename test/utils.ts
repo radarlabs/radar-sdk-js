@@ -55,7 +55,7 @@ export const mockRequest = (status: number, response: unknown) => {
 export const getRequest = () => {
   // find the last non-config fetch call
   const calls = fetchMock.mock.calls;
-  const lastCall = [...calls].reverse().find(([url]) => !String(url).includes('/v1/config'));
+  const lastCall = [...calls].reverse().find(([url]) => !String(url as string).includes('/v1/config'));
 
   return {
     url: (lastCall?.[0] ?? '') as string,

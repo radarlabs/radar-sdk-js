@@ -46,7 +46,7 @@ class RadarPolygonFeature extends RadarMapFeature {
 
       // border layer
       if (options.paint['border-color'] && options.paint['border-width'] && options.paint['border-opacity']) {
-        let borderLayerId = `${featureId}-border`;
+        const borderLayerId = `${featureId}-border`;
         map.addLayer({
           id: borderLayerId,
           source: featureId,
@@ -66,7 +66,7 @@ class RadarPolygonFeature extends RadarMapFeature {
     if (map.loaded()) {
       addFeatureToMap();
     } else {
-      map.once('data',() => { // wait for map to be ready
+      void map.once('data',() => { // wait for map to be ready
         addFeatureToMap();
       });
     }

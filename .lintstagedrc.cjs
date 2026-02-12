@@ -1,6 +1,5 @@
-const path = require('path')
-
 module.exports = {
+  '*.{ts,tsx}': () => 'npm run lint',
   '*.md': [
     (filenames) => {
       if (filenames.length === 0) {

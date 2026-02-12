@@ -12,13 +12,13 @@ export const decodePolyline = (str: string, precision: number = 6): number[][] =
   let index = 0;
   let lat = 0;
   let lng = 0;
-  let coordinates: number[][] = [];
+  const coordinates: number[][] = [];
   let shift = 0;
   let result = 0;
   let byte: number | null = null;
   let latitudeChange: number;
   let longitudeChange: number;
-  let factor = Math.pow(10, precision || 6);
+  const factor = Math.pow(10, precision || 6);
 
   // Coordinates have variable length when encoded, so just keep
   // track of whether we've hit the end of the string. In each

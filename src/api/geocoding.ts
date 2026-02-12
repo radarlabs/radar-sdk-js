@@ -51,7 +51,8 @@ class Geocoding {
   static async reverseGeocode(params: RadarReverseGeocodeParams): Promise<RadarGeocodeResponse> {
     const options = Config.get();
 
-    let { latitude, longitude, layers } = params;
+    const { layers } = params;
+    let { latitude, longitude } = params;
 
     if (!latitude || !longitude) {
       const location = await Navigator.getCurrentPosition();

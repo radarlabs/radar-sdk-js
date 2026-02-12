@@ -4,7 +4,6 @@ import Trips from '../../src/api/trips';
 import Radar from '../../src';
 import { RadarTripOptions } from '../../src/types';
 import { mockRequest } from '../utils';
-import Storage from '../../src/storage';
 
 describe('Trips', () => {
   const userId = 'user-id';

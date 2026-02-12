@@ -50,7 +50,7 @@ class Navigator {
               }
             }
           }
-        } catch (e) {
+        } catch {
           Logger.warn('could not load cached location.');
         }
       }
@@ -121,7 +121,7 @@ class Navigator {
         return resolve(locationAuthorization);
       }
 
-      navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
+      void navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
         switch(permissionsStatus.state) {
           case 'granted':
             locationAuthorization = 'GRANTED_FOREGROUND'
@@ -142,7 +142,7 @@ class Navigator {
   }
 
   /** check whether the browser reports being online */
-  public static online(): Boolean {
+  public static online(): boolean {
     return navigator && navigator.onLine;
   }
 }

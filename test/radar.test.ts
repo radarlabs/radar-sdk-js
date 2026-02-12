@@ -4,7 +4,7 @@ import Storage from '../src/storage';
 import Navigator from '../src/navigator';
 import SDK_VERSION from '../src/version';
 
-import type { NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarReverseGeocodeParams, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
+import type { NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
 
 import Geocoding from '../src/api/geocoding';
 import ContextAPI from '../src/api/context';
@@ -268,7 +268,7 @@ describe('Radar', () => {
         events,
       });
 
-      Radar.trackOnce();
+      void Radar.trackOnce();
     });
   });
 

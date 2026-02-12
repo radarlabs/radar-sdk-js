@@ -96,7 +96,7 @@ class Storage {
 
     try {
       return JSON.parse(item);
-    } catch (err) {
+    } catch {
       Logger.warn(`could not getJSON from storage for key: ${key}`);
       return null;
     }

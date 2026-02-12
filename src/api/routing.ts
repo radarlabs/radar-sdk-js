@@ -19,15 +19,8 @@ class RoutingAPI {
   static async distance(params: RadarDistanceParams): Promise<RadarRouteResponse> {
     const options = Config.get();
 
-    let {
-      origin,
-      destination,
-      modes,
-      units,
-      geometry,
-      geometryPoints,
-      avoid,
-    } = params;
+    const { units, geometry, geometryPoints } = params;
+    let { origin, destination, modes, avoid } = params;
 
     // use browser location if "near" not provided
     if (!origin) {
@@ -84,18 +77,13 @@ class RoutingAPI {
   static async matrix(params: RadarMatrixParams): Promise<RadarMatrixResponse> {
     const options = Config.get();
 
-    let {
-      origins,
-      destinations,
-      mode,
-      units,
-      avoid,
-    } = params;
+    const { mode, units } = params;
+    let { origins, destinations, avoid } = params;
 
     // use browser location if "near" not provided
     if (!origins) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
-      let originStrings = [];
+      const originStrings = [];
       for (let i = 0; i < destinations.length; i++) {
         originStrings.push(`${latitude},${longitude}`);
       }

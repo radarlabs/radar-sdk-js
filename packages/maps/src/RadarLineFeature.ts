@@ -78,7 +78,7 @@ class RadarLineFeature extends RadarMapFeature {
     if (map.loaded()) {
       addFeatureToMap();
     } else {
-      map.once('data',() => { // wait for map to be ready
+      void map.once('data',() => { // wait for map to be ready
         addFeatureToMap();
       });
     }

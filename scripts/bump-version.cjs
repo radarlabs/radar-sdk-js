@@ -1,9 +1,9 @@
 const fs = require('fs');
-const package = require('../package.json');
+const packageJson = require('../package.json');
 const lockfile = require('../package-lock.json');
 const srcfile = fs.readFileSync('./src/version.ts').toString();
 
-const current = package.version;
+const current = packageJson.version;
 let version = process.argv[2];
 
 
@@ -28,15 +28,15 @@ if (version.startsWith('v')) {
 fs.writeFileSync('./src/version.ts', srcfile.replace(current, version));
 
 // update package.json
-package.version = version;
-fs.writeFileSync('./package.json', JSON.stringify(package, null, 2) + '\n');
+packageJson.version = version;
+fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2) + '\n');
 
 // update package-lock.json
 lockfile.version = version;
 fs.writeFileSync('./package-lock.json', JSON.stringify(lockfile, null, 2) + '\n');
 
 // update versions in readme
-const reg = new RegExp(`js.radar.com\/v([^/]+)\/`, 'g');
+const reg = new RegExp(`js.radar.com/v([^/]+)/`, 'g');
 const readme = fs.readFileSync('./README.md').toString();
 fs.writeFileSync('./README.md', readme.replace(reg, `js.radar.com/v${version}/`));
 
