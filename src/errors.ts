@@ -1,3 +1,5 @@
+import type { RadarResponse } from "./http";
+
 /** base error class for all Radar SDK errors */
 export class RadarError extends Error {
   /** legacy status code string (e.g. `'ERROR_PUBLISHABLE_KEY'`) */
@@ -39,9 +41,9 @@ export class RadarPermissionsError extends RadarError {
 /** thrown on HTTP 400 Bad Request responses */
 export class RadarBadRequestError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Bad request.');
     this.name = 'RadarBadRequestError';
     this.code = 400;
@@ -53,9 +55,9 @@ export class RadarBadRequestError extends RadarError {
 /** thrown on HTTP 401 Unauthorized responses */
 export class RadarUnauthorizedError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Unauthorized.');
     this.name = 'RadarUnauthorizedError';
     this.code = 401;
@@ -67,9 +69,9 @@ export class RadarUnauthorizedError extends RadarError {
 /** thrown on HTTP 402 Payment Required responses */
 export class RadarPaymentRequiredError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Payment required.');
     this.name = 'RadarPaymentRequiredError';
     this.code = 402;
@@ -81,9 +83,9 @@ export class RadarPaymentRequiredError extends RadarError {
 /** thrown on HTTP 403 Forbidden responses */
 export class RadarForbiddenError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Forbidden.');
     this.name = 'RadarForbiddenError';
     this.code = 403;
@@ -95,9 +97,9 @@ export class RadarForbiddenError extends RadarError {
 /** thrown on HTTP 404 Not Found responses */
 export class RadarNotFoundError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Not found.');
     this.name = 'RadarNotFoundError';
     this.code = 404;
@@ -109,11 +111,11 @@ export class RadarNotFoundError extends RadarError {
 /** thrown on HTTP 429 Rate Limit responses */
 export class RadarRateLimitError extends RadarError {
   code: number;
-  response?: any;
+  response?: RadarResponse;
   /** rate limit type from the API response (e.g. `'hourly'`) */
-  type: string;
+  type?: string;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Rate limit exceeded.');
     this.name = 'RadarRateLimitError';
     this.code = 429;
@@ -125,9 +127,9 @@ export class RadarRateLimitError extends RadarError {
 
 /** thrown on HTTP 5xx server errors */
 export class RadarServerError extends RadarError {
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Internal server error.');
     this.name = 'RadarServerError';
     this.response = response;
@@ -146,9 +148,9 @@ export class RadarNetworkError extends RadarError {
 
 /** thrown for unexpected/unclassified errors */
 export class RadarUnknownError extends RadarError {
-  response?: any;
+  response?: RadarResponse;
 
-  constructor(response?: any) {
+  constructor(response?: RadarResponse) {
     super(response?.meta?.message || 'Something went wrong.');
     this.name = 'RadarUnknownError';
     this.response = response;

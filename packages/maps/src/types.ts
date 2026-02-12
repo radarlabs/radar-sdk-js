@@ -1,7 +1,7 @@
-import type maplibregl from 'maplibre-gl';
+import type { MapOptions, PopupOptions, MarkerOptions, ExpressionSpecification } from 'maplibre-gl';
 
 /** extends MapLibre MapOptions with Radar-specific options */
-export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformRequest'> {
+export interface RadarMapOptions extends Omit<MapOptions, 'transformRequest'> {
   /** map label language code (e.g. 'en', 'es') */
   language?: string;
   /** whether to show zoom +/- buttons (default: true) */
@@ -9,7 +9,7 @@ export interface RadarMapOptions extends Omit<maplibregl.MapOptions, 'transformR
 }
 
 /** extends MapLibre PopupOptions with content helpers */
-export interface RadarPopupOptions extends maplibregl.PopupOptions {
+export interface RadarPopupOptions extends PopupOptions {
   /** plain text content for the popup */
   text?: string;
   /** HTML string content for the popup */
@@ -19,7 +19,7 @@ export interface RadarPopupOptions extends maplibregl.PopupOptions {
 }
 
 /** extends MapLibre MarkerOptions with Radar features */
-export interface RadarMarkerOptions extends maplibregl.MarkerOptions {
+export interface RadarMarkerOptions extends MarkerOptions {
   /** @deprecated use popup.text */
   text?: string;
 
@@ -44,7 +44,7 @@ export interface RadarLineOptions {
   /** unique feature identifier */
   id?: string;
   /** GeoJSON properties */
-  properties?: any;
+  properties?: GeoJSON.GeoJsonProperties;
   /** MapLibre line paint properties plus border styling */
   paint?: {
     'line-color'?: string;
@@ -55,7 +55,8 @@ export interface RadarLineOptions {
     'line-blur'?: number;
     'line-dasharray'?: Array<number>;
     'line-gap-width'?: number;
-    'line-gradient'?: any;
+    /** MapLibre style expression for line gradients */
+    'line-gradient'?: ExpressionSpecification;
     'border-width'?: number;
     'border-color'?: string;
     'border-opacity'?: number;
@@ -73,7 +74,7 @@ export interface RadarPolygonOptions {
   /** unique feature identifier */
   id?: string;
   /** GeoJSON properties */
-  properties?: any;
+  properties?: GeoJSON.GeoJsonProperties;
   /** fill and border paint properties */
   paint?: {
     'fill-color'?: string;

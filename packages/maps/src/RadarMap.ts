@@ -13,7 +13,7 @@ import type {
   RadarPolylineOptions,
   RadarPolygonOptions,
 } from './types';
-import type { RadarPluginContext } from 'radar-sdk-js';
+import type { RadarOptions, RadarPluginContext } from 'radar-sdk-js';
 import type { FitBoundsOptions } from 'maplibre-gl';
 
 const DEFAULT_STYLE = 'radar-default-v1';
@@ -41,7 +41,7 @@ const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
   padding: 50,
 };
 
-const createStyleURL = (options: any, mapOptions: RadarMapOptions) => {
+const createStyleURL = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style || DEFAULT_STYLE;
 
   let url = `${options.host}/maps/styles/${style}`
@@ -63,7 +63,7 @@ const isRadarStyle = (style: string) => {
 };
 
 // use formatted style URL if using one of Radar's out-of-the-box styles or is a Radar custom style
-const getStyle = (options: any, mapOptions: RadarMapOptions) => {
+const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   const style = mapOptions.style;
 
   if (!style || (typeof style === 'string' && isRadarStyle(style))) {
@@ -214,8 +214,8 @@ class RadarMap extends Map {
 
     if (coords.length > 0) {
       const bounds = new LngLatBounds();
-      coords.forEach((coord: any) => {
-        bounds.extend(coord);
+      coords.forEach((coord) => {
+        bounds.extend(coord as [number, number]);
       });
       this.fitBounds(bounds, fitBoundsOptions);
     }

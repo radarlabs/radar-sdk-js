@@ -73,7 +73,7 @@ abstract class RadarMapFeature {
    * @param callback - handler receiving the feature event
    */
   on(eventType: RadarFeatureEventType, callback: (event: RadarFeatureMouseEvent) => void) {
-    this._map.on(eventType, this.id, (event: any) => {
+    this._map.on(eventType, this.id, (event) => {
       callback(new RadarFeatureMouseEvent(eventType, this, event));
     });
 

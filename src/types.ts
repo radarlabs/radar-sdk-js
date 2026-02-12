@@ -46,7 +46,7 @@ export interface RadarOptions {
   /** geolocation accuracy hint */
   desiredAccuracy?: 'high' | 'medium' | 'low';
   /** callback that returns extra headers to send with every request */
-  getRequestHeaders?: () => {};
+  getRequestHeaders?: () => Record<string, string>;
   /** enable debug logging */
   debug?: boolean;
 };
@@ -54,7 +54,7 @@ export interface RadarOptions {
 /** base response shape shared by all API responses */
 export interface RadarResponse {
   /** raw API response body (only present in debug mode) */
-  response?: any;
+  response?: unknown;
 }
 
 /** travel mode for routing and trips */
@@ -382,10 +382,10 @@ export interface RadarGeocodeAddress extends RadarAddress {
 }
 
 /** USPS record type code */
-export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F' | undefined;
+export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F';
 
 /** property type for address validation */
-export type RadarValidationPropertyType = 'commercial' | 'residential' | undefined;
+export type RadarValidationPropertyType = 'commercial' | 'residential';
 
 /** address verification status */
 export type RadarVerificationStatus = 'verified' | 'partially verified' | 'ambiguous' | 'unverified';

@@ -42,7 +42,7 @@ class SearchAPI {
       }
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarAutocompleteResponse, 'response'>>({
       method: 'GET',
       path: 'search/autocomplete',
       data: {
@@ -59,15 +59,16 @@ class SearchAPI {
       requestId,
     });
 
-    const autocompleteRes = {
+    const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
-    } as RadarAutocompleteResponse;
+    };
 
     if (options.debug) {
       autocompleteRes.response = response;
     }
 
     return autocompleteRes;
+
   }
 
   /**
@@ -101,7 +102,7 @@ class SearchAPI {
       tags = tags.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarSearchGeofencesResponse, 'response'>>({
       method: 'GET',
       path: 'search/geofences',
       data: {
@@ -114,9 +115,9 @@ class SearchAPI {
       },
     });
 
-    const geofencesSearchRes = {
+    const geofencesSearchRes: RadarSearchGeofencesResponse = {
       geofences: response.geofences,
-    } as RadarSearchGeofencesResponse;
+    };
 
     if (options.debug) {
       geofencesSearchRes.response = response;
@@ -162,7 +163,7 @@ class SearchAPI {
       groups = groups.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarSearchPlacesResponse, 'response'>>({
       method: 'GET',
       path: 'search/places',
       data: {
@@ -175,9 +176,9 @@ class SearchAPI {
       },
     });
 
-    const placeSearchRes = {
+    const placeSearchRes: RadarSearchPlacesResponse = {
       places: response.places,
-    } as RadarSearchPlacesResponse;
+    };
 
     if (options.debug) {
       placeSearchRes.response = response;

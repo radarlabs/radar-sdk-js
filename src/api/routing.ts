@@ -51,7 +51,7 @@ class RoutingAPI {
       avoid = avoid.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarRouteResponse, 'response'>>({
       method: 'GET',
       path: 'route/distance',
       data: {
@@ -65,9 +65,9 @@ class RoutingAPI {
       },
     });
 
-    const distanceRes = {
+    const distanceRes: RadarRouteResponse = {
       routes: response.routes,
-    } as RadarRouteResponse;
+    };
 
     if (options.debug) {
       distanceRes.response = response;
@@ -113,7 +113,7 @@ class RoutingAPI {
       avoid = avoid.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarMatrixResponse, 'response'>>({
       method: 'GET',
       path: 'route/matrix',
       data: {
@@ -125,11 +125,11 @@ class RoutingAPI {
       },
     });
 
-    const matrixRes = {
+    const matrixRes: RadarMatrixResponse = {
       origins: response.origins,
       destinations: response.destinations,
       matrix: response.matrix,
-    } as RadarMatrixResponse;
+    };
 
     if (options.debug) {
       matrixRes.response = response;

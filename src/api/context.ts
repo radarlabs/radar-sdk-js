@@ -21,7 +21,7 @@ class ContextAPI {
 
     const { latitude, longitude, accuracy } = location;
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarContextResponse, 'response' | 'location'>>({
       method: 'GET',
       path: 'context',
       data: {
@@ -39,7 +39,7 @@ class ContextAPI {
       postalCode,
     } = response;
 
-    const contextRes = {
+    const contextRes: RadarContextResponse = {
       location,
       geofences,
       place,
@@ -47,7 +47,7 @@ class ContextAPI {
       state,
       dma,
       postalCode,
-    } as RadarContextResponse;
+    };
 
     if (options.debug) {
       contextRes.response = response;

@@ -64,7 +64,11 @@ class TripsAPI {
       scheduledArrivalAt,
     } = tripOptions;
 
-    const data: any = {
+    if (scheduledArrivalAt && !isValidDate(scheduledArrivalAt)) {
+      Logger.warn('Invalid date format for scheduledArrivalAt');
+    }
+
+    const data = {
       userId,
       externalId,
       destinationGeofenceTag,
@@ -72,18 +76,10 @@ class TripsAPI {
       mode,
       metadata,
       approachingThreshold,
+      scheduledArrivalAt: isValidDate(scheduledArrivalAt) ? scheduledArrivalAt!.toJSON() : undefined,
     };
 
-    if (isValidDate(scheduledArrivalAt)) {
-      data.scheduledArrivalAt = scheduledArrivalAt?.toJSON();
-    } else {
-      if (scheduledArrivalAt) {
-        Logger.warn('Invalid date format for scheduledArrivalAt');
-      }
-      data.scheduledArrivalAt = undefined;
-    }
-
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarTripResponse, 'response'>>({
       method: 'POST',
       path: 'trips',
       data,
@@ -92,10 +88,10 @@ class TripsAPI {
     // save trip options
     TripsAPI.setTripOptions(tripOptions);
 
-    const tripRes = {
+    const tripRes: RadarTripResponse = {
       trip: response.trip,
       events: response.events,
-    } as RadarTripResponse;
+    };
 
     if (options.debug) {
       tripRes.response = response;
@@ -128,7 +124,11 @@ class TripsAPI {
       scheduledArrivalAt,
     } = tripOptions;
 
-    const data: any = {
+    if (scheduledArrivalAt && !isValidDate(scheduledArrivalAt)) {
+      Logger.warn('Invalid date format for scheduledArrivalAt');
+    }
+
+    const data = {
       status,
       externalId,
       destinationGeofenceTag,
@@ -136,27 +136,19 @@ class TripsAPI {
       mode,
       metadata,
       approachingThreshold,
+      scheduledArrivalAt: isValidDate(scheduledArrivalAt) ? scheduledArrivalAt!.toJSON() : undefined,
     };
 
-    if (isValidDate(scheduledArrivalAt)) {
-      data.scheduledArrivalAt = scheduledArrivalAt?.toJSON();
-    } else {
-      if (scheduledArrivalAt) {
-        Logger.warn('Invalid date format for scheduledArrivalAt');
-      }
-      data.scheduledArrivalAt = undefined;
-    }
-
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarTripResponse, 'response'>>({
       method: 'PATCH',
       path: `trips/${externalId}/update`,
       data,
     });
 
-    const tripRes = {
+    const tripRes: RadarTripResponse = {
       trip: response.trip,
       events: response.events,
-    } as RadarTripResponse;
+    };
 
     if (options.debug) {
       tripRes.response = response;

@@ -1,6 +1,6 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
-import type { RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
+import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -71,9 +71,9 @@ class AutocompleteUI {
   private ctx: RadarPluginContext;
   config: RadarAutocompleteConfig;
   isOpen: boolean;
-  results: any[];
+  results: RadarAutocompleteAddress[];
   highlightedIndex: number;
-  debouncedFetchResults: (...args: any[]) => Promise<any>;
+  debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[]>;
   near?: string;
 
   // DOM elements
@@ -90,7 +90,7 @@ class AutocompleteUI {
 
     // setup state
     this.isOpen = false;
-    this.debouncedFetchResults = this.debounce(this.fetchResults, this.config.debounceMS);
+    this.debouncedFetchResults = this.debounce(this.fetchResults.bind(this), this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
 
@@ -142,7 +142,7 @@ class AutocompleteUI {
 
       // append to dom
       this.wrapper.appendChild(this.resultsList);
-      (containerEL.parentNode as any).appendChild(this.wrapper);
+      containerEL.parentNode?.appendChild(this.wrapper);
 
     } else {
       // if container is not an input, create new input and append to container
@@ -197,14 +197,14 @@ class AutocompleteUI {
     }
 
     this.debouncedFetchResults(query)
-      .then((results: any[]) => {
+      .then((results) => {
         const onResults = this.config.onResults;
         if (onResults) {
           onResults(results);
         }
         this.displayResults(results);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         Logger.warn(`Autocomplete ui error: ${error.message}`);
         const onError = this.config.onError;
         if (onError) {
@@ -213,33 +213,28 @@ class AutocompleteUI {
       });
   }
 
-  public debounce(fn: Function, delay: number) {
-    let timeoutId: any;
-    let resolveFn: any;
-    let rejectFn: any;
+  public debounce<TArgs extends unknown[], TReturn>(
+    fn: (...args: TArgs) => Promise<TReturn>,
+    delay: number,
+  ): (...args: TArgs) => Promise<TReturn> {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let resolveFn: ((value: TReturn) => void) | null = null;
+    let rejectFn: ((reason: unknown) => void) | null = null;
 
-    return (...args: any[]) => {
+    return (...args: TArgs) => {
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
-        const result = fn.apply(this, args);
-
-        if (result instanceof Promise) {
-          result
-            .then((value) => {
-              if (resolveFn) {
-                resolveFn(value);
-              }
-            })
-            .catch((error) => {
-              if (rejectFn) {
-                rejectFn(error);
-              }
-            });
-        }
+        fn(...args)
+          .then((value) => {
+            resolveFn?.(value);
+          })
+          .catch((error) => {
+            rejectFn?.(error);
+          });
       }, delay);
 
-      return new Promise((resolve, reject) => {
+      return new Promise<TReturn>((resolve, reject) => {
         resolveFn = resolve;
         rejectFn = reject;
       });
@@ -282,7 +277,7 @@ class AutocompleteUI {
    * render autocomplete results in the dropdown
    * @param results - array of address results to display
    */
-  public displayResults(results: any[]) {
+  public displayResults(results: RadarAutocompleteAddress[]) {
     // Clear the previous results
     this.clearResultsList();
     this.results = results;
@@ -303,7 +298,7 @@ class AutocompleteUI {
 
       // construct result with bolded label
       let listContent;
-      if (result.formattedAddress.includes(result.addressLabel) && result.layer !== 'postalCode') {
+      if (result.formattedAddress?.includes(result.addressLabel!) && result.layer !== 'postalCode') {
         // if addressLabel is contained in the formatted address, bold the address label
         const regex = new RegExp(`(${result.addressLabel}),?`);
         listContent = result.formattedAddress.replace(regex, '<b>$1</b>');
@@ -471,7 +466,7 @@ class AutocompleteUI {
     }
 
     let inputValue;
-    if (result.formattedAddress.includes(result.addressLabel)) {
+    if (result.formattedAddress?.includes(result.addressLabel!)) {
       inputValue = result.formattedAddress;
     } else {
       const label = result.placeLabel || result.addressLabel;

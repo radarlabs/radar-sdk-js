@@ -96,7 +96,7 @@ class TrackAPI {
       timeZone,
     };
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarTrackResponse, 'response' | 'location'>>({
       method: 'POST',
       path: 'track',
       data: body,
@@ -106,11 +106,11 @@ class TrackAPI {
     const { user, events } = response;
     const location = { latitude, longitude, accuracy };
 
-    const trackRes = {
+    const trackRes: RadarTrackResponse = {
       user,
       events,
       location,
-    } as RadarTrackResponse;
+    };
 
     if (options.debug) {
       trackRes.response = response;

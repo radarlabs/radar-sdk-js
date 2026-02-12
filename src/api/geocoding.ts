@@ -21,7 +21,7 @@ class Geocoding {
 
     const { query, layers, country, lang } = params;
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarGeocodeResponse, 'response'>>({
       method: 'GET',
       path: 'geocode/forward',
       data: {
@@ -32,9 +32,9 @@ class Geocoding {
       },
     });
 
-    const forwardGeocodeRes = {
+    const forwardGeocodeRes: RadarGeocodeResponse = {
       addresses: response.addresses,
-    } as RadarGeocodeResponse;
+    };
 
     if (options.debug) {
       forwardGeocodeRes.response = response;
@@ -59,7 +59,7 @@ class Geocoding {
       longitude = location.longitude;
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarGeocodeResponse, 'response'>>({
       method: 'GET',
       path: 'geocode/reverse',
       data: {
@@ -68,9 +68,9 @@ class Geocoding {
       },
     });
 
-    const reverseGeocodeRes = {
+    const reverseGeocodeRes: RadarGeocodeResponse = {
       addresses: response.addresses,
-    } as RadarGeocodeResponse;
+    };
 
     if (options.debug) {
       reverseGeocodeRes.response = response;
@@ -86,16 +86,16 @@ class Geocoding {
   static async ipGeocode(): Promise<RadarIPGeocodeResponse> {
     const options = Config.get();
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarIPGeocodeResponse, 'response'>>({
       method: 'GET',
       path: 'geocode/ip',
     });
 
-    const ipGeocodeRes = {
+    const ipGeocodeRes: RadarIPGeocodeResponse = {
       ip: response.ip,
       address: response.address,
       proxy: response.proxy,
-    } as RadarIPGeocodeResponse;
+    };
 
     if (options.debug) {
       ipGeocodeRes.response = response;

@@ -1,6 +1,6 @@
 import Radar from '../src';
 import Config from '../src/config';
-import Http, { HttpMethod } from '../src/http';
+import Http from '../src/http';
 import SDK_VERSION from '../src/version';
 import { getRequest, mockNetworkError, mockRequest } from './utils';
 
@@ -8,7 +8,7 @@ import { getRequest, mockNetworkError, mockRequest } from './utils';
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
 
-  const httpRequestParams = { method: 'PUT' as HttpMethod, path: 'users/userId', data: { valid: true, invalid: undefined } };
+  const httpRequestParams = { method: 'PUT' as const, path: 'users/userId', data: { valid: true, invalid: undefined } };
   const successResponse = { code: 200 };
 
   describe('http requests', () => {
@@ -36,8 +36,8 @@ describe('Http', () => {
         const response = await Http.request(httpRequestParams);
         const request = getRequest();
 
-        expect(request.requestHeaders.getHeader('X-Radar-Device-Type')).toEqual('Web');
-        expect(request.requestHeaders.getHeader('X-Radar-SDK-Version')).toEqual(SDK_VERSION);
+        expect(request.headers['X-Radar-Device-Type']).toEqual('Web');
+        expect(request.headers['X-Radar-SDK-Version']).toEqual(SDK_VERSION);
 
         expect(response.code).toEqual(200);
       });
@@ -134,7 +134,7 @@ describe('Http', () => {
         }
       });
 
-      it('should respond with server error status on request error', async () => {
+      it('should respond with network error status on request error', async () => {
         mockNetworkError();
 
         try {
@@ -143,10 +143,6 @@ describe('Http', () => {
           expect(e.status).toEqual('ERROR_NETWORK');
         }
       });
-
-      // it('should respond with network error status on timeout', async () => {
-      // TODO(jasonl): figure out how to mock timeout errors
-      // });
 
       it('should return a server error on invalid JSON', async () => {
         const jsonErrorResponse = '"invalid_json": true}';
@@ -189,8 +185,7 @@ describe('Http', () => {
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
       const request = getRequest();
 
-      const urlencodedData = `query=${encodeURIComponent(data.query)}`;
-      expect(request.url).toContain(`?${urlencodedData}`);
+      expect(request.url).toContain('?query=841+Broadway');
 
       expect(response.code).toEqual(200);
     });
@@ -227,9 +222,9 @@ describe('Http', () => {
       const request = getRequest();
 
       expect(response.code).toEqual(200);
-      expect(request.requestHeaders.getHeader('X-Radar-Device-Type')).toEqual('Web');
-      expect(request.requestHeaders.getHeader('X-String')).toEqual('string');
-      expect(request.requestHeaders.getHeader('X-Test')).toEqual('true');
+      expect(request.headers['X-Radar-Device-Type']).toEqual('Web');
+      expect(request.headers['X-String']).toEqual('string');
+      expect(request.headers['X-Test']).toEqual('true');
     });
   });
 });

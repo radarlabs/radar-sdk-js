@@ -1,4 +1,4 @@
-import type { RadarAutocompleteParams } from 'radar-sdk-js';
+import type { RadarAutocompleteAddress, RadarAutocompleteParams } from 'radar-sdk-js';
 
 /** configuration options for the autocomplete UI widget */
 export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams, 'query'> {
@@ -15,13 +15,13 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   /** placeholder text for the input field */
   placeholder?: string,
   /** callback invoked when a result is selected */
-  onSelection?: (selection: any) => void,
+  onSelection?: (selection: RadarAutocompleteAddress) => void,
   /** callback invoked before each autocomplete request */
   onRequest?: (params: RadarAutocompleteParams) => void,
   /** callback invoked when results are returned */
-  onResults?: (results: any[]) => void,
+  onResults?: (results: RadarAutocompleteAddress[]) => void,
   /** callback invoked on autocomplete errors */
-  onError?: (error: any) => void,
+  onError?: (error: Error) => void,
   /** whether the input is disabled */
   disabled?: boolean,
   /** whether to use responsive width (100% with optional max-width) */
