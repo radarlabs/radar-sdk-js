@@ -1,8 +1,9 @@
 import Radar from '../../src';
 import Conversions from '../../src/api/conversions';
 import Config from '../../src/config';
-import { RadarOptions } from '../../src/types';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarOptions } from '../../src/types';
 
 describe('Events', () => {
   const baseEventResponse = { event: {} };

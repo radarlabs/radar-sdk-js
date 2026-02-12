@@ -9,7 +9,7 @@ import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
 import Config from './config';
 import Device from './device';
-import { RadarError, RadarPublishableKeyError } from './errors';
+import { RadarPublishableKeyError } from './errors';
 import * as errors from './errors';
 import Http from './http';
 import Logger from './logger';
@@ -18,6 +18,7 @@ import Session from './session';
 import Storage from './storage';
 import SDK_VERSION from './version';
 
+import type { RadarError } from './errors';
 import type { RadarPlugin, RadarPluginContext, RadarStatic } from './plugin';
 import type {
   Location,

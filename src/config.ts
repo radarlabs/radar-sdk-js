@@ -1,5 +1,4 @@
-import { RadarError } from './errors';
-
+import type { RadarError } from './errors';
 import type { RadarOptions } from './types';
 
 /** global SDK configuration singleton */

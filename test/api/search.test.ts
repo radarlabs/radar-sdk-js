@@ -3,9 +3,10 @@ import Search from '../../src/api/search';
 import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import { RadarGeocodeLayer, RadarOptions } from '../../src/types';
 import { latitude, longitude } from '../common';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarGeocodeLayer, RadarOptions } from '../../src/types';
 
 describe('Search', () => {
   const radius = 100;

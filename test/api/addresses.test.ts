@@ -2,8 +2,9 @@ import Addresses from '../../src/api/addresses';
 import Config from '../../src/config';
 import Http from '../../src/http';
 import Radar from '../../src/index';
-import { RadarOptions } from '../../src/types';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarOptions } from '../../src/types';
 
 describe('Addresses', () => {
   const countryCode = 'US';

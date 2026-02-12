@@ -4,6 +4,7 @@ export default defineConfig({
   plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'jsdoc'],
   rules: {
     'prefer-const': 'error',
+    'typescript/consistent-type-imports': 'error',
   },
   overrides: [
     {

@@ -3,9 +3,10 @@ import Routing from '../../src/api/routing';
 import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import { RadarOptions, RadarTravelMode } from '../../src/types';
 import { latitude, longitude } from '../common';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarOptions, RadarTravelMode } from '../../src/types';
 
 describe('Routing', () => {
   const origin = {

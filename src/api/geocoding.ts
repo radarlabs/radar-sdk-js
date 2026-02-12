@@ -1,7 +1,8 @@
 import Config from '../config';
 import Http from '../http';
 import Navigator from '../navigator';
-import {
+
+import type {
   RadarForwardGeocodeParams,
   RadarReverseGeocodeParams,
   RadarGeocodeResponse,

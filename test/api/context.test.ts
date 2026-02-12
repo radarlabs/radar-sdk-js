@@ -2,9 +2,10 @@ import Radar from '../../src';
 import Context from '../../src/api/context';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-import { RadarContextResponse } from '../../src/types';
 import { latitude, longitude } from '../common';
 import { mockRequest } from '../utils';
+
+import type { RadarContextResponse } from '../../src/types';
 
 describe('Context', () => {
   const contextResponse = { meta: {}, context: {} };

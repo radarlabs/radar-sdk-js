@@ -1,8 +1,9 @@
 import Radar from '../../src';
 import Trips from '../../src/api/trips';
 import Http from '../../src/http';
-import { RadarTripOptions } from '../../src/types';
 import { mockRequest } from '../utils';
+
+import type { RadarTripOptions } from '../../src/types';
 
 describe('Trips', () => {
   const userId = 'user-id';

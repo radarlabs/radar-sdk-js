@@ -2,11 +2,11 @@ import { Map, AttributionControl, LngLatBounds, NavigationControl } from 'maplib
 
 import RadarLineFeature from './RadarLineFeature';
 import RadarLogoControl from './RadarLogoControl';
-import RadarMapFeature from './RadarMapFeature';
-import RadarMarker from './RadarMarker';
 import RadarPolygonFeature from './RadarPolygonFeature';
 import { getAllCoords } from './util/geojson';
 
+import type RadarMapFeature from './RadarMapFeature';
+import type RadarMarker from './RadarMarker';
 import type { RadarMapOptions, RadarLineOptions, RadarPolylineOptions, RadarPolygonOptions } from './types';
 import type { FitBoundsOptions } from 'maplibre-gl';
 import type { RadarOptions, RadarPluginContext } from 'radar-sdk-js';

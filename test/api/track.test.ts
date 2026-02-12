@@ -1,7 +1,8 @@
 import Track from '../../src/api/track';
 import Radar from '../../src/index';
-import { RadarTrackResponse } from '../../src/types';
 import { nycOffice, enableLocation, mockRequest } from '../utils';
+
+import type { RadarTrackResponse } from '../../src/types';
 
 describe('Track', () => {
   describe('trackOnce', () => {
