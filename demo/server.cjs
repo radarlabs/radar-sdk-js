@@ -33,13 +33,6 @@ app.use((req, res, next) => {
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/cdn', express.static('./cdn'));
 
-// serve plugin cdns from sibling repos
-const pluginDirs = ['verify', 'maps', 'autocomplete'];
-for (const plugin of pluginDirs) {
-  const pluginCdn = path.join(__dirname, `../../radar-sdk-js-${plugin}/cdn`);
-  app.use('/cdn/plugins', express.static(pluginCdn));
-}
-
 // create a route for each handelbars view
 const views = fs.readdirSync(path.join(__dirname, 'views'));
 views.forEach((view) => {
@@ -52,6 +45,7 @@ views.forEach((view) => {
       title,
       sdk_version,
       js_file: '/cdn/radar.js',
+      css_file: '/cdn/radar.css',
     });
   });
 });
