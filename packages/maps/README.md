@@ -15,7 +15,7 @@ npm install radar-sdk-js @radarlabs/maps-plugin maplibre-gl
 ```js
 import Radar from 'radar-sdk-js';
 import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import '@radarlabs/maps-plugin/dist/radar-map.css';
+import '@radarlabs/maps-plugin/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.initialize('prj_test_pk_...');
@@ -27,7 +27,7 @@ Load the core SDK first, then the maps plugin. The CDN bundle auto-registers
 with the core SDK.
 
 ```html
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-map.css" rel="stylesheet">
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet">
 <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 ```

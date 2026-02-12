@@ -19,7 +19,7 @@ const config: RollupOptions[] = [
       typescript({ declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       postcss({
-        extract: 'radar-map.css',
+        extract: 'radar-maps.css',
         minimize: true,
       }),
     ],
@@ -53,7 +53,7 @@ const config: RollupOptions[] = [
       nodeResolve(),
       commonjs(),
       postcss({
-        extract: 'radar-map.css',
+        extract: 'radar-maps.css',
         minimize: true,
       }),
     ],

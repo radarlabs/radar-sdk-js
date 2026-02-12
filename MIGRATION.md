@@ -44,7 +44,7 @@ const map = Radar.ui.map({ container: 'map' });
 // v5
 import Radar from 'radar-sdk-js';
 import { createMapsPlugin } from '@radarlabs/maps-plugin';
-import '@radarlabs/maps-plugin/dist/radar-map.css';
+import '@radarlabs/maps-plugin/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.initialize('prj_test_pk_...');
