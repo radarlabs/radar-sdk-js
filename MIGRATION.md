@@ -80,6 +80,9 @@ auto-register with the core SDK when loaded:
 <!-- autocomplete plugin (auto-registers) -->
 <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet">
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+
+<!-- fraud plugin (auto-registers) -->
+<script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
 ```
 
 ### CSS imports
@@ -118,10 +121,13 @@ the following methods, install and register the Fraud plugin:
 Radar.initialize('prj_test_pk_...');
 Radar.trackVerified();
 
-// v5
-import { createVerifyPlugin } from '@radarlabs/verify-plugin';
-Radar.registerPlugin(createVerifyPlugin());
+// v5 (preferred — namespaced under Radar.fraud)
+import { createFraudPlugin } from '@radarlabs/fraud-plugin';
+Radar.registerPlugin(createFraudPlugin());
 Radar.initialize('prj_test_pk_...');
+const { token, user, events } = await Radar.fraud.trackVerified();
+
+// v5 (backwards-compat shim — still works but deprecated)
 Radar.trackVerified();
 ```
 
@@ -193,7 +199,7 @@ import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
 |--------|----|----|
 | Maps UI | Built into core | `@radarlabs/maps-plugin` |
 | Autocomplete UI | Built into core | `@radarlabs/autocomplete-ui-plugin` |
-| Fraud API | Built into core | Separate verify plugin |
+| Fraud/Verify API | Built into core | `@radarlabs/fraud-plugin` (`Radar.fraud.*`) |
 | `maplibre-gl` peer dep | Required by core | Required by maps plugin only |
 | CSS | Single `radar.css` | Per-plugin CSS files |
 | CDN scripts | Single `radar.min.js` | Core + plugin scripts |

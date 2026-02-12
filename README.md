@@ -58,11 +58,11 @@ Add the following to your HTML:
 </script>
 ```
 
-## Adding UI plugins
+## Adding plugins
 
-In v5 the Maps and Autocomplete UI components are separate packages that you
-install alongside the core SDK. This keeps the core bundle small if you only
-need the API.
+In v5 the Maps, Autocomplete, and Fraud components are separate packages that
+you install alongside the core SDK. This keeps the core bundle small if you
+only need the API.
 
 ### Maps plugin (npm)
 
@@ -103,7 +103,23 @@ Radar.ui.autocomplete({
 });
 ```
 
-### UI plugins via script tag (CDN)
+### Fraud plugin (npm)
+
+```bash
+npm install @radarlabs/fraud-plugin
+```
+
+```js
+import Radar from 'radar-sdk-js';
+import { createFraudPlugin } from '@radarlabs/fraud-plugin';
+
+Radar.registerPlugin(createFraudPlugin());
+Radar.initialize('prj_live_pk_...');
+
+const { token, user, events } = await Radar.fraud.trackVerified();
+```
+
+### Plugins via script tag (CDN)
 
 Plugin CDN bundles auto-register with the core SDK when loaded. Load
 the core SDK first, then any plugins you need:
@@ -115,6 +131,7 @@ the core SDK first, then any plugins you need:
 <script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+<script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
 ```
 
 ## Quickstart
@@ -212,6 +229,7 @@ are needed for geofencing.
 | `radar-sdk-js` | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js) | Core SDK — tracking, geocoding, search, routing |
 | `@radarlabs/maps-plugin` | [![npm](https://img.shields.io/npm/v/@radarlabs/maps-plugin.svg)](https://www.npmjs.com/package/@radarlabs/maps-plugin) | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
 | `@radarlabs/autocomplete-ui-plugin` | [![npm](https://img.shields.io/npm/v/@radarlabs/autocomplete-ui-plugin.svg)](https://www.npmjs.com/package/@radarlabs/autocomplete-ui-plugin) | Autocomplete UI widget |
+| `@radarlabs/fraud-plugin` | — | Fraud detection — verified tracking, location tokens |
 
 ## Plugin system
 
@@ -223,9 +241,11 @@ plugins before or after calling `Radar.initialize()`:
 import Radar from 'radar-sdk-js';
 import { createMapsPlugin } from '@radarlabs/maps-plugin';
 import { createAutocompletePlugin } from '@radarlabs/autocomplete-ui-plugin';
+import { createFraudPlugin } from '@radarlabs/fraud-plugin';
 
 Radar.registerPlugin(createMapsPlugin());
 Radar.registerPlugin(createAutocompletePlugin());
+Radar.registerPlugin(createFraudPlugin());
 Radar.initialize('prj_test_pk_...');
 ```
 
