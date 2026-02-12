@@ -6,6 +6,7 @@ import version from './version';
 
 import type RadarMap from './RadarMap';
 import type RadarMarker from './RadarMarker';
+import type RadarPopup from './RadarPopup';
 import type { RadarMapOptions, RadarMarkerOptions, RadarPopupOptions } from './types';
 import type * as maplibregl from 'maplibre-gl';
 import type { RadarPlugin } from 'radar-sdk-js';
@@ -24,10 +25,23 @@ export type { default as RadarPopup } from './RadarPopup';
 
 declare module 'radar-sdk-js' {
   interface RadarUI {
+    /** the MapLibre GL library instance */
     maplibregl: typeof maplibregl;
+    /**
+     * create a new RadarMap
+     * @param options - map configuration and container
+     */
     map(options: RadarMapOptions): RadarMap;
+    /**
+     * create a new RadarMarker
+     * @param options - marker configuration
+     */
     marker(options?: RadarMarkerOptions): RadarMarker;
-    popup(options: RadarPopupOptions): maplibregl.Popup;
+    /**
+     * create a new RadarPopup
+     * @param options - popup configuration and content
+     */
+    popup(options: RadarPopupOptions): RadarPopup;
   }
   namespace Radar {
     let ui: RadarUI; // eslint-disable-line no-unused-vars

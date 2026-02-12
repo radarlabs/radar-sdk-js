@@ -9,6 +9,10 @@ export type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './type
 
 declare module 'radar-sdk-js' {
   interface RadarUI {
+    /**
+     * create an address autocomplete UI widget
+     * @param options - autocomplete configuration
+     */
     autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
   }
   namespace Radar {
