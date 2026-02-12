@@ -58,12 +58,12 @@ workflows:
   ci:
     jobs:
       - install
-      - typecheck:
-          requires:
-            - install
       - build:
           requires:
             - install
+      - typecheck:
+          requires:
+            - build
       - test:
           requires:
             - install
