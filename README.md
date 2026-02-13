@@ -237,7 +237,7 @@ are needed for geofencing.
 | `radar-sdk-js`                   | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)                                     | Core SDK — tracking, geocoding, search, routing           |
 | `@radarlabs/plugin-maps`         | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-maps.svg)](https://www.npmjs.com/package/@radarlabs/plugin-maps)                 | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
 | `@radarlabs/plugin-autocomplete` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg)](https://www.npmjs.com/package/@radarlabs/plugin-autocomplete) | Autocomplete UI widget                                    |
-| `@radarlabs/plugin-fraud`        | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-fraud.svg)](https://www.npmjs.com/package/@radarlabs/plugin-fraud) | Fraud detection — verified tracking, location tokens      |
+| `@radarlabs/plugin-fraud`        | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-fraud.svg)](https://www.npmjs.com/package/@radarlabs/plugin-fraud)               | Fraud detection — verified tracking, location tokens      |
 
 ## Plugin system
 

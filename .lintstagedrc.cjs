@@ -1,5 +1,5 @@
 module.exports = {
-  '*.{ts,tsx,js,jsx,cjs,mjs,css,json}': (filenames) => [`oxfmt --write ${filenames.join(' ')}`, 'npm run lint'],
+  '*.{ts,tsx,js,jsx,cjs,mjs,css,json,md}': (filenames) => [`oxfmt --write ${filenames.join(' ')}`, 'npm run lint'],
   '*.md': [
     (filenames) => {
       if (filenames.length === 0) {
