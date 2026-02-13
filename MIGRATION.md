@@ -121,7 +121,7 @@ Radar.initialize('prj_test_pk_...');
 Radar.trackVerified();
 
 // v5 (preferred — namespaced under Radar.fraud)
-import { createFraudPlugin } from '@radarlabs/fraud-plugin';
+import { createFraudPlugin } from '@radarlabs/plugin-fraud';
 Radar.registerPlugin(createFraudPlugin());
 Radar.initialize('prj_test_pk_...');
 const { token, user, events } = await Radar.fraud.trackVerified();
@@ -193,7 +193,7 @@ import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
 | ---------------------- | --------------------- | ------------------------------------------- |
 | Maps UI                | Built into core       | `@radarlabs/plugin-maps`                    |
 | Autocomplete UI        | Built into core       | `@radarlabs/plugin-autocomplete`            |
-| Fraud/Verify API       | Built into core       | `@radarlabs/fraud-plugin` (`Radar.fraud.*`) |
+| Fraud/Verify API       | Built into core       | `@radarlabs/plugin-fraud` (`Radar.fraud.*`) |
 | `maplibre-gl` peer dep | Required by core      | Required by maps plugin only                |
 | CSS                    | Single `radar.css`    | Per-plugin CSS files                        |
 | CDN scripts            | Single `radar.min.js` | Core + plugin scripts                       |

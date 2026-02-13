@@ -1,18 +1,35 @@
-# @radarlabs/plugin-autocomplete
+<p align="center">
+  <img src="https://raw.githubusercontent.com/radarlabs/radar-sdk-js/master/assets/logo.svg">
+</p>
 
-Autocomplete UI plugin for
-[radar-sdk-js](https://www.npmjs.com/package/radar-sdk-js). Provides a
-drop-in `Radar.ui.autocomplete()` widget with search-as-you-type address
-results powered by the
-[Radar Autocomplete API](https://radar.com/documentation/api#autocomplete).
+<h4 align="center">
+  <a href="https://radar.com">Website</a> |
+  <a href="https://radar.com/blog">Blog</a> |
+  <a href="https://radar.com/documentation">Documentation</a> |
+  <a href="mailto:support@radar.com">Support</a>
+</h4>
 
-## Installation
+<p align="center">
+  <a href="https://www.npmjs.com/package/@radarlabs/plugin-autocomplete"><img src="https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg" alt="npm"></a>
+</p>
+
+<p align="center">
+  Autocomplete UI plugin for <a href="https://github.com/radarlabs/radar-sdk-js">radar-sdk-js</a>. Provides a drop-in <code>Radar.ui.autocomplete()</code> widget with search-as-you-type address results powered by the <a href="https://radar.com/documentation/api#autocomplete">Radar Autocomplete API</a>.
+</p>
+
+## 🚀 Installation and Usage
 
 ### With npm
 
 ```bash
-npm install radar-sdk-js @radarlabs/plugin-autocomplete
+# with npm
+npm install @radarlabs/plugin-autocomplete radar-sdk-js
+
+# with yarn
+yarn add @radarlabs/plugin-autocomplete radar-sdk-js
 ```
+
+Then import and initialize:
 
 ```js
 import Radar from 'radar-sdk-js';
@@ -25,8 +42,7 @@ Radar.initialize('prj_test_pk_...');
 
 ### With a script tag
 
-Load the core SDK first, then the autocomplete plugin. The CDN bundle
-auto-registers with the core SDK.
+Include after the core SDK:
 
 ```html
 <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
@@ -34,15 +50,16 @@ auto-registers with the core SDK.
 <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
 ```
 
-## Usage
+The CDN bundle auto-registers with the core SDK when loaded.
+
+## Quickstart
 
 ### Create an autocomplete input
 
-Pass a container element ID (or an `HTMLElement` reference) to render the
-widget:
+Pass a container element ID (or an `HTMLElement` reference) to render the widget:
 
 ```js
-const autocomplete = Radar.ui.autocomplete({
+Radar.ui.autocomplete({
   container: 'autocomplete',
   onSelection: (result) => {
     console.log(result);
@@ -53,6 +70,8 @@ const autocomplete = Radar.ui.autocomplete({
 You can also pass an existing `<input>` element as the container. In that
 case, the widget attaches the results dropdown to the input instead of
 creating a new one.
+
+## API
 
 ### Options
 
@@ -123,6 +142,6 @@ The autocomplete widget includes ARIA attributes for screen readers:
 | -------------- | ---------------- |
 | `radar-sdk-js` | `>=5.0.0-beta.1` |
 
-## Support
+## 📫 Support
 
 Have questions? We're here to help! Email us at [support@radar.com](mailto:support@radar.com).
