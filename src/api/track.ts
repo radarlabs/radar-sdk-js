@@ -47,13 +47,6 @@ class TrackAPI {
     const deviceType = params.deviceType || 'Web';
     const description = params.description || Storage.getItem(Storage.DESCRIPTION);
 
-    let timeZone;
-    try {
-      timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    } catch (err: any) {
-      Logger.warn(`Error getting time zone: ${err.message}`);
-    }
-
     // save userId for trip tracking
     if (!userId) {
       Logger.warn('userId not provided for trackOnce.');
@@ -72,11 +65,6 @@ class TrackAPI {
 
     const headers: TrackRequestHeaders = {};
 
-    const product = Storage.getItem(Storage.PRODUCT);
-    if (product) {
-      headers['X-Radar-Product'] = product;
-    }
-
     const body = {
       ...params,
       locationAuthorization,
@@ -94,7 +82,6 @@ class TrackAPI {
       stopped: true,
       userId,
       tripOptions,
-      timeZone,
     };
 
     const response = await Http.request<Omit<RadarTrackResponse, 'response' | 'location'>>({
