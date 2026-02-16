@@ -10,10 +10,6 @@ import TripsAPI from './trips';
 
 import type { RadarTrackParams, RadarTrackResponse } from '../types';
 
-type TrackRequestHeaders = {
-  'X-Radar-Product'?: string;
-};
-
 /** @internal tracking API — use {@link Radar.trackOnce} instead */
 class TrackAPI {
   /**
@@ -63,8 +59,6 @@ class TrackAPI {
       tripOptions.version = '2';
     }
 
-    const headers: TrackRequestHeaders = {};
-
     const body = {
       ...params,
       locationAuthorization,
@@ -88,7 +82,6 @@ class TrackAPI {
       method: 'POST',
       path: 'track',
       data: body,
-      headers,
     });
 
     const { user, events } = response;
