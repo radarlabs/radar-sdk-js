@@ -5,7 +5,7 @@ import version from './version';
 import type { RadarAutocompleteUIOptions } from './types';
 import type { RadarPlugin } from 'radar-sdk-js';
 
-export type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
+export type * from './types';
 
 declare module 'radar-sdk-js' {
   interface RadarUI {
