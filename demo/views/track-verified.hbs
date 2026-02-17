@@ -12,6 +12,15 @@
       <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
     </div>
   </div>
+  <div class="mb-4 form-row">
+    <label for="skip-verify-app" class="col-form-label" style="width: 128px;">Skip Verify app</label>
+    <div>
+      <select id="skip-verify-app" class="form-select" style="width: 250px;">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </div>
+  </div>
 
   <div>
     <button id="track-verified" type="button" class="btn btn-primary" disabled>Call track verified</button>
@@ -20,39 +29,35 @@
   <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
   </div>
 
-  <div>
-    <div id="map" class="mt-4" style="width: 100%; height: 500px; display: none;"></div>
-  </div>
-
   <div id="response-details" style="display: none;">
     <h6 class="mt-4">Location</h6>
     <div class="mt-2">
-      <pre><code id="location" class="code-sample language-json"></code><pre>
+      <pre><code id="location" class="code-sample language-json"></code></pre>
     </div>
 
     <h6 class="mt-2">User</h6>
     <div class="mt-2">
-      <pre><code id="user" class="code-sample language-json"></code><pre>
+      <pre><code id="user" class="code-sample language-json"></code></pre>
     </div>
 
     <h6 class="mt-2">Events</h6>
     <div class="mt-2">
-      <pre><code id="events" class="code-sample language-json"></code><pre>
+      <pre><code id="events" class="code-sample language-json"></code></pre>
     </div>
 
     <h6 class="mt-4">Token</h6>
     <div class="mt-2">
-      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code><pre>
+      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code></pre>
     </div>
 
     <h6 class="mt-2">Expires at</h6>
     <div class="mt-2">
-      <pre><code id="expires-at" class="code-sample language-json"></code><pre>
+      <pre><code id="expires-at" class="code-sample language-json"></code></pre>
     </div>
 
     <h6 class="mt-2">Passed</h6>
     <div class="mt-2">
-      <pre><code id="passed" class="code-sample language-json"></code><pre>
+      <pre><code id="passed" class="code-sample language-json"></code></pre>
     </div>
   </div>
 
@@ -62,15 +67,10 @@
   &lt;head&gt;
     &lt;meta charset="utf-8" /&gt;
     &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
-    &lt;link href="https://js.radar.com/maps/v{{maps_version}}/radar-maps.css" rel="stylesheet"&gt;
-    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar.min.js"&gt;&lt;/script&gt;
-    &lt;script src="https://js.radar.com/maps/v{{maps_version}}/radar-maps.min.js"&gt;&lt;/script&gt;
-    &lt;script src="https://js.radar.com/fraud/v{{fraud_version}}/radar-fraud.min.js"&gt;&lt;/script&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar-core-fraud.min.js"&gt;&lt;/script&gt;
   &lt;/head&gt;
 
   &lt;body&gt;
-    &lt;div id="map" style="width: 100%; height: 500px;" /&gt;
-
     &lt;script&gt;
       $('#track-verified').click(() =&gt; {
         Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
@@ -101,7 +101,6 @@
     }
   });
 
-  let map;
   $('#track-verified').click(() => {
     $('#error-alert').hide();
     $('#response-details').hide();
@@ -112,37 +111,11 @@
     $('#loader').show();
 
     const userId = $('#user-id').val();
-    Radar.trackVerified({ userId })
+    const skipVerifyApp = $('#skip-verify-app').val() === 'true';
+    Radar.trackVerified({ userId, skipVerifyApp })
       .then(({ location, user, events, token, expiresAt, expiresIn, passed }) => {
         console.log('TRACK RESPONSE', { location, user, events, token, expiresAt, expiresIn, passed });
         $('#loader').hide();
-
-        if (!location) {
-          $('#map').hide();
-          $('#response-details').hide();
-          return;
-        }
-
-        $('#map').show();
-        if (!map) {
-          map = Radar.ui.map({
-            container: 'map',
-          });
-        }
-        map.setCenter([location.longitude, location.latitude]);
-
-        if (map.getZoom() < 14) {
-          map.setZoom(14);
-        }
-
-        const html = `
-          <p>${user.userId}</p>
-          <p>${location.latitude},${location.longitude}</p>
-        `.trim();
-
-        const marker = Radar.ui.marker({ popup: { html } })
-          .setLngLat([location.longitude, location.latitude])
-          .addTo(map);
 
         $('#response-details').show();
         $('#location').html(JSON.stringify(location, null, 2));

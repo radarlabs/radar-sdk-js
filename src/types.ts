@@ -108,10 +108,6 @@ export interface RadarTrackParams {
   tripOptions?: RadarTripOptions;
   /** geolocation accuracy hint */
   desiredAccuracy?: 'high' | 'medium' | 'low';
-  reason?: string;
-  transactionId?: string;
-  /** include fraud signals in the response */
-  fraud?: boolean;
 }
 
 /** confidence level for Radar events */
