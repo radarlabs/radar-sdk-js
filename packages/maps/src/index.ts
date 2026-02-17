@@ -11,14 +11,7 @@ import type { RadarMapOptions, RadarMarkerOptions, RadarPopupOptions } from './t
 import type * as maplibregl from 'maplibre-gl';
 import type { RadarPlugin } from 'radar-sdk-js';
 
-export type {
-  RadarMapOptions,
-  RadarMarkerOptions,
-  RadarPopupOptions,
-  RadarLineOptions,
-  RadarPolylineOptions,
-  RadarPolygonOptions,
-} from './types';
+export type * from './types';
 export type { default as RadarMap } from './RadarMap';
 export type { default as RadarMarker } from './RadarMarker';
 export type { default as RadarPopup } from './RadarPopup';

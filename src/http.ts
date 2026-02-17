@@ -153,7 +153,8 @@ class Http {
         signal: abortController.signal,
       });
     } catch {
-      if (requestId) {
+      // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
+      if (requestId && inFlightRequests.get(requestId) === abortController) {
         inFlightRequests.delete(requestId);
       }
 
@@ -167,7 +168,7 @@ class Http {
       throw new RadarNetworkError();
     }
 
-    if (requestId) {
+    if (requestId && inFlightRequests.get(requestId) === abortController) {
       inFlightRequests.delete(requestId);
     }
 
@@ -178,8 +179,17 @@ class Http {
       } else {
         parsed = (await response.json()) as RadarApiResponse;
       }
-    } catch {
-      throw new RadarServerError(parsed);
+    } catch (err) {
+      if (parsed) {
+        throw new RadarServerError(parsed);
+      } else {
+        if (options.debug) {
+          Logger.debug(`API call failed: ${url}`);
+          Logger.debug(String(err));
+        }
+
+        throw new RadarUnknownError(parsed);
+      }
     }
 
     if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
@@ -193,7 +203,7 @@ class Http {
       }
     }
 
-    if (response.status === 200) {
+    if (response.ok) {
       return parsed as T;
     }
 

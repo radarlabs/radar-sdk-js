@@ -27,10 +27,14 @@ describe('Track', () => {
       });
 
       it('should throw a publishableKey error', async () => {
+        let err;
         try {
           await Track.trackOnce({});
           throw new Error('Test did not throw expected error.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('publishableKey not set.');
           expect(err.status).toEqual('ERROR_PUBLISHABLE_KEY');
@@ -48,10 +52,14 @@ describe('Track', () => {
       });
 
       it('should throw a permissions denied error', async () => {
+        let err;
         try {
           await Track.trackOnce({});
           throw new Error('Test did not throw expected error.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPermissionsError');
           expect(err.message).toEqual('Location permissions denied.');
           expect(err.status).toEqual('ERROR_PERMISSIONS');

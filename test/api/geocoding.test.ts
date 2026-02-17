@@ -46,9 +46,13 @@ describe('Geocoding', () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         jest.spyOn(Http, 'request');
 
+        let err;
         try {
           await Geocoding.reverseGeocode({});
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }

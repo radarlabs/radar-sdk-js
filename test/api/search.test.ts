@@ -42,9 +42,13 @@ describe('Search', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
           await Search.searchPlaces({});
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -81,9 +85,12 @@ describe('Search', () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         jest.spyOn(Http, 'request');
 
+        let err;
         try {
           await Search.searchGeofences({});
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }

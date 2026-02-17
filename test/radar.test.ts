@@ -75,10 +75,14 @@ describe('Radar', () => {
 
     describe('no key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
+        let err;
         try {
           Radar.initialize('');
           throw new Error('Should not succeed.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Publishable key required in initialization.');
         }
@@ -87,10 +91,14 @@ describe('Radar', () => {
 
     describe('secret key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
+        let err;
         try {
           Radar.initialize('_my_test_sk_123');
           throw new Error('Should not succeed.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Secret keys are not allowed. Please use your Radar publishable key.');
         }
@@ -217,9 +225,12 @@ describe('Radar', () => {
     it('should propagate the err if not successful', async () => {
       navigatorStub.mockRejectedValue('ERROR_LOCATION');
 
+      let err;
       try {
         await Radar.getLocation();
-      } catch (err: any) {
+      } catch (caught: any) {
+        err = caught;
+      } finally {
         expect(err).toEqual('ERROR_LOCATION');
       }
     });
@@ -271,14 +282,14 @@ describe('Radar', () => {
       expect(response.events).toEqual(events);
     });
 
-    it('should not throw an error if no callback given', () => {
+    it('should not throw an error if no callback given', async () => {
       trackStub.mockResolvedValue({
         location: { latitude, longitude, accuracy },
         user,
         events,
       });
 
-      void Radar.trackOnce();
+      void (await Radar.trackOnce());
     });
   });
 

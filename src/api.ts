@@ -291,8 +291,8 @@ class Radar {
   }
 
   /** autocomplete partial addresses and place names */
-  public static autocomplete(params: RadarAutocompleteParams): Promise<RadarAutocompleteResponse> {
-    return SearchAPI.autocomplete(params);
+  public static autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
+    return SearchAPI.autocomplete(params, requestId);
   }
 
   /** search for geofences near a location */

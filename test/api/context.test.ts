@@ -40,9 +40,14 @@ describe('Context', () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         mockRequest(200, contextResponse);
 
+        let err;
         try {
-          await Context.getContext({ latitude, longitude });
-        } catch (err: any) {
+          // Pass an actually-missing location value to trigger Navigator-based behavior
+          await Context.getContext({} as any);
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
