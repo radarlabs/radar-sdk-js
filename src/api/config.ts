@@ -9,7 +9,8 @@ import type { LocationAuthorization, RadarConfigResponse, RadarTrackParams } fro
 /** @internal SDK configuration API for fetching remote config */
 class ConfigAPI {
   /**
-   * fetch remote SDK configuration from the Radar API
+   * fetch remote SDK configuration from the Radar API. Generic so plugins can extend the response shape.
+   *
    * @param params - optional tracking params for device/session identification
    */
   public static async getConfig<T extends RadarConfigResponse = RadarConfigResponse>(
