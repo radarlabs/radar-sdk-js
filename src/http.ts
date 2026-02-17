@@ -153,7 +153,8 @@ class Http {
         signal: abortController.signal,
       });
     } catch {
-      if (requestId) {
+      // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
+      if (requestId && inFlightRequests.get(requestId) === abortController) {
         inFlightRequests.delete(requestId);
       }
 
@@ -167,7 +168,7 @@ class Http {
       throw new RadarNetworkError();
     }
 
-    if (requestId) {
+    if (requestId && inFlightRequests.get(requestId) === abortController) {
       inFlightRequests.delete(requestId);
     }
 
