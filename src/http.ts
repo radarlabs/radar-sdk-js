@@ -179,8 +179,17 @@ class Http {
       } else {
         parsed = (await response.json()) as RadarApiResponse;
       }
-    } catch {
-      throw new RadarServerError(parsed);
+    } catch (err) {
+      if (parsed) {
+        throw new RadarServerError(parsed);
+      } else {
+        if (options.debug) {
+          Logger.debug(`API call failed: ${url}`);
+          Logger.debug(String(err));
+        }
+
+        throw new RadarUnknownError(parsed);
+      }
     }
 
     if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
