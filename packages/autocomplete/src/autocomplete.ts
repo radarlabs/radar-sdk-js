@@ -76,6 +76,7 @@ class AutocompleteUI {
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[]>;
   near?: string;
   private _boundClose: () => void;
+  private _debouncePromise: Promise<RadarAutocompleteAddress[]> | null = null;
 
   // DOM elements
   container: HTMLElement;
@@ -201,21 +202,28 @@ class AutocompleteUI {
       return;
     }
 
-    this.debouncedFetchResults(query)
-      .then((results) => {
-        const onResults = this.config.onResults;
-        if (onResults) {
-          onResults(results);
-        }
-        this.displayResults(results);
-      })
-      .catch((error: Error) => {
-        Logger.warn(`Autocomplete ui error: ${error.message}`);
-        const onError = this.config.onError;
-        if (onError) {
-          onError(error);
-        }
-      });
+    // Debounced calls return the same Promise
+    const debouncePromise = this.debouncedFetchResults(query);
+
+    // Only attach handlers once
+    if (this._debouncePromise !== debouncePromise) {
+      this._debouncePromise = debouncePromise;
+      this._debouncePromise
+        .then((results) => {
+          const onResults = this.config.onResults;
+          if (onResults) {
+            onResults(results);
+          }
+          this.displayResults(results);
+        })
+        .catch((error: Error) => {
+          Logger.warn(`Autocomplete ui error: ${error.message}`);
+          const onError = this.config.onError;
+          if (onError) {
+            onError(error);
+          }
+        });
+    }
   }
 
   public debounce<TArgs extends unknown[], TReturn>(
@@ -225,24 +233,34 @@ class AutocompleteUI {
     let timeoutId: ReturnType<typeof setTimeout>;
     let resolveFn: ((value: TReturn) => void) | null = null;
     let rejectFn: ((reason: unknown) => void) | null = null;
+    let promise = new Promise<TReturn>((resolve, reject) => {
+      resolveFn = resolve;
+      rejectFn = reject;
+    });
 
     return (...args: TArgs) => {
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
+        // We're going to run the debounced function now, so if in the meantime the returned closure is called again,
+        // we want it to wait on a new Promise rather than the current one which we are going to resolve
+        const savedResolve = resolveFn;
+        const savedReject = rejectFn;
+        promise = new Promise<TReturn>((resolve, reject) => {
+          resolveFn = resolve;
+          rejectFn = reject;
+        });
+
         fn(...args)
           .then((value) => {
-            resolveFn?.(value);
+            savedResolve?.(value);
           })
           .catch((error) => {
-            rejectFn?.(error);
+            savedReject?.(error);
           });
       }, delay);
 
-      return new Promise<TReturn>((resolve, reject) => {
-        resolveFn = resolve;
-        rejectFn = reject;
-      });
+      return promise;
     };
   }
 
