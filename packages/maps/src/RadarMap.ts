@@ -1,4 +1,5 @@
 import { Map, AttributionControl, LngLatBounds, NavigationControl } from 'maplibre-gl';
+import Radar from 'radar-sdk-js';
 
 import RadarLineFeature from './RadarLineFeature';
 import RadarLogoControl from './RadarLogoControl';
@@ -72,7 +73,7 @@ class RadarMap extends Map {
   _features: RadarMapFeature[] = [];
 
   constructor(radarMapOptions: RadarMapOptions, ctx: RadarPluginContext) {
-    const { Config, Logger, SDK_VERSION } = ctx;
+    const { Config, Logger } = ctx;
     const config = Config.get();
 
     if (!config.publishableKey) {
@@ -100,7 +101,7 @@ class RadarMap extends Map {
       let headers = {
         Authorization: config.publishableKey,
         'X-Radar-Device-Type': 'Web',
-        'X-Radar-SDK-Version': SDK_VERSION,
+        'X-Radar-SDK-Version': Radar.VERSION,
       };
       if (typeof config.getRequestHeaders === 'function') {
         headers = Object.assign(headers, config.getRequestHeaders());

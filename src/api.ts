@@ -10,7 +10,6 @@ import TripsAPI from './api/trips';
 import Config from './config';
 import Device from './device';
 import { RadarPublishableKeyError } from './errors';
-import * as errors from './errors';
 import Http from './http';
 import Logger from './logger';
 import Navigator from './navigator';
@@ -94,8 +93,6 @@ class Radar {
       Session,
       Logger,
       Navigator,
-      SDK_VERSION,
-      errors,
       apis: {
         Addresses: AddressesAPI,
         Config: ConfigAPI,

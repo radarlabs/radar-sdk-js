@@ -10,7 +10,6 @@ import type TrackAPI from './api/track';
 import type TripsAPI from './api/trips';
 import type Config from './config';
 import type Device from './device';
-import type * as errors from './errors';
 import type Http from './http';
 import type Logger from './logger';
 import type Navigator from './navigator';
@@ -48,10 +47,6 @@ export interface RadarPluginContext {
   Logger: typeof Logger;
   /** browser geolocation wrapper */
   Navigator: typeof Navigator;
-  /** current SDK version string */
-  SDK_VERSION: string;
-  /** all Radar error classes */
-  errors: typeof errors;
   /** internal API modules for making Radar API calls */
   apis: {
     Addresses: typeof AddressesAPI;
