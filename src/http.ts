@@ -193,7 +193,7 @@ class Http {
       }
     }
 
-    if (response.status === 200) {
+    if (response.ok) {
       return parsed as T;
     }
 
