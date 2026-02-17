@@ -1,11 +1,10 @@
-import Config from '../config';
 import Device from '../device';
 import Http from '../http';
 import Logger from '../logger';
 import Navigator from '../navigator';
 import Session from '../session';
 
-import type { RadarTrackParams } from '../types';
+import type { LocationAuthorization, RadarConfigResponse, RadarTrackParams } from '../types';
 
 /** @internal SDK configuration API for fetching remote config */
 class ConfigAPI {
@@ -13,20 +12,15 @@ class ConfigAPI {
    * fetch remote SDK configuration from the Radar API
    * @param params - optional tracking params for device/session identification
    */
-  public static async getConfig(params: RadarTrackParams = {}) {
-    const options = Config.get();
-
-    if (options.version != 'v1') {
-      Logger.info('Skipping /config call.');
-      return;
-    }
-
+  public static async getConfig<T extends RadarConfigResponse = RadarConfigResponse>(
+    params: RadarTrackParams = {},
+  ): Promise<T | undefined> {
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
 
     // location authorization
-    let locationAuthorization;
+    let locationAuthorization: LocationAuthorization | undefined;
     try {
       locationAuthorization = await Navigator.getPermissionStatus();
     } catch (err: any) {
@@ -40,15 +34,11 @@ class ConfigAPI {
       locationAuthorization,
     };
 
-    try {
-      await Http.request({
-        method: 'GET',
-        path: 'config',
-        data,
-      });
-    } catch (err: any) {
-      Logger.warn(`Error calling /config: ${err.message}`);
-    }
+    return Http.request<T>({
+      method: 'GET',
+      path: 'config',
+      data,
+    });
   }
 }
 

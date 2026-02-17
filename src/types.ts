@@ -48,6 +48,16 @@ export interface RadarOptions {
   debug?: boolean;
 }
 
+/** response from GET /v1/config */
+export interface RadarConfigResponse {
+  meta: {
+    code: number;
+    featureSettings?: Record<string, unknown>;
+    sdkConfiguration?: Record<string, unknown>;
+    trackingOptions?: Record<string, unknown>;
+  };
+}
+
 /** base response shape shared by all API responses */
 export interface RadarResponse {
   /** raw API response body (only present in debug mode) */

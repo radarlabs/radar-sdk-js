@@ -149,7 +149,9 @@ class Radar {
     // NOTE(jasonl): this allows us to run jest tests
     // without having to mock the ConfigAPI.getConfig call
     if (!window?.RADAR_TEST_ENV) {
-      void ConfigAPI.getConfig();
+      ConfigAPI.getConfig().catch((err) => {
+        Logger.warn(`Error calling /config: ${err.message}`);
+      });
     }
   }
 
@@ -199,7 +201,10 @@ class Radar {
     try {
       return TrackAPI.trackOnce(params);
     } finally {
-      void ConfigAPI.getConfig(params); // call with updated permissions
+      // call with updated permissions
+      ConfigAPI.getConfig(params).catch((err) => {
+        Logger.warn(`Error calling /config: ${err.message}`);
+      });
     }
   }
 
