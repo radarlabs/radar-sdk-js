@@ -42,7 +42,8 @@ describe('Context', () => {
 
         let err;
         try {
-          await Context.getContext({ latitude: 0, longitude: 0 });
+          // Pass an actually-missing location value to trigger Navigator-based behavior
+          await Context.getContext({} as any);
         } catch (caught: any) {
           err = caught;
         } finally {
