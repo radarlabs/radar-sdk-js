@@ -55,9 +55,13 @@ describe('Routing', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
           await Routing.distance({ destination, modes });
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -96,9 +100,13 @@ describe('Routing', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
           await Routing.matrix({ destinations: matrixDestination, mode: matrixMode });
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }

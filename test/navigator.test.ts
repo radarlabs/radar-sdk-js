@@ -7,10 +7,14 @@ describe('Navigator', () => {
   describe('getCurrentPosition', () => {
     describe('location permissions denied', () => {
       it('should throw a RadarPermissionsError', async () => {
+        let err;
         try {
           await Navigator.getCurrentPosition();
           throw new Error('Response should not succeed.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPermissionsError');
           expect(err.message).toEqual('Location permissions denied.');
           expect(err.status).toEqual('ERROR_PERMISSIONS');
