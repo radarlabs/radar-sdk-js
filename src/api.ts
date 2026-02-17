@@ -9,6 +9,7 @@ import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
 import Config from './config';
 import Device from './device';
+import * as errors from './errors';
 import { RadarPublishableKeyError } from './errors';
 import Http from './http';
 import Logger from './logger';
@@ -63,6 +64,8 @@ const isLiveKey = (key: string): boolean => key.includes('_live_');
  */
 class Radar {
   private static _plugins: Map<string, RadarPlugin> = new Map();
+
+  public static errors = errors;
 
   /** current SDK version string */
   public static get VERSION() {

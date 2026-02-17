@@ -1,7 +1,7 @@
-import { RadarError } from 'radar-sdk-js';
+import Radar from 'radar-sdk-js';
 
 /** error thrown when the autocomplete container element is not found in the DOM */
-export class RadarAutocompleteContainerNotFound extends RadarError {
+export class RadarAutocompleteContainerNotFound extends Radar.errors.RadarError {
   public override readonly name = 'RadarAutocompleteContainerNotFound';
   public override readonly status = 'CONTAINER_NOT_FOUND';
 

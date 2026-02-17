@@ -1,12 +1,13 @@
 import '../styles/radar-autocomplete.css';
 import AutocompleteUI from './autocomplete';
+import * as errors from './errors';
 import version from './version';
 
 import type { RadarAutocompleteUIOptions } from './types';
 import type { RadarPlugin } from 'radar-sdk-js';
 
 export type * from './types';
-export * from './errors';
+export { errors };
 
 declare module 'radar-sdk-js' {
   interface RadarUI {
@@ -15,6 +16,7 @@ declare module 'radar-sdk-js' {
      * @param options - autocomplete configuration
      */
     autocomplete(options: Partial<RadarAutocompleteUIOptions>): AutocompleteUI;
+    errors: typeof errors;
   }
   namespace Radar {
     let ui: RadarUI; // eslint-disable-line no-unused-vars
@@ -42,6 +44,7 @@ export function createAutocompletePlugin(): RadarPlugin {
       ctx.Radar.ui = {
         ...existing,
         autocomplete: (options: Partial<RadarAutocompleteUIOptions>) => new AutocompleteUI(options, ctx),
+        errors,
       };
     },
   };
