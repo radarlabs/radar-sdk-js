@@ -91,8 +91,23 @@ export interface RadarTripOptions {
 /** arbitrary key-value metadata attached to Radar objects */
 export type RadarMetadata = Record<string, string | number | boolean>;
 
+/**
+ * extend this interface via declaration merging to add custom fields to track requests.
+ *
+ * @example
+ * ```ts
+ * declare module 'radar-sdk-js' {
+ *   interface TrackBodyExtension {
+ *     param?: boolean;
+ *   }
+ * }
+ * ```
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TrackBodyExtension {}
+
 /** parameters for {@link Radar.trackOnce} */
-export interface RadarTrackParams {
+export interface RadarTrackParams extends TrackBodyExtension {
   /** override latitude (skips device geolocation) */
   latitude?: number;
   /** override longitude (skips device geolocation) */
