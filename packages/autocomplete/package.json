@@ -1,0 +1,41 @@
+{
+  "name": "@radarlabs/plugin-autocomplete",
+  "version": "5.0.0-beta.8",
+  "description": "Autocomplete UI plugin for radar-sdk-js",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radarlabs/radar-sdk-js.git",
+    "directory": "packages/autocomplete"
+  },
+  "style": "dist/radar-autocomplete.css",
+  "files": [
+    "dist",
+    "cdn",
+    "src"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./dist/*.css": "./dist/*.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "radar-sdk-js": "file:../..",
+    "rollup-plugin-postcss": "^4.0.2"
+  },
+  "peerDependencies": {
+    "radar-sdk-js": ">=5.0.0-beta.1"
+  }
+}

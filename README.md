@@ -21,66 +21,148 @@
 </p>
 
 🔥 Try it! 🔥
-* <a href="https://radar.com/demo/js">Geofencing</a>
-* <a href="https://radar.com/demo/api">Maps APIs</a>
-* <a href="https://radar.com/documentation/maps/maps">Maps UI</a>
-* <a href="https://radar.com/documentation/maps/autocomplete">Autocomplete UI</a>
+
+- <a href="https://radar.com/demo/js">Geofencing</a>
+- <a href="https://radar.com/demo/api">Maps APIs</a>
+- <a href="https://radar.com/documentation/maps/maps">Maps UI</a>
+- <a href="https://radar.com/documentation/maps/autocomplete">Autocomplete UI</a>
 
 ## 🚀 Installation and Usage
 
 ### With npm
 
-> **Note:** The Radar JS SDK has a peer dependency on [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js).
+Install the core SDK:
 
-Add the `radar-sdk-js` and `maplibre-gl` packages
 ```bash
 # with npm
-npm install --save radar-sdk-js maplibre-gl
+npm install radar-sdk-js
 
 # with yarn
-yarn add radar-sdk-js maplibre-gl
+yarn add radar-sdk-js
 ```
 
-Then import as an ES Module in your project
+Then import and initialize:
+
 ```js
 import Radar from 'radar-sdk-js';
-import 'radar-sdk-js/dist/radar.css'
 
 // initialize with your test or live publishable key
-Radar.initialize('prj_test_pk_...', { /* options */ });
+Radar.initialize('prj_test_pk_...', {
+  /* options */
+});
 ```
 
-### In your html
+### With a script tag
 
-> The MapLibre dependency is not necessary to install when using installation with the script tag.
+Add the following to your HTML:
 
-Add the following script in your `html` file
 ```html
-<script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
-```
+<script src="https://js.radar.com/v5.0.0-beta.9/radar.min.js"></script>
 
-Then initialize the Radar SDK
-```html
-<script type="text/javascript">
-  Radar.initialize('prj_test_pk_...', { /* options */ });
+<script>
+  Radar.initialize('prj_test_pk_...', {
+    /* options */
+  });
 </script>
+```
+
+## Adding plugins
+
+In v5 the Maps, Autocomplete, and Fraud components are separate packages that
+you install alongside the core SDK. This keeps the core bundle small if you
+only need the API.
+
+### Maps plugin (npm)
+
+```bash
+npm install @radarlabs/plugin-maps maplibre-gl
+```
+
+```js
+import Radar from 'radar-sdk-js';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import '@radarlabs/plugin-maps/dist/radar-maps.css';
+
+Radar.registerPlugin(createMapsPlugin());
+Radar.initialize('prj_test_pk_...');
+
+const map = Radar.ui.map({
+  container: 'map',
+});
+```
+
+### Autocomplete plugin (npm)
+
+```bash
+npm install @radarlabs/plugin-autocomplete
+```
+
+```js
+import Radar from 'radar-sdk-js';
+import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
+import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
+
+Radar.registerPlugin(createAutocompletePlugin());
+Radar.initialize('prj_test_pk_...');
+
+Radar.ui.autocomplete({
+  container: 'autocomplete',
+  onSelection: (result) => {
+    console.log(result);
+  },
+});
+```
+
+### Fraud plugin (npm)
+
+```bash
+npm install @radarlabs/plugin-fraud
+```
+
+```js
+import Radar from 'radar-sdk-js';
+import { createFraudPlugin } from '@radarlabs/plugin-fraud';
+
+Radar.registerPlugin(createFraudPlugin());
+Radar.initialize('prj_live_pk_...');
+
+const { token, user, events } = await Radar.fraud.trackVerified();
+```
+
+### Plugins via script tag (CDN)
+
+Plugin CDN bundles auto-register with the core SDK when loaded. Load
+the core SDK first, then any plugins you need:
+
+```html
+<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
+<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
+
+<script src="https://js.radar.com/v5.0.0-beta.9/radar.min.js"></script>
+<script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
+<script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+<script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
 ```
 
 ## Quickstart
 
 ### Create a map
-To create a map, first initialize the Radar SDK with your publishable key. Then specify the HTML element where you want to render the map, by providing the element's ID, or the element object itself.
+
+Initialize the SDK and the maps plugin, then render a map into an HTML element
+by ID or element reference.
+
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
+    <link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
+    <script src="https://js.radar.com/v5.0.0-beta.9/radar.min.js"></script>
+    <script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
   </head>
 
   <body>
     <div id="map" style="width: 100%; height: 500px;" />
 
-    <script type="text/javascript">
+    <script>
       Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
 
       const map = Radar.ui.map({
@@ -90,25 +172,25 @@ To create a map, first initialize the Radar SDK with your publishable key. Then 
   </body>
 </html>
 ```
-> Remember to provide a `width` and `height` on the element the map is being rendered to
+
+> Provide a `width` and `height` on the container element for the map to
+> render correctly.
 
 ### Create an autocomplete input
-To create an autocomplete input, first initialize the Radar SDK with your publishable key. Then specify the HTML element where you want to render the input.
 
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
+    <link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
+    <script src="https://js.radar.com/v5.0.0-beta.9/radar.min.js"></script>
+    <script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
   </head>
 
   <body>
-    <div id="autocomplete"/>
+    <div id="autocomplete" />
 
-    <script type="text/javascript">
-      // initialize Radar SDK
+    <script>
       Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
-
 
       // create autocomplete widget
       Radar.ui.autocomplete({
@@ -125,34 +207,69 @@ To create an autocomplete input, first initialize the Radar SDK with your publis
 ```
 
 ### Geofencing
-To power [geofencing](https://radar.com/documentation/geofencing/overview) experiences on the web, use the [Track API](https://radar.com/documentation/api#track) to grab the user's current location for geofence and event detection.
+
+Use the [Track API](https://radar.com/documentation/api#track) to get the
+user's current location for geofence and event detection. No UI plugins
+are needed for geofencing.
 
 ```html
 <html>
   <head>
-    <link href="https://js.radar.com/v4.5.8/radar.css" rel="stylesheet">
-    <script src="https://js.radar.com/v4.5.8/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.0.0-beta.9/radar.min.js"></script>
   </head>
 
   <body>
     <script>
       Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
 
-      Radar.trackOnce({ userId: 'example-user-id' })
-        .then(({ location, user, events }) => {
-          // do something with user location or events
-        });
+      Radar.trackOnce({ userId: 'example-user-id' }).then(({ location, user, events }) => {
+        // do something with user location or events
+      });
     </script>
   </body>
 </html>
 ```
 
-See more examples and usage in the Radar web SDK documentation [here](https://radar.com/documentation/sdk/web).
+## Packages
 
+| Package                          | npm                                                                                                                                     | Description                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `radar-sdk-js`                   | [![npm](https://img.shields.io/npm/v/radar-sdk-js.svg)](https://www.npmjs.com/package/radar-sdk-js)                                     | Core SDK — tracking, geocoding, search, routing           |
+| `@radarlabs/plugin-maps`         | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-maps.svg)](https://www.npmjs.com/package/@radarlabs/plugin-maps)                 | Maps UI — RadarMap, RadarMarker, RadarPopup (MapLibre GL) |
+| `@radarlabs/plugin-autocomplete` | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-autocomplete.svg)](https://www.npmjs.com/package/@radarlabs/plugin-autocomplete) | Autocomplete UI widget                                    |
+| `@radarlabs/plugin-fraud`        | [![npm](https://img.shields.io/npm/v/@radarlabs/plugin-fraud.svg)](https://www.npmjs.com/package/@radarlabs/plugin-fraud)               | Fraud detection — verified tracking, location tokens      |
+
+## Plugin system
+
+Version 5 introduces a plugin architecture. UI components like Maps and
+Autocomplete are no longer bundled in the core SDK. Instead, you register
+plugins before or after calling `Radar.initialize()`:
+
+```js
+import Radar from 'radar-sdk-js';
+import { createMapsPlugin } from '@radarlabs/plugin-maps';
+import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
+import { createFraudPlugin } from '@radarlabs/plugin-fraud';
+
+Radar.registerPlugin(createMapsPlugin());
+Radar.registerPlugin(createAutocompletePlugin());
+Radar.registerPlugin(createFraudPlugin());
+Radar.initialize('prj_test_pk_...');
+```
+
+If you're building a custom plugin, import the plugin types from the
+`radar-sdk-js/plugin` subpath:
+
+```ts
+import type { RadarPlugin, RadarPluginContext } from 'radar-sdk-js/plugin';
+```
 
 ## 🔗 Other links
-* [Contributing](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/CONTRIBUTING.md)
-* [Migrating from 3.x to 4.x](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/MIGRATION.md)
+
+- [Contributing](CONTRIBUTING.md)
+- [Migrating from 3.x to 4.x](https://github.com/radarlabs/radar-sdk-js/blob/v4-beta/MIGRATION.md)
+- [Migrating from 4.x to 5.x](MIGRATION.md)
+- [Radar documentation](https://radar.com/documentation/sdk/web)
 
 ## 📫 Support
 

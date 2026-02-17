@@ -1,13 +1,12 @@
+import Radar from '../../src';
+import Search from '../../src/api/search';
+import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-
-import Search from '../../src/api/search';
-
 import { latitude, longitude } from '../common';
-import Radar from '../../src';
-import Config from '../../src/config';
-import { RadarGeocodeLayer, RadarOptions } from '../../src/types';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarGeocodeLayer, RadarOptions } from '../../src/types';
 
 describe('Search', () => {
   const radius = 100;
@@ -43,9 +42,13 @@ describe('Search', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
           await Search.searchPlaces({});
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -69,7 +72,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.searchPlaces({ near, radius, chains, categories, groups, limit })
+        const response = await Search.searchPlaces({ near, radius, chains, categories, groups, limit });
         const validateResponse = getResponseWithDebug(options.debug, placesResponse, placesResponse);
         expect(response).toEqual(validateResponse);
       });
@@ -82,9 +85,12 @@ describe('Search', () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         jest.spyOn(Http, 'request');
 
+        let err;
         try {
           await Search.searchGeofences({});
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -108,7 +114,7 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.searchGeofences({ near, radius, tags, metadata, limit })
+        const response = await Search.searchGeofences({ near, radius, tags, metadata, limit });
         const validateResponse = getResponseWithDebug(options.debug, geofencesResponse, geofencesResponse);
 
         expect(response).toEqual(validateResponse);
@@ -122,10 +128,22 @@ describe('Search', () => {
         mockRequest(200, autocompleteResponse);
         jest.spyOn(Http, 'request');
 
-        const response = await Search.autocomplete({ query })
+        const response = await Search.autocomplete({ query });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: undefined, limit: undefined, layers: undefined, country: undefined, countryCode: undefined, expandUnits: undefined } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: undefined,
+            limit: undefined,
+            layers: undefined,
+            country: undefined,
+            countryCode: undefined,
+            expandUnits: undefined,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
     });
@@ -137,10 +155,22 @@ describe('Search', () => {
 
         const near = { latitude, longitude };
 
-        const response = await Search.autocomplete({ near, query, limit, layers, countryCode })
+        const response = await Search.autocomplete({ near, query, limit, layers, countryCode });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['address'], countryCode, country: undefined, expandUnits: undefined } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: `${latitude},${longitude}`,
+            limit: 50,
+            layers: ['address'],
+            countryCode,
+            country: undefined,
+            expandUnits: undefined,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
 
@@ -151,10 +181,22 @@ describe('Search', () => {
         const near = { latitude, longitude };
         const expandUnits = true;
 
-        const response = await Search.autocomplete({ near, query, limit, layers, countryCode, expandUnits })
+        const response = await Search.autocomplete({ near, query, limit, layers, countryCode, expandUnits });
         const validateResponse = getResponseWithDebug(options.debug, autocompleteResponse, autocompleteResponse);
 
-        expect(Http.request).toHaveBeenCalledWith({ method: 'GET', path: 'search/autocomplete', data: { query: 'mock-query', near: `${latitude},${longitude}`, limit: 50, layers: ['address'], countryCode, country: undefined, expandUnits: true } });
+        expect(Http.request).toHaveBeenCalledWith({
+          method: 'GET',
+          path: 'search/autocomplete',
+          data: {
+            query: 'mock-query',
+            near: `${latitude},${longitude}`,
+            limit: 50,
+            layers: ['address'],
+            countryCode,
+            country: undefined,
+            expandUnits: true,
+          },
+        });
         expect(response).toEqual(validateResponse);
       });
     });

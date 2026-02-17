@@ -1,5 +1,5 @@
-import Storage from '../src/storage';
 import Device from '../src/device';
+import Storage from '../src/storage';
 
 describe('Device', () => {
   afterEach(() => {
@@ -20,8 +20,8 @@ describe('Device', () => {
     });
 
     describe('deviceId has already been set', () => {
-      const deviceId = "abc-123";
-      
+      const deviceId = 'abc-123';
+
       it('should return the deviceId stored saved in the storage', () => {
         jest.spyOn(Storage, 'getItem').mockReturnValue(deviceId);
         expect(Device.getDeviceId()).toEqual(deviceId);

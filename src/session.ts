@@ -7,9 +7,14 @@ const isValid = (sessionId: string): boolean => {
   const session = Number.parseInt(sessionId);
   const diff = Math.abs(now - session);
   return diff < SESSION_TIMEOUT_SECS;
-}
+};
 
+/** session ID manager with a 5-minute timeout */
 class Session {
+  /**
+   * get the current session ID, creating a new one if expired
+   * @returns unix timestamp string used as session ID
+   */
   static getSessionId() {
     const sessionId = Storage.getItem(Storage.SESSION_ID);
 

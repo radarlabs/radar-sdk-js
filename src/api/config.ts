@@ -1,27 +1,37 @@
-import Config from '../config';
 import Device from '../device';
 import Http from '../http';
 import Logger from '../logger';
-import Session from '../session';
 import Navigator from '../navigator';
+import Session from '../session';
 
-import type { RadarTrackParams } from '../types';
+import type { LocationAuthorization, RadarConfigResponse, RadarTrackParams } from '../types';
 
+/** options for customizing the config request (e.g. host, headers) */
+interface ConfigRequestOptions {
+  /** override the API host */
+  host?: string;
+  /** additional headers to include in the request */
+  headers?: Record<string, string>;
+}
+
+/** @internal SDK configuration API for fetching remote config */
 class ConfigAPI {
-  public static async getConfig(params: RadarTrackParams = {}) {
-    const options = Config.get();
-
-    if (options.version != 'v1') {
-      Logger.info('Skipping /config call.');
-      return;
-    }
-
+  /**
+   * fetch remote SDK configuration from the Radar API. Generic so plugins can extend the response shape.
+   *
+   * @param params - optional tracking params for device/session identification
+   * @param options - optional request overrides (host, headers)
+   */
+  public static async getConfig<T extends RadarConfigResponse = RadarConfigResponse>(
+    params: RadarTrackParams = {},
+    options: ConfigRequestOptions = {},
+  ): Promise<T> {
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
 
     // location authorization
-    let locationAuthorization;
+    let locationAuthorization: LocationAuthorization | undefined;
     try {
       locationAuthorization = await Navigator.getPermissionStatus();
     } catch (err: any) {
@@ -35,16 +45,13 @@ class ConfigAPI {
       locationAuthorization,
     };
 
-    try {
-      await Http.request({
-        method: 'GET',
-        path: 'config',
-        data,
-      });
-
-    } catch (err: any) {
-      Logger.warn(`Error calling /config: ${err.message}`);
-    }
+    return Http.request<T>({
+      method: 'GET',
+      path: 'config',
+      data,
+      host: options.host,
+      headers: options.headers,
+    });
   }
 }
 

@@ -1,5 +1,5 @@
-import Storage from '../src/storage';
 import Session from '../src/session';
+import Storage from '../src/storage';
 
 describe('Session', () => {
   afterEach(() => {
@@ -19,7 +19,7 @@ describe('Session', () => {
   describe('session exists', () => {
     describe('session is less than 5 minutes old', () => {
       it('should not create a new session', () => {
-        const validSessionTS = (Date.now() / 1000);
+        const validSessionTS = Date.now() / 1000;
         jest.spyOn(Storage, 'getItem').mockReturnValue(validSessionTS.toString());
         jest.spyOn(Storage, 'setItem');
 
@@ -31,7 +31,7 @@ describe('Session', () => {
 
     describe('session is more than 5 minutes old', () => {
       it('should create a new session', () => {
-        const expiredSessionTS = ((Date.now() / 1000) - 600); // 10 mins old
+        const expiredSessionTS = Date.now() / 1000 - 600; // 10 mins old
         jest.spyOn(Storage, 'getItem').mockReturnValue(expiredSessionTS.toString());
         jest.spyOn(Storage, 'setItem');
 

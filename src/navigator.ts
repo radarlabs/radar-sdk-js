@@ -1,7 +1,7 @@
 import Config from './config';
+import { RadarLocationError, RadarPermissionsError } from './errors';
 import Logger from './logger';
 import Storage from './storage';
-import { RadarLocationError, RadarPermissionsError } from './errors';
 
 import type { LocationAuthorization, NavigatorPosition } from './types';
 
@@ -16,11 +16,17 @@ const DEFAULT_POSITION_OPTIONS: PositionOptions = {
 };
 
 // set "enableHighAccuracy" for navigator only when desiredAccuracy is "high"
-const useHighAccuracy = (desiredAccuracy?: string) => (
-  Boolean(desiredAccuracy === 'high')
-);
+const useHighAccuracy = (desiredAccuracy?: string) => Boolean(desiredAccuracy === 'high');
 
+/** browser geolocation wrapper with caching and permission checks */
 class Navigator {
+  /**
+   * get the device's current position via the browser geolocation API
+   * @param overrides - optional accuracy overrides
+   * @returns device coordinates with accuracy
+   * @throws {RadarLocationError} if geolocation is unavailable or times out
+   * @throws {RadarPermissionsError} if location permissions are denied
+   */
   public static async getCurrentPosition(overrides: PositionOptionOverrides = {}): Promise<NavigatorPosition> {
     return new Promise((resolve, reject) => {
       const options = Config.get();
@@ -42,7 +48,7 @@ class Navigator {
               }
             }
           }
-        } catch (e) {
+        } catch {
           Logger.warn('could not load cached location.');
         }
       }
@@ -79,7 +85,7 @@ class Navigator {
           if (options.cacheLocationMinutes) {
             const cacheLocationMinutes = Number.parseFloat(options.cacheLocationMinutes as any);
             const updatedAt = Date.now();
-            const expiresAt = updatedAt + (cacheLocationMinutes * 60 * 1000); // convert to ms
+            const expiresAt = updatedAt + cacheLocationMinutes * 60 * 1000; // convert to ms
 
             const lastLocation = { latitude, longitude, accuracy, updatedAt, expiresAt };
             Storage.setItem(Storage.CACHED_LOCATION, JSON.stringify(lastLocation));
@@ -87,7 +93,8 @@ class Navigator {
 
           return resolve({ latitude, longitude, accuracy });
         },
-        (err: GeolocationPositionError) => { // location call failed or user did not grant permission
+        (err: GeolocationPositionError) => {
+          // location call failed or user did not grant permission
           if (err && err.code === 1) {
             // https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
             // code 1 means location permissions denied
@@ -101,6 +108,10 @@ class Navigator {
     });
   }
 
+  /**
+   * query the current geolocation permission status
+   * @returns the current location authorization state
+   */
   public static async getPermissionStatus(): Promise<LocationAuthorization> {
     return new Promise((resolve) => {
       let locationAuthorization: LocationAuthorization = 'NOT_DETERMINED';
@@ -109,13 +120,13 @@ class Navigator {
         return resolve(locationAuthorization);
       }
 
-      navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
-        switch(permissionsStatus.state) {
+      void navigator.permissions.query({ name: 'geolocation' }).then((permissionsStatus) => {
+        switch (permissionsStatus.state) {
           case 'granted':
-            locationAuthorization = 'GRANTED_FOREGROUND'
+            locationAuthorization = 'GRANTED_FOREGROUND';
             break;
           case 'denied':
-            locationAuthorization = 'DENIED'
+            locationAuthorization = 'DENIED';
             break;
           case 'prompt':
             locationAuthorization = 'NOT_DETERMINED';
@@ -129,7 +140,8 @@ class Navigator {
     });
   }
 
-  public static online(): Boolean {
+  /** check whether the browser reports being online */
+  public static online(): boolean {
     return navigator && navigator.onLine;
   }
 }

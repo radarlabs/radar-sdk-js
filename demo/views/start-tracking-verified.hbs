@@ -1,0 +1,238 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Start tracking verified</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
+  </div>
+
+  <p>Use the Radar Verify app to continuously verify the user's location.</p>
+
+  <div class="mt-5 mb-3 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-3 form-row">
+    <label for="interval" class="col-form-label" style="width: 128px;">Interval (seconds)</label>
+    <div>
+      <input type="number" class="form-control" id="interval" value="20" style="width: 250px;">
+    </div>
+  </div>
+  <div class="mb-4 form-row">
+    <label for="skip-verify-app" class="col-form-label" style="width: 128px;">Skip Verify app</label>
+    <div>
+      <select id="skip-verify-app" class="form-select" style="width: 250px;">
+        <option value="false" selected>false</option>
+        <option value="true">true</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button id="start-tracking-verified" type="button" class="btn btn-primary" disabled>Start tracking verified</button>
+    <button id="get-verified-location-token" type="button" class="btn btn-secondary" disabled>Get verified location token</button>
+    <button id="stop-tracking-verified" type="button" class="btn btn-danger" disabled>Stop tracking verified</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div id="status-message" class="mt-4" style="display: none;">
+    <div class="alert alert-info" role="alert">
+      <span id="status-text"></span>
+    </div>
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Location</h6>
+    <div class="mt-2">
+      <pre><code id="location" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">User</h6>
+    <div class="mt-2">
+      <pre><code id="user" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Events</h6>
+    <div class="mt-2">
+      <pre><code id="events" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-4">Token</h6>
+    <div class="mt-2">
+      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Expires at</h6>
+    <div class="mt-2">
+      <pre><code id="expires-at" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Passed</h6>
+    <div class="mt-2">
+      <pre><code id="passed" class="code-sample language-json"></code></pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+    &lt;script src="https://js.radar.com/v{{sdk_version}}/radar-core-fraud.min.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;script&gt;
+      Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+      // Listen for token updates
+      Radar.onTokenUpdated((token) =&gt; {
+        console.log('Token updated:', token);
+      });
+
+      // Start tracking
+      Radar.startTrackingVerified({ interval: 20 });
+
+      // Get current token
+      Radar.getVerifiedLocationToken()
+        .then((token) =&gt; {
+          console.log('Current token:', token);
+        });
+
+      // Stop tracking when done
+      // Radar.stopTrackingVerified();
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      $('#start-tracking-verified').prop('disabled', false);
+      $('#get-verified-location-token').prop('disabled', false);
+      $('#stop-tracking-verified').prop('disabled', false);
+    }
+  });
+
+  let isTracking = false;
+  let countdownInterval = null;
+
+  function showStatus(message) {
+    $('#status-text').html(message);
+    $('#status-message').show();
+  }
+
+  function hideStatus() {
+    $('#status-message').hide();
+  }
+
+  function startCountdown(expiresIn) {
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+    }
+
+    // Match SDK logic: min(expiresIn, interval) - 10, with minimum of 10
+    const interval = parseInt($('#interval').val(), 10) || 20;
+    let nextRefresh = Math.min(expiresIn, interval) - 10;
+    if (nextRefresh < 10) {
+      nextRefresh = 10;
+    }
+
+    let secondsRemaining = Math.floor(nextRefresh);
+
+    function updateCountdown() {
+      if (!isTracking) {
+        return;
+      }
+      if (secondsRemaining <= 1) {
+        showStatus('Requesting next token...');
+        return;
+      }
+      showStatus('Requesting next token in ' + secondsRemaining + ' seconds...');
+      secondsRemaining--;
+    }
+
+    updateCountdown();
+    countdownInterval = setInterval(updateCountdown, 1000);
+  }
+
+  function updateDisplay(result) {
+    const { location, user, events, token, expiresAt, expiresIn, passed } = result;
+    console.log('TOKEN UPDATE', { location, user, events, token, expiresAt, expiresIn, passed });
+
+    $('#loader').hide();
+    $('#response-details').show();
+    $('#location').html(JSON.stringify(location, null, 2));
+    $('#user').html(JSON.stringify(user, null, 2));
+    $('#events').html(JSON.stringify(events, null, 2));
+    $('#token').html(token);
+    $('#expires-at').html(expiresAt);
+    $('#passed').html(passed ? 'true' : 'false');
+    hljs.highlightAll();
+
+    if (isTracking && expiresIn) {
+      startCountdown(expiresIn);
+    }
+  }
+
+  $('#start-tracking-verified').click(() => {
+    $('#error-alert').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    const interval = parseInt($('#interval').val(), 10) || 20;
+    const skipVerifyApp = $('#skip-verify-app').val() === 'true';
+
+    // Set up token callback
+    Radar.onTokenUpdated((result) => {
+      updateDisplay(result);
+    });
+
+    $('#loader').show();
+    showStatus('Verified tracking started.');
+    Radar.startTrackingVerified({ interval, skipVerifyApp });
+    isTracking = true;
+  });
+
+  $('#get-verified-location-token').click(() => {
+    $('#error-alert').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true });
+
+    $('#loader').show();
+
+    const skipVerifyApp = $('#skip-verify-app').val() === 'true';
+
+    Radar.getVerifiedLocationToken({ skipVerifyApp })
+      .then((result) => {
+        $('#loader').hide();
+        updateDisplay(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
+  $('#stop-tracking-verified').click(() => {
+    Radar.stopTrackingVerified();
+    isTracking = false;
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+    showStatus('Verified tracking stopped.');
+  });
+
+</script>

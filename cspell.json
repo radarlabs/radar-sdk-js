@@ -4,10 +4,7 @@
   "showSuggestions": true,
   "unique": true,
   "silent": true,
-  "ignorePaths": [
-    "**/docs/places/*",
-    "**/docs/regions/*"
-  ],
+  "ignorePaths": ["**/docs/places/*", "**/docs/regions/*"],
   "ignoreWords": [
     "androidx",
     "appboy",
@@ -73,11 +70,9 @@
     "xcworkspace",
     "yourapp",
     "lookback",
-    "jailbroken"
+    "jailbroken",
+    "subclassing",
+    "maplibregl"
   ],
-  "ignoreRegExpList": [
-    "/^\\s*```[\\s\\S]*?^\\s*```/gm",
-    "/.*enc:.*/",
-    "/.*enc6:.*/"
-  ]
+  "ignoreRegExpList": ["/^\\s*```[\\s\\S]*?^\\s*```/gm", "/.*enc:.*/", "/.*enc6:.*/"]
 }

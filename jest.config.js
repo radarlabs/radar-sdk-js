@@ -2,10 +2,11 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/test/**/*.test.ts'],
-  setupFiles: [
-    './test/mock-data/globals.js',
-  ],
+  setupFilesAfterEnv: ['./test/mock-data/globals.ts'],
   moduleNameMapper: {
-    "\\.css$": "<rootDir>/test/mock-data/styles.js"
+    '\\.css$': '<rootDir>/test/mock-data/styles.js',
+  },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
 };

@@ -1,0 +1,22 @@
+#radar-map-logo {
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+  width: 80px;
+  height: 38px;
+}
+
+#radar-map-logo img {
+  width: 80px;
+  height: 38px;
+}
+
+.maplibregl-marker:hover {
+  cursor: pointer;
+}
+.maplibregl-ctrl-attrib.hidden {
+  display: none !important;
+}
+.maplibregl-popup-close-button:focus-visible {
+  outline: none;
+}

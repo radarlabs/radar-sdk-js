@@ -4,7 +4,13 @@ import Navigator from '../navigator';
 
 import type { RadarContextResponse, Location } from '../types';
 
+/** @internal context API — use {@link Radar.getContext} instead */
 class ContextAPI {
+  /**
+   * get context (geofences, place, region) for a location
+   * @param location - coordinates to get context for
+   * @returns geofences, place, country, state, DMA, and postal code
+   */
   public static async getContext(location: Location): Promise<RadarContextResponse> {
     const options = Config.get();
 
@@ -15,7 +21,7 @@ class ContextAPI {
 
     const { latitude, longitude, accuracy } = location;
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarContextResponse, 'response' | 'location'>>({
       method: 'GET',
       path: 'context',
       data: {
@@ -24,16 +30,9 @@ class ContextAPI {
       },
     });
 
-    const {
-      geofences,
-      place,
-      country,
-      state,
-      dma,
-      postalCode,
-    } = response;
+    const { geofences, place, country, state, dma, postalCode } = response;
 
-    const contextRes = {
+    const contextRes: RadarContextResponse = {
       location,
       geofences,
       place,
@@ -41,7 +40,7 @@ class ContextAPI {
       state,
       dma,
       postalCode,
-    } as RadarContextResponse;
+    };
 
     if (options.debug) {
       contextRes.response = response;

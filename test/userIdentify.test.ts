@@ -41,7 +41,7 @@ describe('Test the user identification functions', () => {
       it('should set stringified metadata in local-storage', () => {
         Radar.setMetadata({ metadata: true });
         const metadata = Storage.getItem(Storage.METADATA);
-        expect(metadata).toEqual(JSON.stringify({"metadata": true}));
+        expect(metadata).toEqual(JSON.stringify({ metadata: true }));
       });
     });
     describe('metadata is not given', () => {

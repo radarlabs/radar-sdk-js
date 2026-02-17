@@ -1,19 +1,31 @@
-import Config from '../src/config';
-import Radar from '../src/index';
-import Storage from '../src/storage';
-import Navigator from '../src/navigator';
-import SDK_VERSION from '../src/version';
-
-import type { NavigatorPosition, RadarAddress, RadarAutocompleteResponse, RadarContextResponse, RadarEvent, RadarGeocodeResponse, RadarIPGeocodeResponse, RadarReverseGeocodeParams, RadarRouteResponse, RadarSearchGeofencesResponse, RadarSearchPlacesResponse, RadarTrackResponse, RadarTravelMode, RadarUser } from '../src/types';
-
-import Geocoding from '../src/api/geocoding';
+import ConfigAPI from '../src/api/config';
 import ContextAPI from '../src/api/context';
+import Geocoding from '../src/api/geocoding';
+import RoutingAPI from '../src/api/routing';
 import SearchAPI from '../src/api/search';
 import TrackAPI from '../src/api/track';
-import RoutingAPI from '../src/api/routing';
-import ConfigAPI from '../src/api/config';
-
+import Config from '../src/config';
+import Radar from '../src/index';
+import Navigator from '../src/navigator';
+import Storage from '../src/storage';
+import SDK_VERSION from '../src/version';
 import { latitude, longitude } from './common';
+
+import type {
+  NavigatorPosition,
+  RadarAddress,
+  RadarAutocompleteResponse,
+  RadarContextResponse,
+  RadarEvent,
+  RadarGeocodeResponse,
+  RadarIPGeocodeResponse,
+  RadarRouteResponse,
+  RadarSearchGeofencesResponse,
+  RadarSearchPlacesResponse,
+  RadarTrackResponse,
+  RadarTravelMode,
+  RadarUser,
+} from '../src/types';
 
 describe('Radar', () => {
   const accuracy = 5;
@@ -41,9 +53,7 @@ describe('Radar', () => {
 
   // geocoding
   const query = 'mock-query';
-  const addresses: RadarAddress[] = [
-    { geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude },
-  ];
+  const addresses: RadarAddress[] = [{ geometry: { type: 'Point', coordinates: [0, 0] }, latitude, longitude }];
 
   // routing
   const destination = {
@@ -55,20 +65,24 @@ describe('Radar', () => {
 
   describe('initialize', () => {
     beforeEach(() => {
-      (window as any).RADAR_TEST_ENV = false;
+      window.RADAR_TEST_ENV = false;
     });
 
     afterEach(() => {
-      (window as any).RADAR_TEST_ENV = true;
+      window.RADAR_TEST_ENV = true;
       jest.restoreAllMocks();
     });
 
     describe('no key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
+        let err;
         try {
           Radar.initialize('');
           throw new Error('Should not succeed.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Publishable key required in initialization.');
         }
@@ -77,10 +91,14 @@ describe('Radar', () => {
 
     describe('secret key is provided', () => {
       it('should throw RadarPublishableKeyError', () => {
+        let err;
         try {
           Radar.initialize('_my_test_sk_123');
           throw new Error('Should not succeed.');
-        } catch (err: any) {
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
           expect(err.message).toEqual('Secret keys are not allowed. Please use your Radar publishable key.');
         }
@@ -207,9 +225,12 @@ describe('Radar', () => {
     it('should propagate the err if not successful', async () => {
       navigatorStub.mockRejectedValue('ERROR_LOCATION');
 
+      let err;
       try {
         await Radar.getLocation();
-      } catch (err: any) {
+      } catch (caught: any) {
+        err = caught;
+      } finally {
         expect(err).toEqual('ERROR_LOCATION');
       }
     });
@@ -261,14 +282,14 @@ describe('Radar', () => {
       expect(response.events).toEqual(events);
     });
 
-    it('should not throw an error if no callback given', () => {
+    it('should not throw an error if no callback given', async () => {
       trackStub.mockResolvedValue({
         location: { latitude, longitude, accuracy },
         user,
         events,
       });
 
-      Radar.trackOnce();
+      void (await Radar.trackOnce());
     });
   });
 

@@ -1,0 +1,43 @@
+{
+  "name": "@radarlabs/plugin-maps",
+  "version": "5.0.0-beta.8",
+  "description": "Maps plugin for radar-sdk-js",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radarlabs/radar-sdk-js.git",
+    "directory": "packages/maps"
+  },
+  "style": "dist/radar-maps.css",
+  "files": [
+    "dist",
+    "cdn",
+    "src"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./dist/*.css": "./dist/*.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "maplibre-gl": "^5.3.0",
+    "radar-sdk-js": "file:../..",
+    "rollup-plugin-postcss": "^4.0.2"
+  },
+  "peerDependencies": {
+    "maplibre-gl": "^2.4.0 || ^3.0.0 || ^4.0.0 || ^5.0.1",
+    "radar-sdk-js": ">=5.0.0-beta.1"
+  }
+}

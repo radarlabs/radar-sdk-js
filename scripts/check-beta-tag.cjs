@@ -15,10 +15,11 @@ if (!tagVersion.includes('-beta')) {
 }
 tagVersion = tagVersion.slice(1); // remove "v"
 
-const fileVersion = fs.readFileSync('./src/version.ts')
+const fileVersion = fs
+  .readFileSync('./src/version.ts')
   .toString()
   .replace('export default', '')
-  .replaceAll('\'', '')
+  .replaceAll("'", '')
   .replace(';', '')
   .trim();
 

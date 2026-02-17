@@ -1,8 +1,4 @@
-import SDK_VERSION from './version';
 import Config from './config';
-import Logger from './logger';
-import Navigator from './navigator';
-
 import {
   RadarBadRequestError,
   RadarForbiddenError,
@@ -16,20 +12,78 @@ import {
   RadarServerError,
   RadarUnauthorizedError,
   RadarUnknownError,
-  RadarVerifyAppError,
 } from './errors';
+import Logger from './logger';
+import Navigator from './navigator';
+import SDK_VERSION from './version';
 
-export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
+/** HTTP methods supported by the SDK */
+type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
-interface HttpResponse {
-  code: number;
-  data: any;
+/** Shape of the `meta` field present in all Radar API responses */
+interface RadarApiMeta {
+  error?: string;
+  message?: string;
+  type?: string;
 }
 
-const inFlightRequests = new Map<string, XMLHttpRequest>();
+/** Base shape all Radar API JSON responses share */
+interface RadarApiResponse {
+  meta?: RadarApiMeta;
+  [key: string]: unknown;
+}
 
+/** Blob response shape returned when responseType is 'blob' */
+interface RadarBlobResponse {
+  meta?: undefined;
+  code: number;
+  data: Blob;
+}
+
+export type RadarResponse = RadarApiResponse | RadarBlobResponse;
+
+/** Request configuration for Http.request */
+interface HttpRequestOptions {
+  method: HttpMethod;
+  path: string;
+  data?: Record<string, any>;
+  host?: string;
+  version?: string;
+  headers?: Record<string, string>;
+  responseType?: 'blob' | 'json';
+  requestId?: string;
+}
+
+const inFlightRequests = new Map<string, AbortController>();
+
+/** fetch-based HTTP client for Radar API requests */
 class Http {
-  static async request({
+  /** map of host patterns to custom error factories for intercepting network errors */
+  static errorInterceptors: Map<string, (online: boolean) => Error> = new Map();
+
+  /**
+   * register a custom error factory for network errors matching a host pattern
+   * @param hostPattern - substring matched against the request host
+   * @param handler - factory that receives online status and returns an error
+   */
+  static registerErrorInterceptor(hostPattern: string, handler: (online: boolean) => Error) {
+    Http.errorInterceptors.set(hostPattern, handler);
+  }
+
+  /**
+   * send an HTTP request to the Radar API
+   * @param options - request configuration
+   * @returns parsed response body, typed as `T`
+   * @throws {RadarPublishableKeyError} if publishable key is not set
+   * @throws {RadarBadRequestError} on 400 responses
+   * @throws {RadarUnauthorizedError} on 401 responses
+   * @throws {RadarNetworkError} on network failures
+   */
+  static async request(options: HttpRequestOptions & { responseType: 'blob' }): Promise<RadarBlobResponse>;
+  static async request<T extends Record<string, any> = RadarApiResponse>(
+    options: HttpRequestOptions,
+  ): Promise<T & { meta?: RadarApiMeta }>;
+  static async request<T extends Record<string, any> = RadarApiResponse>({
     method,
     path,
     data,
@@ -38,172 +92,143 @@ class Http {
     headers = {},
     responseType,
     requestId,
-  }: {
-    method: HttpMethod;
-    path: string;
-    data?: any;
-    host?: string;
-    version?: string;
-    headers?: Record<string, string>;
-    responseType?: XMLHttpRequestResponseType;
-    requestId?: string;
-  }) {
-    return new Promise<HttpResponse>((resolve, reject) => {
-      const options = Config.get();
+  }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
+    const options = Config.get();
 
-      // check for publishableKey on request
-      const publishableKey = options.publishableKey;
-      if (!publishableKey) {
-        reject(new RadarPublishableKeyError('publishableKey not set.'));
-        return;
+    const publishableKey = options.publishableKey;
+    if (!publishableKey) {
+      throw new RadarPublishableKeyError('publishableKey not set.');
+    }
+
+    const urlHost = host || options.host;
+    const urlVersion = version || options.version;
+    let url = `${urlHost}/${urlVersion}/${path}`;
+
+    // filter out undefined values from request data
+    const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
+
+    let body: string | undefined;
+
+    if (method === 'GET') {
+      const params = new URLSearchParams(Object.entries(filtered).map(([k, v]) => [k, String(v)]));
+      const qs = params.toString();
+      if (qs) {
+        url = `${url}?${qs}`;
       }
+    } else {
+      body = JSON.stringify(filtered);
+    }
 
-      // setup request URL
-      const urlHost = host || options.host;
-      const urlVersion = version || options.version;
-      let url = `${urlHost}/${urlVersion}/${path}`;
+    // abort in-flight requests with matching requestIds
+    if (requestId) {
+      inFlightRequests.get(requestId)?.abort();
+    }
 
-      // remove undefined values from request data
-      let body: any = {};
-      Object.keys(data || {}).forEach((key) => {
-        const value = data[key];
-        if (value !== undefined) {
-          body[key] = value;
-        }
+    const abortController = new AbortController();
+
+    if (requestId) {
+      inFlightRequests.set(requestId, abortController);
+    }
+
+    const defaultHeaders: Record<string, string> = {
+      Authorization: publishableKey,
+      'Content-Type': 'application/json',
+      'X-Radar-Device-Type': 'Web',
+      'X-Radar-SDK-Version': SDK_VERSION,
+    };
+
+    let configHeaders: Record<string, string> = {};
+    if (typeof options.getRequestHeaders === 'function') {
+      configHeaders = options.getRequestHeaders();
+    }
+
+    const allHeaders: Record<string, string> = { ...defaultHeaders, ...configHeaders, ...headers };
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method,
+        headers: allHeaders,
+        body,
+        signal: abortController.signal,
       });
-
-      // convert data to querystring for GET requests
-      if (method === 'GET') {
-        const params = Object.keys(body).map((key) => (
-          `${key}=${encodeURIComponent(body[key])}`
-        ));
-        if (params.length > 0) {
-          const queryString = params.join('&');
-          url = `${url}?${queryString}`;
-        }
-        body = undefined; // dont send body for GET request
+    } catch {
+      // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
+      if (requestId && inFlightRequests.get(requestId) === abortController) {
+        inFlightRequests.delete(requestId);
       }
 
-      // check for in-flight requests with matching requestIds
-      if (requestId) {
-        const request = inFlightRequests.get(requestId);
-        if (request) {
-          request.abort(); // abort request
-        }
-      }
-
-      const xhr = new XMLHttpRequest();
-      xhr.open(method, url, true);
-
-      // save reference to request
-      if (requestId) {
-        inFlightRequests.set(requestId, xhr);
-      }
-
-      const defaultHeaders = {
-        'Authorization': publishableKey,
-        'Content-Type': 'application/json',
-        'X-Radar-Device-Type': 'Web',
-        'X-Radar-SDK-Version': SDK_VERSION,
-      };
-
-      // set custom config headers if present
-      let configHeaders: { [key: string]: string } = {};
-      if (typeof options.getRequestHeaders === 'function') {
-        configHeaders = options.getRequestHeaders();
-      }
-
-      // combines default headers with custom headers and config headers
-      const allHeaders = Object.assign(defaultHeaders, configHeaders, headers);
-
-      // set headers
-      Object.keys(allHeaders).forEach((key) => {
-        xhr.setRequestHeader(key, allHeaders[key]);
-      });
-
-      if (responseType) {
-        xhr.responseType = responseType;
-      }
-
-      xhr.onload = () => {
-        let response: any;
-
-        if (requestId) { // clear in-flight request
-          inFlightRequests.delete(requestId);
-        }
-
-        try {
-          if (xhr.responseType === 'blob') {
-            response = { code: xhr.status, data: xhr.response };
-          } else {
-            response = JSON.parse(xhr.response);
+      if (host) {
+        for (const [pattern, handler] of Http.errorInterceptors) {
+          if (host.includes(pattern)) {
+            throw handler(!!Navigator.online());
           }
-        } catch (e) {
-          return reject(new RadarServerError(response));
         }
+      }
+      throw new RadarNetworkError();
+    }
 
-        const error = response?.meta?.error;
-        if (error === 'ERROR_PERMISSIONS') {
-          return reject(new RadarPermissionsError('Location permissions not granted.'));
-        } else if (error === 'ERROR_LOCATION') {
-          return reject(new RadarLocationError('Could not determine location.'));
-        } else if (error === 'ERROR_NETWORK') {
-          return reject(new RadarNetworkError());
-        }
+    if (requestId && inFlightRequests.get(requestId) === abortController) {
+      inFlightRequests.delete(requestId);
+    }
 
-        if (xhr.status == 200) {
-          return resolve(response);
-        }
-
+    let parsed: RadarResponse | undefined;
+    try {
+      if (responseType === 'blob') {
+        parsed = { code: response.status, data: await response.blob() };
+      } else {
+        parsed = (await response.json()) as RadarApiResponse;
+      }
+    } catch (err) {
+      if (parsed) {
+        throw new RadarServerError(parsed);
+      } else {
         if (options.debug) {
           Logger.debug(`API call failed: ${url}`);
-          Logger.debug(JSON.stringify(response));
+          Logger.debug(String(err));
         }
 
-        if (xhr.status === 400) {
-          reject(new RadarBadRequestError(response));
-
-        } else if (xhr.status === 401) {
-          reject(new RadarUnauthorizedError(response));
-
-        } else if (xhr.status === 402) {
-          reject(new RadarPaymentRequiredError(response));
-
-        } else if (xhr.status === 403) {
-          reject(new RadarForbiddenError(response));
-
-        } else if (xhr.status === 404) {
-          reject(new RadarNotFoundError(response));
-
-        } else if (xhr.status === 429) {
-          reject(new RadarRateLimitError(response));
-
-        } else if (500 <= xhr.status && xhr.status < 600) {
-          reject(new RadarServerError(response));
-
-        } else {
-          reject(new RadarUnknownError(response));
-        }
+        throw new RadarUnknownError(parsed);
       }
+    }
 
-      xhr.onerror = function () {
-        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
-        } else {
-          reject(new RadarNetworkError());
-        }
+    if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
+      const error = parsed.meta?.error;
+      if (error === 'ERROR_PERMISSIONS') {
+        throw new RadarPermissionsError('Location permissions not granted.');
+      } else if (error === 'ERROR_LOCATION') {
+        throw new RadarLocationError('Could not determine location.');
+      } else if (error === 'ERROR_NETWORK') {
+        throw new RadarNetworkError();
       }
+    }
 
-      xhr.ontimeout = function () {
-        if (host && (host === 'http://localhost:52516' || host === 'https://radar-verify.com:52516')) {
-          reject(Navigator.online() ? new RadarVerifyAppError() : new RadarNetworkError());
-        } else {
-          reject(new RadarNetworkError());
-        }
-      }
+    if (response.ok) {
+      return parsed as T;
+    }
 
-      xhr.send(JSON.stringify(body));
-    });
+    if (options.debug) {
+      Logger.debug(`API call failed: ${url}`);
+      Logger.debug(JSON.stringify(parsed));
+    }
+
+    if (response.status === 400) {
+      throw new RadarBadRequestError(parsed);
+    } else if (response.status === 401) {
+      throw new RadarUnauthorizedError(parsed);
+    } else if (response.status === 402) {
+      throw new RadarPaymentRequiredError(parsed);
+    } else if (response.status === 403) {
+      throw new RadarForbiddenError(parsed);
+    } else if (response.status === 404) {
+      throw new RadarNotFoundError(parsed);
+    } else if (response.status === 429) {
+      throw new RadarRateLimitError(parsed);
+    } else if (response.status >= 500 && response.status < 600) {
+      throw new RadarServerError(parsed);
+    } else {
+      throw new RadarUnknownError(parsed);
+    }
   }
 }
 

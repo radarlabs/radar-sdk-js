@@ -1,6 +1,5 @@
 import Storage from '../src/storage';
 
-
 describe('Storage', () => {
   afterAll(() => {
     Storage.clear();
@@ -32,7 +31,6 @@ describe('Storage', () => {
   });
 
   describe('setItem', () => {
-
     afterEach(() => {
       Storage.clear();
     });
@@ -54,7 +52,7 @@ describe('Storage', () => {
       expect(Storage.getItem('hello')).toEqual('world');
       Storage.removeItem('hello');
       expect(Storage.getItem('hello')).toBeNull();
-    })
+    });
 
     it('should clear local storage', () => {
       expect(Storage.getItem('hello')).toEqual('world');

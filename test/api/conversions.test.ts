@@ -1,8 +1,9 @@
 import Radar from '../../src';
 import Conversions from '../../src/api/conversions';
 import Config from '../../src/config';
-import { RadarOptions } from '../../src/types';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarOptions } from '../../src/types';
 
 describe('Events', () => {
   const baseEventResponse = { event: {} };
@@ -10,7 +11,7 @@ describe('Events', () => {
   let options: RadarOptions = {};
 
   const name = 'opened_app';
-  const metadata = { 'source': 'organic' };
+  const metadata = { source: 'organic' };
   const conversionEventData = { name, metadata };
 
   const revenue = 10;
@@ -38,7 +39,7 @@ describe('Events', () => {
     it('should return a revenue event', async () => {
       mockRequest(200, baseEventResponse);
 
-      const response = await Conversions.logConversion(revenueConversionEventData)
+      const response = await Conversions.logConversion(revenueConversionEventData);
       const validateResponse = getResponseWithDebug(options.debug, response, baseEventResponse);
       expect(response).toEqual(validateResponse);
     });

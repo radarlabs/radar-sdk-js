@@ -1,12 +1,11 @@
-import { latitude, longitude } from '../common';
-
 import Radar from '../../src';
+import Context from '../../src/api/context';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-
-import Context from '../../src/api/context';
-import { RadarContextResponse } from '../../src/types';
+import { latitude, longitude } from '../common';
 import { mockRequest } from '../utils';
+
+import type { RadarContextResponse } from '../../src/types';
 
 describe('Context', () => {
   const contextResponse = { meta: {}, context: {} };
@@ -41,9 +40,14 @@ describe('Context', () => {
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
         mockRequest(200, contextResponse);
 
+        let err;
         try {
-          await Context.getContext({ latitude, longitude });
-        } catch (err: any) {
+          // Pass an actually-missing location value to trigger Navigator-based behavior
+          await Context.getContext({} as any);
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }

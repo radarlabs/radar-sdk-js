@@ -2,32 +2,27 @@ import Config from '../config';
 import Http from '../http';
 import Navigator from '../navigator';
 
-import type {
-  RadarDistanceParams,
-  RadarRouteResponse,
-  RadarMatrixParams,
-  RadarMatrixResponse,
-} from '../types';
+import type { RadarDistanceParams, RadarRouteResponse, RadarMatrixParams, RadarMatrixResponse } from '../types';
 
+/** @internal routing API — use Radar.distance / matrix instead */
 class RoutingAPI {
+  /**
+   * calculate travel distance and duration between two points
+   * @param params - origin, destination, modes, and units
+   * @returns routes with distance and duration per mode
+   */
   static async distance(params: RadarDistanceParams): Promise<RadarRouteResponse> {
     const options = Config.get();
 
-    let {
-      origin,
-      destination,
-      modes,
-      units,
-      geometry,
-      geometryPoints,
-      avoid,
-    } = params;
+    const { units, geometry, geometryPoints } = params;
+    let { origin, destination, modes, avoid } = params;
 
     // use browser location if "near" not provided
     if (!origin) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
       origin = `${latitude},${longitude}`;
-    } else if (typeof origin !== 'string') { // origin is "Location" object
+    } else if (typeof origin !== 'string') {
+      // origin is "Location" object
       const { latitude, longitude } = origin;
       origin = `${latitude},${longitude}`;
     }
@@ -45,7 +40,7 @@ class RoutingAPI {
       avoid = avoid.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarRouteResponse, 'response'>>({
       method: 'GET',
       path: 'route/distance',
       data: {
@@ -59,9 +54,9 @@ class RoutingAPI {
       },
     });
 
-    const distanceRes = {
+    const distanceRes: RadarRouteResponse = {
       routes: response.routes,
-    } as RadarRouteResponse;
+    };
 
     if (options.debug) {
       distanceRes.response = response;
@@ -70,26 +65,27 @@ class RoutingAPI {
     return distanceRes;
   }
 
+  /**
+   * calculate a distance matrix between multiple origins and destinations
+   * @param params - origins, destinations, mode, and units
+   * @returns matrix of distances and durations
+   */
   static async matrix(params: RadarMatrixParams): Promise<RadarMatrixResponse> {
     const options = Config.get();
 
-    let {
-      origins,
-      destinations,
-      mode,
-      units,
-      avoid,
-    } = params;
+    const { mode, units } = params;
+    let { origins, destinations, avoid } = params;
 
     // use browser location if "near" not provided
     if (!origins) {
       const { latitude, longitude } = await Navigator.getCurrentPosition();
-      let originStrings = [];
+      const originStrings = [];
       for (let i = 0; i < destinations.length; i++) {
         originStrings.push(`${latitude},${longitude}`);
       }
       origins = originStrings.join('|');
-    } else if (Array.isArray(origins)) { // origin is a list of "Location" objects
+    } else if (Array.isArray(origins)) {
+      // origin is a list of "Location" objects
       origins = origins.map((location) => `${location.latitude},${location.longitude}`).join('|');
     }
 
@@ -102,7 +98,7 @@ class RoutingAPI {
       avoid = avoid.join(',');
     }
 
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarMatrixResponse, 'response'>>({
       method: 'GET',
       path: 'route/matrix',
       data: {
@@ -114,11 +110,11 @@ class RoutingAPI {
       },
     });
 
-    const matrixRes = {
+    const matrixRes: RadarMatrixResponse = {
       origins: response.origins,
       destinations: response.destinations,
       matrix: response.matrix,
-    } as RadarMatrixResponse;
+    };
 
     if (options.debug) {
       matrixRes.response = response;

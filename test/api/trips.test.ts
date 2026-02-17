@@ -1,10 +1,9 @@
-import Http from '../../src/http';
-
-import Trips from '../../src/api/trips';
 import Radar from '../../src';
-import { RadarTripOptions } from '../../src/types';
+import Trips from '../../src/api/trips';
+import Http from '../../src/http';
 import { mockRequest } from '../utils';
-import Storage from '../../src/storage';
+
+import type { RadarTripOptions } from '../../src/types';
 
 describe('Trips', () => {
   const userId = 'user-id';
@@ -21,7 +20,6 @@ describe('Trips', () => {
   });
 
   describe('startTrip', () => {
-
     describe('called without tripOptions', () => {
       it('should include tripOptions each set to unknown', async () => {
         mockRequest(200, {});
@@ -40,7 +38,7 @@ describe('Trips', () => {
             mode: undefined,
             approachingThreshold: undefined,
             scheduledArrivalAt: undefined,
-          }
+          },
         });
       });
     });
@@ -69,7 +67,7 @@ describe('Trips', () => {
             userId,
             ...tripOptions,
             scheduledArrivalAt: scheduledArrivalAt.toJSON(),
-          }
+          },
         });
       });
     });
@@ -89,7 +87,7 @@ describe('Trips', () => {
         };
 
         mockRequest(200, {});
-        await Trips.startTrip(tripOptions)
+        await Trips.startTrip(tripOptions);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
@@ -98,7 +96,7 @@ describe('Trips', () => {
             userId,
             ...tripOptions,
             scheduledArrivalAt: scheduledArrivalAt.toJSON(),
-          }
+          },
         });
       });
     });
@@ -119,7 +117,7 @@ describe('Trips', () => {
 
         Radar.setUserId();
         mockRequest(200, {});
-        await Trips.startTrip(tripOptions)
+        await Trips.startTrip(tripOptions);
 
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
@@ -129,7 +127,7 @@ describe('Trips', () => {
             userId: null,
             ...tripOptions,
             scheduledArrivalAt: scheduledArrivalAt.toJSON(),
-          }
+          },
         });
       });
     });
@@ -151,7 +149,7 @@ describe('Trips', () => {
         };
 
         mockRequest(200, {});
-        await Trips.startTrip(tripOptions)
+        await Trips.startTrip(tripOptions);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
           method: 'POST',
@@ -159,7 +157,7 @@ describe('Trips', () => {
           data: {
             ...tripOptions,
             scheduledArrivalAt: undefined,
-          }
+          },
         });
       });
     });
@@ -184,7 +182,7 @@ describe('Trips', () => {
         };
 
         mockRequest(200, {});
-        await Trips.updateTrip(tripOptions)
+        await Trips.updateTrip(tripOptions);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
@@ -198,7 +196,7 @@ describe('Trips', () => {
             status: undefined,
             approachingThreshold: 3,
             scheduledArrivalAt: scheduledArrivalAt.toJSON(),
-          }
+          },
         });
       });
     });
@@ -220,7 +218,7 @@ describe('Trips', () => {
         const status = 'started';
 
         mockRequest(200, {});
-        await Trips.updateTrip(tripOptions, status)
+        await Trips.updateTrip(tripOptions, status);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
@@ -234,7 +232,7 @@ describe('Trips', () => {
             status: 'started',
             approachingThreshold: 3,
             scheduledArrivalAt: scheduledArrivalAt.toJSON(),
-          }
+          },
         });
       });
     });
@@ -257,7 +255,7 @@ describe('Trips', () => {
         const status = 'started';
 
         mockRequest(200, {});
-        await Trips.updateTrip(tripOptions, status)
+        await Trips.updateTrip(tripOptions, status);
         expect(Http.request).toHaveBeenCalledTimes(1);
         expect(Http.request).toHaveBeenCalledWith({
           method: 'PATCH',
@@ -266,7 +264,7 @@ describe('Trips', () => {
             ...tripOptions,
             status: 'started',
             scheduledArrivalAt: undefined,
-          }
+          },
         });
       });
     });

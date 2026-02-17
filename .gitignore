@@ -26,6 +26,9 @@ npm-debug.log
 dist/
 cdn/
 coverage/
+packages/*/dist
+packages/*/cdn
+packages/*/node_modules
 site/
 .nyc_output/
 .vscode/

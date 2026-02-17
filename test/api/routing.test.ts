@@ -1,20 +1,19 @@
-import { latitude, longitude } from '../common';
-
+import Radar from '../../src';
+import Routing from '../../src/api/routing';
+import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
-
-import Routing from '../../src/api/routing';
-import Radar from '../../src';
-import Config from '../../src/config';
-import { RadarOptions, RadarTravelMode } from '../../src/types';
+import { latitude, longitude } from '../common';
 import { getResponseWithDebug, mockRequest } from '../utils';
+
+import type { RadarOptions, RadarTravelMode } from '../../src/types';
 
 describe('Routing', () => {
   const origin = {
     latitude,
     longitude,
-    accuracy: 100
-  }
+    accuracy: 100,
+  };
 
   const destination = {
     latitude: 40.7032123,
@@ -28,13 +27,13 @@ describe('Routing', () => {
 
   const matrixMode = 'car';
   const matrixOrigin = {
-    latitude: 40.70390,
-    longitude: -73.98690,
-    accuracy: 100
+    latitude: 40.7039,
+    longitude: -73.9869,
+    accuracy: 100,
   };
   const matrixDestination = [
-    { latitude: 40.70390, longitude: -73.98690 },
-    { latitude: 40.73237, longitude: -73.94884 }
+    { latitude: 40.7039, longitude: -73.9869 },
+    { latitude: 40.73237, longitude: -73.94884 },
   ];
   const matrixResponse = { meta: {}, origins: {}, destinations: {}, matrix: {} };
 
@@ -44,7 +43,7 @@ describe('Routing', () => {
     Radar.initialize('prj_test_pk_123');
     options = Config.get();
   });
-  
+
   afterEach(() => {
     Radar.clear();
     jest.restoreAllMocks();
@@ -56,9 +55,13 @@ describe('Routing', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
-          const response = await Routing.distance({ destination, modes })
-        } catch (err: any) {
+          await Routing.distance({ destination, modes });
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -82,7 +85,7 @@ describe('Routing', () => {
         it('should return a routing response', async () => {
           mockRequest(200, routingResponse);
 
-          const response = await Routing.distance({ origin, destination, modes, units })
+          const response = await Routing.distance({ origin, destination, modes, units });
           const validateResponse = getResponseWithDebug(options.debug, routingResponse, routingResponse);
 
           expect(response).toEqual(validateResponse);
@@ -97,9 +100,13 @@ describe('Routing', () => {
         jest.spyOn(Http, 'request');
         jest.spyOn(Navigator, 'getCurrentPosition').mockRejectedValue('ERROR_PERMISSIONS');
 
+        let err;
         try {
-          const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode })
-        } catch (err: any) {
+          await Routing.matrix({ destinations: matrixDestination, mode: matrixMode });
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
           expect(err.toString()).toEqual('ERROR_PERMISSIONS');
           expect(Http.request).toHaveBeenCalledTimes(0);
         }
@@ -111,9 +118,9 @@ describe('Routing', () => {
         it('should return a routing response', async () => {
           mockRequest(200, matrixResponse);
           jest.spyOn(Navigator, 'getCurrentPosition').mockResolvedValue(matrixOrigin);
-          
-          const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode })
-          const validateReponse = getResponseWithDebug(options.debug, matrixResponse, matrixResponse)
+
+          const response = await Routing.matrix({ destinations: matrixDestination, mode: matrixMode });
+          const validateReponse = getResponseWithDebug(options.debug, matrixResponse, matrixResponse);
 
           expect(response).toEqual(validateReponse);
         });
@@ -123,8 +130,13 @@ describe('Routing', () => {
         it('should return a routing response', async () => {
           mockRequest(200, matrixResponse);
 
-          const response = await Routing.matrix({ origins: [matrixOrigin], destinations: matrixDestination, mode: matrixMode, units })
-          const validateReponse = getResponseWithDebug(options.debug, matrixResponse, matrixResponse)
+          const response = await Routing.matrix({
+            origins: [matrixOrigin],
+            destinations: matrixDestination,
+            mode: matrixMode,
+            units,
+          });
+          const validateReponse = getResponseWithDebug(options.debug, matrixResponse, matrixResponse);
 
           expect(response).toEqual(validateReponse);
         });

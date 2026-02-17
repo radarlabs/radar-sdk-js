@@ -5,7 +5,13 @@ import Storage from '../storage';
 
 import type { RadarConversionParams, RadarConversionResponse } from '../types';
 
+/** @internal conversions API — use {@link Radar.logConversion} instead */
 class ConversionsAPI {
+  /**
+   * log a conversion event
+   * @param params - conversion name, user info, and optional metadata/revenue
+   * @returns the created event
+   */
   static async logConversion(params: RadarConversionParams): Promise<RadarConversionResponse> {
     const options = Config.get();
 
@@ -20,31 +26,31 @@ class ConversionsAPI {
       metadata.revenue = params.revenue;
     }
 
-    const data: any = {
+    const createdAtValue =
+      typeof createdAt === 'string'
+        ? createdAt
+        : createdAt instanceof Date
+          ? createdAt.toISOString()
+          : new Date().toISOString();
+
+    const data = {
       name,
       userId,
       deviceId,
       installId,
       metadata,
-    }
+      createdAt: createdAtValue,
+    };
 
-    if (typeof createdAt === 'string') {
-      data.createdAt = createdAt;
-    } else if (createdAt instanceof Date) {
-      data.createdAt = createdAt.toISOString();
-    } else {
-      data.createdAt = (new Date()).toISOString();
-    }
-
-    const response: any = await Http.request({
+    const response = await Http.request<Omit<RadarConversionResponse, 'response'>>({
       method: 'POST',
       path: 'events',
       data,
     });
 
-    const conversionRes = {
+    const conversionRes: RadarConversionResponse = {
       event: response.event,
-    } as RadarConversionResponse;
+    };
 
     if (options.debug) {
       conversionRes.response = response;

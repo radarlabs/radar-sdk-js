@@ -1,16 +1,101 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  install:
     docker:
-      - image: cimg/node:16.15
+      - image: cimg/node:24.13.1
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - npm-deps-{{ checksum "package-lock.json" }}
       - run:
-          name: Install Dependencies
+          name: Install dependencies
           command: npm ci
+      - save_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  typecheck:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Run Tests
+          name: Typecheck
+          command: npm run typecheck
+
+  build:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build all packages
+          command: npm run build:all
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+            - packages/maps/dist
+            - packages/autocomplete/dist
+
+  fmt:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Format check
+          command: npm run fmt:check
+
+  lint:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Lint
+          command: npm run lint
+
+  test:
+    docker:
+      - image: cimg/node:24.13.1
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run tests
           command: npm run test
       - store_artifacts:
           path: coverage
-          prefix: coverage
+          destination: coverage
+
+workflows:
+  ci:
+    jobs:
+      - install
+      - build:
+          requires:
+            - install
+      - fmt:
+          requires:
+            - install
+      - test:
+          requires:
+            - install
+      - lint:
+          requires:
+            - build
+      - typecheck:
+          requires:
+            - build

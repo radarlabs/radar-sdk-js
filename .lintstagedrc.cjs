@@ -1,6 +1,5 @@
-const path = require('path')
-
 module.exports = {
+  '*.{ts,tsx,js,jsx,cjs,mjs,css,json,md}': (filenames) => [`oxfmt --write ${filenames.join(' ')}`, 'npm run lint'],
   '*.md': [
     (filenames) => {
       if (filenames.length === 0) {
@@ -12,4 +11,4 @@ module.exports = {
       return [`cspell ${fileNames} -c cspell.json`];
     },
   ],
-}
+};
