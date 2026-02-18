@@ -119,7 +119,7 @@ Each plugin tracks its version in `packages/<name>/package.json` and `packages/<
 
 ```bash
 npm run bump-plugin-version maps                  # increment minor
-npm run bump-plugin-version maps 1.0.0-beta.1     # explicit version
+npm run bump-plugin-version maps 1.0.0     # explicit version
 npm run bump-plugin-version autocomplete 1.0.0-beta.1
 ```
 
@@ -135,7 +135,7 @@ New releases are managed via [GitHub Releases](https://github.com/radarlabs/rada
 - Deploys CDN script tags
 - Builds GitHub Pages for the demo site
 
-Plugins have their own release workflows triggered by tags prefixed with the plugin name (for example, `maps-v5.0.0-beta.4`, `autocomplete-v5.0.0-beta.4`).
+Plugins have their own release workflows triggered by tags prefixed with the plugin name (for example, `maps-v1.0.0`, `autocomplete-v1.0.0`).
 
 > **Note:** All release versions should be prefixed with `v` (for example, `v5.0.0`).
 
