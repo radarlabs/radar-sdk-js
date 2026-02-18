@@ -36,6 +36,14 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   markerColor?: string;
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
+  /** allow result text to wrap (default false: single line with ellipsis) */
+  wrapResults?: boolean;
+  /** optional class name(s) added to each result row for custom styling */
+  resultItemClassName?: string;
+  /** optional inline styles applied to each result row (e.g. { color: '#333' }) */
+  resultItemStyle?: Record<string, string>;
+  /** margin between marker icon and label (CSS value, e.g. '16px' or 12); default 16px */
+  markerMarginRight?: string | number;
 }
 
 /** resolved configuration with required defaults */

@@ -121,42 +121,50 @@
   transform: scale(0);
 }
 
+/* Result item styling hooks – override via CSS variables on .radar-autocomplete-wrapper */
 .radar-autocomplete-results-item {
   display: flex;
-  align-items: center;
-  color: var(--radar-gray6);
-  padding: 8px 16px;
-  text-align: left;
-  font-size: 14px;
-  line-height: 24px;
+  align-items: var(--radar-autocomplete-result-align-items, center);
+  color: var(--radar-autocomplete-result-color, var(--radar-gray6));
+  padding: var(--radar-autocomplete-result-padding, 8px 16px);
+  text-align: var(--radar-autocomplete-result-text-align, left);
+  font-size: var(--radar-autocomplete-result-font-size, 14px);
+  line-height: var(--radar-autocomplete-result-line-height, 24px);
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: var(--radar-autocomplete-result-white-space, nowrap);
+  overflow: var(--radar-autocomplete-result-overflow, hidden);
+  text-overflow: var(--radar-autocomplete-result-text-overflow, ellipsis);
   transition: all 0.2s ease;
 }
 
+/* When .radar-autocomplete-results-list--wrap is set, allow wrapping */
+.radar-autocomplete-results-list--wrap .radar-autocomplete-results-item {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .radar-autocomplete-results-item b {
-  color: var(--radar-gray8);
+  color: var(--radar-autocomplete-result-label-color, var(--radar-gray8));
   font-weight: 600;
   margin-right: 8px;
 }
 
 .radar-autocomplete-results-marker {
-  margin-right: 16px;
+  margin-right: var(--radar-autocomplete-marker-margin-right, 16px);
 }
 
 .radar-autocomplete-results-item:hover {
   cursor: pointer;
-  background-color: var(--radar-gray1);
+  background-color: var(--radar-autocomplete-result-hover-bg, var(--radar-gray1));
 }
 
 .radar-autocomplete-results-item[aria-selected='true'] {
-  background-color: var(--radar-gray2);
+  background-color: var(--radar-autocomplete-result-selected-bg, var(--radar-gray2));
 }
 
 .radar-autocomplete-results-item-selected {
-  background-color: var(--radar-gray2);
+  background-color: var(--radar-autocomplete-result-selected-bg, var(--radar-gray2));
 }
 
 .radar-powered {

@@ -75,30 +75,34 @@ creating a new one.
 
 ### Options
 
-| Option              | Type                    | Default            | Description                               |
-| ------------------- | ----------------------- | ------------------ | ----------------------------------------- |
-| `container`         | `string \| HTMLElement` | `'autocomplete'`   | Container element or ID                   |
-| `onSelection`       | `(result) => void`      | —                  | Called when the user selects a result     |
-| `onResults`         | `(results) => void`     | —                  | Called after results are fetched          |
-| `onRequest`         | `(params) => void`      | —                  | Called before each API request            |
-| `onError`           | `(error) => void`       | —                  | Called on fetch errors                    |
-| `placeholder`       | `string`                | `'Search address'` | Input placeholder text                    |
-| `minCharacters`     | `number`                | `3`                | Minimum characters before searching       |
-| `debounceMS`        | `number`                | `200`              | Debounce delay in milliseconds            |
-| `limit`             | `number`                | `8`                | Maximum number of results                 |
-| `responsive`        | `boolean`               | `true`             | Use 100% width (with optional `maxWidth`) |
-| `width`             | `string \| number`      | `400`              | Fixed width, or max-width if responsive   |
-| `maxHeight`         | `string \| number`      | —                  | Max height for the results dropdown       |
-| `disabled`          | `boolean`               | `false`            | Disable the input                         |
-| `showMarkers`       | `boolean`               | `true`             | Show marker icons next to results         |
-| `markerColor`       | `string`                | `'#ACBDC8'`        | Color of result marker icons              |
-| `hideResultsOnBlur` | `boolean`               | `true`             | Close results when input loses focus      |
-| `near`              | `Location \| string`    | —                  | Bias results near a location              |
-| `layers`            | `string[]`              | —                  | Filter by geocode layers                  |
-| `countryCode`       | `string`                | —                  | Filter results by country                 |
-| `lang`              | `string`                | —                  | Language for results                      |
-| `postalCode`        | `string`                | —                  | Filter results by postal code             |
-| `mailable`          | `boolean`               | —                  | Only return mailable addresses            |
+| Option                | Type                     | Default            | Description                                                    |
+| --------------------- | ------------------------ | ------------------ | -------------------------------------------------------------- |
+| `container`           | `string \| HTMLElement`  | `'autocomplete'`   | Container element or ID                                        |
+| `onSelection`         | `(result) => void`       | —                  | Called when the user selects a result                          |
+| `onResults`           | `(results) => void`      | —                  | Called after results are fetched                               |
+| `onRequest`           | `(params) => void`       | —                  | Called before each API request                                 |
+| `onError`             | `(error) => void`        | —                  | Called on fetch errors                                         |
+| `placeholder`         | `string`                 | `'Search address'` | Input placeholder text                                         |
+| `minCharacters`       | `number`                 | `3`                | Minimum characters before searching                            |
+| `debounceMS`          | `number`                 | `200`              | Debounce delay in milliseconds                                 |
+| `limit`               | `number`                 | `8`                | Maximum number of results                                      |
+| `responsive`          | `boolean`                | `true`             | Use 100% width (with optional `maxWidth`)                      |
+| `width`               | `string \| number`       | `400`              | Fixed width, or max-width if responsive                        |
+| `maxHeight`           | `string \| number`       | —                  | Max height for the results dropdown                            |
+| `disabled`            | `boolean`                | `false`            | Disable the input                                              |
+| `showMarkers`         | `boolean`                | `true`             | Show marker icons next to results                              |
+| `markerColor`         | `string`                 | `'#ACBDC8'`        | Color of result marker icons                                   |
+| `hideResultsOnBlur`   | `boolean`                | `true`             | Close results when input loses focus                           |
+| `wrapResults`         | `boolean`                | `false`            | Allow result text to wrap (default: single line with ellipsis) |
+| `resultItemClassName` | `string`                 | —                  | Optional class name(s) added to each result row                |
+| `resultItemStyle`     | `Record<string, string>` | —                  | Optional inline styles for each result row                     |
+| `markerMarginRight`   | `string \| number`       | `16px`             | Margin between marker icon and label                           |
+| `near`                | `Location \| string`     | —                  | Bias results near a location                                   |
+| `layers`              | `string[]`               | —                  | Filter by geocode layers                                       |
+| `countryCode`         | `string`                 | —                  | Filter results by country                                      |
+| `lang`                | `string`                 | —                  | Language for results                                           |
+| `postalCode`          | `string`                 | —                  | Filter results by postal code                                  |
+| `mailable`            | `boolean`                | —                  | Only return mailable addresses                                 |
 
 ### Chainable setters
 
@@ -117,7 +121,34 @@ autocomplete
 Available setters: `setNear()`, `setPlaceholder()`, `setDisabled()`,
 `setResponsive()`, `setWidth()`, `setMaxHeight()`, `setMinCharacters()`,
 `setLimit()`, `setLang()`, `setPostalCode()`, `setShowMarkers()`,
-`setMarkerColor()`, `setHideResultsOnBlur()`.
+`setMarkerColor()`, `setHideResultsOnBlur()`, `setWrapResults()`,
+`setResultItemClassName()`, `setResultItemStyle()`, `setMarkerMarginRight()`.
+
+### Styling result rows (no deep selectors)
+
+You can style result list items in three ways:
+
+1. **CSS variables** — Set these on the widget wrapper (e.g. `.radar-autocomplete-wrapper`) or a parent to override defaults:
+
+   | Variable                                    | Default              | Description                    |
+   | ------------------------------------------- | -------------------- | ------------------------------ |
+   | `--radar-autocomplete-result-color`         | `var(--radar-gray6)` | Result text color              |
+   | `--radar-autocomplete-result-label-color`   | `var(--radar-gray8)` | Bold label color               |
+   | `--radar-autocomplete-result-padding`       | `8px 16px`           | Row padding                    |
+   | `--radar-autocomplete-result-font-size`     | `14px`               | Font size                      |
+   | `--radar-autocomplete-result-line-height`   | `24px`               | Line height                    |
+   | `--radar-autocomplete-result-align-items`   | `center`             | Flex align-items for the row   |
+   | `--radar-autocomplete-result-text-align`    | `left`               | Text alignment                 |
+   | `--radar-autocomplete-result-white-space`   | `nowrap`             | `nowrap` or `normal` (wrap)    |
+   | `--radar-autocomplete-result-overflow`      | `hidden`             | Overflow behavior              |
+   | `--radar-autocomplete-result-text-overflow` | `ellipsis`           | Text overflow                  |
+   | `--radar-autocomplete-result-hover-bg`      | `var(--radar-gray1)` | Hover background               |
+   | `--radar-autocomplete-result-selected-bg`   | `var(--radar-gray2)` | Selected/highlight background  |
+   | `--radar-autocomplete-marker-margin-right`  | `16px`               | Space between marker and label |
+
+2. **Config options** — Use `wrapResults: true` to allow long addresses to wrap, `resultItemClassName` to add your own class(es) to each row, `resultItemStyle` for inline styles, and `markerMarginRight` to adjust marker spacing.
+
+3. **Class override** — Pass `resultItemClassName: 'my-result-row'` and style `.my-result-row` in your own CSS.
 
 ### Remove the widget
 

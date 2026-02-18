@@ -136,11 +136,23 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
+    if (this.config.wrapResults) {
+      this.resultsList.classList.add('radar-autocomplete-results-list--wrap');
+    }
     this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-live', 'polite');
     this.resultsList.setAttribute('aria-label', 'Search results');
     setHeight(this.resultsList, this.config);
+
+    if (this.config.markerMarginRight != null) {
+      this.wrapper.style.setProperty(
+        '--radar-autocomplete-marker-margin-right',
+        typeof this.config.markerMarginRight === 'number'
+          ? `${this.config.markerMarginRight}px`
+          : this.config.markerMarginRight,
+      );
+    }
 
     if (containerEL.nodeName === 'INPUT') {
       // if an <input> element is provided, use that as the inputField,
@@ -316,8 +328,17 @@ class AutocompleteUI {
     results.forEach((result, index) => {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
+      if (this.config.resultItemClassName) {
+        this.config.resultItemClassName
+          .trim()
+          .split(/\s+/)
+          .forEach((c) => li.classList.add(c));
+      }
+      if (this.config.resultItemStyle) {
+        Object.assign(li.style, this.config.resultItemStyle);
+      }
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
+      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
 
       // construct result with bolded label
       let listContent;
@@ -708,6 +729,55 @@ class AutocompleteUI {
     } else {
       this.inputField.removeEventListener('blur', this._boundClose, true);
     }
+    return this;
+  }
+
+  /**
+   * allow result text to wrap
+   * @param wrapResults - whether to wrap long addresses
+   * @returns this instance for chaining
+   */
+  public setWrapResults(wrapResults: boolean) {
+    this.config.wrapResults = wrapResults;
+    if (wrapResults) {
+      this.resultsList.classList.add('radar-autocomplete-results-list--wrap');
+    } else {
+      this.resultsList.classList.remove('radar-autocomplete-results-list--wrap');
+    }
+    return this;
+  }
+
+  /**
+   * set optional class name(s) added to each result row
+   * @param resultItemClassName - space-separated class names
+   * @returns this instance for chaining
+   */
+  public setResultItemClassName(resultItemClassName: string) {
+    this.config.resultItemClassName = resultItemClassName;
+    return this;
+  }
+
+  /**
+   * set optional inline styles for each result row
+   * @param resultItemStyle - object of CSS properties
+   * @returns this instance for chaining
+   */
+  public setResultItemStyle(resultItemStyle: Record<string, string>) {
+    this.config.resultItemStyle = resultItemStyle;
+    return this;
+  }
+
+  /**
+   * set margin between marker icon and label
+   * @param markerMarginRight - CSS value (e.g. '16px' or 12)
+   * @returns this instance for chaining
+   */
+  public setMarkerMarginRight(markerMarginRight: string | number) {
+    this.config.markerMarginRight = markerMarginRight;
+    this.wrapper.style.setProperty(
+      '--radar-autocomplete-marker-margin-right',
+      typeof markerMarginRight === 'number' ? `${markerMarginRight}px` : markerMarginRight,
+    );
     return this;
   }
 }
