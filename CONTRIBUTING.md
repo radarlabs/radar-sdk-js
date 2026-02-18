@@ -119,8 +119,8 @@ Each plugin tracks its version in `packages/<name>/package.json` and `packages/<
 
 ```bash
 npm run bump-plugin-version maps                  # increment minor
-npm run bump-plugin-version maps 5.0.0-beta.5     # explicit version
-npm run bump-plugin-version autocomplete 5.0.0-beta.5
+npm run bump-plugin-version maps 1.0.0-beta.1     # explicit version
+npm run bump-plugin-version autocomplete 1.0.0-beta.1
 ```
 
 ## Releases

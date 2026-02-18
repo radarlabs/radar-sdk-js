@@ -138,9 +138,9 @@ The autocomplete widget includes ARIA attributes for screen readers:
 
 ## Peer dependencies
 
-| Package        | Version          |
-| -------------- | ---------------- |
-| `radar-sdk-js` | `>=5.0.0-beta.1` |
+| Package        | Version  |
+| -------------- | -------- |
+| `radar-sdk-js` | `^5.0.0` |
 
 ## 📫 Support
 

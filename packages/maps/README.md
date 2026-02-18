@@ -159,7 +159,7 @@ const bounds = new Radar.ui.maplibregl.LngLatBounds(sw, ne);
 
 | Package        | Version                                      |
 | -------------- | -------------------------------------------- |
-| `radar-sdk-js` | `>=5.0.0-beta.1`                             |
+| `radar-sdk-js` | `^5.0.0`                                     |
 | `maplibre-gl`  | `^2.4.0 \|\| ^3.0.0 \|\| ^4.0.0 \|\| ^5.0.1` |
 
 ## 📫 Support
