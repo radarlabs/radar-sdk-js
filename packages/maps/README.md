@@ -45,9 +45,9 @@ Radar.initialize('prj_test_pk_...');
 Include after the core SDK:
 
 ```html
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
-<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
-<script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
+<link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
+<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
 ```
 
 The CDN bundle auto-registers with the core SDK when loaded.
@@ -159,7 +159,7 @@ const bounds = new Radar.ui.maplibregl.LngLatBounds(sw, ne);
 
 | Package        | Version                                      |
 | -------------- | -------------------------------------------- |
-| `radar-sdk-js` | `>=5.0.0-beta.1`                             |
+| `radar-sdk-js` | `^5.0.0`                                     |
 | `maplibre-gl`  | `^2.4.0 \|\| ^3.0.0 \|\| ^4.0.0 \|\| ^5.0.1` |
 
 ## 📫 Support

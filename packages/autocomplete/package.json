@@ -1,6 +1,6 @@
 {
   "name": "@radarlabs/plugin-autocomplete",
-  "version": "5.0.0-beta.8",
+  "version": "1.0.0",
   "description": "Autocomplete UI plugin for radar-sdk-js",
   "license": "ISC",
   "repository": {
@@ -36,6 +36,6 @@
     "rollup-plugin-postcss": "^4.0.2"
   },
   "peerDependencies": {
-    "radar-sdk-js": ">=5.0.0-beta.1"
+    "radar-sdk-js": "^5.0.0"
   }
 }

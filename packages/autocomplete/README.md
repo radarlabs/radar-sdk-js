@@ -45,9 +45,9 @@ Radar.initialize('prj_test_pk_...');
 Include after the core SDK:
 
 ```html
-<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
-<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
-<script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+<link href="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.css" rel="stylesheet" />
+<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.min.js"></script>
 ```
 
 The CDN bundle auto-registers with the core SDK when loaded.
@@ -138,9 +138,9 @@ The autocomplete widget includes ARIA attributes for screen readers:
 
 ## Peer dependencies
 
-| Package        | Version          |
-| -------------- | ---------------- |
-| `radar-sdk-js` | `>=5.0.0-beta.1` |
+| Package        | Version  |
+| -------------- | -------- |
+| `radar-sdk-js` | `^5.0.0` |
 
 ## 📫 Support
 

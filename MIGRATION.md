@@ -70,18 +70,18 @@ auto-register with the core SDK when loaded:
 
 ```html
 <!-- v5 -->
-<script src="https://js.radar.com/v5.0.0-beta.3/radar.min.js"></script>
+<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
 
 <!-- maps plugin (auto-registers) -->
-<link href="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.css" rel="stylesheet" />
-<script src="https://js.radar.com/maps/v5.0.0-beta.4/radar-maps.min.js"></script>
+<link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
+<script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
 
 <!-- autocomplete plugin (auto-registers) -->
-<link href="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.css" rel="stylesheet" />
-<script src="https://js.radar.com/autocomplete/v5.0.0-beta.4/radar-autocomplete.min.js"></script>
+<link href="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.css" rel="stylesheet" />
+<script src="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.min.js"></script>
 
 <!-- fraud plugin (auto-registers) -->
-<script src="https://js.radar.com/fraud/v5.0.0-beta.1/radar-fraud.min.js"></script>
+<script src="https://js.radar.com/fraud/v1.0.0/radar-fraud.min.js"></script>
 ```
 
 ### CSS imports
