@@ -36,6 +36,24 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   markerColor?: string;
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
+  /** callback invoked when the results dropdown opens */
+  onOpen?: () => void;
+  /** callback invoked when the results dropdown closes */
+  onClose?: () => void;
+  /** return false to prevent the dropdown from opening for the given results */
+  shouldOpen?: (results: RadarAutocompleteAddress[]) => boolean;
+  /** callback invoked on keydown when the dropdown is open; call event.preventDefault() to override default behavior */
+  onKeyDown?: (event: KeyboardEvent, context: RadarAutocompleteKeyDownContext) => void;
+}
+
+/** context passed to onKeyDown */
+export interface RadarAutocompleteKeyDownContext {
+  /** key from the keyboard event */
+  key: string;
+  /** current results in the dropdown */
+  results: RadarAutocompleteAddress[];
+  /** index of the currently highlighted result, or -1 if none */
+  highlightedIndex: number;
 }
 
 /** resolved configuration with required defaults */

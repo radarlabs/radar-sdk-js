@@ -75,30 +75,34 @@ creating a new one.
 
 ### Options
 
-| Option              | Type                    | Default            | Description                               |
-| ------------------- | ----------------------- | ------------------ | ----------------------------------------- |
-| `container`         | `string \| HTMLElement` | `'autocomplete'`   | Container element or ID                   |
-| `onSelection`       | `(result) => void`      | —                  | Called when the user selects a result     |
-| `onResults`         | `(results) => void`     | —                  | Called after results are fetched          |
-| `onRequest`         | `(params) => void`      | —                  | Called before each API request            |
-| `onError`           | `(error) => void`       | —                  | Called on fetch errors                    |
-| `placeholder`       | `string`                | `'Search address'` | Input placeholder text                    |
-| `minCharacters`     | `number`                | `3`                | Minimum characters before searching       |
-| `debounceMS`        | `number`                | `200`              | Debounce delay in milliseconds            |
-| `limit`             | `number`                | `8`                | Maximum number of results                 |
-| `responsive`        | `boolean`               | `true`             | Use 100% width (with optional `maxWidth`) |
-| `width`             | `string \| number`      | `400`              | Fixed width, or max-width if responsive   |
-| `maxHeight`         | `string \| number`      | —                  | Max height for the results dropdown       |
-| `disabled`          | `boolean`               | `false`            | Disable the input                         |
-| `showMarkers`       | `boolean`               | `true`             | Show marker icons next to results         |
-| `markerColor`       | `string`                | `'#ACBDC8'`        | Color of result marker icons              |
-| `hideResultsOnBlur` | `boolean`               | `true`             | Close results when input loses focus      |
-| `near`              | `Location \| string`    | —                  | Bias results near a location              |
-| `layers`            | `string[]`              | —                  | Filter by geocode layers                  |
-| `countryCode`       | `string`                | —                  | Filter results by country                 |
-| `lang`              | `string`                | —                  | Language for results                      |
-| `postalCode`        | `string`                | —                  | Filter results by postal code             |
-| `mailable`          | `boolean`               | —                  | Only return mailable addresses            |
+| Option              | Type                       | Default            | Description                                                                             |
+| ------------------- | -------------------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| `container`         | `string \| HTMLElement`    | `'autocomplete'`   | Container element or ID                                                                 |
+| `onSelection`       | `(result) => void`         | —                  | Called when the user selects a result                                                   |
+| `onResults`         | `(results) => void`        | —                  | Called after results are fetched                                                        |
+| `onRequest`         | `(params) => void`         | —                  | Called before each API request                                                          |
+| `onError`           | `(error) => void`          | —                  | Called on fetch errors                                                                  |
+| `onOpen`            | `() => void`               | —                  | Called when the results dropdown opens                                                  |
+| `onClose`           | `() => void`               | —                  | Called when the results dropdown closes                                                 |
+| `shouldOpen`        | `(results) => boolean`     | —                  | Return `false` to prevent opening for these results                                     |
+| `onKeyDown`         | `(event, context) => void` | —                  | Called on keydown when open; call `event.preventDefault()` to override default behavior |
+| `placeholder`       | `string`                   | `'Search address'` | Input placeholder text                                                                  |
+| `minCharacters`     | `number`                   | `3`                | Minimum characters before searching                                                     |
+| `debounceMS`        | `number`                   | `200`              | Debounce delay in milliseconds                                                          |
+| `limit`             | `number`                   | `8`                | Maximum number of results                                                               |
+| `responsive`        | `boolean`                  | `true`             | Use 100% width (with optional `maxWidth`)                                               |
+| `width`             | `string \| number`         | `400`              | Fixed width, or max-width if responsive                                                 |
+| `maxHeight`         | `string \| number`         | —                  | Max height for the results dropdown                                                     |
+| `disabled`          | `boolean`                  | `false`            | Disable the input                                                                       |
+| `showMarkers`       | `boolean`                  | `true`             | Show marker icons next to results                                                       |
+| `markerColor`       | `string`                   | `'#ACBDC8'`        | Color of result marker icons                                                            |
+| `hideResultsOnBlur` | `boolean`                  | `true`             | Close results when input loses focus                                                    |
+| `near`              | `Location \| string`       | —                  | Bias results near a location                                                            |
+| `layers`            | `string[]`                 | —                  | Filter by geocode layers                                                                |
+| `countryCode`       | `string`                   | —                  | Filter results by country                                                               |
+| `lang`              | `string`                   | —                  | Language for results                                                                    |
+| `postalCode`        | `string`                   | —                  | Filter results by postal code                                                           |
+| `mailable`          | `boolean`                  | —                  | Only return mailable addresses                                                          |
 
 ### Chainable setters
 
@@ -119,6 +123,18 @@ Available setters: `setNear()`, `setPlaceholder()`, `setDisabled()`,
 `setLimit()`, `setLang()`, `setPostalCode()`, `setShowMarkers()`,
 `setMarkerColor()`, `setHideResultsOnBlur()`.
 
+### Programmatic control
+
+The instance returned by `Radar.ui.autocomplete()` exposes:
+
+- **`close()`** — Close the results dropdown (e.g. from a "Clear" button or after external navigation).
+
+```js
+const autocomplete = Radar.ui.autocomplete({ container: 'autocomplete' });
+// later:
+autocomplete.close();
+```
+
 ### Remove the widget
 
 Call `remove()` to clean up the widget and its DOM elements:
@@ -134,7 +150,7 @@ The autocomplete widget includes ARIA attributes for screen readers:
 - `role="combobox"` on the input
 - `role="listbox"` on the results list
 - `aria-live="polite"` for dynamic result announcements
-- Keyboard navigation with Arrow keys, Tab, Enter, and Escape
+- Keyboard navigation: Arrow keys (move), Tab (next item or close when no results), Enter (select, does not submit form when dropdown is open), Escape (close)
 
 ## Peer dependencies
 

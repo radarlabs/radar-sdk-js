@@ -317,7 +317,7 @@ class AutocompleteUI {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
+      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
 
       // construct result with bolded label
       let listContent;
@@ -345,7 +345,12 @@ class AutocompleteUI {
       this.resultsList.appendChild(li);
     });
 
-    this.open();
+    const shouldOpen = this.config.shouldOpen;
+    if (shouldOpen === undefined || shouldOpen(results)) {
+      this.open();
+    } else {
+      this.resultsList.setAttribute('hidden', '');
+    }
 
     if (results.length > 0) {
       const link = document.createElement('a');
@@ -384,6 +389,7 @@ class AutocompleteUI {
     this.inputField.setAttribute('aria-expanded', 'true');
     this.resultsList.removeAttribute('hidden');
     this.isOpen = true;
+    this.config.onOpen?.();
   }
 
   /** close the results dropdown and clear highlighted state */
@@ -403,6 +409,7 @@ class AutocompleteUI {
         this.highlightedIndex = -1;
         this.isOpen = false;
         this.clearResultsList();
+        this.config.onClose?.();
       },
       linkClick ? 100 : 0,
     );
@@ -453,9 +460,27 @@ class AutocompleteUI {
       key = 'ArrowUp';
     }
 
+    this.config.onKeyDown?.(event, {
+      key,
+      results: this.results,
+      highlightedIndex: this.highlightedIndex,
+    });
+    if (event.defaultPrevented) {
+      return;
+    }
+
     switch (key) {
-      // Next item
+      // When there are no results, Tab should close the dropdown and move focus (no preventDefault)
       case 'Tab':
+        if (this.results.length === 0) {
+          this.close();
+          return;
+        }
+        event.preventDefault();
+        this.goTo(this.highlightedIndex + 1);
+        break;
+
+      // Next item
       case 'ArrowDown':
         event.preventDefault();
         this.goTo(this.highlightedIndex + 1);
@@ -467,13 +492,14 @@ class AutocompleteUI {
         this.goTo(this.highlightedIndex - 1);
         break;
 
-      // Select
+      // Select (prevent Enter from submitting form when dropdown is open)
       case 'Enter':
+        event.preventDefault();
         this.select(this.highlightedIndex);
         break;
 
       // Close
-      case 'Esc':
+      case 'Escape':
         this.close();
         break;
     }
