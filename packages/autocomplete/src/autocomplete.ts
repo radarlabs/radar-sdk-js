@@ -79,10 +79,10 @@ class AutocompleteUI {
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
   highlightedIndex: number;
-  debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[]>;
+  debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
   private _boundClose: () => void;
-  private _debouncePromise: Promise<RadarAutocompleteAddress[]> | null = null;
+  private _debouncePromise: Promise<RadarAutocompleteAddress[] | null> | null = null;
 
   // DOM elements
   container: HTMLElement;
@@ -99,7 +99,14 @@ class AutocompleteUI {
     // setup state
     this.isOpen = false;
     this._boundClose = this.close.bind(this);
-    this.debouncedFetchResults = this.debounce(this.fetchResults.bind(this), this.config.debounceMS);
+    this.debouncedFetchResults = this.debounce((query: string): Promise<RadarAutocompleteAddress[] | null> => {
+      if (query.length < this.config.minCharacters) {
+        // Null indicates that no results were fetched, semantically different from an empty array which indicates that no results were found
+        return Promise.resolve(null);
+      }
+
+      return this.fetchResults(query);
+    }, this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
 
@@ -203,6 +210,7 @@ class AutocompleteUI {
     if (this.config.hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this._boundClose, true);
     }
+    this.inputField.addEventListener('focus', this.open.bind(this), true);
 
     // mobile accessibility - touch support
     this.resultsList.addEventListener('touchstart', (event) => {
@@ -225,9 +233,6 @@ class AutocompleteUI {
 
     // Fetch autocomplete results and display them
     const query = this.inputField.value;
-    if (query.length < this.config.minCharacters) {
-      return;
-    }
 
     // Debounced calls return the same Promise
     const debouncePromise = this.debouncedFetchResults(query);
@@ -238,10 +243,16 @@ class AutocompleteUI {
       this._debouncePromise
         .then((results) => {
           const onResults = this.config.onResults;
-          if (onResults) {
+          // Do not report results if results were not fetched (happens when query size is smaller than config.minCharacters)
+          // mainly kept for backwards-compatibility as previous implementations also did not report results when query size is smaller than config.minCharacters
+          if (onResults && results !== null) {
             onResults(results);
           }
-          this.displayResults(results);
+          if (results === null) {
+            this.clearResultsList();
+          } else {
+            this.displayResults(results);
+          }
         })
         .catch((error: Error) => {
           Logger.warn(`Autocomplete ui error: ${error.message}`);
@@ -458,7 +469,6 @@ class AutocompleteUI {
         this.resultsList.setAttribute('hidden', '');
         this.highlightedIndex = -1;
         this.isOpen = false;
-        this.clearResultsList();
       },
       linkClick ? 100 : 0,
     );
