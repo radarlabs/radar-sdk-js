@@ -183,7 +183,7 @@
   color: var(--radar-gray6) !important;
 }
 
-.radar-powered #radar-powered-logo {
+.radar-powered .radar-powered-logo {
   display: inline-block;
   margin-left: 4px;
   width: 40px;

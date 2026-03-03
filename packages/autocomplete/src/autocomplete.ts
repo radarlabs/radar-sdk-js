@@ -12,8 +12,17 @@ const CLASSNAMES = {
   RESULTS_MARKER: 'radar-autocomplete-results-marker',
   SELECTED_ITEM: 'radar-autocomplete-results-item-selected',
   POWERED_BY_RADAR: 'radar-powered',
+  POWERED_BY_RADAR_LOGO: 'radar-powered-logo',
   NO_RESULTS: 'radar-no-results',
-};
+  SR_ONLY: 'radar-autocomplete-sr-only',
+} as const;
+
+/** `id`s for different elements */
+const IDENTIFIERS = {
+  INSTRUCTIONS: 'instructions',
+  RESULTS_LIST: 'results-list',
+  RESULTS_ITEM: 'results-item',
+} as const;
 
 const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   container: 'autocomplete',
@@ -25,6 +34,7 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   disabled: false,
   showMarkers: true,
   hideResultsOnBlur: true,
+  idPrefix: 'radar-autocomplete',
 
   // accessibility options
   ariaLabel: 'Search for an address', // Custom aria-label for input
@@ -150,7 +160,7 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
-    this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
+    this.resultsList.setAttribute('id', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_LIST}`);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-label', 'Search results');
     this.resultsList.setAttribute('hidden', '');
@@ -190,12 +200,12 @@ class AutocompleteUI {
 
     // set aria roles
     this.inputField.setAttribute('role', 'combobox');
-    this.inputField.setAttribute('aria-controls', CLASSNAMES.RESULTS_LIST);
+    this.inputField.setAttribute('aria-controls', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_LIST}`);
     this.inputField.setAttribute('aria-expanded', 'false');
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
-    this.inputField.setAttribute('aria-describedby', 'autocomplete-instructions');
+    this.inputField.setAttribute('aria-describedby', `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`);
     if (this.config.ariaLabel) {
       this.inputField.setAttribute('aria-label', this.config.ariaLabel);
     }
@@ -203,8 +213,8 @@ class AutocompleteUI {
     if (this.config.instructionsText) {
       // screen reader instructions
       const srInstructions = document.createElement('div');
-      srInstructions.id = 'autocomplete-instructions';
-      srInstructions.className = 'radar-autocomplete-sr-only'; // screen reader only class
+      srInstructions.id = `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`;
+      srInstructions.className = CLASSNAMES.SR_ONLY; // screen reader only class
       srInstructions.textContent = this.config.instructionsText;
       this.wrapper.appendChild(srInstructions);
     }
@@ -212,7 +222,7 @@ class AutocompleteUI {
     this.srAnnouncements = document.createElement('div');
     this.srAnnouncements.setAttribute('aria-live', 'polite');
     this.srAnnouncements.setAttribute('role', 'status');
-    this.srAnnouncements.className = 'radar-autocomplete-sr-only';
+    this.srAnnouncements.className = CLASSNAMES.SR_ONLY;
     this.wrapper.appendChild(this.srAnnouncements);
 
     // setup event listeners
@@ -369,7 +379,7 @@ class AutocompleteUI {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
+      li.setAttribute('id', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`);
       li.setAttribute('aria-selected', 'false'); // default state
 
       // construct result with bolded label
@@ -419,7 +429,7 @@ class AutocompleteUI {
       link.appendChild(poweredByText);
 
       const radarLogo = document.createElement('span');
-      radarLogo.id = 'radar-powered-logo';
+      radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
       radarLogo.textContent = 'Radar';
       link.appendChild(radarLogo);
 
@@ -497,7 +507,10 @@ class AutocompleteUI {
     resultItems[index]?.setAttribute('aria-selected', 'true');
 
     // set aria active descendant
-    this.inputField.setAttribute('aria-activedescendant', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
+    this.inputField.setAttribute(
+      'aria-activedescendant',
+      `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
+    );
 
     // Make sure the selected item is visible (scroll into view if needed)
     resultItems[index]?.scrollIntoView({ block: 'nearest' });
