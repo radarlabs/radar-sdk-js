@@ -470,7 +470,7 @@ class AutocompleteUI {
     this.isOpen = true;
   }
 
-  /** close the results dropdown and clear highlighted state */
+  /** close the results dropdown */
   public close(e?: FocusEvent) {
     if (!this.isOpen) {
       return;
