@@ -153,11 +153,6 @@
   background-color: var(--radar-gray1);
 }
 
-.radar-autocomplete-results-item:focus {
-  outline: 2px solid #4d90fe;
-  outline-offset: -2px;
-}
-
 .radar-autocomplete-results-item[aria-selected='true'] {
   background-color: var(--radar-gray2);
 }
