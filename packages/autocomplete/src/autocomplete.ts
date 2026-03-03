@@ -400,7 +400,7 @@ class AutocompleteUI {
         li.prepend(marker.cloneNode());
       }
 
-      // add click handler to each result, use mousedown to fire before blur event
+      // add click handler to each result
       li.addEventListener('click', () => {
         this.select(index);
       });
