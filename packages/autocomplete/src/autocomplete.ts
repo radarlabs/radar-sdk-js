@@ -405,14 +405,6 @@ class AutocompleteUI {
         this.select(index);
       });
 
-      // add keyboard event for each item for better interaction
-      li.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          this.select(index);
-        }
-      });
-
       this.resultsList.appendChild(li);
     });
 
