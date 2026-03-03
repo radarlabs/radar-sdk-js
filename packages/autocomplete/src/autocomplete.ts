@@ -91,7 +91,7 @@ class AutocompleteUI {
   highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
-  private _boundClose: () => void;
+  private _blurClose: (event: FocusEvent) => void;
   private _debouncePromise: Promise<RadarAutocompleteAddress[] | null> | null = null;
 
   // DOM elements
@@ -109,7 +109,14 @@ class AutocompleteUI {
 
     // setup state
     this.isOpen = false;
-    this._boundClose = this.close.bind(this);
+    this._blurClose = (event: FocusEvent) => {
+      // Hide on blur only if focus is no longer on input field or "powered by radar" link
+      // This prevents the dropdown from closing right away after tabbing from the input to the
+      // powered-by link when config.hideResultsOnBlur is true
+      if (event.relatedTarget !== this.inputField && event.relatedTarget !== this.poweredByLink) {
+        this.close(event);
+      }
+    };
     this.debouncedFetchResults = this.debounce((query: string): Promise<RadarAutocompleteAddress[] | null> => {
       if (query.length < this.config.minCharacters) {
         // Null indicates that no results were fetched, semantically different from an empty array which indicates that no results were found
@@ -231,7 +238,7 @@ class AutocompleteUI {
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
     if (this.config.hideResultsOnBlur) {
-      this.inputField.addEventListener('blur', this._boundClose, true);
+      this.inputField.addEventListener('blur', this._blurClose, true);
     }
     this.inputField.addEventListener('focus', this.open.bind(this), true);
 
@@ -422,6 +429,9 @@ class AutocompleteUI {
     link.href = 'https://radar.com?ref=powered_by_radar';
     link.target = '_blank';
     this.poweredByLink = link;
+    if (this.config.hideResultsOnBlur) {
+      link.addEventListener('blur', this._blurClose, true);
+    }
 
     const poweredByText = document.createElement('span');
     poweredByText.textContent = 'Powered by';
@@ -777,9 +787,11 @@ class AutocompleteUI {
   public setHideResultsOnBlur(hideResultsOnBlur: boolean) {
     this.config.hideResultsOnBlur = hideResultsOnBlur;
     if (hideResultsOnBlur) {
-      this.inputField.addEventListener('blur', this._boundClose, true);
+      this.inputField.addEventListener('blur', this._blurClose, true);
+      this.poweredByLink?.addEventListener('blur', this._blurClose, true);
     } else {
-      this.inputField.removeEventListener('blur', this._boundClose, true);
+      this.inputField.removeEventListener('blur', this._blurClose, true);
+      this.poweredByLink?.removeEventListener('blur', this._blurClose, true);
     }
     return this;
   }
