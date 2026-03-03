@@ -164,6 +164,7 @@ class AutocompleteUI {
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-label', 'Search results');
     this.resultsList.setAttribute('hidden', '');
+    this.resultsList.setAttribute('aria-hidden', 'true');
     setHeight(this.resultsList, this.config);
 
     if (containerEL.nodeName === 'INPUT') {
@@ -446,6 +447,7 @@ class AutocompleteUI {
 
     this.inputField.setAttribute('aria-expanded', 'true');
     this.resultsList.removeAttribute('hidden');
+    this.resultsList.setAttribute('aria-hidden', 'false');
     this.isOpen = true;
   }
 
@@ -463,6 +465,7 @@ class AutocompleteUI {
         this.inputField.setAttribute('aria-expanded', 'false');
         this.inputField.setAttribute('aria-activedescendant', '');
         this.resultsList.setAttribute('hidden', '');
+        this.resultsList.setAttribute('aria-hidden', 'true');
         this.highlightedIndex = -1;
         this.isOpen = false;
       },
