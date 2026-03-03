@@ -371,7 +371,6 @@ class AutocompleteUI {
       marker = document.createElement('img');
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
-      marker.setAttribute('alt', 'Location marker'); // add alt text for screen readers
       marker.setAttribute('aria-hidden', 'true'); // hide from screen readers when decorative
     }
 
