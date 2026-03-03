@@ -45,9 +45,9 @@ Radar.initialize('prj_test_pk_...');
 Include after the core SDK:
 
 ```html
-<link href="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.css" rel="stylesheet" />
+<link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
 <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
-<script src="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.min.js"></script>
+<script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
 ```
 
 The CDN bundle auto-registers with the core SDK when loaded.
