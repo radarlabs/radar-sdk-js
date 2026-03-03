@@ -562,18 +562,6 @@ class AutocompleteUI {
     }
     this.inputField.value = inputValue;
 
-    // announce selection to screen readers
-    const announcement = document.createElement('div');
-    announcement.setAttribute('role', 'status');
-    announcement.className = 'radar-autocomplete-sr-only';
-    announcement.textContent = `Selected: ${inputValue}`;
-    this.wrapper.appendChild(announcement);
-
-    // remove announcement after it's been read
-    setTimeout(() => {
-      announcement.remove();
-    }, 1000);
-
     const onSelection = this.config.onSelection;
     if (onSelection) {
       onSelection(result);
