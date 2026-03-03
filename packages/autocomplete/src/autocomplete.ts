@@ -549,7 +549,7 @@ class AutocompleteUI {
       case 'Esc':
         event.preventDefault();
         this.close();
-        setTimeout(() => this.inputField.focus(), 0); // return focus to input
+        this.inputField.focus(); // return focus to input
         break;
     }
   }
