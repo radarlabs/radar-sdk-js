@@ -467,7 +467,6 @@ class AutocompleteUI {
         this.inputField.setAttribute('aria-activedescendant', '');
         this.resultsList.setAttribute('hidden', '');
         this.resultsList.setAttribute('aria-hidden', 'true');
-        this.highlightedIndex = -1;
         this.isOpen = false;
       },
       linkClick ? 100 : 0,
