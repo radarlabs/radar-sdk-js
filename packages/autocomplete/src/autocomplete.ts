@@ -261,6 +261,7 @@ class AutocompleteUI {
           }
           if (results === null) {
             this.clearResultsList();
+            this.close();
           } else {
             this.displayResults(results);
           }
@@ -441,7 +442,7 @@ class AutocompleteUI {
 
   /** open the results dropdown */
   public open() {
-    if (this.isOpen) {
+    if (this.isOpen || this.resultsList.childNodes.length === 0) {
       return;
     }
 
