@@ -101,7 +101,7 @@ class AutocompleteUI {
   resultsWrapper: HTMLDivElement;
   resultsList: HTMLUListElement;
   wrapper: HTMLElement;
-  poweredByLink?: HTMLAnchorElement;
+  poweredByLink: HTMLAnchorElement;
   srAnnouncements: HTMLDivElement;
 
   constructor(options: Partial<RadarAutocompleteUIOptions>, ctx: RadarPluginContext) {
@@ -179,9 +179,32 @@ class AutocompleteUI {
     this.resultsWrapper.setAttribute('hidden', '');
     this.resultsWrapper.setAttribute('aria-hidden', 'true');
     setHeight(this.resultsList, this.config);
-
     this.resultsWrapper.appendChild(this.resultsList);
 
+    // powered by radar link
+    this.poweredByLink = document.createElement('a');
+    this.poweredByLink.href = 'https://radar.com?ref=powered_by_radar';
+    this.poweredByLink.target = '_blank';
+    this.poweredByLink.rel = 'noopener noreferrer';
+    if (this.config.hideResultsOnBlur) {
+      this.poweredByLink.addEventListener('blur', this._blurClose, true);
+    }
+
+    const poweredByText = document.createElement('span');
+    poweredByText.textContent = 'Powered by';
+    this.poweredByLink.appendChild(poweredByText);
+
+    const radarLogo = document.createElement('span');
+    radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
+    radarLogo.textContent = 'Radar';
+    this.poweredByLink.appendChild(radarLogo);
+
+    const poweredByContainer = document.createElement('div');
+    poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
+    poweredByContainer.appendChild(this.poweredByLink);
+    this.resultsWrapper.appendChild(poweredByContainer);
+
+    // Mount to container
     if (containerEL.nodeName === 'INPUT') {
       // if an <input> element is provided, use that as the inputField,
       // and append the resultList to it's parent container
@@ -432,29 +455,6 @@ class AutocompleteUI {
 
       this.resultsList.appendChild(noResultsText);
     }
-
-    const link = document.createElement('a');
-    link.href = 'https://radar.com?ref=powered_by_radar';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    this.poweredByLink = link;
-    if (this.config.hideResultsOnBlur) {
-      link.addEventListener('blur', this._blurClose, true);
-    }
-
-    const poweredByText = document.createElement('span');
-    poweredByText.textContent = 'Powered by';
-    link.appendChild(poweredByText);
-
-    const radarLogo = document.createElement('span');
-    radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
-    radarLogo.textContent = 'Radar';
-    link.appendChild(radarLogo);
-
-    const poweredByContainer = document.createElement('div');
-    poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
-    poweredByContainer.appendChild(link);
-    this.resultsWrapper.appendChild(poweredByContainer);
 
     this.open();
   }
@@ -798,10 +798,10 @@ class AutocompleteUI {
     this.config.hideResultsOnBlur = hideResultsOnBlur;
     if (hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this._blurClose, true);
-      this.poweredByLink?.addEventListener('blur', this._blurClose, true);
+      this.poweredByLink.addEventListener('blur', this._blurClose, true);
     } else {
       this.inputField.removeEventListener('blur', this._blurClose, true);
-      this.poweredByLink?.removeEventListener('blur', this._blurClose, true);
+      this.poweredByLink.removeEventListener('blur', this._blurClose, true);
     }
     return this;
   }
