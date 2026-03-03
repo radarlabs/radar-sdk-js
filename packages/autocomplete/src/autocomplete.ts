@@ -151,7 +151,6 @@ class AutocompleteUI {
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('role', 'listbox');
-    this.resultsList.setAttribute('aria-live', 'polite');
     this.resultsList.setAttribute('aria-label', 'Search results');
     setHeight(this.resultsList, this.config);
 
@@ -373,10 +372,8 @@ class AutocompleteUI {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
+      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
       li.setAttribute('aria-selected', 'false'); // default state
-
-      li.setAttribute('tabindex', '-1'); // make focusable but not in tab order
 
       // construct result with bolded label
       let listContent;
@@ -512,21 +509,15 @@ class AutocompleteUI {
   }
 
   public handleKeyboardNavigation(event: KeyboardEvent) {
-    let key = event.key;
+    const key = event.key;
 
     // allow event to propagate if result list is not open
     if (!this.isOpen) {
       return;
     }
 
-    // treat shift+tab as up key
-    if (key === 'Tab' && event.shiftKey) {
-      key = 'ArrowUp';
-    }
-
     switch (key) {
       // Next item
-      case 'Tab':
       case 'ArrowDown':
         event.preventDefault();
         this.goTo(this.highlightedIndex + 1);
