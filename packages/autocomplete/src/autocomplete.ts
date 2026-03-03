@@ -546,6 +546,7 @@ class AutocompleteUI {
 
       // Select
       case 'Enter':
+        event.preventDefault();
         this.select(this.highlightedIndex);
         break;
 
