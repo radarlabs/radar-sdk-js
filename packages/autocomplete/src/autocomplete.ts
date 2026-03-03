@@ -409,39 +409,39 @@ class AutocompleteUI {
       this.resultsList.appendChild(li);
     });
 
-    this.open();
-
-    if (results.length > 0) {
-      const link = document.createElement('a');
-      link.href = 'https://radar.com?ref=powered_by_radar';
-      link.target = '_blank';
-      this.poweredByLink = link;
-
-      const poweredByText = document.createElement('span');
-      poweredByText.textContent = 'Powered by';
-      link.appendChild(poweredByText);
-
-      const radarLogo = document.createElement('span');
-      radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
-      radarLogo.textContent = 'Radar';
-      link.appendChild(radarLogo);
-
-      const poweredByContainer = document.createElement('div');
-      poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
-      poweredByContainer.appendChild(link);
-      this.resultsList.appendChild(poweredByContainer);
-    } else {
+    if (results.length === 0) {
       const noResultsText = document.createElement('div');
       noResultsText.classList.add(CLASSNAMES.NO_RESULTS);
       noResultsText.textContent = 'No results';
 
       this.resultsList.appendChild(noResultsText);
     }
+
+    const link = document.createElement('a');
+    link.href = 'https://radar.com?ref=powered_by_radar';
+    link.target = '_blank';
+    this.poweredByLink = link;
+
+    const poweredByText = document.createElement('span');
+    poweredByText.textContent = 'Powered by';
+    link.appendChild(poweredByText);
+
+    const radarLogo = document.createElement('span');
+    radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
+    radarLogo.textContent = 'Radar';
+    link.appendChild(radarLogo);
+
+    const poweredByContainer = document.createElement('div');
+    poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
+    poweredByContainer.appendChild(link);
+    this.resultsList.appendChild(poweredByContainer);
+
+    this.open();
   }
 
   /** open the results dropdown */
   public open() {
-    if (this.isOpen || this.resultsList.children.length === 0) {
+    if (this.isOpen) {
       return;
     }
 
