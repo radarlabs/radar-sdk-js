@@ -28,7 +28,7 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
 
   // accessibility options
   ariaLabel: 'Search for an address', // Custom aria-label for input
-  instructionsText: 'Start typing to search for addresses', // Instructions for screen readers
+  instructionsText: 'When results appear, use up and down arrow keys to navigate and Enter to select', // Instructions for screen readers
   announceResults: true, // Announce results count to screen readers
 };
 
@@ -90,6 +90,7 @@ class AutocompleteUI {
   resultsList: HTMLElement;
   wrapper: HTMLElement;
   poweredByLink?: HTMLElement;
+  srAnnouncements: HTMLElement;
 
   constructor(options: Partial<RadarAutocompleteUIOptions>, ctx: RadarPluginContext) {
     this.ctx = ctx;
@@ -152,6 +153,7 @@ class AutocompleteUI {
     this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-label', 'Search results');
+    this.resultsList.setAttribute('hidden', '');
     setHeight(this.resultsList, this.config);
 
     if (containerEL.nodeName === 'INPUT') {
@@ -193,15 +195,25 @@ class AutocompleteUI {
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
-    this.inputField.setAttribute('aria-owns', CLASSNAMES.RESULTS_LIST);
     this.inputField.setAttribute('aria-describedby', 'autocomplete-instructions');
+    if (this.config.ariaLabel) {
+      this.inputField.setAttribute('aria-label', this.config.ariaLabel);
+    }
 
-    // screen reader instructions
-    const srInstructions = document.createElement('div');
-    srInstructions.id = 'autocomplete-instructions';
-    srInstructions.className = 'sr-only'; // screen reader only class
-    srInstructions.textContent = 'When results appear, use up and down arrow keys to navigate and Enter to select';
-    this.wrapper.appendChild(srInstructions);
+    if (this.config.instructionsText) {
+      // screen reader instructions
+      const srInstructions = document.createElement('div');
+      srInstructions.id = 'autocomplete-instructions';
+      srInstructions.className = 'sr-only'; // screen reader only class
+      srInstructions.textContent = this.config.instructionsText;
+      this.wrapper.appendChild(srInstructions);
+    }
+
+    this.srAnnouncements = document.createElement('div');
+    this.srAnnouncements.setAttribute('aria-live', 'polite');
+    this.srAnnouncements.setAttribute('role', 'status');
+    this.srAnnouncements.className = 'sr-only';
+    this.wrapper.appendChild(this.srAnnouncements);
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
@@ -343,20 +355,17 @@ class AutocompleteUI {
     this.results = results;
 
     // create status announcement for screen readers
-    const statusAnnouncement = document.createElement('div');
-    statusAnnouncement.setAttribute('role', 'status');
-    statusAnnouncement.className = 'sr-only';
-    if (results.length > 0) {
-      statusAnnouncement.textContent = `${results.length} results available. Use arrow keys to navigate.`;
-    } else {
-      statusAnnouncement.textContent = 'No results found.';
+    if (this.config.announceResults) {
+      this.srAnnouncements.textContent = '';
+      // Make screenreader re-read announcement if # of results is the same
+      setTimeout(() => {
+        if (results.length > 0) {
+          this.srAnnouncements.textContent = `${results.length} result${results.length === 1 ? '' : 's'} available. Use arrow keys to navigate.`;
+        } else {
+          this.srAnnouncements.textContent = 'No results found.';
+        }
+      }, 250);
     }
-    this.wrapper.appendChild(statusAnnouncement);
-
-    // Remove the announcement after it's been read
-    setTimeout(() => {
-      statusAnnouncement.remove();
-    }, 2000);
 
     let marker: HTMLElement;
     if (this.config.showMarkers) {
@@ -441,7 +450,7 @@ class AutocompleteUI {
 
   /** open the results dropdown */
   public open() {
-    if (this.isOpen) {
+    if (this.isOpen || this.resultsList.children.length === 0) {
       return;
     }
 
