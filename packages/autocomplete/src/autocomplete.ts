@@ -98,11 +98,11 @@ class AutocompleteUI {
   // DOM elements
   container: HTMLElement;
   inputField: HTMLInputElement;
-  resultsWrapper: HTMLElement;
-  resultsList: HTMLElement;
+  resultsWrapper: HTMLDivElement;
+  resultsList: HTMLUListElement;
   wrapper: HTMLElement;
-  poweredByLink?: HTMLElement;
-  srAnnouncements: HTMLElement;
+  poweredByLink?: HTMLAnchorElement;
+  srAnnouncements: HTMLDivElement;
 
   constructor(options: Partial<RadarAutocompleteUIOptions>, ctx: RadarPluginContext) {
     this.ctx = ctx;
