@@ -223,18 +223,6 @@ class AutocompleteUI {
     }
     this.inputField.addEventListener('focus', this.open.bind(this), true);
 
-    // mobile accessibility - touch support
-    this.resultsList.addEventListener('touchstart', (event) => {
-      const target = event.target as HTMLElement;
-      const li = target.closest('li');
-      if (li) {
-        const index = Array.from(this.resultsList.children).indexOf(li);
-        if (index !== -1) {
-          this.select(index);
-        }
-      }
-    });
-
     Logger.debug('AutocompleteUI initialized with options', this.config);
   }
 
@@ -403,7 +391,7 @@ class AutocompleteUI {
       }
 
       // add click handler to each result, use mousedown to fire before blur event
-      li.addEventListener('mousedown', () => {
+      li.addEventListener('click', () => {
         this.select(index);
       });
 
