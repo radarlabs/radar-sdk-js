@@ -436,6 +436,7 @@ class AutocompleteUI {
     const link = document.createElement('a');
     link.href = 'https://radar.com?ref=powered_by_radar';
     link.target = '_blank';
+    link.rel = 'noopener noreferrer';
     this.poweredByLink = link;
     if (this.config.hideResultsOnBlur) {
       link.addEventListener('blur', this._blurClose, true);
