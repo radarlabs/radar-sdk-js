@@ -204,7 +204,7 @@ class AutocompleteUI {
       // screen reader instructions
       const srInstructions = document.createElement('div');
       srInstructions.id = 'autocomplete-instructions';
-      srInstructions.className = 'sr-only'; // screen reader only class
+      srInstructions.className = 'radar-autocomplete-sr-only'; // screen reader only class
       srInstructions.textContent = this.config.instructionsText;
       this.wrapper.appendChild(srInstructions);
     }
@@ -212,7 +212,7 @@ class AutocompleteUI {
     this.srAnnouncements = document.createElement('div');
     this.srAnnouncements.setAttribute('aria-live', 'polite');
     this.srAnnouncements.setAttribute('role', 'status');
-    this.srAnnouncements.className = 'sr-only';
+    this.srAnnouncements.className = 'radar-autocomplete-sr-only';
     this.wrapper.appendChild(this.srAnnouncements);
 
     // setup event listeners
@@ -577,7 +577,7 @@ class AutocompleteUI {
     // announce selection to screen readers
     const announcement = document.createElement('div');
     announcement.setAttribute('role', 'status');
-    announcement.className = 'sr-only';
+    announcement.className = 'radar-autocomplete-sr-only';
     announcement.textContent = `Selected: ${inputValue}`;
     this.wrapper.appendChild(announcement);
 

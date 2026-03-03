@@ -202,7 +202,7 @@
 }
 
 /* screen reader only class for autocomplete */
-.sr-only {
+.radar-autocomplete-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
