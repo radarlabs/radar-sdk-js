@@ -205,12 +205,13 @@ class AutocompleteUI {
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
-    this.inputField.setAttribute('aria-describedby', `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`);
     if (this.config.ariaLabel) {
       this.inputField.setAttribute('aria-label', this.config.ariaLabel);
     }
 
     if (this.config.instructionsText) {
+      this.inputField.setAttribute('aria-describedby', `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`);
+
       // screen reader instructions
       const srInstructions = document.createElement('div');
       srInstructions.id = `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`;
