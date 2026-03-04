@@ -116,15 +116,20 @@ class AutocompleteUI {
       resultItems[this.highlightedIndex]?.setAttribute('aria-selected', 'false');
     }
 
-    // add class name to newly highlighted item
-    resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
-    resultItems[index]?.setAttribute('aria-selected', 'true');
+    if (index > -1) {
+      // add class name to newly highlighted item
+      resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
+      resultItems[index]?.setAttribute('aria-selected', 'true');
 
-    // set aria active descendant
-    this.inputField.setAttribute(
-      'aria-activedescendant',
-      `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
-    );
+      // set aria active descendant
+      this.inputField.setAttribute(
+        'aria-activedescendant',
+        `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
+      );
+    } else {
+      // clear aria active descendant
+      this.inputField.setAttribute('aria-activedescendant', '');
+    }
 
     this._highlightedIndex = index;
   }
