@@ -534,8 +534,25 @@ class AutocompleteUI {
   public handleKeyboardNavigation(event: KeyboardEvent) {
     const key = event.key;
 
-    // allow event to propagate if result list is not open
     if (!this.isOpen) {
+      switch (key) {
+        // If not open, open and go to first item
+        // https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/#kbd_label
+        case 'ArrowDown':
+          event.preventDefault();
+          this.open();
+          this.goTo(0);
+          break;
+
+        case 'ArrowUp':
+          // If not open, open and go to last item
+          event.preventDefault();
+          this.open();
+          this.goTo(-1);
+          break;
+      }
+
+      // Allow other events to propagate if result list is not open
       return;
     }
 
