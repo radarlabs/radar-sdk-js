@@ -467,9 +467,10 @@ class AutocompleteUI {
     });
 
     if (results.length === 0) {
-      const noResultsText = document.createElement('div');
+      const noResultsText = document.createElement('li');
       noResultsText.classList.add(CLASSNAMES.NO_RESULTS);
       noResultsText.textContent = 'No results';
+      noResultsText.setAttribute('role', 'presentation'); // Role presentation because we already announce no results separately
 
       this.resultsList.appendChild(noResultsText);
     }
