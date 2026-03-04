@@ -486,7 +486,14 @@ class AutocompleteUI {
       return;
     }
 
+    // Revert everything that was done in the close function
     this.inputField.setAttribute('aria-expanded', 'true');
+    if (this.highlightedIndex > -1) {
+      this.inputField.setAttribute(
+        'aria-activedescendant',
+        `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${this.highlightedIndex}`,
+      );
+    }
     this.resultsList.removeAttribute('hidden');
     this.resultsList.setAttribute('aria-hidden', 'false');
     this.isOpen = true;
