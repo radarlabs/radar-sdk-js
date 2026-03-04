@@ -186,6 +186,7 @@ class AutocompleteUI {
     this.poweredByLink.href = 'https://radar.com?ref=powered_by_radar';
     this.poweredByLink.target = '_blank';
     this.poweredByLink.rel = 'noopener noreferrer';
+    this.poweredByLink.setAttribute('tabindex', '-1');
     if (this.config.hideResultsOnBlur) {
       this.poweredByLink.addEventListener('blur', this._blurClose, true);
     }
@@ -202,6 +203,7 @@ class AutocompleteUI {
     const poweredByContainer = document.createElement('div');
     poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
     poweredByContainer.appendChild(this.poweredByLink);
+    poweredByContainer.setAttribute('aria-hidden', 'true');
     this.resultsWrapper.appendChild(poweredByContainer);
 
     // Mount to container
@@ -297,6 +299,7 @@ class AutocompleteUI {
           if (onResults && results !== null) {
             onResults(results);
           }
+          this.highlightedIndex = -1;
           if (results === null) {
             this.clearResultsList();
             this.close();
