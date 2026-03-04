@@ -77,8 +77,8 @@ auto-register with the core SDK when loaded:
 <script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
 
 <!-- autocomplete plugin (auto-registers) -->
-<link href="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.css" rel="stylesheet" />
-<script src="https://js.radar.com/autocomplete/v1.0.0/radar-autocomplete.min.js"></script>
+<link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
+<script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
 
 <!-- fraud plugin (auto-registers) -->
 <script src="https://js.radar.com/fraud/v1.0.0/radar-fraud.min.js"></script>

@@ -12,8 +12,17 @@ const CLASSNAMES = {
   RESULTS_MARKER: 'radar-autocomplete-results-marker',
   SELECTED_ITEM: 'radar-autocomplete-results-item-selected',
   POWERED_BY_RADAR: 'radar-powered',
+  POWERED_BY_RADAR_LOGO: 'radar-powered-logo',
   NO_RESULTS: 'radar-no-results',
-};
+  SR_ONLY: 'radar-autocomplete-sr-only',
+} as const;
+
+/** `id`s for different elements */
+const IDENTIFIERS = {
+  INSTRUCTIONS: 'instructions',
+  RESULTS_LIST: 'results-list',
+  RESULTS_ITEM: 'results-item',
+} as const;
 
 const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   container: 'autocomplete',
@@ -25,6 +34,12 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   disabled: false,
   showMarkers: true,
   hideResultsOnBlur: true,
+  idPrefix: 'radar-autocomplete',
+
+  // accessibility options
+  ariaLabel: 'Search for an address', // Custom aria-label for input
+  instructionsText: 'When results appear, use up and down arrow keys to navigate and Enter to select', // Instructions for screen readers
+  announceResults: true, // Announce results count to screen readers
 };
 
 // determine whether to use px or CSS string
@@ -60,7 +75,8 @@ const setHeight = (resultsList: HTMLElement, options: RadarAutocompleteUIOptions
 
 const getMarkerIcon = (color: string = '#ACBDC8') => {
   const fill = color.replace('#', '%23');
-  const svg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  const svg =
+    `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location marker">
     <path d="M12.5704 6.57036C12.5704 4.11632 10.6342 2.11257 8.21016 2C8.14262 2 8.06757 2 8.00003 2C7.93249 2 7.85744 2 7.7899 2C5.35838 2.11257 3.42967 4.11632 3.42967 6.57036C3.42967 6.60037 3.42967 6.6379 3.42967 6.66792C3.42967 6.69794 3.42967 6.73546 3.42967 6.76548C3.42967 9.46717 7.09196 13.3621 7.4672 13.7598C7.61729 13.9174 7.84994 14 8.00003 14C8.15012 14 8.38277 13.9174 8.53286 13.7598C8.9156 13.3621 12.5704 9.46717 12.5704 6.76548C12.5704 6.72795 12.5704 6.69794 12.5704 6.66792C12.5704 6.6379 12.5704 6.60037 12.5704 6.57036ZM7.99252 8.28893C7.04693 8.28893 6.27395 7.52345 6.27395 6.57036C6.27395 5.61726 7.03943 4.85178 7.99252 4.85178C8.94562 4.85178 9.7111 5.61726 9.7111 6.57036C9.7111 7.52345 8.94562 8.28893 7.99252 8.28893Z" fill="${fill}"/>
   </svg>`.trim();
   return `data:image/svg+xml;charset=utf-8,${svg}`;
@@ -72,18 +88,51 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
-  highlightedIndex: number;
-  debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[]>;
+  private _highlightedIndex: number;
+  debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
   private _boundClose: () => void;
-  private _debouncePromise: Promise<RadarAutocompleteAddress[]> | null = null;
+  private _debouncePromise: Promise<RadarAutocompleteAddress[] | null> | null = null;
 
   // DOM elements
   container: HTMLElement;
   inputField: HTMLInputElement;
-  resultsList: HTMLElement;
+  resultsList: HTMLUListElement;
   wrapper: HTMLElement;
-  poweredByLink?: HTMLElement;
+  poweredByLink: HTMLAnchorElement;
+  poweredByContainer: HTMLLIElement;
+  srAnnouncements: HTMLDivElement;
+
+  public get highlightedIndex(): number {
+    return this._highlightedIndex;
+  }
+
+  public set highlightedIndex(index: number) {
+    const resultItems = this.resultsList.getElementsByTagName('li');
+
+    if (this.highlightedIndex > -1) {
+      // clear class names on previously highlighted item
+      resultItems[this.highlightedIndex]?.classList.remove(CLASSNAMES.SELECTED_ITEM);
+      resultItems[this.highlightedIndex]?.setAttribute('aria-selected', 'false');
+    }
+
+    if (index > -1) {
+      // add class name to newly highlighted item
+      resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
+      resultItems[index]?.setAttribute('aria-selected', 'true');
+
+      // set aria active descendant
+      this.inputField.setAttribute(
+        'aria-activedescendant',
+        `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
+      );
+    } else {
+      // clear aria active descendant
+      this.inputField.setAttribute('aria-activedescendant', '');
+    }
+
+    this._highlightedIndex = index;
+  }
 
   constructor(options: Partial<RadarAutocompleteUIOptions>, ctx: RadarPluginContext) {
     this.ctx = ctx;
@@ -93,9 +142,16 @@ class AutocompleteUI {
     // setup state
     this.isOpen = false;
     this._boundClose = this.close.bind(this);
-    this.debouncedFetchResults = this.debounce(this.fetchResults.bind(this), this.config.debounceMS);
+    this.debouncedFetchResults = this.debounce((query: string): Promise<RadarAutocompleteAddress[] | null> => {
+      if (query.length < this.config.minCharacters) {
+        // Null indicates that no results were fetched, semantically different from an empty array which indicates that no results were found
+        return Promise.resolve(null);
+      }
+
+      return this.fetchResults(query);
+    }, this.config.debounceMS);
     this.results = [];
-    this.highlightedIndex = -1;
+    this._highlightedIndex = -1;
 
     // set threshold alias
     if (this.config.threshold !== undefined) {
@@ -136,12 +192,36 @@ class AutocompleteUI {
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
-    this.resultsList.setAttribute('id', CLASSNAMES.RESULTS_LIST);
+    this.resultsList.setAttribute('id', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_LIST}`);
     this.resultsList.setAttribute('role', 'listbox');
-    this.resultsList.setAttribute('aria-live', 'polite');
     this.resultsList.setAttribute('aria-label', 'Search results');
+    this.resultsList.setAttribute('hidden', '');
+    this.resultsList.setAttribute('aria-hidden', 'true');
     setHeight(this.resultsList, this.config);
 
+    // powered by radar link
+    this.poweredByLink = document.createElement('a');
+    this.poweredByLink.href = 'https://radar.com?ref=powered_by_radar';
+    this.poweredByLink.target = '_blank';
+    this.poweredByLink.rel = 'noopener noreferrer';
+    this.poweredByLink.setAttribute('tabindex', '-1');
+
+    const poweredByText = document.createElement('span');
+    poweredByText.textContent = 'Powered by';
+    this.poweredByLink.appendChild(poweredByText);
+
+    const radarLogo = document.createElement('span');
+    radarLogo.className = CLASSNAMES.POWERED_BY_RADAR_LOGO;
+    radarLogo.textContent = 'Radar';
+    this.poweredByLink.appendChild(radarLogo);
+
+    this.poweredByContainer = document.createElement('li');
+    this.poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
+    this.poweredByContainer.appendChild(this.poweredByLink);
+    this.poweredByContainer.setAttribute('aria-hidden', 'true');
+    this.poweredByContainer.setAttribute('role', 'presentation');
+
+    // Mount to container
     if (containerEL.nodeName === 'INPUT') {
       // if an <input> element is provided, use that as the inputField,
       // and append the resultList to it's parent container
@@ -176,11 +256,31 @@ class AutocompleteUI {
 
     // set aria roles
     this.inputField.setAttribute('role', 'combobox');
-    this.inputField.setAttribute('aria-controls', CLASSNAMES.RESULTS_LIST);
+    this.inputField.setAttribute('aria-controls', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_LIST}`);
     this.inputField.setAttribute('aria-expanded', 'false');
     this.inputField.setAttribute('aria-haspopup', 'listbox');
     this.inputField.setAttribute('aria-autocomplete', 'list');
     this.inputField.setAttribute('aria-activedescendant', '');
+    if (this.config.ariaLabel) {
+      this.inputField.setAttribute('aria-label', this.config.ariaLabel);
+    }
+
+    if (this.config.instructionsText) {
+      this.inputField.setAttribute('aria-describedby', `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`);
+
+      // screen reader instructions
+      const srInstructions = document.createElement('div');
+      srInstructions.id = `${this.config.idPrefix}-${IDENTIFIERS.INSTRUCTIONS}`;
+      srInstructions.className = CLASSNAMES.SR_ONLY; // screen reader only class
+      srInstructions.textContent = this.config.instructionsText;
+      this.wrapper.appendChild(srInstructions);
+    }
+
+    this.srAnnouncements = document.createElement('div');
+    this.srAnnouncements.setAttribute('aria-live', 'polite');
+    this.srAnnouncements.setAttribute('role', 'status');
+    this.srAnnouncements.className = CLASSNAMES.SR_ONLY;
+    this.wrapper.appendChild(this.srAnnouncements);
 
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
@@ -188,6 +288,7 @@ class AutocompleteUI {
     if (this.config.hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this._boundClose, true);
     }
+    this.inputField.addEventListener('focus', this.open.bind(this), true);
 
     Logger.debug('AutocompleteUI initialized with options', this.config);
   }
@@ -198,9 +299,6 @@ class AutocompleteUI {
 
     // Fetch autocomplete results and display them
     const query = this.inputField.value;
-    if (query.length < this.config.minCharacters) {
-      return;
-    }
 
     // Debounced calls return the same Promise
     const debouncePromise = this.debouncedFetchResults(query);
@@ -211,10 +309,18 @@ class AutocompleteUI {
       this._debouncePromise
         .then((results) => {
           const onResults = this.config.onResults;
-          if (onResults) {
+          // Do not report results if results were not fetched (happens when query size is smaller than config.minCharacters)
+          // mainly kept for backwards-compatibility as previous implementations also did not report results when query size is smaller than config.minCharacters
+          if (onResults && results !== null) {
             onResults(results);
           }
-          this.displayResults(results);
+          this.highlightedIndex = -1;
+          if (results === null) {
+            this.close();
+            this.clearResultsList();
+          } else {
+            this.displayResults(results);
+          }
         })
         .catch((error: Error) => {
           Logger.warn(`Autocomplete ui error: ${error.message}`);
@@ -305,11 +411,26 @@ class AutocompleteUI {
     this.clearResultsList();
     this.results = results;
 
+    // create status announcement for screen readers
+    if (this.config.announceResults) {
+      this.srAnnouncements.textContent = '';
+      // Make screenreader re-read announcement if # of results is the same
+      setTimeout(() => {
+        if (results.length > 0) {
+          this.srAnnouncements.textContent = `${results.length} result${results.length === 1 ? '' : 's'} available. Use arrow keys to navigate.`;
+        } else {
+          this.srAnnouncements.textContent = 'No results found.';
+        }
+      }, 250);
+    }
+
     let marker: HTMLElement;
     if (this.config.showMarkers) {
       marker = document.createElement('img');
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
+      marker.setAttribute('aria-hidden', 'true'); // hide from screen readers when decorative
+      marker.setAttribute('alt', ''); // decorative image: empty alt for accessibility
     }
 
     // Create and append list items for each result
@@ -317,7 +438,8 @@ class AutocompleteUI {
       const li = document.createElement('li');
       li.classList.add(CLASSNAMES.RESULTS_ITEM);
       li.setAttribute('role', 'option');
-      li.setAttribute('id', `${CLASSNAMES.RESULTS_ITEM}}-${index}`);
+      li.setAttribute('id', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`);
+      li.setAttribute('aria-selected', 'false'); // default state
 
       // construct result with bolded label
       let listContent;
@@ -345,48 +467,40 @@ class AutocompleteUI {
       this.resultsList.appendChild(li);
     });
 
-    this.open();
-
-    if (results.length > 0) {
-      const link = document.createElement('a');
-      link.href = 'https://radar.com?ref=powered_by_radar';
-      link.target = '_blank';
-      this.poweredByLink = link;
-
-      const poweredByText = document.createElement('span');
-      poweredByText.textContent = 'Powered by';
-      link.appendChild(poweredByText);
-
-      const radarLogo = document.createElement('span');
-      radarLogo.id = 'radar-powered-logo';
-      radarLogo.textContent = 'Radar';
-      link.appendChild(radarLogo);
-
-      const poweredByContainer = document.createElement('div');
-      poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
-      poweredByContainer.appendChild(link);
-      this.resultsList.appendChild(poweredByContainer);
-    } else {
-      const noResultsText = document.createElement('div');
+    if (results.length === 0) {
+      const noResultsText = document.createElement('li');
       noResultsText.classList.add(CLASSNAMES.NO_RESULTS);
       noResultsText.textContent = 'No results';
+      noResultsText.setAttribute('role', 'presentation'); // Role presentation because we already announce no results separately
 
       this.resultsList.appendChild(noResultsText);
     }
+
+    this.resultsList.appendChild(this.poweredByContainer);
+
+    this.open();
   }
 
   /** open the results dropdown */
   public open() {
-    if (this.isOpen) {
+    if (this.isOpen || this.resultsList.childNodes.length === 0) {
       return;
     }
 
+    // Revert everything that was done in the close function
     this.inputField.setAttribute('aria-expanded', 'true');
+    if (this.highlightedIndex > -1) {
+      this.inputField.setAttribute(
+        'aria-activedescendant',
+        `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${this.highlightedIndex}`,
+      );
+    }
     this.resultsList.removeAttribute('hidden');
+    this.resultsList.setAttribute('aria-hidden', 'false');
     this.isOpen = true;
   }
 
-  /** close the results dropdown and clear highlighted state */
+  /** close the results dropdown */
   public close(e?: FocusEvent) {
     if (!this.isOpen) {
       return;
@@ -400,9 +514,8 @@ class AutocompleteUI {
         this.inputField.setAttribute('aria-expanded', 'false');
         this.inputField.setAttribute('aria-activedescendant', '');
         this.resultsList.setAttribute('hidden', '');
-        this.highlightedIndex = -1;
+        this.resultsList.setAttribute('aria-hidden', 'true');
         this.isOpen = false;
-        this.clearResultsList();
       },
       linkClick ? 100 : 0,
     );
@@ -426,36 +539,39 @@ class AutocompleteUI {
 
     const resultItems = this.resultsList.getElementsByTagName('li');
 
-    if (this.highlightedIndex > -1) {
-      // clear class names on previously highlighted item
-      resultItems[this.highlightedIndex]?.classList.remove(CLASSNAMES.SELECTED_ITEM);
-    }
-
-    // add class name to newly highlighted item
-    resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
-
-    // set aria active descendant
-    this.inputField.setAttribute('aria-activedescendant', `${CLASSNAMES.RESULTS_ITEM}-${index}`);
-
     this.highlightedIndex = index;
+
+    // Make sure the selected item is visible (scroll into view if needed)
+    resultItems[index]?.scrollIntoView({ block: 'nearest' });
   }
 
   public handleKeyboardNavigation(event: KeyboardEvent) {
-    let key = event.key;
+    const key = event.key;
 
-    // allow event to propagate if result list is not open
     if (!this.isOpen) {
-      return;
-    }
+      switch (key) {
+        // If not open, open and go to first item
+        // https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/#kbd_label
+        case 'ArrowDown':
+          event.preventDefault();
+          this.open();
+          this.goTo(0);
+          break;
 
-    // treat shift+tab as up key
-    if (key === 'Tab' && event.shiftKey) {
-      key = 'ArrowUp';
+        case 'ArrowUp':
+          // If not open, open and go to last item
+          event.preventDefault();
+          this.open();
+          this.goTo(-1);
+          break;
+      }
+
+      // Allow other events to propagate if result list is not open
+      return;
     }
 
     switch (key) {
       // Next item
-      case 'Tab':
       case 'ArrowDown':
         event.preventDefault();
         this.goTo(this.highlightedIndex + 1);
@@ -469,12 +585,19 @@ class AutocompleteUI {
 
       // Select
       case 'Enter':
-        this.select(this.highlightedIndex);
+        if (this.highlightedIndex !== -1) {
+          event.preventDefault();
+          this.select(this.highlightedIndex);
+        }
+        // If highlightedIndex is -1, allow event to continue and do nothing (i.e hit enter right after entering address)
         break;
 
       // Close
+      case 'Escape':
       case 'Esc':
+        event.preventDefault();
         this.close();
+        this.inputField.focus(); // return focus to input
         break;
     }
   }
@@ -491,6 +614,7 @@ class AutocompleteUI {
       return;
     }
 
+    this.highlightedIndex = index;
     let inputValue;
     if (result.formattedAddress?.includes(result.addressLabel!)) {
       inputValue = result.formattedAddress;
@@ -504,6 +628,9 @@ class AutocompleteUI {
     if (onSelection) {
       onSelection(result);
     }
+
+    // Return focus to input after selection
+    this.inputField.focus();
 
     // clear results list
     this.close();

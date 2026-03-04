@@ -36,6 +36,20 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   markerColor?: string;
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
+  /**
+   * prefix all ids for this component, so if multiple autocomplete components are on the same page,
+   * the id stays unique. Defaults to `radar-autocomplete`.
+   */
+  idPrefix?: string;
+
+  // Accessibility options
+
+  /** Custom aria-label for input */
+  ariaLabel?: string;
+  /** Instructions for screen readers */
+  instructionsText?: string;
+  /** Announce results count to screen readers */
+  announceResults?: boolean;
 }
 
 /** resolved configuration with required defaults */
