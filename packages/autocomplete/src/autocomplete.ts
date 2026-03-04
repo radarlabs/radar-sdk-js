@@ -558,8 +558,11 @@ class AutocompleteUI {
 
       // Select
       case 'Enter':
-        event.preventDefault();
-        this.select(this.highlightedIndex);
+        if (this.highlightedIndex !== -1) {
+          event.preventDefault();
+          this.select(this.highlightedIndex);
+        }
+        // If highlightedIndex is -1, allow event to continue and do nothing (i.e hit enter right after entering address)
         break;
 
       // Close
