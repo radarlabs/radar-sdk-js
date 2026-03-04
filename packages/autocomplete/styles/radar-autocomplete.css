@@ -116,7 +116,7 @@
   -webkit-transition: opacity 0.15s ease-in-out;
 }
 
-.radar-autocomplete-results-wrapper[hidden] {
+.radar-autocomplete-results-list:empty {
   display: block;
   opacity: 0;
   transform: scale(0);
