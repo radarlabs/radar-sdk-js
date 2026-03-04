@@ -291,8 +291,8 @@ class AutocompleteUI {
           }
           this.highlightedIndex = -1;
           if (results === null) {
-            this.clearResultsList();
             this.close();
+            this.clearResultsList();
           } else {
             this.displayResults(results);
           }
