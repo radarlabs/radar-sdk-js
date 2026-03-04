@@ -7,7 +7,6 @@ const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
   INPUT: 'radar-autocomplete-input',
   SEARCH_ICON: 'radar-autocomplete-search-icon',
-  RESULTS_WRAPPER: 'radar-autocomplete-results-wrapper',
   RESULTS_LIST: 'radar-autocomplete-results-list',
   RESULTS_ITEM: 'radar-autocomplete-results-item',
   RESULTS_MARKER: 'radar-autocomplete-results-marker',
@@ -98,10 +97,10 @@ class AutocompleteUI {
   // DOM elements
   container: HTMLElement;
   inputField: HTMLInputElement;
-  resultsWrapper: HTMLDivElement;
   resultsList: HTMLUListElement;
   wrapper: HTMLElement;
   poweredByLink: HTMLAnchorElement;
+  poweredByContainer: HTMLLIElement;
   srAnnouncements: HTMLDivElement;
 
   public get highlightedIndex(): number {
@@ -185,20 +184,15 @@ class AutocompleteUI {
     this.wrapper.style.display = this.config.responsive ? 'block' : 'inline-block';
     setWidth(this.wrapper, this.config);
 
-    // wrapper for result list
-    this.resultsWrapper = document.createElement('div');
-    this.resultsWrapper.classList.add(CLASSNAMES.RESULTS_WRAPPER);
-
     // result list element
     this.resultsList = document.createElement('ul');
     this.resultsList.classList.add(CLASSNAMES.RESULTS_LIST);
     this.resultsList.setAttribute('id', `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_LIST}`);
     this.resultsList.setAttribute('role', 'listbox');
     this.resultsList.setAttribute('aria-label', 'Search results');
-    this.resultsWrapper.setAttribute('hidden', '');
-    this.resultsWrapper.setAttribute('aria-hidden', 'true');
+    this.resultsList.setAttribute('hidden', '');
+    this.resultsList.setAttribute('aria-hidden', 'true');
     setHeight(this.resultsList, this.config);
-    this.resultsWrapper.appendChild(this.resultsList);
 
     // powered by radar link
     this.poweredByLink = document.createElement('a');
@@ -216,11 +210,11 @@ class AutocompleteUI {
     radarLogo.textContent = 'Radar';
     this.poweredByLink.appendChild(radarLogo);
 
-    const poweredByContainer = document.createElement('div');
-    poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
-    poweredByContainer.appendChild(this.poweredByLink);
-    poweredByContainer.setAttribute('aria-hidden', 'true');
-    this.resultsWrapper.appendChild(poweredByContainer);
+    this.poweredByContainer = document.createElement('li');
+    this.poweredByContainer.classList.add(CLASSNAMES.POWERED_BY_RADAR);
+    this.poweredByContainer.appendChild(this.poweredByLink);
+    this.poweredByContainer.setAttribute('aria-hidden', 'true');
+    this.poweredByContainer.setAttribute('role', 'presentation');
 
     // Mount to container
     if (containerEL.nodeName === 'INPUT') {
@@ -229,7 +223,7 @@ class AutocompleteUI {
       this.inputField = containerEL as HTMLInputElement;
 
       // append to dom
-      this.wrapper.appendChild(this.resultsWrapper);
+      this.wrapper.appendChild(this.resultsList);
       containerEL.parentNode?.appendChild(this.wrapper);
     } else {
       // if container is not an input, create new input and append to container
@@ -247,7 +241,7 @@ class AutocompleteUI {
 
       // append to DOM
       this.wrapper.appendChild(this.inputField);
-      this.wrapper.appendChild(this.resultsWrapper);
+      this.wrapper.appendChild(this.resultsList);
       this.wrapper.appendChild(searchIcon);
       this.container.appendChild(this.wrapper);
     }
@@ -475,6 +469,8 @@ class AutocompleteUI {
       this.resultsList.appendChild(noResultsText);
     }
 
+    this.resultsList.appendChild(this.poweredByContainer);
+
     this.open();
   }
 
@@ -485,8 +481,8 @@ class AutocompleteUI {
     }
 
     this.inputField.setAttribute('aria-expanded', 'true');
-    this.resultsWrapper.removeAttribute('hidden');
-    this.resultsWrapper.setAttribute('aria-hidden', 'false');
+    this.resultsList.removeAttribute('hidden');
+    this.resultsList.setAttribute('aria-hidden', 'false');
     this.isOpen = true;
   }
 
@@ -503,8 +499,8 @@ class AutocompleteUI {
       () => {
         this.inputField.setAttribute('aria-expanded', 'false');
         this.inputField.setAttribute('aria-activedescendant', '');
-        this.resultsWrapper.setAttribute('hidden', '');
-        this.resultsWrapper.setAttribute('aria-hidden', 'true');
+        this.resultsList.setAttribute('hidden', '');
+        this.resultsList.setAttribute('aria-hidden', 'true');
         this.isOpen = false;
       },
       linkClick ? 100 : 0,
