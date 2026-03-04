@@ -430,6 +430,7 @@ class AutocompleteUI {
       marker.classList.add(CLASSNAMES.RESULTS_MARKER);
       marker.setAttribute('src', getMarkerIcon(this.config.markerColor));
       marker.setAttribute('aria-hidden', 'true'); // hide from screen readers when decorative
+      marker.setAttribute('alt', ''); // decorative image: empty alt for accessibility
     }
 
     // Create and append list items for each result
