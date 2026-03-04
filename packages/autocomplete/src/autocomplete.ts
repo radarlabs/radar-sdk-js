@@ -89,7 +89,7 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
-  highlightedIndex: number;
+  private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
   private _boundClose: () => void;
@@ -103,6 +103,32 @@ class AutocompleteUI {
   wrapper: HTMLElement;
   poweredByLink: HTMLAnchorElement;
   srAnnouncements: HTMLDivElement;
+
+  public get highlightedIndex(): number {
+    return this._highlightedIndex;
+  }
+
+  public set highlightedIndex(index: number) {
+    const resultItems = this.resultsList.getElementsByTagName('li');
+
+    if (this.highlightedIndex > -1) {
+      // clear class names on previously highlighted item
+      resultItems[this.highlightedIndex]?.classList.remove(CLASSNAMES.SELECTED_ITEM);
+      resultItems[this.highlightedIndex]?.setAttribute('aria-selected', 'false');
+    }
+
+    // add class name to newly highlighted item
+    resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
+    resultItems[index]?.setAttribute('aria-selected', 'true');
+
+    // set aria active descendant
+    this.inputField.setAttribute(
+      'aria-activedescendant',
+      `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
+    );
+
+    this._highlightedIndex = index;
+  }
 
   constructor(options: Partial<RadarAutocompleteUIOptions>, ctx: RadarPluginContext) {
     this.ctx = ctx;
@@ -121,7 +147,7 @@ class AutocompleteUI {
       return this.fetchResults(query);
     }, this.config.debounceMS);
     this.results = [];
-    this.highlightedIndex = -1;
+    this._highlightedIndex = -1;
 
     // set threshold alias
     if (this.config.threshold !== undefined) {
@@ -503,26 +529,10 @@ class AutocompleteUI {
 
     const resultItems = this.resultsList.getElementsByTagName('li');
 
-    if (this.highlightedIndex > -1) {
-      // clear class names on previously highlighted item
-      resultItems[this.highlightedIndex]?.classList.remove(CLASSNAMES.SELECTED_ITEM);
-      resultItems[this.highlightedIndex]?.setAttribute('aria-selected', 'false');
-    }
-
-    // add class name to newly highlighted item
-    resultItems[index]?.classList.add(CLASSNAMES.SELECTED_ITEM);
-    resultItems[index]?.setAttribute('aria-selected', 'true');
-
-    // set aria active descendant
-    this.inputField.setAttribute(
-      'aria-activedescendant',
-      `${this.config.idPrefix}-${IDENTIFIERS.RESULTS_ITEM}-${index}`,
-    );
+    this.highlightedIndex = index;
 
     // Make sure the selected item is visible (scroll into view if needed)
     resultItems[index]?.scrollIntoView({ block: 'nearest' });
-
-    this.highlightedIndex = index;
   }
 
   public handleKeyboardNavigation(event: KeyboardEvent) {
@@ -574,6 +584,7 @@ class AutocompleteUI {
       return;
     }
 
+    this.highlightedIndex = index;
     let inputValue;
     if (result.formattedAddress?.includes(result.addressLabel!)) {
       inputValue = result.formattedAddress;
