@@ -260,6 +260,7 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  passed?: boolean;
 }
 
 /** response from {@link Radar.trackOnce} */
