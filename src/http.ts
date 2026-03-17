@@ -74,7 +74,7 @@ class Http {
    * send an HTTP request to the Radar API
    * @param options - request configuration
    * @returns parsed response body, typed as `T`
-   * @throws {RadarPublishableKeyError} if publishable key is not set
+   * @throws {RadarPublishableKeyError} if neither publishable key nor token is set
    * @throws {RadarBadRequestError} on 400 responses
    * @throws {RadarUnauthorizedError} on 401 responses
    * @throws {RadarNetworkError} on network failures
@@ -95,9 +95,9 @@ class Http {
   }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
-    const publishableKey = options.publishableKey;
-    if (!publishableKey) {
-      throw new RadarPublishableKeyError('publishableKey not set.');
+    const { publishableKey, token } = options;
+    if (!publishableKey && !token) {
+      throw new RadarPublishableKeyError('publishableKey or token not set.');
     }
 
     const urlHost = host || options.host;
@@ -131,7 +131,7 @@ class Http {
     }
 
     const defaultHeaders: Record<string, string> = {
-      Authorization: publishableKey,
+      Authorization: token ? `Bearer ${token}` : publishableKey!,
       'Content-Type': 'application/json',
       'X-Radar-Device-Type': 'Web',
       'X-Radar-SDK-Version': SDK_VERSION,

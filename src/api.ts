@@ -35,6 +35,7 @@ import type {
   RadarMatrixParams,
   RadarMatrixResponse,
   RadarMetadata,
+  RadarInitOptions,
   RadarOptions,
   RadarReverseGeocodeParams,
   RadarRouteResponse,
@@ -52,6 +53,14 @@ import type {
 
 const isSecretKey = (key: string): boolean => key.includes('_sk_');
 const isLiveKey = (key: string): boolean => key.includes('_live_');
+const isJWTShape = (value: string): boolean => {
+  // NOTE(jasonl): keep this check lightweight since we're doing real validation server-side
+  if (!value.startsWith('eyJ')) {
+    return false;
+  }
+  const parts = value.split('.');
+  return parts.length === 3 && parts.every((s) => s.length > 0);
+};
 
 /**
  * main entry point for the Radar SDK. all methods are static — do not instantiate.
@@ -109,14 +118,45 @@ class Radar {
       },
     };
   }
-
   /**
-   * initialize the SDK with a publishable key. must be called before any other method.
+   * initialize the SDK with a token or publishable key via options object.
+   * @param options - SDK configuration with `token` or `publishableKey`
+   * @throws {RadarPublishableKeyError} if credentials are missing or invalid
+   */
+  public static initialize(options: RadarInitOptions): void;
+  /**
+   * initialize the SDK with a publishable key string.
    * @param publishableKey - your Radar publishable key (starts with `prj_test_pk_` or `prj_live_pk_`)
    * @param options - optional SDK configuration
    * @throws {RadarPublishableKeyError} if the key is missing or is a secret key
    */
-  public static initialize(publishableKey: string, options: RadarOptions = {}) {
+  public static initialize(publishableKey: string, options?: RadarOptions): void;
+  public static initialize(publishableKeyOrOptions: string | RadarOptions, options: RadarOptions = {}) {
+    if (typeof publishableKeyOrOptions === 'object') {
+      options = publishableKeyOrOptions;
+
+      if (options.publishableKey && options.token) {
+        throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
+      }
+
+      if (options.publishableKey) {
+        return Radar.initialize(options.publishableKey, options);
+      }
+
+      if (!options.token) {
+        throw new RadarPublishableKeyError('Publishable key or token required in initialization.');
+      }
+      if (!isJWTShape(options.token)) {
+        throw new RadarPublishableKeyError('Invalid token format. Expected a JWT.');
+      }
+
+      Radar._applyConfig('token', options);
+      return;
+    }
+
+    // string path -> initialize(publishableKey, options)
+    const publishableKey = publishableKeyOrOptions;
+
     if (!publishableKey) {
       throw new RadarPublishableKeyError('Publishable key required in initialization.');
     }
@@ -125,29 +165,25 @@ class Radar {
       throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
     }
 
-    // store settings in global config
+    if (options.token) {
+      throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
+    }
+
     const live = isLiveKey(publishableKey);
-    const logLevel = live ? 'error' : 'info';
-    const debug = !live;
-    const radarOptions = Object.assign(
-      Config.defaultOptions,
-      {
-        publishableKey,
-        live,
-        logLevel,
-        debug,
-      },
-      options,
-    );
+    Radar._applyConfig('publishableKey', { ...options, publishableKey, live });
+  }
+
+  private static _applyConfig(credentialLabel: string, options: RadarOptions) {
+    const debug = options.debug ?? (options.live !== undefined ? !options.live : false);
+    const logLevel = options.logLevel ?? (debug ? 'debug' : 'error');
+    const radarOptions = Object.assign({}, Config.defaultOptions, { logLevel, debug }, options);
     Config.setup(radarOptions);
 
-    Logger.info(`initialized with ${live ? 'live' : 'test'} publishableKey.`);
-    if (options.debug) {
+    Logger.info(`initialized with ${credentialLabel}.`);
+    if (debug) {
       Logger.debug('using options', options);
     }
 
-    // NOTE(jasonl): this allows us to run jest tests
-    // without having to mock the ConfigAPI.getConfig call
     if (!window?.RADAR_TEST_ENV) {
       ConfigAPI.getConfig().catch((err) => {
         Logger.warn(`Error calling /config: ${err.message}`);

@@ -126,6 +126,116 @@ describe('Radar', () => {
         expect(ConfigAPI.getConfig).toHaveBeenCalledTimes(1);
       });
     });
+
+    describe('token initialization', () => {
+      it('should initialize SDK with token (defaults to non-debug)', () => {
+        Radar.initialize({ token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
+        const options = Config.get();
+        expect(options.token).toEqual('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123');
+        expect(options.debug).toEqual(false);
+        expect(options.logLevel).toEqual('error');
+        expect(options.live).toEqual(false);
+        expect(options.publishableKey).toBeUndefined();
+      });
+
+      it('should initialize SDK with token and debug: true', () => {
+        Radar.initialize({ token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123', debug: true });
+        const options = Config.get();
+        expect(options.token).toEqual('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123');
+        expect(options.debug).toEqual(true);
+        expect(options.logLevel).toEqual('debug');
+      });
+
+      it('should throw when both token and publishableKey provided via options', () => {
+        let err: any;
+        try {
+          // @ts-expect-error testing runtime guard for invalid combination
+          Radar.initialize({
+            token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123',
+            publishableKey: '_my_test_pk_123',
+          });
+          throw new Error('Should not succeed.');
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
+          expect(err.name).toEqual('RadarPublishableKeyError');
+          expect(err.message).toEqual('Token and publishableKey are mutually exclusive.');
+        }
+      });
+
+      it('should throw when both token and publishableKey provided via string + options', () => {
+        let err: any;
+        try {
+          Radar.initialize('_my_test_pk_123', { token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
+          throw new Error('Should not succeed.');
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
+          expect(err.name).toEqual('RadarPublishableKeyError');
+          expect(err.message).toEqual('Token and publishableKey are mutually exclusive.');
+        }
+      });
+
+      it('should throw on invalid token format', () => {
+        let err: any;
+        try {
+          Radar.initialize({ token: 'not-a-jwt' });
+          throw new Error('Should not succeed.');
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
+          expect(err.name).toEqual('RadarPublishableKeyError');
+          expect(err.message).toEqual('Invalid token format. Expected a JWT.');
+        }
+      });
+
+      it('should throw on token with empty segments', () => {
+        let err: any;
+        try {
+          Radar.initialize({ token: 'a..b' });
+          throw new Error('Should not succeed.');
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
+          expect(err.name).toEqual('RadarPublishableKeyError');
+          expect(err.message).toEqual('Invalid token format. Expected a JWT.');
+        }
+      });
+
+      it('should support initialize({ publishableKey }) object form', () => {
+        jest.spyOn(ConfigAPI, 'getConfig');
+        Radar.initialize({ publishableKey: '_my_test_pk_123' });
+        const options = Config.get();
+        expect(options.publishableKey).toEqual('_my_test_pk_123');
+        expect(options.live).toEqual(false);
+      });
+
+      it('should throw when options object has neither token nor publishableKey', () => {
+        let err: any;
+        try {
+          // @ts-expect-error testing runtime guard for missing credentials
+          Radar.initialize({});
+          throw new Error('Should not succeed.');
+        } catch (caught: any) {
+          err = caught;
+        } finally {
+          expect(err).toBeDefined();
+          expect(err.name).toEqual('RadarPublishableKeyError');
+          expect(err.message).toEqual('Publishable key or token required in initialization.');
+        }
+      });
+
+      it('should clear token state via Radar.clear()', () => {
+        Radar.initialize({ token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
+        Radar.clear();
+        const options = Config.get();
+        expect(options.token).toBeUndefined();
+      });
+    });
   });
 
   describe('clear', () => {

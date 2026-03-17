@@ -224,4 +224,69 @@ describe('Http', () => {
       expect(request.headers['X-Test']).toEqual('true');
     });
   });
+
+  describe('token authentication', () => {
+    const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123';
+
+    beforeEach(() => {
+      Radar.initialize({ token });
+    });
+
+    afterEach(() => {
+      Radar.clear();
+    });
+
+    it('should send Bearer token in Authorization header', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request(httpRequestParams);
+      const request = getRequest();
+
+      expect(request.headers['Authorization']).toEqual(`Bearer ${token}`);
+    });
+
+    it('should still include Device-Type and SDK-Version headers', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request(httpRequestParams);
+      const request = getRequest();
+
+      expect(request.headers['X-Radar-Device-Type']).toEqual('Web');
+      expect(request.headers['X-Radar-SDK-Version']).toEqual(SDK_VERSION);
+    });
+  });
+
+  describe('publishable key authentication (regression)', () => {
+    beforeEach(() => {
+      Radar.initialize(publishableKey);
+    });
+
+    afterEach(() => {
+      Radar.clear();
+    });
+
+    it('should send raw publishable key in Authorization header', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request(httpRequestParams);
+      const request = getRequest();
+
+      expect(request.headers['Authorization']).toEqual(publishableKey);
+    });
+  });
+
+  describe('no credential set', () => {
+    beforeEach(() => {
+      Config.clear();
+    });
+
+    it('should throw RadarPublishableKeyError', async () => {
+      try {
+        await Http.request(httpRequestParams);
+      } catch (e: any) {
+        expect(e.status).toEqual('ERROR_PUBLISHABLE_KEY');
+        expect(e.message).toEqual('publishableKey or token not set.');
+      }
+    });
+  });
 });

@@ -36,7 +36,7 @@ describe('Track', () => {
         } finally {
           expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('publishableKey not set.');
+          expect(err.message).toEqual('publishableKey or token not set.');
           expect(err.status).toEqual('ERROR_PUBLISHABLE_KEY');
         }
       });
