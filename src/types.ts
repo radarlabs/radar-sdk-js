@@ -23,7 +23,7 @@ export interface NavigatorPosition {
 export type LocationAuthorization = 'DENIED' | 'NOT_DETERMINED' | 'GRANTED_FOREGROUND';
 
 /** shared SDK configuration fields (excluding auth credentials) */
-interface RadarBaseOptions {
+export interface RadarBaseOptions {
   /** @deprecated use `debug` instead. inferred automatically from publishableKey. */
   live?: boolean;
   /** SDK log verbosity */
@@ -61,7 +61,7 @@ export interface RadarPublishableKeyInitOptions extends RadarBaseOptions {
   token?: never;
 }
 
-/** union of valid initialization option shapes */
+/** configuration options passed to {@link Radar.initialize} */
 export type RadarInitOptions = RadarTokenInitOptions | RadarPublishableKeyInitOptions;
 
 /** internal SDK configuration (all fields optional — stored by Config after initialization) */
