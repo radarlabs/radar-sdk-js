@@ -84,7 +84,7 @@ describe('Radar', () => {
         } finally {
           expect(err).toBeDefined();
           expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Publishable key required in initialization.');
+          expect(err.message).toEqual('Publishable key or token required in initialization.');
         }
       });
     });

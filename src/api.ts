@@ -131,59 +131,42 @@ class Radar {
    * @throws {RadarPublishableKeyError} if the key is missing or is a secret key
    */
   public static initialize(publishableKey: string, options?: RadarOptions): void;
-  public static initialize(publishableKeyOrOptions: string | RadarOptions, options: RadarOptions = {}) {
-    if (typeof publishableKeyOrOptions === 'object') {
-      options = publishableKeyOrOptions;
+  public static initialize(publishableKeyOrOptions: string | RadarInitOptions, extraOptions: RadarOptions = {}) {
+    // NOTE(jasonl): shim the string signature into the options object to handle both cases
+    const options: RadarOptions =
+      typeof publishableKeyOrOptions === 'string'
+        ? { ...extraOptions, publishableKey: publishableKeyOrOptions }
+        : publishableKeyOrOptions;
 
-      if (options.publishableKey && options.token) {
-        throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
-      }
-
-      if (options.publishableKey) {
-        return Radar.initialize(options.publishableKey, options);
-      }
-
-      if (!options.token) {
-        throw new RadarPublishableKeyError('Publishable key or token required in initialization.');
-      }
-      if (!isJWTShape(options.token)) {
-        throw new RadarPublishableKeyError('Invalid token format. Expected a JWT.');
-      }
-
-      Radar._applyConfig('token', options);
-      return;
-    }
-
-    // string path -> initialize(publishableKey, options)
-    const publishableKey = publishableKeyOrOptions;
-
-    if (!publishableKey) {
-      throw new RadarPublishableKeyError('Publishable key required in initialization.');
-    }
-
-    if (isSecretKey(publishableKey)) {
-      throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
-    }
-
-    if (options.token) {
+    if (options.publishableKey && options.token) {
       throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
     }
 
-    const live = isLiveKey(publishableKey);
-    Radar._applyConfig('publishableKey', { ...options, publishableKey, live });
-  }
+    let credentialLabel: 'publishableKey' | 'token';
 
-  private static _applyConfig(credentialLabel: string, options: RadarOptions) {
+    if (options.publishableKey) {
+      if (isSecretKey(options.publishableKey)) {
+        throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
+      }
+      options.live = isLiveKey(options.publishableKey);
+      credentialLabel = 'publishableKey';
+    } else if (options.token) {
+      if (!isJWTShape(options.token)) {
+        throw new RadarPublishableKeyError('Invalid token format. Expected a JWT.');
+      }
+      credentialLabel = 'token';
+    } else {
+      throw new RadarPublishableKeyError('Publishable key or token required in initialization.');
+    }
+
     // NOTE(jasonl): for backwards compat with the old `live` option - if `debug` isn't explicitly set, we'll set it to the inverse of `live`
-    const debug = options.debug ?? (options.live !== undefined ? !options.live : false);
-    const logLevel = options.logLevel ?? (debug ? 'debug' : 'error');
-    const radarOptions = Object.assign({}, Config.defaultOptions, { logLevel, debug }, options);
+    options.debug = options.debug ?? (options.live !== undefined ? !options.live : false);
+    options.logLevel = options.logLevel ?? (options.debug ? 'debug' : 'error');
+    const radarOptions = Object.assign({}, Config.defaultOptions, options);
     Config.setup(radarOptions);
 
     Logger.info(`initialized with ${credentialLabel}.`);
-    if (debug) {
-      Logger.debug('using options', options);
-    }
+    Logger.debug('using options', options);
 
     // NOTE(jasonl): this allows us to run jest tests
     // without having to mock the ConfigAPI.getConfig call
