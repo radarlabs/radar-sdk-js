@@ -174,6 +174,7 @@ class Radar {
   }
 
   private static _applyConfig(credentialLabel: string, options: RadarOptions) {
+    // NOTE(jasonl): for backwards compat with the old `live` option - if `debug` isn't explicitly set, we'll set it to the inverse of `live`
     const debug = options.debug ?? (options.live !== undefined ? !options.live : false);
     const logLevel = options.logLevel ?? (debug ? 'debug' : 'error');
     const radarOptions = Object.assign({}, Config.defaultOptions, { logLevel, debug }, options);
@@ -184,6 +185,8 @@ class Radar {
       Logger.debug('using options', options);
     }
 
+    // NOTE(jasonl): this allows us to run jest tests
+    // without having to mock the ConfigAPI.getConfig call
     if (!window?.RADAR_TEST_ENV) {
       ConfigAPI.getConfig().catch((err) => {
         Logger.warn(`Error calling /config: ${err.message}`);
