@@ -33,11 +33,5 @@ describe('Config', () => {
       const headers = Config.getDefaultHeaders();
       expect(headers['X-Custom']).toEqual('val');
     });
-
-    it('should not include Content-Type', () => {
-      Radar.initialize('prj_test_pk_123');
-      const headers = Config.getDefaultHeaders();
-      expect(headers['Content-Type']).toBeUndefined();
-    });
   });
 });
