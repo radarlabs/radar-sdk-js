@@ -136,7 +136,7 @@ class Radar {
     const options: RadarOptions =
       typeof publishableKeyOrOptions === 'string'
         ? { ...extraOptions, publishableKey: publishableKeyOrOptions }
-        : publishableKeyOrOptions;
+        : { ...publishableKeyOrOptions };
 
     if (options.publishableKey && options.authToken) {
       throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
