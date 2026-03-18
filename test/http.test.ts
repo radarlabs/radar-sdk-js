@@ -225,24 +225,24 @@ describe('Http', () => {
     });
   });
 
-  describe('token authentication', () => {
-    const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123';
+  describe('authToken authentication', () => {
+    const authToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123';
 
     beforeEach(() => {
-      Radar.initialize({ token });
+      Radar.initialize({ authToken });
     });
 
     afterEach(() => {
       Radar.clear();
     });
 
-    it('should send Bearer token in Authorization header', async () => {
+    it('should send Bearer authToken in Authorization header', async () => {
       mockRequest(200, successResponse);
 
       await Http.request(httpRequestParams);
       const request = getRequest();
 
-      expect(request.headers['Authorization']).toEqual(`Bearer ${token}`);
+      expect(request.headers['Authorization']).toEqual(`Bearer ${authToken}`);
     });
 
     it('should still include Device-Type and SDK-Version headers', async () => {
@@ -285,7 +285,7 @@ describe('Http', () => {
         await Http.request(httpRequestParams);
       } catch (e: any) {
         expect(e.status).toEqual('ERROR_PUBLISHABLE_KEY');
-        expect(e.message).toEqual('publishableKey or token not set.');
+        expect(e.message).toEqual('publishableKey or authToken not set.');
       }
     });
   });

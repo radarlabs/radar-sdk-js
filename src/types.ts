@@ -47,9 +47,9 @@ export interface RadarBaseOptions {
 }
 
 /** options for initializing with a JWT auth token */
-export interface RadarTokenInitOptions extends RadarBaseOptions {
+export interface RadarAuthTokenInitOptions extends RadarBaseOptions {
   /** JWT auth token */
-  token: string;
+  authToken: string;
   live?: never;
   publishableKey?: never;
 }
@@ -58,18 +58,18 @@ export interface RadarTokenInitOptions extends RadarBaseOptions {
 export interface RadarPublishableKeyInitOptions extends RadarBaseOptions {
   /** Radar publishable key */
   publishableKey: string;
-  token?: never;
+  authToken?: never;
 }
 
 /** configuration options passed to {@link Radar.initialize} */
-export type RadarInitOptions = RadarTokenInitOptions | RadarPublishableKeyInitOptions;
+export type RadarInitOptions = RadarAuthTokenInitOptions | RadarPublishableKeyInitOptions;
 
 /** internal SDK configuration (all fields optional — stored by Config after initialization) */
 export interface RadarOptions extends RadarBaseOptions {
   /** Radar publishable key (set automatically by `initialize`) */
   publishableKey?: string;
-  /** JWT auth token (mutually exclusive with publishableKey) */
-  token?: string;
+  /** JWT auth Token (mutually exclusive with publishableKey) */
+  authToken?: string;
 }
 
 /** response from GET /v1/config */

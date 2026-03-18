@@ -119,8 +119,8 @@ class Radar {
     };
   }
   /**
-   * initialize the SDK with a token or publishable key via options object.
-   * @param options - SDK configuration with `token` or `publishableKey`
+   * initialize the SDK with an authToken or publishable key via options object.
+   * @param options - SDK configuration with `authToken` or `publishableKey`
    * @throws {RadarPublishableKeyError} if credentials are missing or invalid
    */
   public static initialize(options: RadarInitOptions): void;
@@ -138,11 +138,11 @@ class Radar {
         ? { ...extraOptions, publishableKey: publishableKeyOrOptions }
         : publishableKeyOrOptions;
 
-    if (options.publishableKey && options.token) {
+    if (options.publishableKey && options.authToken) {
       throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
     }
 
-    let credentialLabel: 'publishableKey' | 'token';
+    let credentialLabel: 'publishableKey' | 'authToken';
 
     if (options.publishableKey) {
       if (isSecretKey(options.publishableKey)) {
@@ -150,13 +150,13 @@ class Radar {
       }
       options.live = isLiveKey(options.publishableKey);
       credentialLabel = 'publishableKey';
-    } else if (options.token) {
-      if (!isJWTShape(options.token)) {
-        throw new RadarPublishableKeyError('Invalid token format. Expected a JWT.');
+    } else if (options.authToken) {
+      if (!isJWTShape(options.authToken)) {
+        throw new RadarPublishableKeyError('Invalid authToken format. Expected a JWT.');
       }
-      credentialLabel = 'token';
+      credentialLabel = 'authToken';
     } else {
-      throw new RadarPublishableKeyError('Publishable key or token required in initialization.');
+      throw new RadarPublishableKeyError('Publishable key or authToken required in initialization.');
     }
 
     // NOTE(jasonl): for backwards compat with the old `live` option - if `debug` isn't explicitly set, we'll set it to the inverse of `live`
