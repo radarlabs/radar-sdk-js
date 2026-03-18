@@ -55,7 +55,7 @@ Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 Add the following to your HTML:
 
 ```html
-<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/v5.1.0-beta.0/radar.min.js"></script>
 
 <script>
   Radar.initialize({ publishableKey: 'prj_test_pk_...' });
@@ -134,7 +134,7 @@ the core SDK first, then any plugins you need:
 <link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
 <link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
 
-<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/v5.1.0-beta.0/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
 <script src="https://js.radar.com/fraud/v1.0.0/radar-fraud.min.js"></script>
@@ -151,7 +151,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0-beta.0/radar.min.js"></script>
     <script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
   </head>
 
@@ -178,7 +178,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0-beta.0/radar.min.js"></script>
     <script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
   </head>
 
@@ -211,7 +211,7 @@ are needed for geofencing.
 ```html
 <html>
   <head>
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0-beta.0/radar.min.js"></script>
   </head>
 
   <body>
