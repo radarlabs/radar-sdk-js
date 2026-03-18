@@ -47,7 +47,9 @@ class Config {
     }
   }
 
-  /** build standard Radar request headers (Authorization, Device-Type, SDK-Version) */
+  /** build standard Radar request headers (Authorization, Device-Type, SDK-Version).
+   * Callers must ensure credentials are set before calling (e.g. via Radar.initialize).
+   * */
   static getDefaultHeaders(): Record<string, string> {
     const { publishableKey, authToken, getRequestHeaders: getHeaders } = Config.options;
     const headers: Record<string, string> = {
