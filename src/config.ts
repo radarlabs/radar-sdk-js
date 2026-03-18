@@ -1,3 +1,5 @@
+import SDK_VERSION from './version';
+
 import type { RadarError } from './errors';
 import type { RadarOptions } from './types';
 
@@ -43,6 +45,20 @@ class Config {
     if (Config.errorCallback && error) {
       Config.errorCallback(error);
     }
+  }
+
+  /** build standard Radar request headers (Authorization, Device-Type, SDK-Version) */
+  static getDefaultHeaders(): Record<string, string> {
+    const { publishableKey, authToken, getRequestHeaders: getHeaders } = Config.options;
+    const headers: Record<string, string> = {
+      Authorization: authToken ? `Bearer ${authToken}` : publishableKey!,
+      'X-Radar-Device-Type': 'Web',
+      'X-Radar-SDK-Version': SDK_VERSION,
+    };
+    if (typeof getHeaders === 'function') {
+      Object.assign(headers, getHeaders());
+    }
+    return headers;
   }
 }
 
