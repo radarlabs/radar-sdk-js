@@ -27,6 +27,15 @@ import type {
   RadarUser,
 } from '../src/types';
 
+/** Build a structurally valid JWT from plain objects (no crypto). */
+const makeJWT = (
+  payload: Record<string, unknown> = { sub: 'test' },
+  header: Record<string, unknown> = { alg: 'HS256' },
+): string => {
+  const b64 = (obj: Record<string, unknown>) => btoa(JSON.stringify(obj)).replace(/=+$/, '');
+  return `${b64(header)}.${b64(payload)}.fakesig`;
+};
+
 describe('Radar', () => {
   const accuracy = 5;
 
@@ -128,10 +137,12 @@ describe('Radar', () => {
     });
 
     describe('authToken initialization', () => {
+      const authToken = makeJWT();
+
       it('should initialize SDK with authToken (defaults to non-debug)', () => {
-        Radar.initialize({ authToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
+        Radar.initialize({ authToken });
         const options = Config.get();
-        expect(options.authToken).toEqual('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123');
+        expect(options.authToken).toEqual(authToken);
         expect(options.debug).toEqual(false);
         expect(options.logLevel).toEqual('error');
         expect(options.live).toEqual(false);
@@ -139,71 +150,56 @@ describe('Radar', () => {
       });
 
       it('should initialize SDK with authToken and debug: true', () => {
-        Radar.initialize({ authToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123', debug: true });
+        Radar.initialize({ authToken, debug: true });
         const options = Config.get();
-        expect(options.authToken).toEqual('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123');
+        expect(options.authToken).toEqual(authToken);
         expect(options.debug).toEqual(true);
         expect(options.logLevel).toEqual('debug');
       });
 
       it('should throw when both authToken and publishableKey provided via options', () => {
-        let err: any;
-        try {
+        expect(() => {
           // @ts-expect-error testing runtime guard for invalid combination
-          Radar.initialize({
-            authToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123',
-            publishableKey: '_my_test_pk_123',
-          });
-          throw new Error('Should not succeed.');
-        } catch (caught: any) {
-          err = caught;
-        } finally {
-          expect(err).toBeDefined();
-          expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Token and publishableKey are mutually exclusive.');
-        }
+          Radar.initialize({ authToken, publishableKey: '_my_test_pk_123' });
+        }).toThrow(
+          expect.objectContaining({
+            name: 'RadarPublishableKeyError',
+            message: 'Token and publishableKey are mutually exclusive.',
+          }),
+        );
       });
 
       it('should throw when both authToken and publishableKey provided via string + options', () => {
-        let err: any;
-        try {
-          Radar.initialize('_my_test_pk_123', { authToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
-          throw new Error('Should not succeed.');
-        } catch (caught: any) {
-          err = caught;
-        } finally {
-          expect(err).toBeDefined();
-          expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Token and publishableKey are mutually exclusive.');
-        }
+        expect(() => {
+          Radar.initialize('_my_test_pk_123', { authToken });
+        }).toThrow(
+          expect.objectContaining({
+            name: 'RadarPublishableKeyError',
+            message: 'Token and publishableKey are mutually exclusive.',
+          }),
+        );
       });
 
       it('should throw on invalid authToken format', () => {
-        let err: any;
-        try {
+        expect(() => {
           Radar.initialize({ authToken: 'not-a-jwt' });
-          throw new Error('Should not succeed.');
-        } catch (caught: any) {
-          err = caught;
-        } finally {
-          expect(err).toBeDefined();
-          expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Invalid authToken format. Expected a JWT.');
-        }
+        }).toThrow(
+          expect.objectContaining({
+            name: 'RadarPublishableKeyError',
+            message: 'Invalid authToken format. Expected a JWT.',
+          }),
+        );
       });
 
       it('should throw on authToken with empty segments', () => {
-        let err: any;
-        try {
-          Radar.initialize({ authToken: 'a..b' });
-          throw new Error('Should not succeed.');
-        } catch (caught: any) {
-          err = caught;
-        } finally {
-          expect(err).toBeDefined();
-          expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Invalid authToken format. Expected a JWT.');
-        }
+        expect(() => {
+          Radar.initialize({ authToken: 'eyJhbGciOiJIUzI1NiJ9..sig' });
+        }).toThrow(
+          expect.objectContaining({
+            name: 'RadarPublishableKeyError',
+            message: 'Invalid authToken format. Expected a JWT.',
+          }),
+        );
       });
 
       it('should support initialize({ publishableKey }) object form', () => {
@@ -215,22 +211,19 @@ describe('Radar', () => {
       });
 
       it('should throw when options object has neither authToken nor publishableKey', () => {
-        let err: any;
-        try {
+        expect(() => {
           // @ts-expect-error testing runtime guard for missing credentials
           Radar.initialize({});
-          throw new Error('Should not succeed.');
-        } catch (caught: any) {
-          err = caught;
-        } finally {
-          expect(err).toBeDefined();
-          expect(err.name).toEqual('RadarPublishableKeyError');
-          expect(err.message).toEqual('Publishable key or authToken required in initialization.');
-        }
+        }).toThrow(
+          expect.objectContaining({
+            name: 'RadarPublishableKeyError',
+            message: 'Publishable key or authToken required in initialization.',
+          }),
+        );
       });
 
       it('should clear authToken state via Radar.clear()', () => {
-        Radar.initialize({ authToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123' });
+        Radar.initialize({ authToken });
         Radar.clear();
         const options = Config.get();
         expect(options.authToken).toBeUndefined();
