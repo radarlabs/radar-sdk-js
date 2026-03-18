@@ -1,5 +1,4 @@
 import { Map, AttributionControl, LngLatBounds, NavigationControl } from 'maplibre-gl';
-import Radar from 'radar-sdk-js';
 
 import RadarLineFeature from './RadarLineFeature';
 import RadarLogoControl from './RadarLogoControl';
@@ -76,8 +75,8 @@ class RadarMap extends Map {
     const { Config, Logger } = ctx;
     const config = Config.get();
 
-    if (!config.publishableKey) {
-      Logger.warn('publishableKey not set. Call Radar.initialize() with key before creating a new map.');
+    if (!config.publishableKey && !config.authToken) {
+      Logger.warn('publishableKey or authToken not set. Call Radar.initialize() before creating a new map.');
     }
 
     // configure map options
@@ -98,16 +97,7 @@ class RadarMap extends Map {
         url = createStyleURL(config, { ...mapOptions, style: url });
       }
 
-      let headers = {
-        Authorization: config.publishableKey,
-        'X-Radar-Device-Type': 'Web',
-        'X-Radar-SDK-Version': Radar.VERSION,
-      };
-      if (typeof config.getRequestHeaders === 'function') {
-        headers = Object.assign(headers, config.getRequestHeaders());
-      }
-
-      return { url, headers };
+      return { url, headers: Config.getDefaultHeaders() };
     };
 
     super(mapOptions); // initialize MapLibre instance
