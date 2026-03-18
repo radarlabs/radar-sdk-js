@@ -99,7 +99,7 @@ describe('Http', () => {
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
       });
 
-      it('should return a server error on invalid JSON', async () => {
+      it('should return an unknown error on invalid JSON', async () => {
         fetchMock.mockResponseOnce(() => Promise.resolve({ body: '{invalid json', status: 200 }));
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_UNKNOWN');
       });
