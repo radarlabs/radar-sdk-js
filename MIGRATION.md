@@ -46,7 +46,7 @@ import { createMapsPlugin } from '@radarlabs/plugin-maps';
 import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 const map = Radar.ui.map({ container: 'map' });
 ```
 
@@ -123,7 +123,7 @@ Radar.trackVerified();
 // v5 (preferred — namespaced under Radar.fraud)
 import { createFraudPlugin } from '@radarlabs/plugin-fraud';
 Radar.registerPlugin(createFraudPlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 const { token, user, events } = await Radar.fraud.trackVerified();
 
 // v5 (backwards-compat shim — still works but deprecated)

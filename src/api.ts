@@ -67,7 +67,7 @@ const isJWTShape = (value: string): boolean => {
  *
  * @example
  * ```ts
- * Radar.initialize('prj_test_pk_...');
+ * Radar.initialize({ publishableKey: 'prj_test_pk_...' });
  * const { user, events } = await Radar.trackOnce();
  * ```
  */
