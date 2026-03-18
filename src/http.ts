@@ -174,8 +174,10 @@ class Http {
       if (parsed) {
         throw new RadarServerError(parsed);
       } else {
-        Logger.debug(`API call failed: ${url}`);
-        Logger.debug(String(err));
+        if (options.debug) {
+          Logger.debug(`API call failed: ${url}`);
+          Logger.debug(String(err));
+        }
         throw new RadarUnknownError(parsed);
       }
     }
@@ -194,8 +196,10 @@ class Http {
     if (response.ok) {
       return parsed as T;
     }
-    Logger.debug(`API call failed: ${url}`);
-    Logger.debug(JSON.stringify(parsed));
+    if (options.debug) {
+      Logger.debug(`API call failed: ${url}`);
+      Logger.debug(JSON.stringify(parsed));
+    }
 
     if (response.status === 400) {
       throw new RadarBadRequestError(parsed);

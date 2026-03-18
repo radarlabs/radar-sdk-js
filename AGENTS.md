@@ -67,7 +67,7 @@ Version is tracked in 3 places that must stay in sync:
 - **State**: `Config` singleton + `Storage` (typed localStorage with `radar-*` keys)
 - **HTTP**: `Http.request({ method, path, data })` — fetch-based, deduplicates in-flight requests via AbortController
 - **Errors**: `RadarError` hierarchy with a custom class per HTTP status (BadRequest, Unauthorized, RateLimit, etc.)
-- **Initialization**: `Radar.initialize(options)` — accepts `{ publishableKey }` or `{ authToken }`, validates credentials, auto-detects live/test mode
+- **Initialization**: `Radar.initialize(publishableKey, options?)` (string shorthand) or `Radar.initialize(options)` (options object with `publishableKey` or `authToken`). Validates credentials, auto-detects live/test mode
 
 ## Code style
 

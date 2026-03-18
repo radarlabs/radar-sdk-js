@@ -51,12 +51,16 @@ class Config {
    * Callers must ensure credentials are set before calling (e.g. via Radar.initialize).
    * */
   static getDefaultHeaders(): Record<string, string> {
-    const { publishableKey, authToken, getRequestHeaders: getHeaders } = Config.options;
+    const { publishableKey, authToken, getRequestHeaders: getHeaders } = Config.get();
     const headers: Record<string, string> = {
-      Authorization: authToken ? `Bearer ${authToken}` : publishableKey!,
       'X-Radar-Device-Type': 'Web',
       'X-Radar-SDK-Version': SDK_VERSION,
     };
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
+    } else if (publishableKey) {
+      headers.Authorization = publishableKey;
+    }
     if (typeof getHeaders === 'function') {
       Object.assign(headers, getHeaders());
     }

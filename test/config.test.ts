@@ -33,5 +33,12 @@ describe('Config', () => {
       const headers = Config.getDefaultHeaders();
       expect(headers['X-Custom']).toEqual('val');
     });
+
+    it('should omit Authorization when neither credential is set', () => {
+      Config.clear();
+      const headers = Config.getDefaultHeaders();
+      expect(headers['Authorization']).toBeUndefined();
+      expect(headers['X-Radar-Device-Type']).toEqual('Web');
+    });
   });
 });
