@@ -172,6 +172,15 @@ describe('Http', () => {
       expect(request.headers['X-String']).toEqual('string');
       expect(request.headers['X-Test']).toEqual('true');
     });
+
+    it('should allow per-request headers to override defaults', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data, headers: { 'X-Radar-Device-Type': 'iOS' } });
+      const request = getRequest();
+
+      expect(request.headers['X-Radar-Device-Type']).toEqual('iOS');
+    });
   });
 
   describe('authToken authentication', () => {

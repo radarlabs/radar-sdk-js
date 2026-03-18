@@ -15,7 +15,6 @@ import {
 } from './errors';
 import Logger from './logger';
 import Navigator from './navigator';
-import SDK_VERSION from './version';
 
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -130,19 +129,11 @@ class Http {
       inFlightRequests.set(requestId, abortController);
     }
 
-    const defaultHeaders: Record<string, string> = {
-      Authorization: authToken ? `Bearer ${authToken}` : publishableKey!,
+    const allHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
-      'X-Radar-Device-Type': 'Web',
-      'X-Radar-SDK-Version': SDK_VERSION,
+      ...Config.getDefaultHeaders(),
+      ...headers,
     };
-
-    let configHeaders: Record<string, string> = {};
-    if (typeof options.getRequestHeaders === 'function') {
-      configHeaders = options.getRequestHeaders();
-    }
-
-    const allHeaders: Record<string, string> = { ...defaultHeaders, ...configHeaders, ...headers };
 
     let response: Response;
     try {
