@@ -75,30 +75,31 @@ creating a new one.
 
 ### Options
 
-| Option              | Type                    | Default            | Description                               |
-| ------------------- | ----------------------- | ------------------ | ----------------------------------------- |
-| `container`         | `string \| HTMLElement` | `'autocomplete'`   | Container element or ID                   |
-| `onSelection`       | `(result) => void`      | —                  | Called when the user selects a result     |
-| `onResults`         | `(results) => void`     | —                  | Called after results are fetched          |
-| `onRequest`         | `(params) => void`      | —                  | Called before each API request            |
-| `onError`           | `(error) => void`       | —                  | Called on fetch errors                    |
-| `placeholder`       | `string`                | `'Search address'` | Input placeholder text                    |
-| `minCharacters`     | `number`                | `3`                | Minimum characters before searching       |
-| `debounceMS`        | `number`                | `200`              | Debounce delay in milliseconds            |
-| `limit`             | `number`                | `8`                | Maximum number of results                 |
-| `responsive`        | `boolean`               | `true`             | Use 100% width (with optional `maxWidth`) |
-| `width`             | `string \| number`      | `400`              | Fixed width, or max-width if responsive   |
-| `maxHeight`         | `string \| number`      | —                  | Max height for the results dropdown       |
-| `disabled`          | `boolean`               | `false`            | Disable the input                         |
-| `showMarkers`       | `boolean`               | `true`             | Show marker icons next to results         |
-| `markerColor`       | `string`                | `'#ACBDC8'`        | Color of result marker icons              |
-| `hideResultsOnBlur` | `boolean`               | `true`             | Close results when input loses focus      |
-| `near`              | `Location \| string`    | —                  | Bias results near a location              |
-| `layers`            | `string[]`              | —                  | Filter by geocode layers                  |
-| `countryCode`       | `string`                | —                  | Filter results by country                 |
-| `lang`              | `string`                | —                  | Language for results                      |
-| `postalCode`        | `string`                | —                  | Filter results by postal code             |
-| `mailable`          | `boolean`               | —                  | Only return mailable addresses            |
+| Option                  | Type                    | Default            | Description                                                                                            |
+| ----------------------- | ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
+| `container`             | `string \| HTMLElement` | `'autocomplete'`   | Container element or ID                                                                                |
+| `onSelection`           | `(result) => void`      | —                  | Called when the user selects a result                                                                  |
+| `onResults`             | `(results) => void`     | —                  | Called after results are fetched                                                                       |
+| `onRequest`             | `(params) => void`      | —                  | Called before each API request                                                                         |
+| `onError`               | `(error) => void`       | —                  | Called on fetch errors                                                                                 |
+| `placeholder`           | `string`                | `'Search address'` | Input placeholder text                                                                                 |
+| `minCharacters`         | `number`                | `3`                | Minimum characters before searching                                                                    |
+| `debounceMS`            | `number`                | `200`              | Debounce delay in milliseconds                                                                         |
+| `limit`                 | `number`                | `8`                | Maximum number of results                                                                              |
+| `responsive`            | `boolean`               | `true`             | Use 100% width (with optional `maxWidth`)                                                              |
+| `width`                 | `string \| number`      | `400`              | Fixed width, or max-width if responsive                                                                |
+| `maxHeight`             | `string \| number`      | —                  | Max height for the results dropdown                                                                    |
+| `disabled`              | `boolean`               | `false`            | Disable the input                                                                                      |
+| `showMarkers`           | `boolean`               | `true`             | Show marker icons next to results                                                                      |
+| `markerColor`           | `string`                | `'#ACBDC8'`        | Color of result marker icons                                                                           |
+| `hideResultsOnBlur`     | `boolean`               | `true`             | Close results when input loses focus                                                                   |
+| `ignoreBrowserAutofill` | `boolean`               | `true`             | Skip autocomplete when the browser bulk-fills the field; resumes after the user types, pastes, or cuts |
+| `near`                  | `Location \| string`    | —                  | Bias results near a location                                                                           |
+| `layers`                | `string[]`              | —                  | Filter by geocode layers                                                                               |
+| `countryCode`           | `string`                | —                  | Filter results by country                                                                              |
+| `lang`                  | `string`                | —                  | Language for results                                                                                   |
+| `postalCode`            | `string`                | —                  | Filter results by postal code                                                                          |
+| `mailable`              | `boolean`               | —                  | Only return mailable addresses                                                                         |
 
 ### Chainable setters
 
@@ -117,7 +118,7 @@ autocomplete
 Available setters: `setNear()`, `setPlaceholder()`, `setDisabled()`,
 `setResponsive()`, `setWidth()`, `setMaxHeight()`, `setMinCharacters()`,
 `setLimit()`, `setLang()`, `setPostalCode()`, `setShowMarkers()`,
-`setMarkerColor()`, `setHideResultsOnBlur()`.
+`setMarkerColor()`, `setHideResultsOnBlur()`, `setIgnoreBrowserAutofill()`.
 
 ### Remove the widget
 

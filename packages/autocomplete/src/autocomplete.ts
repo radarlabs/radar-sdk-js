@@ -25,6 +25,7 @@ const defaultAutocompleteOptions: RadarAutocompleteUIOptions = {
   disabled: false,
   showMarkers: true,
   hideResultsOnBlur: true,
+  ignoreBrowserAutofill: true,
 };
 
 // determine whether to use px or CSS string
@@ -77,6 +78,14 @@ class AutocompleteUI {
   near?: string;
   private _boundClose: () => void;
   private _debouncePromise: Promise<RadarAutocompleteAddress[]> | null = null;
+  /** when true, bulk-filled value was treated as browser autofill; skip API until manual edit */
+  private _suppressAutocompleteUntilManualInput = false;
+  /** set by keydown (capture), paste, cut before input runs */
+  private _pendingManualInput = false;
+  /** previous input value for autofill bulk detection */
+  private _prevInputValue = '';
+  private _boundMarkManualInput: () => void;
+  private _boundOnFocusAutofill: () => void;
 
   // DOM elements
   container: HTMLElement;
@@ -93,6 +102,17 @@ class AutocompleteUI {
     // setup state
     this.isOpen = false;
     this._boundClose = this.close.bind(this);
+    this._boundMarkManualInput = () => {
+      if (this.config.ignoreBrowserAutofill) {
+        this._pendingManualInput = true;
+      }
+    };
+    this._boundOnFocusAutofill = () => {
+      if (this.config.ignoreBrowserAutofill) {
+        this._prevInputValue = this.inputField.value;
+        this._suppressAutocompleteUntilManualInput = false;
+      }
+    };
     this.debouncedFetchResults = this.debounce(this.fetchResults.bind(this), this.config.debounceMS);
     this.results = [];
     this.highlightedIndex = -1;
@@ -185,6 +205,13 @@ class AutocompleteUI {
     // setup event listeners
     this.inputField.addEventListener('input', this.handleInput.bind(this));
     this.inputField.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
+    if (this.config.ignoreBrowserAutofill) {
+      this.inputField.addEventListener('focus', this._boundOnFocusAutofill);
+      this.inputField.addEventListener('paste', this._boundMarkManualInput);
+      this.inputField.addEventListener('cut', this._boundMarkManualInput);
+      this.inputField.addEventListener('keydown', this._boundMarkManualInput, true);
+      this._prevInputValue = this.inputField.value;
+    }
     if (this.config.hideResultsOnBlur) {
       this.inputField.addEventListener('blur', this._boundClose, true);
     }
@@ -196,9 +223,41 @@ class AutocompleteUI {
   public handleInput() {
     const { Logger } = this.ctx;
 
-    // Fetch autocomplete results and display them
     const query = this.inputField.value;
-    if (query.length < this.config.minCharacters) {
+    const min = this.config.minCharacters;
+
+    if (this.config.ignoreBrowserAutofill) {
+      if (this._suppressAutocompleteUntilManualInput) {
+        if (this._pendingManualInput) {
+          this._suppressAutocompleteUntilManualInput = false;
+        } else {
+          if (query.length < min) {
+            this._suppressAutocompleteUntilManualInput = false;
+          }
+          this._prevInputValue = query;
+          return;
+        }
+      }
+
+      if (!this._pendingManualInput) {
+        const prev = this._prevInputValue;
+        const jump = query.length - prev.length;
+        const looksLikeBulkFill =
+          (jump >= 12 && query.length >= min) || (prev.length < min && query.length >= min && jump >= min);
+        if (looksLikeBulkFill) {
+          this._suppressAutocompleteUntilManualInput = true;
+          this._prevInputValue = query;
+          this.close();
+          return;
+        }
+      } else {
+        this._pendingManualInput = false;
+      }
+
+      this._prevInputValue = query;
+    }
+
+    if (query.length < min) {
       return;
     }
 
@@ -519,6 +578,12 @@ class AutocompleteUI {
   public remove() {
     const { Logger } = this.ctx;
     Logger.debug('AutocompleteUI removed.');
+    if (this.config.ignoreBrowserAutofill) {
+      this.inputField.removeEventListener('focus', this._boundOnFocusAutofill);
+      this.inputField.removeEventListener('paste', this._boundMarkManualInput);
+      this.inputField.removeEventListener('cut', this._boundMarkManualInput);
+      this.inputField.removeEventListener('keydown', this._boundMarkManualInput, true);
+    }
     this.inputField.remove();
     this.resultsList.remove();
     this.wrapper.remove();
@@ -707,6 +772,31 @@ class AutocompleteUI {
       this.inputField.addEventListener('blur', this._boundClose, true);
     } else {
       this.inputField.removeEventListener('blur', this._boundClose, true);
+    }
+    return this;
+  }
+
+  /**
+   * when true, skip autocomplete after browser autofill until the user edits the field
+   * @param ignoreBrowserAutofill - whether to suppress autocomplete on bulk autofill
+   * @returns this instance for chaining
+   */
+  public setIgnoreBrowserAutofill(ignoreBrowserAutofill: boolean) {
+    const was = this.config.ignoreBrowserAutofill;
+    this.config.ignoreBrowserAutofill = ignoreBrowserAutofill;
+    if (!was && ignoreBrowserAutofill) {
+      this.inputField.addEventListener('focus', this._boundOnFocusAutofill);
+      this.inputField.addEventListener('paste', this._boundMarkManualInput);
+      this.inputField.addEventListener('cut', this._boundMarkManualInput);
+      this.inputField.addEventListener('keydown', this._boundMarkManualInput, true);
+      this._prevInputValue = this.inputField.value;
+      this._suppressAutocompleteUntilManualInput = false;
+    } else if (was && !ignoreBrowserAutofill) {
+      this.inputField.removeEventListener('focus', this._boundOnFocusAutofill);
+      this.inputField.removeEventListener('paste', this._boundMarkManualInput);
+      this.inputField.removeEventListener('cut', this._boundMarkManualInput);
+      this.inputField.removeEventListener('keydown', this._boundMarkManualInput, true);
+      this._suppressAutocompleteUntilManualInput = false;
     }
     return this;
   }

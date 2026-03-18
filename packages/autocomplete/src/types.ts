@@ -36,6 +36,13 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   markerColor?: string;
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
+  /**
+   * When true, skip autocomplete API and dropdown after browser address autofill
+   * (bulk fill without typing). After the user edits the field (keyboard, paste, cut),
+   * autocomplete runs normally. Set false to always search on input.
+   * @default true
+   */
+  ignoreBrowserAutofill?: boolean;
 }
 
 /** resolved configuration with required defaults */
