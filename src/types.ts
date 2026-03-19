@@ -1,5 +1,5 @@
 /** log verbosity level for the SDK */
-export type LogLevel = 'none' | 'info' | 'warn' | 'error';
+export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
 
 /** a geographic coordinate with optional accuracy and timestamp */
 export interface Location {
@@ -22,11 +22,9 @@ export interface NavigatorPosition {
 /** browser location permission state */
 export type LocationAuthorization = 'DENIED' | 'NOT_DETERMINED' | 'GRANTED_FOREGROUND';
 
-/** configuration options passed to {@link Radar.initialize} */
-export interface RadarOptions {
-  /** Radar publishable key (set automatically by `initialize`) */
-  publishableKey?: string;
-  /** whether the key is a live key (set automatically) */
+/** shared SDK configuration fields (excluding auth credentials) */
+export interface RadarBaseOptions {
+  /** @deprecated use `debug` instead. inferred automatically from publishableKey. */
   live?: boolean;
   /** SDK log verbosity */
   logLevel?: LogLevel;
@@ -46,6 +44,32 @@ export interface RadarOptions {
   getRequestHeaders?: () => Record<string, string>;
   /** enable debug logging */
   debug?: boolean;
+}
+
+/** options for initializing with a JWT auth token */
+export interface RadarAuthTokenInitOptions extends RadarBaseOptions {
+  /** JWT auth token */
+  authToken: string;
+  live?: never;
+  publishableKey?: never;
+}
+
+/** options for initializing with a publishable key via the options object */
+export interface RadarPublishableKeyInitOptions extends RadarBaseOptions {
+  /** Radar publishable key */
+  publishableKey: string;
+  authToken?: never;
+}
+
+/** configuration options passed to {@link Radar.initialize} */
+export type RadarInitOptions = RadarAuthTokenInitOptions | RadarPublishableKeyInitOptions;
+
+/** internal SDK configuration (all fields optional — stored by Config after initialization) */
+export interface RadarOptions extends RadarBaseOptions {
+  /** Radar publishable key (set automatically by `initialize`) */
+  publishableKey?: string;
+  /** JWT auth Token (mutually exclusive with publishableKey) */
+  authToken?: string;
 }
 
 /** response from GET /v1/config */

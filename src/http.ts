@@ -15,7 +15,6 @@ import {
 } from './errors';
 import Logger from './logger';
 import Navigator from './navigator';
-import SDK_VERSION from './version';
 
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
@@ -74,7 +73,7 @@ class Http {
    * send an HTTP request to the Radar API
    * @param options - request configuration
    * @returns parsed response body, typed as `T`
-   * @throws {RadarPublishableKeyError} if publishable key is not set
+   * @throws {RadarPublishableKeyError} if neither publishable key nor authToken is set
    * @throws {RadarBadRequestError} on 400 responses
    * @throws {RadarUnauthorizedError} on 401 responses
    * @throws {RadarNetworkError} on network failures
@@ -95,9 +94,9 @@ class Http {
   }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
-    const publishableKey = options.publishableKey;
-    if (!publishableKey) {
-      throw new RadarPublishableKeyError('publishableKey not set.');
+    const { publishableKey, authToken } = options;
+    if (!publishableKey && !authToken) {
+      throw new RadarPublishableKeyError('publishableKey or authToken not set.');
     }
 
     const urlHost = host || options.host;
@@ -130,19 +129,11 @@ class Http {
       inFlightRequests.set(requestId, abortController);
     }
 
-    const defaultHeaders: Record<string, string> = {
-      Authorization: publishableKey,
+    const allHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
-      'X-Radar-Device-Type': 'Web',
-      'X-Radar-SDK-Version': SDK_VERSION,
+      ...Config.getDefaultHeaders(),
+      ...headers,
     };
-
-    let configHeaders: Record<string, string> = {};
-    if (typeof options.getRequestHeaders === 'function') {
-      configHeaders = options.getRequestHeaders();
-    }
-
-    const allHeaders: Record<string, string> = { ...defaultHeaders, ...configHeaders, ...headers };
 
     let response: Response;
     try {
@@ -187,7 +178,6 @@ class Http {
           Logger.debug(`API call failed: ${url}`);
           Logger.debug(String(err));
         }
-
         throw new RadarUnknownError(parsed);
       }
     }
@@ -206,7 +196,6 @@ class Http {
     if (response.ok) {
       return parsed as T;
     }
-
     if (options.debug) {
       Logger.debug(`API call failed: ${url}`);
       Logger.debug(JSON.stringify(parsed));

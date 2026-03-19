@@ -37,7 +37,7 @@ import { createMapsPlugin } from '@radarlabs/plugin-maps';
 import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 ```
 
 ### With a script tag

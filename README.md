@@ -46,10 +46,8 @@ Then import and initialize:
 ```js
 import Radar from 'radar-sdk-js';
 
-// initialize with your test or live publishable key
-Radar.initialize('prj_test_pk_...', {
-  /* options */
-});
+// initialize with your publishable key
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 ```
 
 ### With a script tag
@@ -57,12 +55,10 @@ Radar.initialize('prj_test_pk_...', {
 Add the following to your HTML:
 
 ```html
-<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/v5.1.0/radar.min.js"></script>
 
 <script>
-  Radar.initialize('prj_test_pk_...', {
-    /* options */
-  });
+  Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 </script>
 ```
 
@@ -84,7 +80,7 @@ import { createMapsPlugin } from '@radarlabs/plugin-maps';
 import '@radarlabs/plugin-maps/dist/radar-maps.css';
 
 Radar.registerPlugin(createMapsPlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 
 const map = Radar.ui.map({
   container: 'map',
@@ -103,7 +99,7 @@ import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
 import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
 
 Radar.registerPlugin(createAutocompletePlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 
 Radar.ui.autocomplete({
   container: 'autocomplete',
@@ -124,7 +120,7 @@ import Radar from 'radar-sdk-js';
 import { createFraudPlugin } from '@radarlabs/plugin-fraud';
 
 Radar.registerPlugin(createFraudPlugin());
-Radar.initialize('prj_live_pk_...');
+Radar.initialize({ publishableKey: 'prj_live_pk_...' });
 
 const { token, user, events } = await Radar.fraud.trackVerified();
 ```
@@ -138,7 +134,7 @@ the core SDK first, then any plugins you need:
 <link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
 <link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
 
-<script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+<script src="https://js.radar.com/v5.1.0/radar.min.js"></script>
 <script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
 <script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
 <script src="https://js.radar.com/fraud/v1.0.0/radar-fraud.min.js"></script>
@@ -155,7 +151,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/maps/v1.0.0/radar-maps.css" rel="stylesheet" />
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0/radar.min.js"></script>
     <script src="https://js.radar.com/maps/v1.0.0/radar-maps.min.js"></script>
   </head>
 
@@ -163,7 +159,7 @@ by ID or element reference.
     <div id="map" style="width: 100%; height: 500px;" />
 
     <script>
-      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+      Radar.initialize({ publishableKey: '<RADAR_PUBLISHABLE_KEY>' });
 
       const map = Radar.ui.map({
         container: 'map', // OR document.getElementById('map')
@@ -182,7 +178,7 @@ by ID or element reference.
 <html>
   <head>
     <link href="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.css" rel="stylesheet" />
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0/radar.min.js"></script>
     <script src="https://js.radar.com/autocomplete/v1.1.0/radar-autocomplete.min.js"></script>
   </head>
 
@@ -190,7 +186,7 @@ by ID or element reference.
     <div id="autocomplete" />
 
     <script>
-      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+      Radar.initialize({ publishableKey: '<RADAR_PUBLISHABLE_KEY>' });
 
       // create autocomplete widget
       Radar.ui.autocomplete({
@@ -215,12 +211,12 @@ are needed for geofencing.
 ```html
 <html>
   <head>
-    <script src="https://js.radar.com/v5.0.0/radar.min.js"></script>
+    <script src="https://js.radar.com/v5.1.0/radar.min.js"></script>
   </head>
 
   <body>
     <script>
-      Radar.initialize('<RADAR_PUBLISHABLE_KEY>');
+      Radar.initialize({ publishableKey: '<RADAR_PUBLISHABLE_KEY>' });
 
       Radar.trackOnce({ userId: 'example-user-id' }).then(({ location, user, events }) => {
         // do something with user location or events
@@ -254,7 +250,7 @@ import { createFraudPlugin } from '@radarlabs/plugin-fraud';
 Radar.registerPlugin(createMapsPlugin());
 Radar.registerPlugin(createAutocompletePlugin());
 Radar.registerPlugin(createFraudPlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 ```
 
 If you're building a custom plugin, import the plugin types from the

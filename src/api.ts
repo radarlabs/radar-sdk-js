@@ -35,6 +35,7 @@ import type {
   RadarMatrixParams,
   RadarMatrixResponse,
   RadarMetadata,
+  RadarInitOptions,
   RadarOptions,
   RadarReverseGeocodeParams,
   RadarRouteResponse,
@@ -52,13 +53,21 @@ import type {
 
 const isSecretKey = (key: string): boolean => key.includes('_sk_');
 const isLiveKey = (key: string): boolean => key.includes('_live_');
+const isJWTShape = (value: string): boolean => {
+  // NOTE(jasonl): keep this check lightweight since we're doing real validation server-side
+  if (!value.startsWith('eyJ')) {
+    return false;
+  }
+  const parts = value.split('.');
+  return parts.length === 3 && parts.every((s) => s.length > 0);
+};
 
 /**
  * main entry point for the Radar SDK. all methods are static — do not instantiate.
  *
  * @example
  * ```ts
- * Radar.initialize('prj_test_pk_...');
+ * Radar.initialize({ publishableKey: 'prj_test_pk_...' });
  * const { user, events } = await Radar.trackOnce();
  * ```
  */
@@ -109,42 +118,55 @@ class Radar {
       },
     };
   }
-
   /**
-   * initialize the SDK with a publishable key. must be called before any other method.
+   * initialize the SDK with an authToken or publishable key via options object.
+   * @param options - SDK configuration with `authToken` or `publishableKey`
+   * @throws {RadarPublishableKeyError} if credentials are missing or invalid
+   */
+  public static initialize(options: RadarInitOptions): void;
+  /**
+   * initialize the SDK with a publishable key string.
    * @param publishableKey - your Radar publishable key (starts with `prj_test_pk_` or `prj_live_pk_`)
    * @param options - optional SDK configuration
    * @throws {RadarPublishableKeyError} if the key is missing or is a secret key
    */
-  public static initialize(publishableKey: string, options: RadarOptions = {}) {
-    if (!publishableKey) {
-      throw new RadarPublishableKeyError('Publishable key required in initialization.');
+  public static initialize(publishableKey: string, options?: RadarOptions): void;
+  public static initialize(publishableKeyOrOptions: string | RadarInitOptions, extraOptions: RadarOptions = {}) {
+    // NOTE(jasonl): shim the string signature into the options object to handle both cases
+    const options: RadarOptions =
+      typeof publishableKeyOrOptions === 'string'
+        ? { publishableKey: publishableKeyOrOptions, ...extraOptions }
+        : { ...publishableKeyOrOptions };
+
+    if (options.publishableKey && options.authToken) {
+      throw new RadarPublishableKeyError('Token and publishableKey are mutually exclusive.');
     }
 
-    if (isSecretKey(publishableKey)) {
-      throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
+    let credentialLabel: 'publishableKey' | 'authToken';
+
+    if (options.publishableKey) {
+      if (isSecretKey(options.publishableKey)) {
+        throw new RadarPublishableKeyError('Secret keys are not allowed. Please use your Radar publishable key.');
+      }
+      options.live = isLiveKey(options.publishableKey);
+      credentialLabel = 'publishableKey';
+    } else if (options.authToken) {
+      if (!isJWTShape(options.authToken)) {
+        throw new RadarPublishableKeyError('Invalid authToken format. Expected a JWT.');
+      }
+      credentialLabel = 'authToken';
+    } else {
+      throw new RadarPublishableKeyError('Publishable key or authToken required in initialization.');
     }
 
-    // store settings in global config
-    const live = isLiveKey(publishableKey);
-    const logLevel = live ? 'error' : 'info';
-    const debug = !live;
-    const radarOptions = Object.assign(
-      Config.defaultOptions,
-      {
-        publishableKey,
-        live,
-        logLevel,
-        debug,
-      },
-      options,
-    );
+    // NOTE(jasonl): for backwards compat with the old `live` option - if `debug` isn't explicitly set, we'll set it to the inverse of `live`
+    options.debug = options.debug ?? (options.live !== undefined ? !options.live : false);
+    options.logLevel = options.logLevel ?? (options.debug ? 'debug' : 'error');
+    const radarOptions = Object.assign({}, Config.defaultOptions, options);
     Config.setup(radarOptions);
 
-    Logger.info(`initialized with ${live ? 'live' : 'test'} publishableKey.`);
-    if (options.debug) {
-      Logger.debug('using options', options);
-    }
+    Logger.info(`initialized with ${credentialLabel}.`);
+    Logger.debug('using options', options);
 
     // NOTE(jasonl): this allows us to run jest tests
     // without having to mock the ConfigAPI.getConfig call

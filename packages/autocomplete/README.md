@@ -37,7 +37,7 @@ import { createAutocompletePlugin } from '@radarlabs/plugin-autocomplete';
 import '@radarlabs/plugin-autocomplete/dist/radar-autocomplete.css';
 
 Radar.registerPlugin(createAutocompletePlugin());
-Radar.initialize('prj_test_pk_...');
+Radar.initialize({ publishableKey: 'prj_test_pk_...' });
 ```
 
 ### With a script tag
