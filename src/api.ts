@@ -135,7 +135,7 @@ class Radar {
     // NOTE(jasonl): shim the string signature into the options object to handle both cases
     const options: RadarOptions =
       typeof publishableKeyOrOptions === 'string'
-        ? { ...extraOptions, publishableKey: publishableKeyOrOptions }
+        ? { publishableKey: publishableKeyOrOptions, ...extraOptions }
         : { ...publishableKeyOrOptions };
 
     if (options.publishableKey && options.authToken) {
