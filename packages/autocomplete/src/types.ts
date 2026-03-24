@@ -37,6 +37,12 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   /** whether to hide results when the input loses focus */
   hideResultsOnBlur?: boolean;
   /**
+   * HTML `autocomplete` attribute on the input. Default `'off'` reduces native autofill competing with the widget.
+   * Use e.g. `'street-address'` when you want the browser to offer saved addresses (often with `ignoreBrowserAutofill`).
+   * @default 'off'
+   */
+  inputAutocomplete?: string;
+  /**
    * When true, skip autocomplete API and dropdown after browser address autofill
    * (bulk fill without typing). After the user edits the field (keyboard, paste, cut),
    * autocomplete runs normally. Set false to always search on input.
