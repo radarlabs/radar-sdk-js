@@ -161,6 +161,11 @@ export interface RadarNetworkFailureDetails {
   readonly userAgent?: string;
   /** true when API hostname differs from the document hostname */
   readonly crossSiteApiCall?: boolean;
+  /**
+   * Wall-clock ms from immediately before `fetch()` until it rejected (rounded integer).
+   * Does not include JSON parse time when a response was received.
+   */
+  readonly durationMs: number;
   /** whether `navigator.onLine` was false at failure time */
   readonly online: boolean;
   /** true when failure was triggered by AbortController / user abort */

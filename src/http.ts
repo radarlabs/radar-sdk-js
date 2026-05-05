@@ -111,12 +111,19 @@ function parseThrowable(err: unknown): { name: string; message: string; stack?: 
   return { name: 'non_error', message: String(err) };
 }
 
+/** monotonic-ish timestamp in ms (`performance.now` when available; else `Date.now`) */
+function getHighResTime(): number {
+  return typeof performance !== 'undefined' && typeof performance.now === 'function' ? performance.now() : Date.now();
+}
+
 function buildFetchFailureDetails(
   method: HttpMethod,
   url: string,
   requestId: string | undefined,
   err: unknown,
   signal: AbortSignal,
+  /** elapsed ms from immediately before `fetch()` until rejection */
+  durationMs: number,
 ): RadarNetworkFailureDetails {
   let pathname = '';
   let search = '';
@@ -157,6 +164,7 @@ function buildFetchFailureDetails(
     url,
     pathname,
     search,
+    durationMs: Math.max(0, Math.round(durationMs)),
     ...(apiHostname !== undefined ? { apiHostname } : {}),
     ...(pageOrigin !== undefined ? { pageOrigin } : {}),
     ...(pagePath !== undefined ? { pagePath } : {}),
@@ -266,6 +274,7 @@ class Http {
     };
 
     let response: Response;
+    const fetchStartedAt = getHighResTime();
     try {
       response = await fetch(url, {
         method,
@@ -274,12 +283,20 @@ class Http {
         signal: abortController.signal,
       });
     } catch (fetchErr) {
+      const durationMs = getHighResTime() - fetchStartedAt;
       // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
       if (requestId && inFlightRequests.get(requestId) === abortController) {
         inFlightRequests.delete(requestId);
       }
 
-      const fetchFailureDetails = buildFetchFailureDetails(method, url, requestId, fetchErr, abortController.signal);
+      const fetchFailureDetails = buildFetchFailureDetails(
+        method,
+        url,
+        requestId,
+        fetchErr,
+        abortController.signal,
+        durationMs,
+      );
 
       Logger.error(
         `Fetch failed (${fetchFailureDetails.aborted ? 'aborted' : fetchFailureDetails.errorName})`,

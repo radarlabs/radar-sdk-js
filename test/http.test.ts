@@ -112,6 +112,7 @@ describe('Http', () => {
             errorName: 'TypeError',
             errorMessage: 'Network error',
             apiHostname: 'api.radar.io',
+            durationMs: expect.any(Number),
           },
           fetchError: expect.any(Error),
         });
