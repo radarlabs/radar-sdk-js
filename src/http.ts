@@ -1,4 +1,5 @@
 import Config from './config';
+import { scheduleDnsOverHttpsProbe } from './dns-over-https';
 import {
   RadarBadRequestError,
   RadarForbiddenError,
@@ -302,6 +303,20 @@ class Http {
         `Fetch failed (${fetchFailureDetails.aborted ? 'aborted' : fetchFailureDetails.errorName})`,
         fetchFailureDetails,
       );
+
+      if (!fetchFailureDetails.aborted) {
+        scheduleDnsOverHttpsProbe(fetchFailureDetails.apiHostname, {
+          requestFailure: {
+            method: fetchFailureDetails.method,
+            url: fetchFailureDetails.url,
+            durationMs: fetchFailureDetails.durationMs,
+            phase: fetchFailureDetails.phase,
+            errorName: fetchFailureDetails.errorName,
+            errorMessage: fetchFailureDetails.errorMessage,
+            crossSiteApiCall: fetchFailureDetails.crossSiteApiCall,
+          },
+        });
+      }
 
       for (const [pattern, interceptorHandler] of Http.errorInterceptors) {
         if ((urlHost ?? '').includes(pattern)) {
