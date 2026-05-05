@@ -117,6 +117,7 @@ describe('Http', () => {
           fetchError: expect.any(Error),
         });
         expect((err as Error).message).toBe('Network error');
+        expect((err as { dnsProbe?: Promise<unknown> }).dnsProbe).toBeUndefined();
       });
 
       it('should return an unknown error on invalid JSON', async () => {

@@ -1,4 +1,7 @@
+import type { DnsProbeResult } from './dns-over-https';
 import type { RadarResponse } from './http';
+
+export type { DnsProbeResult };
 
 /** base error class for all Radar SDK errors */
 export abstract class RadarError extends Error {
@@ -192,10 +195,22 @@ export class RadarNetworkError extends RadarError {
   /** original rejection from fetch; often a `TypeError` or `DOMException` */
   public readonly fetchError?: unknown;
 
-  constructor(message?: string, details?: RadarNetworkFailureDetails, fetchError?: unknown) {
+  /**
+   * Resolves when the optional Cloudflare DNS-over-HTTPS (A record) probe finishes.
+   * Only set for non-aborted fetch failures where a probe was scheduled (`null` if skipped in tests, no hostname, or a probe already ran for this host).
+   */
+  public readonly dnsProbe?: Promise<DnsProbeResult>;
+
+  constructor(
+    message?: string,
+    details?: RadarNetworkFailureDetails,
+    fetchError?: unknown,
+    dnsProbe?: Promise<DnsProbeResult> | null,
+  ) {
     super(message ?? 'Request timed out.');
     this.details = details;
     this.fetchError = fetchError;
+    this.dnsProbe = dnsProbe ?? undefined;
   }
 }
 

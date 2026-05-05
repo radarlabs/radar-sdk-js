@@ -15,7 +15,26 @@ interface DnsJsonResponse {
 
 const CLOUDFLARE_DOH_JSON = 'https://cloudflare-dns.com/dns-query';
 
-/** hostname -> already scheduled a probe this session */
+export type DnsProbeResult =
+  | {
+      status: 'success';
+      hostname: string;
+      resolver: 'cloudflare-dns.com';
+      dnsStatus: number;
+      ipv4Answers: string[];
+    }
+  | {
+      status: 'no_answers';
+      hostname: string;
+      resolver: 'cloudflare-dns.com';
+      dnsStatus: number;
+      answerCount: number;
+      note: string;
+    }
+  | { status: 'http_error'; hostname: string; resolver: 'cloudflare-dns.com'; httpStatus: number }
+  | { status: 'fetch_error'; hostname: string; resolver: 'cloudflare-dns.com'; errorMessage: string };
+
+/** hostname -> already ran a probe this session */
 const dnsProbeScheduledForHostname = new Set<string>();
 
 function getDnsProbeAbortSignal(): AbortSignal | undefined {
@@ -25,7 +44,9 @@ function getDnsProbeAbortSignal(): AbortSignal | undefined {
   return undefined;
 }
 
-async function dnsLookupA(hostname: string, correlation: Record<string, unknown>): Promise<DnsJsonResponse | null> {
+async function dnsLookupAJson(
+  hostname: string,
+): Promise<{ kind: 'ok'; data: DnsJsonResponse } | { kind: 'http_error'; httpStatus: number }> {
   const query = new URL(CLOUDFLARE_DOH_JSON);
   query.searchParams.set('name', hostname);
   query.searchParams.set('type', 'A');
@@ -36,71 +57,110 @@ async function dnsLookupA(hostname: string, correlation: Record<string, unknown>
   });
 
   if (!res.ok) {
-    Logger.error(`DNS-over-HTTPS HTTP error (${hostname})`, {
-      resolver: 'cloudflare-dns.com',
-      httpStatus: res.status,
-      correlation,
-    });
-    return null;
+    return { kind: 'http_error', httpStatus: res.status };
   }
 
-  return (await res.json()) as DnsJsonResponse;
+  return { kind: 'ok', data: (await res.json()) as DnsJsonResponse };
+}
+
+async function runDnsOverHttpsProbe(hostname: string, correlation: Record<string, unknown>): Promise<DnsProbeResult> {
+  try {
+    const outcome = await dnsLookupAJson(hostname);
+
+    if (outcome.kind === 'http_error') {
+      const result: DnsProbeResult = {
+        status: 'http_error',
+        hostname,
+        resolver: 'cloudflare-dns.com',
+        httpStatus: outcome.httpStatus,
+      };
+      Logger.error(`DNS-over-HTTPS HTTP error (${hostname})`, {
+        resolver: 'cloudflare-dns.com',
+        httpStatus: outcome.httpStatus,
+        correlation,
+      });
+      return result;
+    }
+
+    const data = outcome.data;
+    const ips = data.Status === 0 && Array.isArray(data.Answer) ? data.Answer.map((a) => a.data).filter(Boolean) : [];
+
+    if (ips.length > 0) {
+      const result: DnsProbeResult = {
+        status: 'success',
+        hostname,
+        resolver: 'cloudflare-dns.com',
+        dnsStatus: data.Status,
+        ipv4Answers: ips,
+      };
+      Logger.error(`DNS-over-HTTPS (${hostname})`, {
+        resolver: 'cloudflare-dns.com',
+        dnsStatus: data.Status,
+        ipv4Answers: ips,
+        correlation,
+      });
+      return result;
+    }
+
+    const note =
+      data.Status !== 0
+        ? `Resolver returned DNS status ${String(data.Status)} (non-zero)`
+        : 'No IPv4 Answer records returned';
+
+    const result: DnsProbeResult = {
+      status: 'no_answers',
+      hostname,
+      resolver: 'cloudflare-dns.com',
+      dnsStatus: data.Status,
+      answerCount: Array.isArray(data.Answer) ? data.Answer.length : 0,
+      note,
+    };
+
+    Logger.error(`DNS-over-HTTPS (${hostname})`, {
+      resolver: 'cloudflare-dns.com',
+      dnsStatus: data.Status,
+      answerCount: result.answerCount,
+      correlation,
+      note,
+    });
+    return result;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const result: DnsProbeResult = {
+      status: 'fetch_error',
+      hostname,
+      resolver: 'cloudflare-dns.com',
+      errorMessage: message,
+    };
+    Logger.error(`DNS-over-HTTPS probe failed (${hostname})`, {
+      resolver: 'cloudflare-dns.com',
+      errorMessage: message,
+      correlation,
+    });
+    return result;
+  }
 }
 
 /**
- * Runs at most once per hostname per page load after an API fetch fails without a response.
- * Uses Cloudflare's public resolver (RFC 8484 JSON) — does not block the throwing error path.
+ * Runs at most one DoH probe per hostname per page load. Returns a promise you can await
+ * from `RadarNetworkError.dnsProbe` — does not block the throwing error path.
  */
-export function scheduleDnsOverHttpsProbe(hostname: string | undefined, correlation: Record<string, unknown>): void {
+export function scheduleDnsOverHttpsProbe(
+  hostname: string | undefined,
+  correlation: Record<string, unknown>,
+): Promise<DnsProbeResult> | null {
   if (!hostname || hostname.length === 0) {
-    return;
+    return null;
   }
 
-  // skip secondary network traffic in jest
   if (typeof window !== 'undefined' && window.RADAR_TEST_ENV === true) {
-    return;
+    return null;
   }
 
   if (dnsProbeScheduledForHostname.has(hostname)) {
-    return;
+    return null;
   }
   dnsProbeScheduledForHostname.add(hostname);
 
-  void (async (): Promise<void> => {
-    try {
-      const data = await dnsLookupA(hostname, correlation);
-      if (data === null) {
-        return;
-      }
-
-      const ips = data.Status === 0 && Array.isArray(data.Answer) ? data.Answer.map((a) => a.data).filter(Boolean) : [];
-
-      if (ips.length > 0) {
-        Logger.error(`DNS-over-HTTPS (${hostname})`, {
-          resolver: 'cloudflare-dns.com',
-          dnsStatus: data.Status,
-          ipv4Answers: ips,
-          correlation,
-        });
-      } else {
-        Logger.error(`DNS-over-HTTPS (${hostname})`, {
-          resolver: 'cloudflare-dns.com',
-          dnsStatus: data.Status,
-          answerCount: Array.isArray(data.Answer) ? data.Answer.length : 0,
-          correlation,
-          note:
-            data.Status !== 0
-              ? `Resolver returned DNS status ${String(data.Status)} (non-zero)`
-              : 'No IPv4 Answer records returned',
-        });
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      Logger.error(`DNS-over-HTTPS probe failed (${hostname})`, {
-        resolver: 'cloudflare-dns.com',
-        errorMessage: message,
-        correlation,
-      });
-    }
-  })();
+  return runDnsOverHttpsProbe(hostname, correlation);
 }

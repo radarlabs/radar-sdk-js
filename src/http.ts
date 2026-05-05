@@ -1,5 +1,5 @@
 import Config from './config';
-import { scheduleDnsOverHttpsProbe } from './dns-over-https';
+import { scheduleDnsOverHttpsProbe, type DnsProbeResult } from './dns-over-https';
 import {
   RadarBadRequestError,
   RadarForbiddenError,
@@ -284,6 +284,7 @@ class Http {
         signal: abortController.signal,
       });
     } catch (fetchErr) {
+      let dnsProbePromise: Promise<DnsProbeResult> | null = null;
       const durationMs = getHighResTime() - fetchStartedAt;
       // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
       if (requestId && inFlightRequests.get(requestId) === abortController) {
@@ -305,7 +306,7 @@ class Http {
       );
 
       if (!fetchFailureDetails.aborted) {
-        scheduleDnsOverHttpsProbe(fetchFailureDetails.apiHostname, {
+        dnsProbePromise = scheduleDnsOverHttpsProbe(fetchFailureDetails.apiHostname, {
           requestFailure: {
             method: fetchFailureDetails.method,
             url: fetchFailureDetails.url,
@@ -325,7 +326,7 @@ class Http {
       }
 
       const userMsg = fetchFailureUserMessage(fetchFailureDetails);
-      throw new RadarNetworkError(userMsg, fetchFailureDetails, fetchErr);
+      throw new RadarNetworkError(userMsg, fetchFailureDetails, fetchErr, dnsProbePromise);
     }
 
     if (requestId && inFlightRequests.get(requestId) === abortController) {
