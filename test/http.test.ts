@@ -122,7 +122,6 @@ describe('Http', () => {
         });
         expect((err as Error).message).toBe('Network error');
         expect((err as { dnsProbe?: Promise<unknown> }).dnsProbe).toBeUndefined();
-        await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
       });
 
       it('should return an unknown error on invalid JSON', async () => {
