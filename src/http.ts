@@ -16,6 +16,8 @@ import {
 import Logger from './logger';
 import Navigator from './navigator';
 
+import type { RadarNetworkFailureDetails } from './errors';
+
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
@@ -54,6 +56,134 @@ interface HttpRequestOptions {
 }
 
 const inFlightRequests = new Map<string, AbortController>();
+
+interface NavigatorNW extends Navigator {
+  /** Network Information API; see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation */
+  connection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+    saveData?: boolean;
+  };
+}
+
+type ConnectionExtras = Partial<
+  Pick<
+    RadarNetworkFailureDetails,
+    'connectionEffectiveType' | 'connectionDownlink' | 'connectionRtt' | 'connectionSaveData'
+  >
+>;
+
+/** gather optional Network Information API snapshot (best-effort) */
+function getConnectionSnapshot(nav: Navigator | undefined): ConnectionExtras {
+  if (!nav) {
+    return {};
+  }
+  const c = (nav as NavigatorNW).connection;
+  if (!c) {
+    return {};
+  }
+  return {
+    ...(c.effectiveType !== undefined ? { connectionEffectiveType: String(c.effectiveType) } : {}),
+    ...(typeof c.downlink === 'number' ? { connectionDownlink: c.downlink } : {}),
+    ...(typeof c.rtt === 'number' ? { connectionRtt: c.rtt } : {}),
+    ...(typeof c.saveData === 'boolean' ? { connectionSaveData: c.saveData } : {}),
+  };
+}
+
+function isAbortError(err: unknown, signal: AbortSignal): boolean {
+  if (signal.aborted) {
+    return true;
+  }
+  if (err instanceof DOMException && err.name === 'AbortError') {
+    return true;
+  }
+  return err instanceof Error && err.name === 'AbortError';
+}
+
+function parseThrowable(err: unknown): { name: string; message: string; stack?: string } {
+  if (err instanceof Error) {
+    return { name: err.name, message: err.message, stack: err.stack };
+  }
+  if (typeof err === 'string') {
+    return { name: 'string', message: err };
+  }
+  return { name: 'non_error', message: String(err) };
+}
+
+function buildFetchFailureDetails(
+  method: HttpMethod,
+  url: string,
+  requestId: string | undefined,
+  err: unknown,
+  signal: AbortSignal,
+): RadarNetworkFailureDetails {
+  let pathname = '';
+  let search = '';
+  let apiHostname: string | undefined;
+
+  try {
+    const parsed = new URL(url);
+    pathname = parsed.pathname;
+    search = parsed.search;
+    apiHostname = parsed.hostname;
+  } catch {
+    pathname = url;
+  }
+
+  const { name, message, stack } = parseThrowable(err);
+  const aborted = isAbortError(err, signal);
+  const nav = typeof navigator !== 'undefined' ? navigator : undefined;
+
+  let pageOrigin: string | undefined;
+  let pagePath: string | undefined;
+  let userAgent: string | undefined;
+  let crossSiteApiCall: boolean | undefined;
+
+  if (typeof window !== 'undefined' && window.location && nav) {
+    pageOrigin = window.location.origin;
+    pagePath = window.location.pathname === '' ? '/' : window.location.pathname;
+    userAgent = nav.userAgent;
+    if (apiHostname !== undefined && window.location.hostname !== '') {
+      crossSiteApiCall = window.location.hostname !== apiHostname;
+    }
+  }
+
+  const online = Boolean(nav && nav.onLine);
+
+  return {
+    phase: 'fetch',
+    method,
+    url,
+    pathname,
+    search,
+    ...(apiHostname !== undefined ? { apiHostname } : {}),
+    ...(pageOrigin !== undefined ? { pageOrigin } : {}),
+    ...(pagePath !== undefined ? { pagePath } : {}),
+    ...(userAgent !== undefined ? { userAgent } : {}),
+    ...(crossSiteApiCall !== undefined ? { crossSiteApiCall } : {}),
+    online,
+    aborted,
+    errorName: name,
+    errorMessage: message,
+    ...(stack ? { errorStack: stack } : {}),
+    ...getConnectionSnapshot(nav),
+    ...(requestId ? { requestId } : {}),
+  };
+}
+
+function fetchFailureUserMessage(details: RadarNetworkFailureDetails): string {
+  if (details.aborted) {
+    return 'Request aborted.';
+  }
+  if (details.errorMessage) {
+    return details.errorMessage;
+  }
+  if (!details.online) {
+    return 'Network unavailable (browser offline).';
+  }
+  return 'Network request failed.';
+}
 
 /** fetch-based HTTP client for Radar API requests */
 class Http {
@@ -143,20 +273,27 @@ class Http {
         body,
         signal: abortController.signal,
       });
-    } catch {
+    } catch (fetchErr) {
       // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
       if (requestId && inFlightRequests.get(requestId) === abortController) {
         inFlightRequests.delete(requestId);
       }
 
-      if (host) {
-        for (const [pattern, handler] of Http.errorInterceptors) {
-          if (host.includes(pattern)) {
-            throw handler(!!Navigator.online());
-          }
+      const fetchFailureDetails = buildFetchFailureDetails(method, url, requestId, fetchErr, abortController.signal);
+
+      Logger.error(
+        `Fetch failed (${fetchFailureDetails.aborted ? 'aborted' : fetchFailureDetails.errorName})`,
+        fetchFailureDetails,
+      );
+
+      for (const [pattern, interceptorHandler] of Http.errorInterceptors) {
+        if ((urlHost ?? '').includes(pattern)) {
+          throw interceptorHandler(!!Navigator.online());
         }
       }
-      throw new RadarNetworkError();
+
+      const userMsg = fetchFailureUserMessage(fetchFailureDetails);
+      throw new RadarNetworkError(userMsg, fetchFailureDetails, fetchErr);
     }
 
     if (requestId && inFlightRequests.get(requestId) === abortController) {
@@ -189,6 +326,12 @@ class Http {
       } else if (error === 'ERROR_LOCATION') {
         throw new RadarLocationError('Could not determine location.');
       } else if (error === 'ERROR_NETWORK') {
+        Logger.error('Radar API returned ERROR_NETWORK in response meta', {
+          httpStatus: response.status,
+          method,
+          url,
+          meta: parsed.meta ?? null,
+        });
         throw new RadarNetworkError();
       }
     }

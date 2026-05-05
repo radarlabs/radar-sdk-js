@@ -96,7 +96,26 @@ describe('Http', () => {
 
       it('should respond with network error status on request error', async () => {
         mockNetworkError();
-        await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
+        let err: unknown;
+        try {
+          await Http.request(httpRequestParams);
+        } catch (e) {
+          err = e;
+        }
+        expect(err).toMatchObject({
+          status: 'ERROR_NETWORK',
+          name: 'RadarNetworkError',
+          details: {
+            phase: 'fetch',
+            method: 'PUT',
+            aborted: false,
+            errorName: 'TypeError',
+            errorMessage: 'Network error',
+            apiHostname: 'api.radar.io',
+          },
+          fetchError: expect.any(Error),
+        });
+        expect((err as Error).message).toBe('Network error');
       });
 
       it('should return an unknown error on invalid JSON', async () => {

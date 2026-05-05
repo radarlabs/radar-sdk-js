@@ -42,10 +42,15 @@ class Logger {
     }
   }
 
-  /** log an error-level message */
-  public static error(message: string) {
+  /** log an error-level message; optional second argument for structured diagnostics (printed as a separate console.error arg) */
+  public static error(message: string, data?: unknown) {
     if (getLevel() >= LOG_LEVELS.error) {
-      console.error(`Radar SDK: ${message.trim()}`);
+      const trimmed = message.trim();
+      if (data !== undefined) {
+        console.error(`Radar SDK: ${trimmed}`, data);
+      } else {
+        console.error(`Radar SDK: ${trimmed}`);
+      }
     }
   }
 }

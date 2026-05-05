@@ -141,13 +141,56 @@ export class RadarServerError extends RadarError {
   }
 }
 
+/**
+ * Diagnostics captured when fetch() rejects before any HTTP response is received.
+ * Safe to stringify for logs — does not include request headers or bodies.
+ */
+export interface RadarNetworkFailureDetails {
+  readonly phase: 'fetch';
+  readonly method: string;
+  readonly url: string;
+  readonly pathname: string;
+  readonly search: string;
+  /** hostname parsed from the request URL */
+  readonly apiHostname?: string;
+  /** document origin when in a browser */
+  readonly pageOrigin?: string;
+  /** document pathname when in a browser */
+  readonly pagePath?: string;
+  /** `navigator.userAgent` when available */
+  readonly userAgent?: string;
+  /** true when API hostname differs from the document hostname */
+  readonly crossSiteApiCall?: boolean;
+  /** whether `navigator.onLine` was false at failure time */
+  readonly online: boolean;
+  /** true when failure was triggered by AbortController / user abort */
+  readonly aborted: boolean;
+  readonly errorName: string;
+  readonly errorMessage: string;
+  /** present when the environment threw an Error with a stack */
+  readonly errorStack?: string;
+  readonly connectionEffectiveType?: string;
+  readonly connectionDownlink?: number;
+  readonly connectionRtt?: number;
+  readonly connectionSaveData?: boolean;
+  readonly requestId?: string;
+}
+
 /** thrown when a request times out or the network is unavailable */
 export class RadarNetworkError extends RadarError {
   public override readonly name = 'RadarNetworkError';
   public override readonly status = 'ERROR_NETWORK';
 
-  constructor() {
-    super('Request timed out.');
+  /** set when fetch() fails in the SDK HTTP client (omit for API `ERROR_NETWORK` responses) */
+  public readonly details?: RadarNetworkFailureDetails;
+
+  /** original rejection from fetch; often a `TypeError` or `DOMException` */
+  public readonly fetchError?: unknown;
+
+  constructor(message?: string, details?: RadarNetworkFailureDetails, fetchError?: unknown) {
+    super(message ?? 'Request timed out.');
+    this.details = details;
+    this.fetchError = fetchError;
   }
 }
 
