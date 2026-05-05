@@ -9,7 +9,11 @@ import { getRequest, mockNetworkError, mockRequest } from './utils';
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
 
-  const httpRequestParams = { method: 'PUT' as const, path: 'users/userId', data: { valid: true, invalid: undefined } };
+  const httpRequestParams = {
+    method: 'PUT' as const,
+    path: 'users/userId',
+    data: { valid: true, invalid: undefined },
+  };
   const successResponse = { code: 200 };
 
   describe('http requests', () => {
@@ -118,6 +122,7 @@ describe('Http', () => {
         });
         expect((err as Error).message).toBe('Network error');
         expect((err as { dnsProbe?: Promise<unknown> }).dnsProbe).toBeUndefined();
+        await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
       });
 
       it('should return an unknown error on invalid JSON', async () => {
@@ -149,7 +154,11 @@ describe('Http', () => {
     it('should inject GET parameters into the url querystring', async () => {
       mockRequest(200, successResponse);
 
-      const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
+      const response = await Http.request({
+        method: 'GET',
+        path: 'geocode/forward',
+        data,
+      });
       const request = getRequest();
 
       expect(request.url).toContain('?query=841+Broadway');
@@ -159,7 +168,11 @@ describe('Http', () => {
 
     it('should not append querystring of no params', async () => {
       mockRequest(200, successResponse);
-      const response = await Http.request({ method: 'GET', path: 'geocode/forward', data: {} });
+      const response = await Http.request({
+        method: 'GET',
+        path: 'geocode/forward',
+        data: {},
+      });
       const request = getRequest();
 
       expect(request.url).not.toContain('?');
@@ -175,7 +188,9 @@ describe('Http', () => {
     };
 
     beforeEach(() => {
-      Radar.initialize(publishableKey, { getRequestHeaders: () => customHeaders });
+      Radar.initialize(publishableKey, {
+        getRequestHeaders: () => customHeaders,
+      });
     });
 
     afterEach(() => {
@@ -185,7 +200,11 @@ describe('Http', () => {
     it('should include headers in request', async () => {
       mockRequest(200, successResponse);
 
-      const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
+      const response = await Http.request({
+        method: 'GET',
+        path: 'geocode/forward',
+        data,
+      });
       const request = getRequest();
 
       expect(response.code).toEqual(200);
@@ -197,7 +216,12 @@ describe('Http', () => {
     it('should allow per-request headers to override defaults', async () => {
       mockRequest(200, successResponse);
 
-      await Http.request({ method: 'GET', path: 'geocode/forward', data, headers: { 'X-Radar-Device-Type': 'iOS' } });
+      await Http.request({
+        method: 'GET',
+        path: 'geocode/forward',
+        data,
+        headers: { 'X-Radar-Device-Type': 'iOS' },
+      });
       const request = getRequest();
 
       expect(request.headers['X-Radar-Device-Type']).toEqual('iOS');

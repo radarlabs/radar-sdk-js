@@ -102,7 +102,11 @@ function isAbortError(err: unknown, signal: AbortSignal): boolean {
   return err instanceof Error && err.name === 'AbortError';
 }
 
-function parseThrowable(err: unknown): { name: string; message: string; stack?: string } {
+function parseThrowable(err: unknown): {
+  name: string;
+  message: string;
+  stack?: string;
+} {
   if (err instanceof Error) {
     return { name: err.name, message: err.message, stack: err.stack };
   }

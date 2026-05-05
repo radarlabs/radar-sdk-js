@@ -116,7 +116,7 @@
     $('#response-details').hide();
 
     const publishableKey = $('#publishableKey').val();
-    Radar.initialize(publishableKey, { debug: true });
+    Radar.initialize(publishableKey, { debug: true, logLevel: 'debug' });
 
     $('#loader').show();
 
@@ -156,7 +156,11 @@
         hljs.highlightAll();
       })
       .catch((err) => {
-        console.error(err);
+        if(err instanceof Radar.errors.RadarNetworkError) {
+            console.error(err.details);
+
+            console.log("dns", err.dnsProbe);
+        }
         $('#loader').hide();
         $('#error-alert').show();
         $('#error-text').html(err.message);
