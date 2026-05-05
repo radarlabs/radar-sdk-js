@@ -156,11 +156,7 @@
         hljs.highlightAll();
       })
       .catch((err) => {
-        if(err instanceof Radar.errors.RadarNetworkError) {
-            console.error(err.details);
-
-            console.log("dns", err.dnsProbe);
-        }
+        console.error(err);
         $('#loader').hide();
         $('#error-alert').show();
         $('#error-text').html(err.message);
