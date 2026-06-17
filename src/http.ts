@@ -110,7 +110,10 @@ class Http {
 
     if (method === 'GET') {
       const params = new URLSearchParams(Object.entries(filtered).map(([k, v]) => [k, String(v)]));
-      const qs = params.toString();
+      // URLSearchParams serializes spaces as '+' (application/x-www-form-urlencoded)
+      // a query string is part of a URI, so encode per RFC 3986 (%20)
+      // the only differnce is really how spaces are handled between the two protocols
+      const qs = params.toString().replace(/\+/g, '%20');
       if (qs) {
         url = `${url}?${qs}`;
       }
