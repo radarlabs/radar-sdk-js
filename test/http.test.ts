@@ -131,9 +131,93 @@ describe('Http', () => {
       const response = await Http.request({ method: 'GET', path: 'geocode/forward', data });
       const request = getRequest();
 
-      expect(request.url).toContain('?query=841+Broadway');
+      expect(request.url).toContain('?query=841%20Broadway');
 
       expect(response.code).toEqual(200);
+    });
+
+    it('should encode spaces as %20 (RFC 3986), NOT + (application/x-www-form-urlencoded)', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'a b c' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=a%20b%20c');
+      expect(request.url).not.toContain('+');
+    });
+
+    it('should preserve a literal + as %2B', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: '1+1 = 2' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=1%2B1%20%3D%202');
+    });
+
+    it('should percent-encode reserved delimiters inside a value', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'a&b=c#d?e/f' } });
+      const request = getRequest();
+
+      // & = # ? / inside a value must be encoded so they can't split the query
+      expect(request.url).toContain('?query=a%26b%3Dc%23d%3Fe%2Ff');
+    });
+
+    it('should percent-encode a literal % as %25', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: '50%' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=50%25');
+    });
+
+    it('should UTF-8 percent-encode non-ASCII characters', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'café 北京' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=caf%C3%A9%20%E5%8C%97%E4%BA%AC');
+    });
+
+    it('should encode parameter names, not just values', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { 'a b': 'x' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?a%20b=x');
+    });
+
+    it('should leave RFC 3986 unreserved characters unencoded', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'Abc-9_.xZ' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=Abc-9_.xZ');
+    });
+
+    it('should separate multiple params with a literal & while encoding each value', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'a b', near: '40.1,-74.2' } });
+      const request = getRequest();
+
+      expect(request.url).toContain('?query=a%20b&near=40.1%2C-74.2');
+    });
+
+    it('should over-encode ~ and leave * literal (both RFC 3986-valid)', async () => {
+      mockRequest(200, successResponse);
+
+      await Http.request({ method: 'GET', path: 'geocode/forward', data: { query: 'a~b*c' } });
+      const request = getRequest();
+
+      // URLSearchParams over-encodes the unreserved ~ (harmless) and keeps * literal
+      expect(request.url).toContain('?query=a%7Eb*c');
     });
 
     it('should not append querystring of no params', async () => {
