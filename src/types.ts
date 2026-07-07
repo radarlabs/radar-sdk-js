@@ -1,5 +1,5 @@
 /** log verbosity level for the SDK */
-export type LogLevel = "none" | "error" | "warn" | "info" | "debug";
+export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
 
 /** a geographic coordinate with optional accuracy and timestamp */
 export interface Location {
@@ -20,10 +20,7 @@ export interface NavigatorPosition {
 }
 
 /** browser location permission state */
-export type LocationAuthorization =
-  | "DENIED"
-  | "NOT_DETERMINED"
-  | "GRANTED_FOREGROUND";
+export type LocationAuthorization = 'DENIED' | 'NOT_DETERMINED' | 'GRANTED_FOREGROUND';
 
 /** shared SDK configuration fields (excluding auth credentials) */
 export interface RadarBaseOptions {
@@ -42,7 +39,7 @@ export interface RadarBaseOptions {
   /** geolocation timeout in ms */
   locationTimeout?: number;
   /** geolocation accuracy hint */
-  desiredAccuracy?: "high" | "medium" | "low";
+  desiredAccuracy?: 'high' | 'medium' | 'low';
   /** callback that returns extra headers to send with every request */
   getRequestHeaders?: () => Record<string, string>;
   /** enable debug logging */
@@ -65,9 +62,7 @@ export interface RadarPublishableKeyInitOptions extends RadarBaseOptions {
 }
 
 /** configuration options passed to {@link Radar.initialize} */
-export type RadarInitOptions =
-  | RadarAuthTokenInitOptions
-  | RadarPublishableKeyInitOptions;
+export type RadarInitOptions = RadarAuthTokenInitOptions | RadarPublishableKeyInitOptions;
 
 /** internal SDK configuration (all fields optional — stored by Config after initialization) */
 export interface RadarOptions extends RadarBaseOptions {
@@ -94,14 +89,10 @@ export interface RadarResponse {
 }
 
 /** travel mode for routing and trips */
-export type RadarTravelMode = "car" | "foot" | "bike" | "motorbike" | "truck";
+export type RadarTravelMode = 'car' | 'foot' | 'bike' | 'motorbike' | 'truck';
 
 /** road feature to avoid in routing requests */
-export type RadarAvoidOption =
-  | "tolls"
-  | "highways"
-  | "ferries"
-  | "borderCrossings";
+export type RadarAvoidOption = 'tolls' | 'highways' | 'ferries' | 'borderCrossings';
 
 /** options for creating or updating a trip */
 export interface RadarTripOptions {
@@ -155,7 +146,7 @@ export interface RadarTrackParams extends TrackBodyExtension {
   metadata?: RadarMetadata;
   tripOptions?: RadarTripOptions;
   /** geolocation accuracy hint */
-  desiredAccuracy?: "high" | "medium" | "low";
+  desiredAccuracy?: 'high' | 'medium' | 'low';
 }
 
 /** confidence level for Radar events */
@@ -165,37 +156,36 @@ export const RadarEventConfidence = {
   medium: 2,
   high: 3,
 } as const;
-export type RadarEventConfidence =
-  (typeof RadarEventConfidence)[keyof typeof RadarEventConfidence];
+export type RadarEventConfidence = (typeof RadarEventConfidence)[keyof typeof RadarEventConfidence];
 
 /** all possible Radar event types */
 export type RadarEventType =
-  | "unknown"
-  | "user.entered_geofence"
-  | "user.entered_home"
-  | "user.entered_office"
-  | "user.entered_place"
-  | "user.entered_region_country"
-  | "user.entered_region_dma"
-  | "user.entered_region_state"
-  | "user.exited_geofence"
-  | "user.exited_home"
-  | "user.exited_office"
-  | "user.exited_place"
-  | "user.exited_region_country"
-  | "user.exited_region_dma"
-  | "user.exited_region_state"
-  | "user.nearby_place_chain"
-  | "user.started_traveling"
-  | "user.stopped_traveling"
-  | "user.started_commuting"
-  | "user.stopped_commuting"
-  | "user.started_trip"
-  | "user.updated_trip"
-  | "user.approaching_trip_destination"
-  | "user.arrived_at_trip_destination"
-  | "user.stopped_trip"
-  | "user.failed_fraud";
+  | 'unknown'
+  | 'user.entered_geofence'
+  | 'user.entered_home'
+  | 'user.entered_office'
+  | 'user.entered_place'
+  | 'user.entered_region_country'
+  | 'user.entered_region_dma'
+  | 'user.entered_region_state'
+  | 'user.exited_geofence'
+  | 'user.exited_home'
+  | 'user.exited_office'
+  | 'user.exited_place'
+  | 'user.exited_region_country'
+  | 'user.exited_region_dma'
+  | 'user.exited_region_state'
+  | 'user.nearby_place_chain'
+  | 'user.started_traveling'
+  | 'user.stopped_traveling'
+  | 'user.started_commuting'
+  | 'user.stopped_commuting'
+  | 'user.started_trip'
+  | 'user.updated_trip'
+  | 'user.approaching_trip_destination'
+  | 'user.arrived_at_trip_destination'
+  | 'user.stopped_trip'
+  | 'user.failed_fraud';
 
 /** a Radar geofence */
 export interface RadarGeofence {
@@ -215,14 +205,7 @@ export interface RadarTripEta {
 }
 
 /** lifecycle status of a trip */
-export type RadarTripStatus =
-  | "pending"
-  | "started"
-  | "approaching"
-  | "arrived"
-  | "completed"
-  | "canceled"
-  | "expired";
+export type RadarTripStatus = 'pending' | 'started' | 'approaching' | 'arrived' | 'completed' | 'canceled' | 'expired';
 
 /** a Radar trip with destination, ETA, and status */
 export interface RadarTrip {
@@ -359,16 +342,16 @@ export interface RadarConversionResponse extends RadarResponse {
 
 /** geocode layer filter for forward/reverse geocode and autocomplete */
 export type RadarGeocodeLayer =
-  | "place"
-  | "address"
-  | "postalCode"
-  | "locality"
-  | "neighborhood"
-  | "county"
-  | "state"
-  | "country"
-  | "coarse"
-  | "fine";
+  | 'place'
+  | 'address'
+  | 'postalCode'
+  | 'locality'
+  | 'neighborhood'
+  | 'county'
+  | 'state'
+  | 'country'
+  | 'coarse'
+  | 'fine';
 
 /** a geocoded address result */
 export interface RadarAddress {
@@ -377,7 +360,7 @@ export interface RadarAddress {
   categories?: string[];
   city?: string;
   /** geocode match confidence */
-  confidence?: "exact" | "interpolated" | "fallback";
+  confidence?: 'exact' | 'interpolated' | 'fallback';
   country?: string;
   countryCode?: string;
   countryFlag?: string;
@@ -424,17 +407,13 @@ export interface RadarGeocodeAddress extends RadarAddress {
 }
 
 /** USPS record type code */
-export type RadarValidationRecordType = "S" | "R" | "P" | "M" | "H" | "G" | "F";
+export type RadarValidationRecordType = 'S' | 'R' | 'P' | 'M' | 'H' | 'G' | 'F';
 
 /** property type for address validation */
-export type RadarValidationPropertyType = "commercial" | "residential";
+export type RadarValidationPropertyType = 'commercial' | 'residential';
 
 /** address verification status */
-export type RadarVerificationStatus =
-  | "verified"
-  | "partially verified"
-  | "ambiguous"
-  | "unverified";
+export type RadarVerificationStatus = 'verified' | 'partially verified' | 'ambiguous' | 'unverified';
 
 /** validated address with USPS metadata */
 export interface RadarValidationAddress extends RadarAddress {
@@ -536,11 +515,7 @@ export interface RadarSearchPlacesResponse extends RadarResponse {
 }
 
 /** route geometry encoding format */
-export type RadarDistanceGeometryType =
-  | "polyline"
-  | "polyline5"
-  | "polyline6"
-  | "linestring";
+export type RadarDistanceGeometryType = 'polyline' | 'polyline5' | 'polyline6' | 'linestring';
 
 /** parameters for {@link Radar.distance} */
 export interface RadarDistanceParams {
@@ -551,7 +526,7 @@ export interface RadarDistanceParams {
   /** travel modes to calculate (e.g. `['car', 'foot']`) */
   modes: RadarTravelMode[] | string;
   /** distance units */
-  units?: "metric" | "imperial";
+  units?: 'metric' | 'imperial';
   /** route geometry encoding */
   geometry?: RadarDistanceGeometryType;
   /** number of points in the route geometry */
@@ -606,7 +581,7 @@ export interface RadarMatrixParams {
   /** travel mode */
   mode: RadarTravelMode;
   /** distance units */
-  units?: "metric" | "imperial";
+  units?: 'metric' | 'imperial';
   /** road features to avoid */
   avoid?: RadarAvoidOption[] | string;
 }

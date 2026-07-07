@@ -1,12 +1,12 @@
-import Config from "../config";
-import Device from "../device";
-import Http from "../http";
-import Logger from "../logger";
-import Session from "../session";
-import Storage from "../storage";
-import SDK_VERSION from "../version";
+import Config from '../config';
+import Device from '../device';
+import Http from '../http';
+import Logger from '../logger';
+import Session from '../session';
+import Storage from '../storage';
+import SDK_VERSION from '../version';
 
-import type { RadarRevealRiskParams, RadarRevealRiskResponse } from "../types";
+import type { RadarRevealRiskParams, RadarRevealRiskResponse } from '../types';
 
 class RevealRiskAPI {
   /**
@@ -22,13 +22,12 @@ class RevealRiskAPI {
     const deviceId = params.deviceId || Device.getDeviceId();
     const installId = params.installId || Device.getInstallId();
     const sessionId = Session.getSessionId();
-    const deviceType = params.deviceType || "Web";
-    const description =
-      params.description || Storage.getItem(Storage.DESCRIPTION);
+    const deviceType = params.deviceType || 'Web';
+    const description = params.description || Storage.getItem(Storage.DESCRIPTION);
 
     // save userId for trip tracking
     if (!userId) {
-      Logger.warn("userId not provided for trackOnce.");
+      Logger.warn('userId not provided for trackOnce.');
     } else {
       Storage.setItem(Storage.USER_ID, userId);
     }
@@ -50,11 +49,9 @@ class RevealRiskAPI {
       userId,
     };
 
-    const response = await Http.request<
-      Omit<RadarRevealRiskResponse, "response" | "reveal/risk">
-    >({
-      method: "POST",
-      path: "track",
+    const response = await Http.request<Omit<RadarRevealRiskResponse, 'response' | 'reveal/risk'>>({
+      method: 'POST',
+      path: 'track',
       data: body,
     });
 
