@@ -750,7 +750,7 @@ export interface RadarDeviceResponse {
   browserEngineVersion: string;
 }
 
-export interface RadarRevealRiskResponse {
+export interface RadarRevealRiskResponse extends RadarResponse {
   id?: string;
   token: string;
   expiresAt?: Date;
