@@ -1,0 +1,126 @@
+<div class="content flex-grow-1 p-4">
+  <h1 class="mb-4">Reveal risk</h1>
+  <div id="error-alert" class="alert alert-danger fade show" role="alert" style="display: none;">
+    <strong>Error:</strong> <span id="error-text">Something went wrong. Check the developer console for details.</span>
+  </div>
+
+  <p>Reveal network, device, and fraud risk signals for the current device without tracking location.</p>
+
+  <div class="mt-5 mb-4 form-row">
+    <label for="user-id" class="col-form-label" style="width: 128px;">User ID</label>
+    <div>
+      <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+    </div>
+  </div>
+
+  <div>
+    <button id="reveal-risk" type="button" class="btn btn-primary" disabled>Call reveal risk</button>
+  </div>
+
+  <div id="loader" class="spinner-border text-primary mt-4" role="status" style="display: none;">
+  </div>
+
+  <div id="response-details" style="display: none;">
+    <h6 class="mt-4">Risk</h6>
+    <div class="mt-2">
+      <pre><code id="risk" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Network</h6>
+    <div class="mt-2">
+      <pre><code id="network" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Device</h6>
+    <div class="mt-2">
+      <pre><code id="device" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-4">Token</h6>
+    <div class="mt-2">
+      <pre style="white-space: pre-wrap"><code id="token" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">Expires at</h6>
+    <div class="mt-2">
+      <pre><code id="expires-at" class="code-sample language-json"></code></pre>
+    </div>
+
+    <h6 class="mt-2">ID</h6>
+    <div class="mt-2">
+      <pre><code id="id" class="code-sample language-json"></code></pre>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <pre><code class="code-sample language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" /&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;script&gt;
+      $('#reveal-risk').click(() =&gt; {
+        Radar.initialize('&lt;RADAR_PUBLISHABLE_KEY&gt;');
+
+        Radar.fraud.revealRisk({ userId: 'test-user-id' })
+          .then(({ _id, risk, network, device, token, expiresAt, expiresIn }) =&gt; {
+            console.log(risk);
+            console.log(network);
+            console.log(device);
+            console.log(token);
+            console.log(expiresAt);
+            console.log(expiresIn);
+            console.log(_id);
+          });
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+    </pre>
+  </div>
+</div>
+
+<script>
+  $('#publishableKey').on('change', () => {
+    const publishableKey = $('#publishableKey').val();
+    if (publishableKey) {
+      $('#reveal-risk').prop('disabled', false);
+    }
+  });
+
+  $('#reveal-risk').click(() => {
+    $('#error-alert').hide();
+    $('#response-details').hide();
+
+    const publishableKey = $('#publishableKey').val();
+    Radar.initialize(publishableKey, { debug: true, host: 'https://api-server-dev-shicheng.use1.radar-staging.com' });
+
+    $('#loader').show();
+
+    const userId = $('#user-id').val();
+    Radar.fraud.revealRisk({ userId })
+      .then(({ _id, risk, network, device, token, expiresAt, expiresIn }) => {
+        console.log('REVEAL RISK RESPONSE', { _id, risk, network, device, token, expiresAt, expiresIn });
+        $('#loader').hide();
+
+        $('#response-details').show();
+        $('#risk').html(JSON.stringify(risk, null, 2));
+        $('#network').html(JSON.stringify(network, null, 2));
+        $('#device').html(JSON.stringify(device, null, 2));
+        $('#token').html(token);
+        $('#expires-at').html(expiresAt);
+        $('#id').html(_id);
+        hljs.highlightAll();
+      })
+      .catch((err) => {
+        console.error(err);
+        $('#loader').hide();
+        $('#error-alert').show();
+        $('#error-text').html(err.message);
+      });
+  });
+
+</script>
