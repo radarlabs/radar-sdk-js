@@ -1,0 +1,364 @@
+<div class="content flex-grow-1 p-4">
+  <div class="rr-layout">
+
+    <!-- LEFT: the flow -->
+    <div class="rr-main">
+      <h1 class="mb-2">Reveal risk flow</h1>
+      <p>
+        Call <code>revealRisk</code> during a login or checkout to silently score the device. If a proxy is detected,
+        the flow ramps up to <code>trackVerified</code> before completing. On success, the user's location is shown on a map.
+      </p>
+
+      <div class="mt-4 mb-3 form-row">
+        <label for="flow-select" class="col-form-label" style="width: 96px;">Flow</label>
+        <select id="flow-select" class="form-select" style="width: 220px;">
+          <option value="login" selected>Login</option>
+          <option value="checkout">Checkout</option>
+        </select>
+      </div>
+      <div class="mb-4 form-row">
+        <label for="user-id" class="col-form-label" style="width: 96px;">User ID</label>
+        <input type="text" class="form-control" id="user-id" value="test-user-id" style="width: 250px;">
+      </div>
+
+      <!-- LOGIN flow -->
+      <div class="rr-flow" id="flow-login">
+        <div class="card" style="max-width: 440px;">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Log in</h5>
+            <div class="mb-3">
+              <label class="form-label" for="login-email">Email</label>
+              <input id="login-email" type="email" class="form-control" value="user@example.com">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="login-password">Password</label>
+              <input id="login-password" type="password" class="form-control" value="password">
+            </div>
+            <div id="login-warning" class="text-danger fw-semibold mb-3" style="display: none;"></div>
+            <div id="login-success" class="text-success fw-semibold mb-3" style="display: none;"></div>
+            <button id="login-submit" type="button" class="btn btn-primary" disabled>Log in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECKOUT flow -->
+      <div class="rr-flow" id="flow-checkout" style="display: none;">
+        <div class="card" style="max-width: 440px;">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Checkout</h5>
+            <div class="rr-order">
+              <div class="rr-order-row"><span>Item</span><span>$25.00</span></div>
+              <div class="rr-order-row"><span>Shipping</span><span>$5.00</span></div>
+              <div class="rr-order-row rr-order-total"><span>Total</span><span>$30.00</span></div>
+            </div>
+            <div id="checkout-warning" class="text-danger fw-semibold mt-3 mb-3" style="display: none;"></div>
+            <div id="checkout-success" class="text-success fw-semibold mt-3 mb-3" style="display: none;"></div>
+            <button id="checkout-submit" type="button" class="btn btn-primary mt-3">Place order</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP (shown on success) -->
+      <div id="map-section" style="display: none;">
+        <h6 class="rr-section-title mt-4">Location</h6>
+        <div id="map" style="width: 100%; max-width: 640px; height: 360px; border-radius: 8px; overflow: hidden;"></div>
+        <p id="map-note" class="text-muted mt-2" style="font-size: 12px;"></p>
+      </div>
+    </div>
+
+    <!-- RIGHT: console -->
+    <div class="rr-console">
+      <div class="rr-tabs">
+        <button type="button" class="rr-tab active" data-tab="properties">Properties</button>
+        <button type="button" class="rr-tab" data-tab="json">JSON</button>
+      </div>
+      <div class="rr-console-body">
+        <div id="console-empty" class="text-muted">Complete the flow to see the response.</div>
+        <div id="console-loader" class="spinner-border text-primary" role="status" style="display: none;"></div>
+        <div id="console-error" class="alert alert-danger" role="alert" style="display: none;"></div>
+
+        <div id="tab-properties" style="display: none;">
+          <div id="console-method" class="rr-method"></div>
+          <div id="console-properties"></div>
+        </div>
+        <div id="tab-json" style="display: none;">
+          <pre style="white-space: pre-wrap; margin: 0;"><code id="console-json" class="code-sample language-json"></code></pre>
+        </div>
+
+        <div id="rampup" style="display: none;">
+          <div class="rr-divider"></div>
+          <p id="rampup-text" class="mb-2" style="font-size: 13px;">No proxy detected. Ramp up anyway?</p>
+          <button id="rampup-btn" type="button" class="btn btn-outline-primary btn-sm">Call track verified</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .rr-layout { display: flex; gap: 24px; align-items: flex-start; }
+  .rr-main { flex: 1 1 auto; min-width: 0; }
+  .rr-console {
+    flex: 0 0 380px; width: 380px;
+    border: 1px solid #e3e8ee; border-radius: 8px; background: #fff;
+    position: sticky; top: 0;
+  }
+  .rr-tabs { display: flex; gap: 24px; padding: 12px 16px 0; border-bottom: 1px solid #e3e8ee; }
+  .rr-tab {
+    cursor: pointer; padding: 0 0 10px; font-weight: 700; font-size: 14px;
+    color: #8792a2; background: none; border: none; border-bottom: 2px solid transparent;
+  }
+  .rr-tab.active { color: #1a1f36; border-bottom-color: #1a1f36; }
+  .rr-console-body { padding: 16px; max-height: calc(100vh - 120px); overflow: auto; }
+  .rr-method { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #eb0083; margin-bottom: 12px; }
+  .rr-section-title { font-weight: 700; color: #1a1f36; }
+  .rr-console .rr-section-title { margin: 16px 0 8px; }
+  .rr-console .rr-section-title:first-child { margin-top: 0; }
+  .rr-row { display: flex; padding: 5px 0; font-size: 14px; }
+  .rr-row .rr-key { flex: 0 0 130px; color: #8792a2; }
+  .rr-row .rr-val { color: #1a1f36; word-break: break-word; }
+  .rr-divider { border-top: 1px solid #e3e8ee; margin: 16px 0; }
+  .rr-order-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #3c4257; }
+  .rr-order-total { border-top: 1px solid #e3e8ee; margin-top: 6px; padding-top: 10px; font-weight: 700; color: #1a1f36; }
+</style>
+
+<script>
+  let map;
+  let lastResponse;
+
+  // ------------------------------------------------------------------
+  // Backend-shaped assumptions — adjust once the reveal risk API is final.
+  //
+  // 1) detectProxy(resp): reveal risk does not (yet) have a locked response
+  //    shape, so we check every plausible location for a proxy/VPN signal.
+  // 2) extractLngLat(resp): trackVerified returns location.coordinates
+  //    ([lng, lat]); reveal risk is expected to carry a coarse IP-based
+  //    location on `network`. We probe the likely fields and fall back to
+  //    a demo center if none are present.
+  // ------------------------------------------------------------------
+  const DEMO_CENTER = [-73.995538, 40.724322]; // downtown NYC
+
+  const detectProxy = (resp) => {
+    const risk = resp.risk || {};
+    const network = resp.network || {};
+    if (network.proxy === true || network.isProxy === true || network.vpn === true) return true;
+    if (risk.proxy === true || risk.isProxy === true) return true;
+    const reasons = risk.reasons || risk.riskScoreReasons || resp.failureReasons || [];
+    if (Array.isArray(reasons) && reasons.some((r) => String(r).toLowerCase().includes('proxy'))) return true;
+    if (reasons && typeof reasons === 'object' && !Array.isArray(reasons) && reasons.proxy) return true;
+    return false;
+  };
+
+  const extractLngLat = (resp) => {
+    if (resp.location && Array.isArray(resp.location.coordinates) && resp.location.coordinates.length === 2) {
+      return resp.location.coordinates;
+    }
+    const network = resp.network || {};
+    const geo = network.location || network.ipGeolocation || network.geoIP || network.geo || {};
+    if (Array.isArray(geo.coordinates) && geo.coordinates.length === 2) return geo.coordinates;
+    if (typeof geo.longitude === 'number' && typeof geo.latitude === 'number') return [geo.longitude, geo.latitude];
+    if (typeof network.longitude === 'number' && typeof network.latitude === 'number') return [network.longitude, network.latitude];
+    return null;
+  };
+
+  // ------------------------------------------------------------------
+  // Console rendering
+  // ------------------------------------------------------------------
+  const humanLabel = (key) =>
+    key.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()).trim();
+
+  const formatValue = (v) => {
+    if (v === null || v === undefined || v === '') return '—';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    return String(v);
+  };
+
+  const flattenRows = (obj, rows) => {
+    Object.keys(obj).forEach((k) => {
+      const v = obj[k];
+      if (k === 'coordinates' && Array.isArray(v) && v.length === 2) {
+        rows.push(['Coordinates', '(' + v[1] + ', ' + v[0] + ')']);
+      } else if (v instanceof Date) {
+        rows.push([humanLabel(k), v.toString()]);
+      } else if (Array.isArray(v)) {
+        rows.push([humanLabel(k), v.length ? v.map(formatValue).join(', ') : '—']);
+      } else if (v && typeof v === 'object') {
+        flattenRows(v, rows);
+      } else {
+        rows.push([humanLabel(k), formatValue(v)]);
+      }
+    });
+  };
+
+  const renderSection = ($container, title, obj) => {
+    const rows = [];
+    flattenRows(obj, rows);
+    if (!rows.length) return;
+    $container.append('<div class="rr-section-title">' + title + '</div>');
+    rows.forEach(([key, val]) => {
+      const $row = $('<div class="rr-row"></div>');
+      $row.append($('<div class="rr-key"></div>').text(key));
+      $row.append($('<div class="rr-val"></div>').text(val));
+      $container.append($row);
+    });
+  };
+
+  const renderProperties = (resp) => {
+    const $c = $('#console-properties').empty();
+    const details = {};
+    const sections = [];
+    Object.keys(resp).forEach((k) => {
+      const v = resp[k];
+      if (v && typeof v === 'object' && !(v instanceof Date) && !Array.isArray(v)) {
+        sections.push({ title: humanLabel(k), obj: v });
+      } else {
+        details[k] = v;
+      }
+    });
+    renderSection($c, 'Details', details);
+    sections.forEach((s) => renderSection($c, s.title, s.obj));
+  };
+
+  const showActiveTab = () => {
+    const tab = $('.rr-tab.active').data('tab') || 'properties';
+    $('#tab-properties').toggle(tab === 'properties');
+    $('#tab-json').toggle(tab === 'json');
+  };
+
+  const renderConsole = (method, resp) => {
+    lastResponse = resp;
+    $('#console-empty').hide();
+    $('#console-loader').hide();
+    $('#console-error').hide();
+    $('#console-method').text(method);
+    renderProperties(resp);
+    $('#console-json').text(JSON.stringify(resp, null, 2));
+    hljs.highlightElement(document.getElementById('console-json'));
+    showActiveTab();
+  };
+
+  const showConsoleLoading = () => {
+    $('#console-empty, #console-error, #tab-properties, #tab-json, #rampup').hide();
+    $('#console-loader').show();
+  };
+
+  const showConsoleError = (err) => {
+    console.error(err);
+    $('#console-loader, #tab-properties, #tab-json').hide();
+    $('#console-error').text(err && err.message ? err.message : 'Something went wrong.').show();
+  };
+
+  const resetConsole = () => {
+    $('#console-loader, #console-error, #tab-properties, #tab-json, #rampup').hide();
+    $('#console-empty').show();
+  };
+
+  // ------------------------------------------------------------------
+  // Map
+  // ------------------------------------------------------------------
+  const showMap = (coords) => {
+    const center = coords || DEMO_CENTER;
+    $('#map-section').show();
+    $('#map-note').text(coords ? '' : 'No coordinates in the response — showing a demo location.');
+    if (map) {
+      map.remove();
+    }
+    map = Radar.ui.map({ container: 'map', style: 'radar-default-v1', center, zoom: 12 });
+    map.on('load', () => {
+      Radar.ui.marker().setLngLat(center).addTo(map);
+    });
+    map.on('error', (err) => console.error(err));
+  };
+
+  // ------------------------------------------------------------------
+  // Flow logic
+  // ------------------------------------------------------------------
+  const initRadar = () => {
+    const publishableKey = $('#publishableKey').val();
+    if (!publishableKey) return false;
+    Radar.initialize(publishableKey, { debug: true, host: 'https://api.radar-staging.com' });
+    return true;
+  };
+
+  const currentFlow = () => $('#flow-select').val();
+
+  const flowLabels = {
+    login: { warning: '#login-warning', success: '#login-success', done: 'Logged in successfully.' },
+    checkout: { warning: '#checkout-warning', success: '#checkout-success', done: 'Order placed successfully.' },
+  };
+
+  const hideFlowMessages = () => {
+    $('#login-warning, #login-success, #checkout-warning, #checkout-success').hide();
+  };
+
+  const completeFlow = (flow, resp) => {
+    $(flowLabels[flow].success).text(flowLabels[flow].done).show();
+    showMap(extractLngLat(resp));
+  };
+
+  const runTrackVerified = (flow) => {
+    showConsoleLoading();
+    const userId = $('#user-id').val();
+    return Radar.fraud.trackVerified({ userId, skipVerifyApp: true })
+      .then((resp) => {
+        renderConsole('trackVerified', resp);
+        $('#rampup').hide();
+        completeFlow(flow, resp);
+      })
+      .catch(showConsoleError);
+  };
+
+  const runFlow = (flow) => {
+    if (!initRadar()) return;
+    hideFlowMessages();
+    $('#map-section').hide();
+    showConsoleLoading();
+
+    const userId = $('#user-id').val();
+    Radar.fraud.revealRisk({ userId })
+      .then((resp) => {
+        renderConsole('revealRisk', resp);
+
+        if (detectProxy(resp)) {
+          // Ramp up: proxy detected → require verified location.
+          $(flowLabels[flow].warning).text('Proxy detected — please verify your location to continue.').show();
+          $('#rampup').hide();
+          return runTrackVerified(flow);
+        }
+
+        // No proxy → flow succeeds immediately, but offer opt-in ramp up.
+        $('#rampup-text').text('No proxy detected. Ramp up anyway?');
+        $('#rampup').show();
+        completeFlow(flow, resp);
+      })
+      .catch(showConsoleError);
+  };
+
+  // ------------------------------------------------------------------
+  // Wiring
+  // ------------------------------------------------------------------
+  $('#publishableKey').on('change', () => {
+    const hasKey = !!$('#publishableKey').val();
+    $('#login-submit, #checkout-submit').prop('disabled', !hasKey);
+  });
+
+  $('#flow-select').on('change', function () {
+    const flow = $(this).val();
+    $('#flow-login').toggle(flow === 'login');
+    $('#flow-checkout').toggle(flow === 'checkout');
+    hideFlowMessages();
+    resetConsole();
+    $('#map-section').hide();
+  });
+
+  $('.rr-tab').on('click', function () {
+    $('.rr-tab').removeClass('active');
+    $(this).addClass('active');
+    showActiveTab();
+  });
+
+  $('#login-submit').on('click', () => runFlow('login'));
+  $('#checkout-submit').on('click', () => runFlow('checkout'));
+  $('#rampup-btn').on('click', () => runTrackVerified(currentFlow()));
+</script>
