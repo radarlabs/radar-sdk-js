@@ -12,7 +12,6 @@ jobs:
   publish:
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
-    environment: npm-publish
     steps:
       - uses: actions/checkout@v6
 
@@ -119,7 +118,6 @@ jobs:
   publish-beta:
     if: ${{ github.event.release.prerelease }}
     runs-on: ubuntu-latest
-    environment: npm-publish
     steps:
       - uses: actions/checkout@v6
 
