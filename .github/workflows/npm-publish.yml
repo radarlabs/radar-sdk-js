@@ -176,7 +176,6 @@ jobs:
           MAJOR_VERSION="${PLUGIN_VERSION%%.*}"
           echo "PLUGIN_NAME=$PLUGIN_NAME" >> "$GITHUB_ENV"
           echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> "$GITHUB_ENV"
-          echo "MAJOR_VERSION=$MAJOR_VERSION" >> "$GITHUB_ENV"
           echo "Parsed tag: plugin=$PLUGIN_NAME version=$PLUGIN_VERSION major=$MAJOR_VERSION"
 
       - name: Build plugin package
