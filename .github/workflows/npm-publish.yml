@@ -2,10 +2,10 @@ name: Publish packages to npmjs
 
 on:
   release:
-    types: [released, prereleased]
+    types: [published]
 
 permissions:
-  contents: write
+  contents: read
   id-token: write
 
 jobs:
@@ -39,7 +39,8 @@ jobs:
 
       - name: Upload core CDN for release tag
         if: startsWith(github.ref_name, 'v')
-        uses: jakejarvis/s3-sync-action@master
+        # Pin third-party action SHAs because this step receives AWS credentials.
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -50,7 +51,7 @@ jobs:
 
       - name: Upload core CDN for latest major version
         if: startsWith(github.ref_name, 'v')
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -58,17 +59,6 @@ jobs:
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'cdn/'
           DEST_DIR: ${{ env.MAJOR_VERSION }} # release latest major version
-
-      - name: Publish docs site
-        if: startsWith(github.ref_name, 'v')
-        run: npm run compile-site
-
-      - name: Deploy docs site
-        if: startsWith(github.ref_name, 'v')
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
 
       # plugins
       - name: Parse plugin release tag
@@ -95,25 +85,51 @@ jobs:
 
       - name: Upload plugin CDN for release tag
         if: ${{ !startsWith(github.ref_name, 'v') }}
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
-
-      - name: Set plugin CDN major destination
-        if: ${{ !startsWith(github.ref_name, 'v') }}
-        run: echo "DEST_DIR=$PLUGIN_NAME/$MAJOR_VERSION" >> "$GITHUB_ENV"
+          SOURCE_DIR: packages/${{ env.PLUGIN_NAME }}/cdn/
+          DEST_DIR: ${{ env.PLUGIN_NAME }}/v${{ env.PLUGIN_VERSION }}
 
       - name: Upload plugin CDN for latest major version
         if: ${{ !startsWith(github.ref_name, 'v') }}
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
+          SOURCE_DIR: packages/${{ env.PLUGIN_NAME }}/cdn/
+          DEST_DIR: ${{ env.PLUGIN_NAME }}/${{ env.MAJOR_VERSION }}
+
+  deploy-docs:
+    if: ${{ !github.event.release.prerelease && startsWith(github.ref_name, 'v') }}
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Build docs site
+        run: |
+          npm ci --force
+          npm run compile-site
+
+      - name: Deploy docs site
+        # Pin third-party action SHAs rather than mutable tags.
+        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
 
   publish-beta:
     if: ${{ github.event.release.prerelease }}
@@ -141,7 +157,7 @@ jobs:
 
       - name: Upload core CDN for release tag
         if: startsWith(github.ref_name, 'v')
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -175,9 +191,11 @@ jobs:
 
       - name: Upload plugin CDN for release tag
         if: ${{ !startsWith(github.ref_name, 'v') }}
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
         env:
           AWS_S3_BUCKET: js.radar.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
+          SOURCE_DIR: packages/${{ env.PLUGIN_NAME }}/cdn/
+          DEST_DIR: ${{ env.PLUGIN_NAME }}/v${{ env.PLUGIN_VERSION }}
