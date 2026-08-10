@@ -55,6 +55,20 @@ interface HttpRequestOptions {
 
 const inFlightRequests = new Map<string, AbortController>();
 
+const DEFAULT_NETWORK_TIMEOUT_INTERVAL = 10;
+const MIN_NETWORK_TIMEOUT_INTERVAL = 1;
+const MAX_NETWORK_TIMEOUT_INTERVAL = 300;
+
+const getNetworkTimeoutInterval = (interval?: number) => {
+  let timeout = interval ?? DEFAULT_NETWORK_TIMEOUT_INTERVAL;
+
+  if (timeout <= 0 || !Number.isFinite(timeout)) {
+    timeout = DEFAULT_NETWORK_TIMEOUT_INTERVAL;
+  }
+
+  return Math.min(Math.max(timeout, MIN_NETWORK_TIMEOUT_INTERVAL), MAX_NETWORK_TIMEOUT_INTERVAL);
+};
+
 /** fetch-based HTTP client for Radar API requests */
 class Http {
   /** map of host patterns to custom error factories for intercepting network errors */
@@ -82,16 +96,9 @@ class Http {
   static async request<T extends Record<string, any> = RadarApiResponse>(
     options: HttpRequestOptions,
   ): Promise<T & { meta?: RadarApiMeta }>;
-  static async request<T extends Record<string, any> = RadarApiResponse>({
-    method,
-    path,
-    data,
-    host,
-    version,
-    headers = {},
-    responseType,
-    requestId,
-  }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
+  static async request<T extends Record<string, any> = RadarApiResponse>(
+    requestOptions: HttpRequestOptions,
+  ): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
     const { publishableKey, authToken } = options;
@@ -99,7 +106,16 @@ class Http {
       throw new RadarPublishableKeyError('publishableKey or authToken not set.');
     }
 
-    const urlHost = host || options.host;
+    const urlHost = requestOptions.host || options.host || Config.defaultOptions.host;
+    return Http.sendRequest<T>(requestOptions, urlHost);
+  }
+
+  private static async sendRequest<T extends Record<string, any> = RadarApiResponse>(
+    { method, path, data, version, headers = {}, responseType, requestId }: HttpRequestOptions,
+    urlHost: string,
+  ): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
+    const options = Config.get();
+
     const urlVersion = version || options.version;
     let url = `${urlHost}/${urlVersion}/${path}`;
 
@@ -127,6 +143,12 @@ class Http {
     }
 
     const abortController = new AbortController();
+    const timeoutId = setTimeout(
+      () => {
+        abortController.abort();
+      },
+      getNetworkTimeoutInterval(options.networkTimeoutInterval) * 1000,
+    );
 
     if (requestId) {
       inFlightRequests.set(requestId, abortController);
@@ -138,88 +160,87 @@ class Http {
       ...headers,
     };
 
-    let response: Response;
     try {
-      response = await fetch(url, {
-        method,
-        headers: allHeaders,
-        body,
-        signal: abortController.signal,
-      });
-    } catch {
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method,
+          headers: allHeaders,
+          body,
+          signal: abortController.signal,
+        });
+      } catch {
+        if (urlHost) {
+          for (const [pattern, handler] of Http.errorInterceptors) {
+            if (urlHost.includes(pattern)) {
+              throw handler(!!Navigator.online());
+            }
+          }
+        }
+        throw new RadarNetworkError();
+      }
+
+      let parsed: RadarResponse | undefined;
+      try {
+        if (responseType === 'blob') {
+          parsed = { code: response.status, data: await response.blob() };
+        } else {
+          parsed = (await response.json()) as RadarApiResponse;
+        }
+      } catch (err) {
+        if (parsed) {
+          throw new RadarServerError(parsed);
+        } else {
+          if (options.debug) {
+            Logger.debug(`API call failed: ${url}`);
+            Logger.debug(String(err));
+          }
+          throw new RadarUnknownError(parsed);
+        }
+      }
+
+      if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
+        const error = parsed.meta?.error;
+        if (error === 'ERROR_PERMISSIONS') {
+          throw new RadarPermissionsError('Location permissions not granted.');
+        } else if (error === 'ERROR_LOCATION') {
+          throw new RadarLocationError('Could not determine location.');
+        } else if (error === 'ERROR_NETWORK') {
+          throw new RadarNetworkError();
+        }
+      }
+
+      if (response.ok) {
+        return parsed as T;
+      }
+      if (options.debug) {
+        Logger.debug(`API call failed: ${url}`);
+        Logger.debug(JSON.stringify(parsed));
+      }
+
+      if (response.status === 400) {
+        throw new RadarBadRequestError(parsed);
+      } else if (response.status === 401) {
+        throw new RadarUnauthorizedError(parsed);
+      } else if (response.status === 402) {
+        throw new RadarPaymentRequiredError(parsed);
+      } else if (response.status === 403) {
+        throw new RadarForbiddenError(parsed);
+      } else if (response.status === 404) {
+        throw new RadarNotFoundError(parsed);
+      } else if (response.status === 429) {
+        throw new RadarRateLimitError(parsed);
+      } else if (response.status >= 500 && response.status < 600) {
+        throw new RadarServerError(parsed);
+      } else {
+        throw new RadarUnknownError(parsed);
+      }
+    } finally {
+      clearTimeout(timeoutId);
       // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
       if (requestId && inFlightRequests.get(requestId) === abortController) {
         inFlightRequests.delete(requestId);
       }
-
-      if (host) {
-        for (const [pattern, handler] of Http.errorInterceptors) {
-          if (host.includes(pattern)) {
-            throw handler(!!Navigator.online());
-          }
-        }
-      }
-      throw new RadarNetworkError();
-    }
-
-    if (requestId && inFlightRequests.get(requestId) === abortController) {
-      inFlightRequests.delete(requestId);
-    }
-
-    let parsed: RadarResponse | undefined;
-    try {
-      if (responseType === 'blob') {
-        parsed = { code: response.status, data: await response.blob() };
-      } else {
-        parsed = (await response.json()) as RadarApiResponse;
-      }
-    } catch (err) {
-      if (parsed) {
-        throw new RadarServerError(parsed);
-      } else {
-        if (options.debug) {
-          Logger.debug(`API call failed: ${url}`);
-          Logger.debug(String(err));
-        }
-        throw new RadarUnknownError(parsed);
-      }
-    }
-
-    if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
-      const error = parsed.meta?.error;
-      if (error === 'ERROR_PERMISSIONS') {
-        throw new RadarPermissionsError('Location permissions not granted.');
-      } else if (error === 'ERROR_LOCATION') {
-        throw new RadarLocationError('Could not determine location.');
-      } else if (error === 'ERROR_NETWORK') {
-        throw new RadarNetworkError();
-      }
-    }
-
-    if (response.ok) {
-      return parsed as T;
-    }
-    if (options.debug) {
-      Logger.debug(`API call failed: ${url}`);
-      Logger.debug(JSON.stringify(parsed));
-    }
-
-    if (response.status === 400) {
-      throw new RadarBadRequestError(parsed);
-    } else if (response.status === 401) {
-      throw new RadarUnauthorizedError(parsed);
-    } else if (response.status === 402) {
-      throw new RadarPaymentRequiredError(parsed);
-    } else if (response.status === 403) {
-      throw new RadarForbiddenError(parsed);
-    } else if (response.status === 404) {
-      throw new RadarNotFoundError(parsed);
-    } else if (response.status === 429) {
-      throw new RadarRateLimitError(parsed);
-    } else if (response.status >= 500 && response.status < 600) {
-      throw new RadarServerError(parsed);
-    } else {
-      throw new RadarUnknownError(parsed);
     }
   }
 }

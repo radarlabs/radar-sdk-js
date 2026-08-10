@@ -15,6 +15,8 @@ class Config {
     live: false,
     logLevel: 'error',
     host: 'https://api.radar.io',
+    trackVerifiedAutoFailover: false,
+    networkTimeoutInterval: 10,
     version: 'v1',
     debug: false,
   };

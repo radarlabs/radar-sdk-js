@@ -99,6 +99,34 @@ describe('Http', () => {
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
       });
 
+      it('should time out network requests after 10 seconds by default', async () => {
+        jest.useFakeTimers();
+        try {
+          fetchMock.mockClear();
+          fetchMock.mockImplementationOnce((_url, init) => {
+            const signal = init?.signal as AbortSignal;
+            return new Promise<Response>((_resolve, reject) => {
+              signal.addEventListener('abort', () => {
+                reject(new DOMException('Aborted', 'AbortError'));
+              });
+            });
+          });
+
+          const requestPromise = Http.request(httpRequestParams);
+          await Promise.resolve();
+          const signal = fetchMock.mock.calls[0]![1]?.signal as AbortSignal;
+
+          jest.advanceTimersByTime(9999);
+          expect(signal.aborted).toEqual(false);
+
+          jest.advanceTimersByTime(1);
+          await expect(requestPromise).rejects.toHaveProperty('status', 'ERROR_NETWORK');
+          expect(signal.aborted).toEqual(true);
+        } finally {
+          jest.useRealTimers();
+        }
+      });
+
       it('should return an unknown error on invalid JSON', async () => {
         fetchMock.mockResponseOnce(() => Promise.resolve({ body: '{invalid json', status: 200 }));
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_UNKNOWN');
