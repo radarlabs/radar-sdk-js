@@ -96,9 +96,16 @@ class Http {
   static async request<T extends Record<string, any> = RadarApiResponse>(
     options: HttpRequestOptions,
   ): Promise<T & { meta?: RadarApiMeta }>;
-  static async request<T extends Record<string, any> = RadarApiResponse>(
-    requestOptions: HttpRequestOptions,
-  ): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
+  static async request<T extends Record<string, any> = RadarApiResponse>({
+    method,
+    path,
+    data,
+    host,
+    version,
+    headers = {},
+    responseType,
+    requestId,
+  }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
     const { publishableKey, authToken } = options;
@@ -106,16 +113,7 @@ class Http {
       throw new RadarPublishableKeyError('publishableKey or authToken not set.');
     }
 
-    const urlHost = requestOptions.host || options.host || Config.defaultOptions.host;
-    return Http.sendRequest<T>(requestOptions, urlHost);
-  }
-
-  private static async sendRequest<T extends Record<string, any> = RadarApiResponse>(
-    { method, path, data, version, headers = {}, responseType, requestId }: HttpRequestOptions,
-    urlHost: string,
-  ): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
-    const options = Config.get();
-
+    const urlHost = host || options.host;
     const urlVersion = version || options.version;
     let url = `${urlHost}/${urlVersion}/${path}`;
 
