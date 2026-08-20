@@ -41,6 +41,13 @@ interface RadarBlobResponse {
 
 export type RadarResponse = RadarApiResponse | RadarBlobResponse;
 
+/** Response paired with the `x-radar-request-id` header, returned when `includeRequestId` is set */
+export interface RadarResponseWithRequestId<T> {
+  data: T;
+  /** the `x-radar-request-id` response header, when the server sent one */
+  requestId?: string;
+}
+
 /** Request configuration for Http.request */
 interface HttpRequestOptions {
   method: HttpMethod;
@@ -51,6 +58,10 @@ interface HttpRequestOptions {
   headers?: Record<string, string>;
   responseType?: 'blob' | 'json';
   requestId?: string;
+  /** when true, the response is returned as `{ data, requestId }` with the `x-radar-request-id` header */
+  includeRequestId?: boolean;
+  /** when true, the request survives a page unload (fire-and-forget beacons) */
+  keepalive?: boolean;
 }
 
 const inFlightRequests = new Map<string, AbortController>();
@@ -80,6 +91,9 @@ class Http {
    */
   static async request(options: HttpRequestOptions & { responseType: 'blob' }): Promise<RadarBlobResponse>;
   static async request<T extends Record<string, any> = RadarApiResponse>(
+    options: HttpRequestOptions & { includeRequestId: true },
+  ): Promise<RadarResponseWithRequestId<T & { meta?: RadarApiMeta }>>;
+  static async request<T extends Record<string, any> = RadarApiResponse>(
     options: HttpRequestOptions,
   ): Promise<T & { meta?: RadarApiMeta }>;
   static async request<T extends Record<string, any> = RadarApiResponse>({
@@ -91,7 +105,11 @@ class Http {
     headers = {},
     responseType,
     requestId,
-  }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
+    includeRequestId,
+    keepalive,
+  }: HttpRequestOptions): Promise<
+    (T & { meta?: RadarApiMeta }) | RadarBlobResponse | RadarResponseWithRequestId<T & { meta?: RadarApiMeta }>
+  > {
     const options = Config.get();
 
     const { publishableKey, authToken } = options;
@@ -144,6 +162,7 @@ class Http {
         method,
         headers: allHeaders,
         body,
+        keepalive,
         signal: abortController.signal,
       });
     } catch {
@@ -171,7 +190,10 @@ class Http {
       if (responseType === 'blob') {
         parsed = { code: response.status, data: await response.blob() };
       } else {
-        parsed = (await response.json()) as RadarApiResponse;
+        // some endpoints (e.g. search/autocomplete/click) reply 204 with no body,
+        // which response.json() would reject on
+        const text = await response.text();
+        parsed = (text ? JSON.parse(text) : {}) as RadarApiResponse;
       }
     } catch (err) {
       if (parsed) {
@@ -197,6 +219,12 @@ class Http {
     }
 
     if (response.ok) {
+      if (includeRequestId) {
+        return {
+          data: parsed as T,
+          requestId: response.headers.get('x-radar-request-id') ?? undefined,
+        };
+      }
       return parsed as T;
     }
     if (options.debug) {

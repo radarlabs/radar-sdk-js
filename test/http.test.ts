@@ -42,6 +42,65 @@ describe('Http', () => {
         expect(response.code).toEqual(200);
       });
 
+      it('should resolve with an empty object on a 204 with no body', async () => {
+        fetchMock.mockResponse(async (req) => {
+          if (req.url.includes('/v1/config')) {
+            return JSON.stringify({});
+          }
+          return { body: '', status: 204 };
+        });
+
+        const response = await Http.request({ method: 'POST', path: 'search/autocomplete/click' });
+
+        expect(response).toEqual({});
+      });
+
+      it('should return the x-radar-request-id header when includeRequestId is set', async () => {
+        fetchMock.mockResponse(async (req) => {
+          if (req.url.includes('/v1/config')) {
+            return JSON.stringify({});
+          }
+          return {
+            body: JSON.stringify(successResponse),
+            status: 200,
+            headers: { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
+          };
+        });
+
+        const { data, requestId } = await Http.request({ ...httpRequestParams, includeRequestId: true });
+
+        expect(requestId).toEqual('01a01c2e-7512-704c-aa02-81253218d810');
+        expect(data.code).toEqual(200);
+      });
+
+      it('should not wrap the response when includeRequestId is not set', async () => {
+        fetchMock.mockResponse(async (req) => {
+          if (req.url.includes('/v1/config')) {
+            return JSON.stringify({});
+          }
+          return {
+            body: JSON.stringify(successResponse),
+            status: 200,
+            headers: { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
+          };
+        });
+
+        const response = await Http.request(httpRequestParams);
+
+        expect(response).toEqual(successResponse);
+      });
+
+      it('should pass keepalive through to fetch so requests survive page unload', async () => {
+        mockRequest(200, successResponse);
+
+        await Http.request({ ...httpRequestParams, keepalive: true });
+
+        const calls = fetchMock.mock.calls;
+        const lastCall = [...calls].reverse().find(([reqUrl]) => !String(reqUrl as string).includes('/v1/config'));
+
+        expect(lastCall?.[1]?.keepalive).toBe(true);
+      });
+
       it('should filter out undefined values in data', async () => {
         mockRequest(200, successResponse);
 

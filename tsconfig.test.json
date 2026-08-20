@@ -3,7 +3,12 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "noUnusedLocals": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    // mirrors the jest moduleNameMapper so plugin sources typecheck without a build
+    "paths": {
+      "radar-sdk-js": ["./src/index.ts"]
+    }
   },
   "include": ["src/**/*", "test/**/*"]
 }

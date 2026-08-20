@@ -481,11 +481,25 @@ export interface RadarAutocompleteParams {
   lang?: string;
   /** filter by postal code */
   postalCode?: string;
+  /** UUID grouping related autocomplete requests and their clickthrough into one session */
+  sessionToken?: string;
 }
 
 /** response from {@link Radar.autocomplete} */
 export interface RadarAutocompleteResponse extends RadarResponse {
   addresses: RadarAutocompleteAddress[];
+  /** the `x-radar-request-id` of the originating request, echoed back when reporting a click */
+  requestId?: string;
+}
+
+/** parameters for reporting an autocomplete clickthrough */
+export interface RadarAutocompleteClickParams {
+  /** the session UUID sent on the originating autocomplete request */
+  sessionToken: string;
+  /** the `x-radar-request-id` of the autocomplete response the selection came from */
+  requestId: string;
+  /** zero-based index of the selected result */
+  idx: number;
 }
 
 /** parameters for {@link Radar.searchPlaces} */

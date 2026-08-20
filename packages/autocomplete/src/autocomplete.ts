@@ -1,4 +1,5 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
+import generateUUID from './uuid';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
@@ -88,6 +89,10 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
+  /** UUID grouping this widget's autocomplete requests and clickthroughs into one session */
+  sessionToken: string;
+  /** `x-radar-request-id` of the response that produced the currently displayed results */
+  private _lastRequestId?: string;
   private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
@@ -152,6 +157,7 @@ class AutocompleteUI {
     }, this.config.debounceMS);
     this.results = [];
     this._highlightedIndex = -1;
+    this.sessionToken = generateUUID();
 
     // set threshold alias
     if (this.config.threshold !== undefined) {
@@ -388,6 +394,7 @@ class AutocompleteUI {
       mailable,
       lang,
       postalCode,
+      sessionToken: this.sessionToken,
     };
 
     if (this.near) {
@@ -398,7 +405,8 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    this._lastRequestId = requestId;
     return addresses;
   }
 
@@ -627,6 +635,15 @@ class AutocompleteUI {
     const onSelection = this.config.onSelection;
     if (onSelection) {
       onSelection(result);
+    }
+
+    if (this._lastRequestId) {
+      // fire-and-forget: autocompleteClick never rejects, so no need to await or catch
+      void this.ctx.apis.Search.autocompleteClick({
+        sessionToken: this.sessionToken,
+        requestId: this._lastRequestId,
+        idx: index,
+      });
     }
 
     // Return focus to input after selection
