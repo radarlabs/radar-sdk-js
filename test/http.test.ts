@@ -4,7 +4,7 @@ import Radar from '../src';
 import Config from '../src/config';
 import Http from '../src/http';
 import SDK_VERSION from '../src/version';
-import { getRequest, mockNetworkError, mockRequest } from './utils';
+import { getRequest, mockNetworkError, mockRequest, mockRequestWithHeaders } from './utils';
 
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
@@ -55,57 +55,53 @@ describe('Http', () => {
         expect(response).toEqual({});
       });
 
-      it('should return the x-radar-request-id header when includeRequestId is set', async () => {
-        fetchMock.mockResponse(async (req) => {
-          if (req.url.includes('/v1/config')) {
-            return JSON.stringify({});
-          }
-          return {
-            body: JSON.stringify(successResponse),
-            status: 200,
-            headers: { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
-          };
-        });
-
-        const { data, requestId } = await Http.request({ ...httpRequestParams, includeRequestId: true });
-
-        expect(requestId).toEqual('01a01c2e-7512-704c-aa02-81253218d810');
-        expect(data.code).toEqual(200);
-      });
-
-      it('should not wrap the response when includeRequestId is not set', async () => {
-        fetchMock.mockResponse(async (req) => {
-          if (req.url.includes('/v1/config')) {
-            return JSON.stringify({});
-          }
-          return {
-            body: JSON.stringify(successResponse),
-            status: 200,
-            headers: { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
-          };
+      it('should attach the x-radar-request-id header to meta', async () => {
+        mockRequestWithHeaders(200, successResponse, {
+          'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810',
         });
 
         const response = await Http.request(httpRequestParams);
 
-        expect(response).toEqual(successResponse);
+        expect(response.meta?.requestId).toEqual('01a01c2e-7512-704c-aa02-81253218d810');
+        expect(response.code).toEqual(200);
       });
 
-      it('should require includeRequestId to be the literal true, not a boolean', () => {
-        // a call expression, not `const x: boolean = true` -- the latter is narrowed back to
-        // the literal `true` by control-flow analysis and would not exercise anything
-        const dynamicFlag = (): boolean => true;
+      it('should not invent a requestId when the server sent no such header', async () => {
+        mockRequest(200, successResponse);
 
-        // compile-time assertion only -- never invoked. includeRequestId selects the return
-        // shape, so it must be statically known: a boolean variable would leave the caller
-        // statically holding the bare body while receiving { data, requestId } at runtime.
-        // if the option type ever widens back to `boolean`, the unused @ts-expect-error
-        // below becomes a compile error and this suite fails.
-        const neverCalled = async () => {
-          // @ts-expect-error includeRequestId must be `true`, not `boolean`
-          await Http.request({ ...httpRequestParams, includeRequestId: dynamicFlag() });
-        };
+        const response = await Http.request(httpRequestParams);
 
-        expect(neverCalled).toBeInstanceOf(Function);
+        expect(response.meta?.requestId).toBeUndefined();
+      });
+
+      it('should preserve server-sent meta fields alongside the requestId', async () => {
+        mockRequestWithHeaders(
+          200,
+          { ...successResponse, meta: { message: 'ok' } },
+          { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
+        );
+
+        const response = await Http.request(httpRequestParams);
+
+        expect(response.meta).toEqual({
+          message: 'ok',
+          requestId: '01a01c2e-7512-704c-aa02-81253218d810',
+        });
+      });
+
+      it('should attach the requestId to the response carried by a thrown error', async () => {
+        mockRequestWithHeaders(
+          400,
+          { meta: { message: 'bad' } },
+          {
+            'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810',
+          },
+        );
+
+        const err = await Http.request(httpRequestParams).catch((e) => e);
+
+        expect(err.status).toEqual('ERROR_BAD_REQUEST');
+        expect(err.response?.meta?.requestId).toEqual('01a01c2e-7512-704c-aa02-81253218d810');
       });
 
       it('should pass keepalive through to fetch so requests survive page unload', async () => {

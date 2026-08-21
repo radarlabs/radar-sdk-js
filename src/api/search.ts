@@ -34,9 +34,7 @@ class SearchAPI {
       }
     }
 
-    const { data: response, requestId: radarRequestId } = await Http.request<
-      Omit<RadarAutocompleteResponse, 'response' | 'requestId'>
-    >({
+    const response = await Http.request<Omit<RadarAutocompleteResponse, 'response' | 'requestId'>>({
       method: 'GET',
       path: 'search/autocomplete',
       data: {
@@ -52,13 +50,12 @@ class SearchAPI {
         sessionToken,
       },
       requestId,
-      includeRequestId: true,
     });
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
       // echoed back to search/autocomplete/click to attribute a selection to this response
-      requestId: radarRequestId,
+      requestId: response.meta?.requestId,
     };
 
     if (options.debug) {

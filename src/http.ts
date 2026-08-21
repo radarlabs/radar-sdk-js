@@ -24,6 +24,11 @@ interface RadarApiMeta {
   error?: string;
   message?: string;
   type?: string;
+  /**
+   * Attached from the `x-radar-request-id` response header
+   * For use when reporting an issue to Radar
+   */
+  requestId?: string;
 }
 
 /** Base shape all Radar API JSON responses share */
@@ -41,13 +46,6 @@ interface RadarBlobResponse {
 
 export type RadarResponse = RadarApiResponse | RadarBlobResponse;
 
-/** Response paired with the `x-radar-request-id` header, returned when `includeRequestId` is set */
-export interface RadarResponseWithRequestId<T> {
-  data: T;
-  /** the `x-radar-request-id` response header, when the server sent one */
-  requestId?: string;
-}
-
 /** Request configuration for Http.request */
 interface HttpRequestOptions {
   method: HttpMethod;
@@ -58,14 +56,6 @@ interface HttpRequestOptions {
   headers?: Record<string, string>;
   responseType?: 'blob' | 'json';
   requestId?: string;
-  /**
-   * when `true`, the response is returned as `{ data, requestId }` carrying the
-   * `x-radar-request-id` header. typed as the literal `true` rather than `boolean` on
-   * purpose: this flag selects the return shape, so it has to be statically known. a
-   * `boolean` variable would match the general overload and leave the caller statically
-   * holding the bare body while receiving the wrapper at runtime.
-   */
-  includeRequestId?: true;
   /** when true, the request survives a page unload (fire-and-forget beacons) */
   keepalive?: boolean;
 }
@@ -97,9 +87,6 @@ class Http {
    */
   static async request(options: HttpRequestOptions & { responseType: 'blob' }): Promise<RadarBlobResponse>;
   static async request<T extends Record<string, any> = RadarApiResponse>(
-    options: HttpRequestOptions & { includeRequestId: true },
-  ): Promise<RadarResponseWithRequestId<T & { meta?: RadarApiMeta }>>;
-  static async request<T extends Record<string, any> = RadarApiResponse>(
     options: HttpRequestOptions,
   ): Promise<T & { meta?: RadarApiMeta }>;
   static async request<T extends Record<string, any> = RadarApiResponse>({
@@ -111,11 +98,8 @@ class Http {
     headers = {},
     responseType,
     requestId,
-    includeRequestId,
     keepalive,
-  }: HttpRequestOptions): Promise<
-    (T & { meta?: RadarApiMeta }) | RadarBlobResponse | RadarResponseWithRequestId<T & { meta?: RadarApiMeta }>
-  > {
+  }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
     const { publishableKey, authToken } = options;
@@ -213,6 +197,16 @@ class Http {
       }
     }
 
+    // surface the request id on meta for every JSON response, success or failure. blob
+    // responses are skipped: RadarBlobResponse declares `meta?: undefined`.
+    if (responseType !== 'blob' && parsed && typeof parsed === 'object') {
+      const radarRequestId = response.headers.get('x-radar-request-id');
+      if (radarRequestId) {
+        const apiResponse = parsed as RadarApiResponse;
+        apiResponse.meta = { ...apiResponse.meta, requestId: radarRequestId };
+      }
+    }
+
     if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
       const error = parsed.meta?.error;
       if (error === 'ERROR_PERMISSIONS') {
@@ -225,12 +219,6 @@ class Http {
     }
 
     if (response.ok) {
-      if (includeRequestId) {
-        return {
-          data: parsed as T,
-          requestId: response.headers.get('x-radar-request-id') ?? undefined,
-        };
-      }
       return parsed as T;
     }
     if (options.debug) {

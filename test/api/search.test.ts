@@ -136,7 +136,6 @@ describe('Search', () => {
         expect(Http.request).toHaveBeenCalledWith({
           method: 'GET',
           path: 'search/autocomplete',
-          includeRequestId: true,
           data: {
             query: 'mock-query',
             near: undefined,
@@ -191,7 +190,6 @@ describe('Search', () => {
         expect(Http.request).toHaveBeenCalledWith({
           method: 'GET',
           path: 'search/autocomplete',
-          includeRequestId: true,
           data: {
             query: 'mock-query',
             near: `${latitude},${longitude}`,
@@ -218,7 +216,6 @@ describe('Search', () => {
         expect(Http.request).toHaveBeenCalledWith({
           method: 'GET',
           path: 'search/autocomplete',
-          includeRequestId: true,
           data: {
             query: 'mock-query',
             near: `${latitude},${longitude}`,

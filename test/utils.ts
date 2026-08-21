@@ -58,6 +58,16 @@ export const mockRequest = (status: number, response: unknown) => {
   });
 };
 
+// same as mockRequest, but with response headers (e.g. x-radar-request-id)
+export const mockRequestWithHeaders = (status: number, response: unknown, headers: Record<string, string>) => {
+  fetchMock.mockResponse(async (req) => {
+    if (req.url.includes('/v1/config')) {
+      return JSON.stringify({});
+    }
+    return { body: JSON.stringify(response), status: status || 200, headers };
+  });
+};
+
 export const getRequest = () => {
   // find the last non-config fetch call
   const calls = fetchMock.mock.calls;
