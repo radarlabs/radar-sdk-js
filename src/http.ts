@@ -58,8 +58,14 @@ interface HttpRequestOptions {
   headers?: Record<string, string>;
   responseType?: 'blob' | 'json';
   requestId?: string;
-  /** when true, the response is returned as `{ data, requestId }` with the `x-radar-request-id` header */
-  includeRequestId?: boolean;
+  /**
+   * when `true`, the response is returned as `{ data, requestId }` carrying the
+   * `x-radar-request-id` header. typed as the literal `true` rather than `boolean` on
+   * purpose: this flag selects the return shape, so it has to be statically known. a
+   * `boolean` variable would match the general overload and leave the caller statically
+   * holding the bare body while receiving the wrapper at runtime.
+   */
+  includeRequestId?: true;
   /** when true, the request survives a page unload (fire-and-forget beacons) */
   keepalive?: boolean;
 }

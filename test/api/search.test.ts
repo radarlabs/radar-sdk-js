@@ -151,7 +151,7 @@ describe('Search', () => {
       });
     });
 
-    describe('session tracking', () => {
+    describe('session association', () => {
       it('should pass sessionToken through to the autocomplete request', async () => {
         mockRequest(200, autocompleteResponse);
 

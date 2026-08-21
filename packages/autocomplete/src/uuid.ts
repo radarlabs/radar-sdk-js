@@ -1,9 +1,8 @@
 /**
  * generate a random v4 UUID
  *
- * NOTE(binhrobles): mirrors the generator private to the core SDK's device.ts, rather than
- * being shared through RadarPluginContext. The plugin is versioned separately, so widening
- * the published plugin contract for a 12-line crypto shim is the more expensive trade.
+ * NOTE: mirrors the generator private to the core SDK's device.ts.
+ * Duplicate here rather than import across RadarPluginContext boundary.
  *
  * @returns a newly generated UUID
  */

@@ -632,18 +632,19 @@ class AutocompleteUI {
     }
     this.inputField.value = inputValue;
 
-    const onSelection = this.config.onSelection;
-    if (onSelection) {
-      onSelection(result);
-    }
-
     if (this._lastRequestId) {
-      // fire-and-forget: autocompleteClick never rejects, so no need to await or catch
+      // reported before onSelection: that callback is consumer code, and a throw from it
+      // must not swallow the clickthrough. fire-and-forget -- autocompleteClick never rejects.
       void this.ctx.apis.Search.autocompleteClick({
         sessionToken: this.sessionToken,
         requestId: this._lastRequestId,
         idx: index,
       });
+    }
+
+    const onSelection = this.config.onSelection;
+    if (onSelection) {
+      onSelection(result);
     }
 
     // Return focus to input after selection

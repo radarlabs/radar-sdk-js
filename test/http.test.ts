@@ -90,6 +90,24 @@ describe('Http', () => {
         expect(response).toEqual(successResponse);
       });
 
+      it('should require includeRequestId to be the literal true, not a boolean', () => {
+        // a call expression, not `const x: boolean = true` -- the latter is narrowed back to
+        // the literal `true` by control-flow analysis and would not exercise anything
+        const dynamicFlag = (): boolean => true;
+
+        // compile-time assertion only -- never invoked. includeRequestId selects the return
+        // shape, so it must be statically known: a boolean variable would leave the caller
+        // statically holding the bare body while receiving { data, requestId } at runtime.
+        // if the option type ever widens back to `boolean`, the unused @ts-expect-error
+        // below becomes a compile error and this suite fails.
+        const neverCalled = async () => {
+          // @ts-expect-error includeRequestId must be `true`, not `boolean`
+          await Http.request({ ...httpRequestParams, includeRequestId: dynamicFlag() });
+        };
+
+        expect(neverCalled).toBeInstanceOf(Function);
+      });
+
       it('should pass keepalive through to fetch so requests survive page unload', async () => {
         mockRequest(200, successResponse);
 
