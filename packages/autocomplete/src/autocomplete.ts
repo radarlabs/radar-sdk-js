@@ -90,7 +90,7 @@ class AutocompleteUI {
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
   /** UUID grouping this widget's autocomplete requests and clickthroughs into one session */
-  sessionToken: string;
+  readonly sessionToken: string;
   /** `x-radar-request-id` of the response that produced the currently displayed results */
   private _lastRequestId?: string;
   private _highlightedIndex: number;

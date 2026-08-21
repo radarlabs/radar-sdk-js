@@ -83,8 +83,6 @@ const clickRequests = () =>
 const mount = (options: Partial<RadarAutocompleteUIOptions> = {}) =>
   new AutocompleteUI({ container: 'autocomplete', ...options }, ctx as never);
 
-const createWidget = () => mount();
-
 describe('AutocompleteUI sessions', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="autocomplete"></div>';
@@ -98,7 +96,7 @@ describe('AutocompleteUI sessions', () => {
   });
 
   it('sends a session token UUID on every autocomplete request', async () => {
-    const widget = createWidget();
+    const widget = mount();
 
     await widget.fetchResults('66 steuben');
 
@@ -107,7 +105,7 @@ describe('AutocompleteUI sessions', () => {
   });
 
   it('reuses the same session token across requests', async () => {
-    const widget = createWidget();
+    const widget = mount();
 
     await widget.fetchResults('66 steu');
     await widget.fetchResults('66 steuben');
@@ -129,7 +127,7 @@ describe('AutocompleteUI sessions', () => {
   });
 
   it('reports a click with the session token, originating request id, and result index', async () => {
-    const widget = createWidget();
+    const widget = mount();
 
     const results = await widget.fetchResults('66 steuben');
     widget.displayResults(results);
@@ -146,7 +144,7 @@ describe('AutocompleteUI sessions', () => {
   });
 
   it('reports the click against the most recent autocomplete response', async () => {
-    const widget = createWidget();
+    const widget = mount();
 
     mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000001');
     widget.displayResults(await widget.fetchResults('66 steu'));
@@ -186,7 +184,7 @@ describe('AutocompleteUI sessions', () => {
       // no x-radar-request-id header
       return { body: JSON.stringify({ meta: {}, addresses }), status: 200 };
     });
-    const widget = createWidget();
+    const widget = mount();
 
     widget.displayResults(await widget.fetchResults('66 steuben'));
     widget.select(0);
@@ -214,7 +212,7 @@ describe('AutocompleteUI sessions', () => {
   });
 
   it('does not report a click when the selected index has no result', async () => {
-    const widget = createWidget();
+    const widget = mount();
 
     widget.displayResults(await widget.fetchResults('66 steuben'));
     widget.select(99);

@@ -4,7 +4,7 @@ import Radar from '../src';
 import Config from '../src/config';
 import Http from '../src/http';
 import SDK_VERSION from '../src/version';
-import { getRequest, mockNetworkError, mockRequest, mockRequestWithHeaders } from './utils';
+import { getRequest, mockNetworkError, mockRequest } from './utils';
 
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
@@ -56,7 +56,7 @@ describe('Http', () => {
       });
 
       it('should attach the x-radar-request-id header to meta', async () => {
-        mockRequestWithHeaders(200, successResponse, {
+        mockRequest(200, successResponse, {
           'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810',
         });
 
@@ -75,7 +75,7 @@ describe('Http', () => {
       });
 
       it('should preserve server-sent meta fields alongside the requestId', async () => {
-        mockRequestWithHeaders(
+        mockRequest(
           200,
           { ...successResponse, meta: { message: 'ok' } },
           { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
@@ -90,7 +90,7 @@ describe('Http', () => {
       });
 
       it('should attach the requestId to the response carried by a thrown error', async () => {
-        mockRequestWithHeaders(
+        mockRequest(
           400,
           { meta: { message: 'bad' } },
           {
