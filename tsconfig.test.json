@@ -5,7 +5,9 @@
     "noUnusedLocals": false,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    // mirrors the jest moduleNameMapper so plugin sources typecheck without a build
+    // Same remap as jest's moduleNameMapper, but for the typechecker rather than the
+    // module loader: without it, plugin sources fail to resolve 'radar-sdk-js' types
+    // until dist/ has been built.
     "paths": {
       "radar-sdk-js": ["./src/index.ts"]
     }
