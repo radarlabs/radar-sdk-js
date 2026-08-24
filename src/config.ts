@@ -13,10 +13,10 @@ class Config {
   /** default option values applied during initialization */
   static defaultOptions = {
     live: false,
-    logLevel: 'error',
-    host: 'https://api.radar.io',
+    logLevel: 'debug',
+    host: 'https://api-server-dev-binh.use1.radar-staging.com',
     version: 'v1',
-    debug: false,
+    debug: true,
   };
 
   /** store SDK options (called by Radar.initialize) */
