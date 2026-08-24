@@ -76,7 +76,7 @@ class SearchAPI {
         method: 'POST',
         path: 'search/autocomplete/click',
         data: { sessionToken, requestId, idx },
-        // the selection often navigates the page; keepalive lets the report outlive it
+        // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
       });
     } catch (err) {
