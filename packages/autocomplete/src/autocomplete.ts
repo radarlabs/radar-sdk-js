@@ -640,6 +640,11 @@ class AutocompleteUI {
         requestId: this._lastRequestId,
         idx: index,
       });
+    } else {
+      Logger.warn(
+        'Could not report autocomplete selection: the autocomplete response carried no request ID. ' +
+          'Check that the x-radar-request-id response header is exposed to the browser.',
+      );
     }
 
     const onSelection = this.config.onSelection;

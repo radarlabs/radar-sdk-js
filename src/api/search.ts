@@ -1,5 +1,6 @@
 import Config from '../config';
 import Http from '../http';
+import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
@@ -78,9 +79,10 @@ class SearchAPI {
         // the selection often navigates the page; keepalive lets the report outlive it
         keepalive: true,
       });
-    } catch {
+    } catch (err) {
       // clickthroughs are fire-and-forget. an expired session or a network blip must never
-      // surface to the caller, and is never retried.
+      // surface to the caller, and is never retried
+      Logger.debug(`Autocomplete click not reported: ${String(err)}`);
     }
   }
 
