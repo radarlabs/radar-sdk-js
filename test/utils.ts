@@ -49,12 +49,13 @@ export const enableLocation = (position: NavigatorPosition, callback?: (args: an
 
 // mock a single API response — config calls are handled by the default
 // handler in globals.ts, so this only needs to cover the test request.
-export const mockRequest = (status: number, response: unknown) => {
+// pass `headers` to mock response headers such as x-radar-request-id.
+export const mockRequest = (status: number, response: unknown, headers?: Record<string, string>) => {
   fetchMock.mockResponse(async (req) => {
     if (req.url.includes('/v1/config')) {
       return JSON.stringify({});
     }
-    return { body: JSON.stringify(response), status: status || 200 };
+    return { body: JSON.stringify(response), status: status || 200, headers };
   });
 };
 

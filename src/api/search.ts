@@ -1,8 +1,10 @@
 import Config from '../config';
 import Http from '../http';
+import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
+  RadarAutocompleteClickParams,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
   RadarSearchPlacesParams,
@@ -22,7 +24,7 @@ class SearchAPI {
   static async autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
-    const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode } = params;
+    const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode, sessionToken } = params;
     let { near } = params;
 
     // near can be provided as a string or Location object
@@ -33,7 +35,7 @@ class SearchAPI {
       }
     }
 
-    const response = await Http.request<Omit<RadarAutocompleteResponse, 'response'>>({
+    const response = await Http.request<Omit<RadarAutocompleteResponse, 'response' | 'requestId'>>({
       method: 'GET',
       path: 'search/autocomplete',
       data: {
@@ -46,12 +48,15 @@ class SearchAPI {
         mailable,
         lang,
         postalCode,
+        sessionToken,
       },
       requestId,
     });
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
+      // echoed back to search/autocomplete/click to attribute a selection to this response
+      requestId: response.meta?.requestId,
     };
 
     if (options.debug) {
@@ -59,6 +64,26 @@ class SearchAPI {
     }
 
     return autocompleteRes;
+  }
+
+  /**
+   * report a clickthrough on an autocomplete result
+   * @param params - session token, originating request ID, and result index
+   */
+  static async autocompleteClick({ sessionToken, requestId, idx }: RadarAutocompleteClickParams): Promise<void> {
+    try {
+      await Http.request({
+        method: 'POST',
+        path: 'search/autocomplete/click',
+        data: { sessionToken, requestId, idx },
+        // the selection may navigate the page; keepalive lets the report outlive it
+        keepalive: true,
+      });
+    } catch (err) {
+      // clickthroughs are fire-and-forget. an expired session or a network blip must never
+      // surface to the caller, and is never retried
+      Logger.debug(`Autocomplete click not reported: ${String(err)}`);
+    }
   }
 
   /**
