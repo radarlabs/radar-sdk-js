@@ -24,6 +24,11 @@ interface RadarApiMeta {
   error?: string;
   message?: string;
   type?: string;
+  /**
+   * Attached from the `x-radar-request-id` response header
+   * For use when reporting an issue to Radar
+   */
+  requestId?: string;
 }
 
 /** Base shape all Radar API JSON responses share */
@@ -51,6 +56,8 @@ interface HttpRequestOptions {
   headers?: Record<string, string>;
   responseType?: 'blob' | 'json';
   requestId?: string;
+  /** when true, the request survives a page unload (fire-and-forget beacons) */
+  keepalive?: boolean;
 }
 
 const inFlightRequests = new Map<string, AbortController>();
@@ -141,6 +148,7 @@ class Http {
     headers = {},
     responseType,
     requestId,
+    keepalive,
   }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
@@ -199,6 +207,7 @@ class Http {
           method,
           headers: allHeaders,
           body,
+          keepalive,
           signal: fetchSignal,
         });
       } catch {
@@ -217,7 +226,10 @@ class Http {
         if (responseType === 'blob') {
           parsed = { code: response.status, data: await response.blob() };
         } else {
-          parsed = (await response.json()) as RadarApiResponse;
+          // some endpoints (e.g. search/autocomplete/click) reply 204 with no body,
+          // which response.json() would reject on
+          const text = await response.text();
+          parsed = (text ? JSON.parse(text) : {}) as RadarApiResponse;
         }
       } catch (err) {
         if (parsed) {
@@ -228,6 +240,16 @@ class Http {
             Logger.debug(String(err));
           }
           throw new RadarUnknownError(parsed);
+        }
+      }
+
+      // surface the request id on meta for every JSON response, success or failure. blob
+      // responses are skipped: RadarBlobResponse declares `meta?: undefined`.
+      if (responseType !== 'blob' && parsed && typeof parsed === 'object') {
+        const radarRequestId = response.headers.get('x-radar-request-id');
+        if (radarRequestId) {
+          const apiResponse = parsed as RadarApiResponse;
+          apiResponse.meta = { ...apiResponse.meta, requestId: radarRequestId };
         }
       }
 

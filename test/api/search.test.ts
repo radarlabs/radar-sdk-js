@@ -1,10 +1,12 @@
+import fetchMock from 'jest-fetch-mock';
+
 import Radar from '../../src';
 import Search from '../../src/api/search';
 import Config from '../../src/config';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import { latitude, longitude } from '../common';
-import { getResponseWithDebug, mockRequest } from '../utils';
+import { getRequest, getResponseWithDebug, mockRequest } from '../utils';
 
 import type { RadarGeocodeLayer, RadarOptions } from '../../src/types';
 
@@ -148,6 +150,33 @@ describe('Search', () => {
       });
     });
 
+    describe('session association', () => {
+      it('should pass sessionToken through to the autocomplete request', async () => {
+        mockRequest(200, autocompleteResponse);
+
+        await Search.autocomplete({ query, sessionToken: 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f' });
+
+        expect(getRequest().url).toContain('sessionToken=ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f');
+      });
+
+      it('should return the originating x-radar-request-id on the response', async () => {
+        fetchMock.mockResponse(async (req) => {
+          if (req.url.includes('/v1/config')) {
+            return JSON.stringify({});
+          }
+          return {
+            body: JSON.stringify(autocompleteResponse),
+            status: 200,
+            headers: { 'x-radar-request-id': '01a01c2e-7512-704c-aa02-81253218d810' },
+          };
+        });
+
+        const response = await Search.autocomplete({ query });
+
+        expect(response.requestId).toEqual('01a01c2e-7512-704c-aa02-81253218d810');
+      });
+    });
+
     describe('params are provided', () => {
       it('should return an autocomplete response', async () => {
         mockRequest(200, autocompleteResponse);
@@ -199,6 +228,44 @@ describe('Search', () => {
         });
         expect(response).toEqual(validateResponse);
       });
+    });
+  });
+  describe('autocompleteClick', () => {
+    const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
+    const requestId = '01a01c2e-7512-704c-aa02-81253218d810';
+
+    it('should POST the session, request id, and result index', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteClick({ sessionToken, requestId, idx: 2 });
+
+      const request = getRequest();
+      expect(request.method).toEqual('POST');
+      expect(request.url).toContain('/v1/search/autocomplete/click');
+      expect(JSON.parse(request.body!)).toEqual({ sessionToken, requestId, idx: 2 });
+    });
+
+    it('should send the click with keepalive so it survives page navigation', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteClick({ sessionToken, requestId, idx: 0 });
+
+      const lastCall = [...fetchMock.mock.calls]
+        .reverse()
+        .find(([url]) => String(url as string).includes('/autocomplete/click'));
+      expect(lastCall?.[1]?.keepalive).toBe(true);
+    });
+
+    it('should resolve without throwing when the session is unknown or expired', async () => {
+      mockRequest(400, { meta: { code: 400 } });
+
+      await expect(Search.autocompleteClick({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
+    });
+
+    it('should resolve without throwing on a network error', async () => {
+      fetchMock.mockReject(new TypeError('Network error'));
+
+      await expect(Search.autocompleteClick({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
     });
   });
 });

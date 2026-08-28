@@ -3,7 +3,14 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "noUnusedLocals": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    // Same remap as jest's moduleNameMapper, but for the typechecker rather than the
+    // module loader: without it, plugin sources fail to resolve 'radar-sdk-js' types
+    // until dist/ has been built.
+    "paths": {
+      "radar-sdk-js": ["./src/index.ts"]
+    }
   },
   "include": ["src/**/*", "test/**/*"]
 }

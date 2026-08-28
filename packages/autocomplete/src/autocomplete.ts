@@ -1,4 +1,5 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
+import generateUUID from './uuid';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
@@ -88,6 +89,10 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
+  /** UUID grouping this widget's autocomplete requests and clickthroughs into one session */
+  readonly sessionToken: string;
+  /** `x-radar-request-id` of the response that produced the currently displayed results */
+  private _lastRequestId?: string;
   private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
@@ -152,6 +157,7 @@ class AutocompleteUI {
     }, this.config.debounceMS);
     this.results = [];
     this._highlightedIndex = -1;
+    this.sessionToken = generateUUID();
 
     // set threshold alias
     if (this.config.threshold !== undefined) {
@@ -388,6 +394,7 @@ class AutocompleteUI {
       mailable,
       lang,
       postalCode,
+      sessionToken: this.sessionToken,
     };
 
     if (this.near) {
@@ -398,7 +405,8 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    this._lastRequestId = requestId;
     return addresses;
   }
 
@@ -623,6 +631,21 @@ class AutocompleteUI {
       inputValue = `${label}, ${result.formattedAddress}`;
     }
     this.inputField.value = inputValue;
+
+    if (this._lastRequestId) {
+      // reported before onSelection: that callback is consumer code, and a throw from it
+      // must not swallow the clickthrough. fire-and-forget -- autocompleteClick never rejects.
+      void this.ctx.apis.Search.autocompleteClick({
+        sessionToken: this.sessionToken,
+        requestId: this._lastRequestId,
+        idx: index,
+      });
+    } else {
+      Logger.warn(
+        'Could not report autocomplete selection: the autocomplete response carried no request ID. ' +
+          'Check that the x-radar-request-id response header is exposed to the browser.',
+      );
+    }
 
     const onSelection = this.config.onSelection;
     if (onSelection) {
