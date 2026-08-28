@@ -6,6 +6,11 @@ import Http from '../src/http';
 import SDK_VERSION from '../src/version';
 import { getRequest, mockNetworkError, mockRequest } from './utils';
 
+type AbortSignalWithOptionalMethods = Omit<typeof AbortSignal, 'any' | 'timeout'> & {
+  any?: (signals: AbortSignal[]) => AbortSignal;
+  timeout?: (milliseconds: number) => AbortSignal;
+};
+
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
 
@@ -99,8 +104,12 @@ describe('Http', () => {
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
       });
 
-      it('should time out network requests after 10 seconds by default', async () => {
-        jest.useFakeTimers();
+      it('should use AbortSignal.timeout for network request timeout by default', async () => {
+        const abortSignalTimeout = AbortSignal.timeout;
+        const timeoutAbortController = new AbortController();
+        const timeout = jest.fn(() => timeoutAbortController.signal);
+        (AbortSignal as AbortSignalWithOptionalMethods).timeout = timeout;
+
         try {
           fetchMock.mockClear();
           fetchMock.mockImplementationOnce((_url, init) => {
@@ -116,14 +125,14 @@ describe('Http', () => {
           await Promise.resolve();
           const signal = fetchMock.mock.calls[0]![1]?.signal as AbortSignal;
 
-          jest.advanceTimersByTime(9999);
+          expect(timeout).toHaveBeenCalledWith(10000);
           expect(signal.aborted).toEqual(false);
 
-          jest.advanceTimersByTime(1);
+          timeoutAbortController.abort();
           await expect(requestPromise).rejects.toHaveProperty('status', 'ERROR_NETWORK');
           expect(signal.aborted).toEqual(true);
         } finally {
-          jest.useRealTimers();
+          (AbortSignal as AbortSignalWithOptionalMethods).timeout = abortSignalTimeout;
         }
       });
 

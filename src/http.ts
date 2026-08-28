@@ -69,6 +69,42 @@ const getNetworkTimeoutInterval = (interval?: number) => {
   return Math.min(Math.max(timeout, MIN_NETWORK_TIMEOUT_INTERVAL), MAX_NETWORK_TIMEOUT_INTERVAL);
 };
 
+type AbortSignalConstructor = typeof AbortSignal & {
+  any?: (signals: AbortSignal[]) => AbortSignal;
+  timeout?: (milliseconds: number) => AbortSignal;
+};
+
+const getAbortSignalConstructor = (): AbortSignalConstructor | undefined => {
+  if (typeof AbortSignal === 'undefined') {
+    return undefined;
+  }
+
+  return AbortSignal as AbortSignalConstructor;
+};
+
+const createTimeoutSignal = (timeoutMS: number): AbortSignal | undefined => {
+  const AbortSignalCtor = getAbortSignalConstructor();
+  return AbortSignalCtor?.timeout?.(timeoutMS);
+};
+
+const combineAbortSignals = (signals: AbortSignal[]): AbortSignal | undefined => {
+  if (signals.length === 0) {
+    return undefined;
+  }
+
+  if (signals.length === 1) {
+    return signals[0]!;
+  }
+
+  const AbortSignalCtor = getAbortSignalConstructor();
+  if (AbortSignalCtor?.any) {
+    return AbortSignalCtor.any(signals);
+  }
+
+  // Without AbortSignal.any(), prefer requestId cancellation over timeout when both signals exist.
+  return signals[0]!;
+};
+
 /** fetch-based HTTP client for Radar API requests */
 class Http {
   /** map of host patterns to custom error factories for intercepting network errors */
@@ -140,16 +176,14 @@ class Http {
       inFlightRequests.get(requestId)?.abort();
     }
 
-    const abortController = new AbortController();
-    const timeoutId = setTimeout(
-      () => {
-        abortController.abort();
-      },
-      getNetworkTimeoutInterval(options.networkTimeoutInterval) * 1000,
+    const requestAbortController = requestId ? new AbortController() : undefined;
+    const timeoutSignal = createTimeoutSignal(getNetworkTimeoutInterval(options.networkTimeoutInterval) * 1000);
+    const fetchSignal = combineAbortSignals(
+      [requestAbortController?.signal, timeoutSignal].filter((value): value is AbortSignal => !!value),
     );
 
-    if (requestId) {
-      inFlightRequests.set(requestId, abortController);
+    if (requestId && requestAbortController) {
+      inFlightRequests.set(requestId, requestAbortController);
     }
 
     const allHeaders: Record<string, string> = {
@@ -165,7 +199,7 @@ class Http {
           method,
           headers: allHeaders,
           body,
-          signal: abortController.signal,
+          signal: fetchSignal,
         });
       } catch {
         if (urlHost) {
@@ -234,9 +268,8 @@ class Http {
         throw new RadarUnknownError(parsed);
       }
     } finally {
-      clearTimeout(timeoutId);
       // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
-      if (requestId && inFlightRequests.get(requestId) === abortController) {
+      if (requestId && inFlightRequests.get(requestId) === requestAbortController) {
         inFlightRequests.delete(requestId);
       }
     }
