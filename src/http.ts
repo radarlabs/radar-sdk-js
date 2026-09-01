@@ -77,6 +77,7 @@ const getNetworkTimeoutInterval = (interval?: number) => {
 };
 
 type AbortSignalConstructor = typeof AbortSignal & {
+  // Mark these as optional for browsers that do not support newer AbortSignal helpers.
   any?: (signals: AbortSignal[]) => AbortSignal;
   timeout?: (milliseconds: number) => AbortSignal;
 };
