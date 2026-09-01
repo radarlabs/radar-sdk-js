@@ -30,6 +30,8 @@ export interface RadarBaseOptions {
   logLevel?: LogLevel;
   /** override the Radar API host */
   host?: string;
+  /** network request timeout in seconds */
+  networkTimeoutInterval?: number;
   /** API version string */
   version?: string;
   /** minutes to cache the device location */

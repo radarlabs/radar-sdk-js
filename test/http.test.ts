@@ -6,6 +6,11 @@ import Http from '../src/http';
 import SDK_VERSION from '../src/version';
 import { getRequest, mockNetworkError, mockRequest } from './utils';
 
+type AbortSignalWithOptionalMethods = Omit<typeof AbortSignal, 'any' | 'timeout'> & {
+  any?: (signals: AbortSignal[]) => AbortSignal;
+  timeout?: (milliseconds: number) => AbortSignal;
+};
+
 describe('Http', () => {
   const publishableKey = 'prj_test_pk_123';
 
@@ -170,6 +175,38 @@ describe('Http', () => {
       it('should respond with network error status on request error', async () => {
         mockNetworkError();
         await expect(Http.request(httpRequestParams)).rejects.toHaveProperty('status', 'ERROR_NETWORK');
+      });
+
+      it('should use AbortSignal.timeout for network request timeout by default', async () => {
+        const abortSignalTimeout = AbortSignal.timeout;
+        const timeoutAbortController = new AbortController();
+        const timeout = jest.fn(() => timeoutAbortController.signal);
+        (AbortSignal as AbortSignalWithOptionalMethods).timeout = timeout;
+
+        try {
+          fetchMock.mockClear();
+          fetchMock.mockImplementationOnce((_url, init) => {
+            const signal = init?.signal as AbortSignal;
+            return new Promise<Response>((_resolve, reject) => {
+              signal.addEventListener('abort', () => {
+                reject(new DOMException('Aborted', 'AbortError'));
+              });
+            });
+          });
+
+          const requestPromise = Http.request(httpRequestParams);
+          await Promise.resolve();
+          const signal = fetchMock.mock.calls[0]![1]?.signal as AbortSignal;
+
+          expect(timeout).toHaveBeenCalledWith(10000);
+          expect(signal.aborted).toEqual(false);
+
+          timeoutAbortController.abort();
+          await expect(requestPromise).rejects.toHaveProperty('status', 'ERROR_NETWORK');
+          expect(signal.aborted).toEqual(true);
+        } finally {
+          (AbortSignal as AbortSignalWithOptionalMethods).timeout = abortSignalTimeout;
+        }
       });
 
       it('should return an unknown error on invalid JSON', async () => {

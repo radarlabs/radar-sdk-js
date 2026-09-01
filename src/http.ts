@@ -62,6 +62,57 @@ interface HttpRequestOptions {
 
 const inFlightRequests = new Map<string, AbortController>();
 
+const DEFAULT_NETWORK_TIMEOUT_INTERVAL = 10;
+const MIN_NETWORK_TIMEOUT_INTERVAL = 1;
+const MAX_NETWORK_TIMEOUT_INTERVAL = 300;
+
+const getNetworkTimeoutInterval = (interval?: number) => {
+  let timeout = interval ?? DEFAULT_NETWORK_TIMEOUT_INTERVAL;
+
+  if (timeout <= 0 || !Number.isFinite(timeout)) {
+    timeout = DEFAULT_NETWORK_TIMEOUT_INTERVAL;
+  }
+
+  return Math.min(Math.max(timeout, MIN_NETWORK_TIMEOUT_INTERVAL), MAX_NETWORK_TIMEOUT_INTERVAL);
+};
+
+type AbortSignalConstructor = typeof AbortSignal & {
+  // Mark these as optional for browsers that do not support newer AbortSignal helpers.
+  any?: (signals: AbortSignal[]) => AbortSignal;
+  timeout?: (milliseconds: number) => AbortSignal;
+};
+
+const getAbortSignalConstructor = (): AbortSignalConstructor | undefined => {
+  if (typeof AbortSignal === 'undefined') {
+    return undefined;
+  }
+
+  return AbortSignal as AbortSignalConstructor;
+};
+
+const createTimeoutSignal = (timeoutMS: number): AbortSignal | undefined => {
+  const AbortSignalCtor = getAbortSignalConstructor();
+  return AbortSignalCtor?.timeout?.(timeoutMS);
+};
+
+const combineAbortSignals = (signals: AbortSignal[]): AbortSignal | undefined => {
+  if (signals.length === 0) {
+    return undefined;
+  }
+
+  if (signals.length === 1) {
+    return signals[0]!;
+  }
+
+  const AbortSignalCtor = getAbortSignalConstructor();
+  if (AbortSignalCtor?.any) {
+    return AbortSignalCtor.any(signals);
+  }
+
+  // Without AbortSignal.any(), prefer requestId cancellation over timeout when both signals exist.
+  return signals[0]!;
+};
+
 /** fetch-based HTTP client for Radar API requests */
 class Http {
   /** map of host patterns to custom error factories for intercepting network errors */
@@ -134,10 +185,14 @@ class Http {
       inFlightRequests.get(requestId)?.abort();
     }
 
-    const abortController = new AbortController();
+    const requestAbortController = requestId ? new AbortController() : undefined;
+    const timeoutSignal = createTimeoutSignal(getNetworkTimeoutInterval(options.networkTimeoutInterval) * 1000);
+    const fetchSignal = combineAbortSignals(
+      [requestAbortController?.signal, timeoutSignal].filter((value): value is AbortSignal => !!value),
+    );
 
-    if (requestId) {
-      inFlightRequests.set(requestId, abortController);
+    if (requestId && requestAbortController) {
+      inFlightRequests.set(requestId, requestAbortController);
     }
 
     const allHeaders: Record<string, string> = {
@@ -146,102 +201,100 @@ class Http {
       ...headers,
     };
 
-    let response: Response;
     try {
-      response = await fetch(url, {
-        method,
-        headers: allHeaders,
-        body,
-        keepalive,
-        signal: abortController.signal,
-      });
-    } catch {
-      // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
-      if (requestId && inFlightRequests.get(requestId) === abortController) {
-        inFlightRequests.delete(requestId);
-      }
-
-      if (host) {
-        for (const [pattern, handler] of Http.errorInterceptors) {
-          if (host.includes(pattern)) {
-            throw handler(!!Navigator.online());
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method,
+          headers: allHeaders,
+          body,
+          keepalive,
+          signal: fetchSignal,
+        });
+      } catch {
+        if (urlHost) {
+          for (const [pattern, handler] of Http.errorInterceptors) {
+            if (urlHost.includes(pattern)) {
+              throw handler(!!Navigator.online());
+            }
           }
         }
-      }
-      throw new RadarNetworkError();
-    }
-
-    if (requestId && inFlightRequests.get(requestId) === abortController) {
-      inFlightRequests.delete(requestId);
-    }
-
-    let parsed: RadarResponse | undefined;
-    try {
-      if (responseType === 'blob') {
-        parsed = { code: response.status, data: await response.blob() };
-      } else {
-        // some endpoints (e.g. search/autocomplete/click) reply 204 with no body,
-        // which response.json() would reject on
-        const text = await response.text();
-        parsed = (text ? JSON.parse(text) : {}) as RadarApiResponse;
-      }
-    } catch (err) {
-      if (parsed) {
-        throw new RadarServerError(parsed);
-      } else {
-        if (options.debug) {
-          Logger.debug(`API call failed: ${url}`);
-          Logger.debug(String(err));
-        }
-        throw new RadarUnknownError(parsed);
-      }
-    }
-
-    // surface the request id on meta for every JSON response, success or failure. blob
-    // responses are skipped: RadarBlobResponse declares `meta?: undefined`.
-    if (responseType !== 'blob' && parsed && typeof parsed === 'object') {
-      const radarRequestId = response.headers.get('x-radar-request-id');
-      if (radarRequestId) {
-        const apiResponse = parsed as RadarApiResponse;
-        apiResponse.meta = { ...apiResponse.meta, requestId: radarRequestId };
-      }
-    }
-
-    if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
-      const error = parsed.meta?.error;
-      if (error === 'ERROR_PERMISSIONS') {
-        throw new RadarPermissionsError('Location permissions not granted.');
-      } else if (error === 'ERROR_LOCATION') {
-        throw new RadarLocationError('Could not determine location.');
-      } else if (error === 'ERROR_NETWORK') {
         throw new RadarNetworkError();
       }
-    }
 
-    if (response.ok) {
-      return parsed as T;
-    }
-    if (options.debug) {
-      Logger.debug(`API call failed: ${url}`);
-      Logger.debug(JSON.stringify(parsed));
-    }
+      let parsed: RadarResponse | undefined;
+      try {
+        if (responseType === 'blob') {
+          parsed = { code: response.status, data: await response.blob() };
+        } else {
+          // some endpoints (e.g. search/autocomplete/click) reply 204 with no body,
+          // which response.json() would reject on
+          const text = await response.text();
+          parsed = (text ? JSON.parse(text) : {}) as RadarApiResponse;
+        }
+      } catch (err) {
+        if (parsed) {
+          throw new RadarServerError(parsed);
+        } else {
+          if (options.debug) {
+            Logger.debug(`API call failed: ${url}`);
+            Logger.debug(String(err));
+          }
+          throw new RadarUnknownError(parsed);
+        }
+      }
 
-    if (response.status === 400) {
-      throw new RadarBadRequestError(parsed);
-    } else if (response.status === 401) {
-      throw new RadarUnauthorizedError(parsed);
-    } else if (response.status === 402) {
-      throw new RadarPaymentRequiredError(parsed);
-    } else if (response.status === 403) {
-      throw new RadarForbiddenError(parsed);
-    } else if (response.status === 404) {
-      throw new RadarNotFoundError(parsed);
-    } else if (response.status === 429) {
-      throw new RadarRateLimitError(parsed);
-    } else if (response.status >= 500 && response.status < 600) {
-      throw new RadarServerError(parsed);
-    } else {
-      throw new RadarUnknownError(parsed);
+      // surface the request id on meta for every JSON response, success or failure. blob
+      // responses are skipped: RadarBlobResponse declares `meta?: undefined`.
+      if (responseType !== 'blob' && parsed && typeof parsed === 'object') {
+        const radarRequestId = response.headers.get('x-radar-request-id');
+        if (radarRequestId) {
+          const apiResponse = parsed as RadarApiResponse;
+          apiResponse.meta = { ...apiResponse.meta, requestId: radarRequestId };
+        }
+      }
+
+      if (parsed && typeof parsed === 'object' && 'meta' in parsed) {
+        const error = parsed.meta?.error;
+        if (error === 'ERROR_PERMISSIONS') {
+          throw new RadarPermissionsError('Location permissions not granted.');
+        } else if (error === 'ERROR_LOCATION') {
+          throw new RadarLocationError('Could not determine location.');
+        } else if (error === 'ERROR_NETWORK') {
+          throw new RadarNetworkError();
+        }
+      }
+
+      if (response.ok) {
+        return parsed as T;
+      }
+      if (options.debug) {
+        Logger.debug(`API call failed: ${url}`);
+        Logger.debug(JSON.stringify(parsed));
+      }
+
+      if (response.status === 400) {
+        throw new RadarBadRequestError(parsed);
+      } else if (response.status === 401) {
+        throw new RadarUnauthorizedError(parsed);
+      } else if (response.status === 402) {
+        throw new RadarPaymentRequiredError(parsed);
+      } else if (response.status === 403) {
+        throw new RadarForbiddenError(parsed);
+      } else if (response.status === 404) {
+        throw new RadarNotFoundError(parsed);
+      } else if (response.status === 429) {
+        throw new RadarRateLimitError(parsed);
+      } else if (response.status >= 500 && response.status < 600) {
+        throw new RadarServerError(parsed);
+      } else {
+        throw new RadarUnknownError(parsed);
+      }
+    } finally {
+      // Delete abort controller instance for this request ID if it hasn't yet been replaced with a different one
+      if (requestId && inFlightRequests.get(requestId) === requestAbortController) {
+        inFlightRequests.delete(requestId);
+      }
     }
   }
 }
