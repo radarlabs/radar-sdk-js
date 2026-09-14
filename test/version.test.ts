@@ -73,9 +73,9 @@ describe('VERSION', () => {
 
     it('should match version in the plugin src/version.ts', () => {
       if (PLUGIN_VERSION && pluginDir) {
-        const contents = fs.readFileSync(path.join(pluginDir, 'src', 'version.ts'), 'utf8');
-        const fileVersion = contents.match(/'([^']+)'/)?.[1];
-        expect(PLUGIN_VERSION).toEqual(fileVersion);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const pluginVersion = require(path.join(pluginDir, 'src', 'version.ts')).default;
+        expect(PLUGIN_VERSION).toEqual(pluginVersion);
       }
     });
 
