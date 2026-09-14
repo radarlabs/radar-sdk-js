@@ -14,6 +14,10 @@ const PLUGIN_NAME = pluginTagMatch?.[1];
 const PLUGIN_VERSION = pluginTagMatch?.[2];
 const CORE_RELEASE_TAG = pluginTagMatch ? undefined : RELEASE_TAG;
 
+// the lockfile's inferred literal type can't be indexed with a dynamic key, and
+// workspace link entries carry no version field, so widen it once here
+const lockPackages = packageLockJSON.packages as Record<string, { version?: string } | undefined>;
+
 describe('VERSION', () => {
   it('should match version in package.json', () => {
     expect(VERSION).toEqual(packageJSON.version);
@@ -77,8 +81,7 @@ describe('VERSION', () => {
 
     it('should match version in package-lock.json', () => {
       if (PLUGIN_NAME && PLUGIN_VERSION) {
-        const lockJSON = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package-lock.json'), 'utf8'));
-        expect(PLUGIN_VERSION).toEqual(lockJSON.packages?.[`packages/${PLUGIN_NAME}`]?.version);
+        expect(PLUGIN_VERSION).toEqual(lockPackages[`packages/${PLUGIN_NAME}`]?.version);
       }
     });
   });
