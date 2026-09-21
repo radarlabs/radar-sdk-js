@@ -393,7 +393,7 @@ export interface RadarExpectedAddress {
   latitude?: number;
   longitude?: number;
   atAddress: boolean;
-  confidence?: 'high' | 'medium' | 'low';
+  confidence: 'high' | 'medium' | 'low' | 'unknown';
   distance?: number;
 }
 
