@@ -286,6 +286,7 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  expectedAddress?: RadarExpectedAddress;
 }
 
 /** response from {@link Radar.trackOnce} */
@@ -384,6 +385,16 @@ export interface RadarAddress {
   state?: string;
   stateCode?: string;
   street?: string;
+}
+
+export interface RadarExpectedAddress {
+  expectedAddress: string;
+  formattedAddress?: string;
+  latitude?: number;
+  longitude?: number;
+  atAddress: boolean;
+  confidence: 'high' | 'medium' | 'low' | 'unknown';
+  distance?: number;
 }
 
 /** time zone information for a geocoded address */

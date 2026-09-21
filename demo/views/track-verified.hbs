@@ -111,6 +111,10 @@
 
     const userId = $('#user-id').val();
     const skipVerifyApp = $('#skip-verify-app').val() === 'true';
+
+    Radar.fraud.setExpectedJurisdiction('US', 'NY');
+    Radar.fraud.setExpectedAddress("111 5th Ave, NY");
+
     Radar.trackVerified({ userId, skipVerifyApp })
       .then(({ location, user, events, token, expiresAt, expiresIn, passed }) => {
         console.log('TRACK RESPONSE', { location, user, events, token, expiresAt, expiresIn, passed });
