@@ -286,6 +286,7 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  expectedAddress?: RadarExpectedAddress;
 }
 
 /** response from {@link Radar.trackOnce} */
