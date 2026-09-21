@@ -386,6 +386,16 @@ export interface RadarAddress {
   street?: string;
 }
 
+export interface RadarExpectedAddress {
+  expectedAddress: string;
+  formattedAddress?: string;
+  latitude?: number;
+  longitude?: number;
+  atAddress: boolean;
+  confidence?: 'high' | 'medium' | 'low';
+  distance?: number;
+}
+
 /** time zone information for a geocoded address */
 export interface RadarTimeZone {
   /** IANA time zone ID (e.g. `'America/New_York'`) */
