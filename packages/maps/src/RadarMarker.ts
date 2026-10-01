@@ -2,7 +2,7 @@ import { Marker, Popup } from 'maplibre-gl';
 
 import type RadarMap from './RadarMap';
 import type { RadarMarkerOptions } from './types';
-import type { LngLat, Point2D } from 'maplibre-gl';
+import type { LngLat, MarkerOptions, Point2D } from 'maplibre-gl';
 import type { RadarPluginContext } from 'radar-sdk-js';
 
 class RadarMarkerMouseEvent {
@@ -96,7 +96,7 @@ class RadarMarker extends Marker {
 
   constructor(markerOptions: RadarMarkerOptions, ctx: RadarPluginContext) {
     const { Logger, Http } = ctx;
-    const maplibreOptions: maplibregl.MarkerOptions = Object.assign({}, defaultMarkerOptions);
+    const maplibreOptions: MarkerOptions = Object.assign({}, defaultMarkerOptions);
 
     // init MapLibre marker configs
     if (markerOptions.color) {
