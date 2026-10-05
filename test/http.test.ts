@@ -377,6 +377,51 @@ describe('Http', () => {
     });
   });
 
+  describe('complete header snapshots', () => {
+    beforeEach(() => Radar.initialize(publishableKey));
+    afterEach(() => Radar.clear());
+
+    it('advertises snapshot support to plugins', () => {
+      expect('supportsHeaderSnapshot' in Http && Http.supportsHeaderSnapshot).toBe(true);
+    });
+
+    it.each<Record<string, string>>([{}, { Authorization: 'Bearer exact-token', 'x-radar-product': 'first' }])(
+      'uses only the snapshot and never evaluates defaults: %j',
+      async (headerSnapshot) => {
+        const defaults = jest.spyOn(Config, 'getDefaultHeaders').mockReturnValue({
+          'X-Radar-Product': 'second',
+          'X-RADAR-PRODUCT': 'alias',
+        });
+        try {
+          mockRequest(200, successResponse);
+          const options = { ...httpRequestParams, headerSnapshot, headers: { Ignored: 'override' } };
+          await Http.request(options);
+          const sent = fetchMock.mock.calls[fetchMock.mock.calls.length - 1]![1]!.headers;
+          expect(sent).toEqual(headerSnapshot);
+          expect(sent).not.toBe(headerSnapshot);
+          expect(defaults).not.toHaveBeenCalled();
+        } finally {
+          defaults.mockRestore();
+        }
+      },
+    );
+
+    it('preserves ordinary Content-Type, defaults and override precedence', async () => {
+      const defaults = jest.spyOn(Config, 'getDefaultHeaders').mockReturnValue({ Product: 'default' });
+      try {
+        mockRequest(200, successResponse);
+        await Http.request({ ...httpRequestParams, headers: { Product: 'override' } });
+        expect(fetchMock.mock.calls[fetchMock.mock.calls.length - 1]![1]!.headers).toEqual({
+          'Content-Type': 'application/json',
+          Product: 'override',
+        });
+        expect(defaults).toHaveBeenCalledTimes(1);
+      } finally {
+        defaults.mockRestore();
+      }
+    });
+  });
+
   describe('authToken authentication', () => {
     const authToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.abc123';
 

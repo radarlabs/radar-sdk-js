@@ -54,6 +54,8 @@ interface HttpRequestOptions {
   host?: string;
   version?: string;
   headers?: Record<string, string>;
+  /** Complete fetch headers. Takes precedence over headers and bypasses defaults, including Content-Type. */
+  headerSnapshot?: Record<string, string>;
   responseType?: 'blob' | 'json';
   requestId?: string;
   /** when true, the request survives a page unload (fire-and-forget beacons) */
@@ -115,6 +117,8 @@ const combineAbortSignals = (signals: AbortSignal[]): AbortSignal | undefined =>
 
 /** fetch-based HTTP client for Radar API requests */
 class Http {
+  /** Whether complete header snapshots are supported by this core transport. */
+  static readonly supportsHeaderSnapshot = true;
   /** map of host patterns to custom error factories for intercepting network errors */
   static errorInterceptors: Map<string, (online: boolean) => Error> = new Map();
 
@@ -147,6 +151,7 @@ class Http {
     host,
     version,
     headers = {},
+    headerSnapshot,
     responseType,
     requestId,
     keepalive,
@@ -195,11 +200,14 @@ class Http {
       inFlightRequests.set(requestId, requestAbortController);
     }
 
-    const allHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...Config.getDefaultHeaders(),
-      ...headers,
-    };
+    const allHeaders: Record<string, string> =
+      headerSnapshot !== undefined
+        ? { ...headerSnapshot }
+        : {
+            'Content-Type': 'application/json',
+            ...Config.getDefaultHeaders(),
+            ...headers,
+          };
 
     try {
       let response: Response;
