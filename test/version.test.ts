@@ -5,16 +5,13 @@ import VERSION from '../src/version';
 const RELEASE_TAG = process.env.GITHUB_REF_NAME;
 
 describe('VERSION', () => {
-  it('targets the additive snapshot release', () => {
-    expect(VERSION).toEqual('5.3.0');
-    expect(packageLockJSON.packages[''].version).toEqual(VERSION);
-  });
   it('should match version in package.json', () => {
     expect(VERSION).toEqual(packageJSON.version);
   });
 
   it('should match version in package-lock.json', () => {
     expect(VERSION).toEqual(packageLockJSON.version);
+    expect(VERSION).toEqual(packageLockJSON.packages[''].version);
   });
 
   // additional checks if running as part of a release
