@@ -8,7 +8,7 @@ import { getAllCoords } from './util/geojson';
 import type RadarMapFeature from './RadarMapFeature';
 import type RadarMarker from './RadarMarker';
 import type { RadarMapOptions, RadarLineOptions, RadarPolylineOptions, RadarPolygonOptions } from './types';
-import type { FitBoundsOptions } from 'maplibre-gl';
+import type { FitBoundsOptions, MapOptions } from 'maplibre-gl';
 import type { RadarOptions, RadarPluginContext } from 'radar-sdk-js';
 
 const DEFAULT_STYLE = 'radar-default-v1';
@@ -20,7 +20,7 @@ const defaultRadarMapOptions: Partial<RadarMapOptions> = {
   showZoomControls: true,
 };
 
-const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
+const defaultMaplibreOptions: Partial<MapOptions> = {
   maxZoom: 20,
   attributionControl: false,
   dragRotate: false,
@@ -28,7 +28,7 @@ const defaultMaplibreOptions: Partial<maplibregl.MapOptions> = {
   maplibreLogo: false,
 };
 
-const defaultFitMarkersOptions: maplibregl.FitBoundsOptions = {
+const defaultFitMarkersOptions: FitBoundsOptions = {
   padding: 50,
 };
 
@@ -91,7 +91,7 @@ class RadarMap extends Map {
     );
     Logger.debug('map initialized with options', mapOptions);
 
-    (mapOptions as maplibregl.MapOptions).transformRequest = (url, resourceType) => {
+    (mapOptions as MapOptions).transformRequest = (url, resourceType) => {
       // this handles when a style is switched
       if (resourceType === 'Style' && isRadarStyle(url)) {
         url = createStyleURL(config, { ...mapOptions, style: url });
@@ -159,7 +159,7 @@ class RadarMap extends Map {
    * @param fitBoundsOptions - MapLibre fit bounds options
    * @param overrideMarkers - optional subset of markers to fit (defaults to all)
    */
-  fitToMarkers(fitBoundsOptions: maplibregl.FitBoundsOptions = {}, overrideMarkers?: RadarMarker[]) {
+  fitToMarkers(fitBoundsOptions: FitBoundsOptions = {}, overrideMarkers?: RadarMarker[]) {
     const markers = overrideMarkers || this.getMarkers();
 
     if (markers.length === 0) {
