@@ -18,6 +18,9 @@ import Navigator from './navigator';
 
 import type { RadarIntegration } from './types';
 
+/** request header carrying the first-party widget that originated a request, as `name@version` */
+const INTEGRATION_HEADER = 'X-Radar-Integration';
+
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
@@ -170,14 +173,6 @@ class Http {
     // filter out undefined values from request data
     const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
 
-    // sent as a request param rather than a header: Radar's API response logs preserve the full
-    // query and body for these endpoints, but capture only a fixed set of headers, so a custom
-    // header would not reach analytics without a server change. serialized in one place so
-    // switching transports later is a change here and nowhere else.
-    if (integration) {
-      filtered.integration = `${integration.name}@${integration.version}`;
-    }
-
     let body: string | undefined;
 
     if (method === 'GET') {
@@ -213,6 +208,14 @@ class Http {
       ...Config.getDefaultHeaders(),
       ...headers,
     };
+
+    // a header, not a request param: this is caller identity, so it belongs alongside
+    // X-Radar-SDK-Version rather than mixed into the customer's own query or body. the server
+    // reads it into its own column on the API response log.
+    // set after the spread -- attribution is the widget's to state, not a caller's to override.
+    if (integration) {
+      allHeaders[INTEGRATION_HEADER] = `${integration.name}@${integration.version}`;
+    }
 
     try {
       let response: Response;

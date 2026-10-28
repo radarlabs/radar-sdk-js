@@ -80,6 +80,9 @@ const autocompleteRequests = () =>
 const clickRequests = () =>
   fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete/click'));
 
+const integrationHeader = (call: [unknown, RequestInit | undefined]) =>
+  (call[1]?.headers as Record<string, string> | undefined)?.['X-Radar-Integration'];
+
 // `ctx as never` is the one unchecked point: AutocompleteUI's declared parameter resolves to
 // the dist-built RadarPluginContext, and classes with private members are nominally typed, so
 // the src-built ctx above is not assignable to it. every value in it is the real module.
@@ -143,7 +146,6 @@ describe('AutocompleteUI sessions', () => {
       sessionToken: widget.sessionToken,
       requestId: REQUEST_ID,
       idx: 1,
-      integration: INTEGRATION,
     });
   });
 
@@ -152,8 +154,7 @@ describe('AutocompleteUI sessions', () => {
 
     await widget.fetchResults('66 steuben');
 
-    const url = new URL(String(autocompleteRequests()[0]![0] as string));
-    expect(url.searchParams.get('integration')).toEqual(INTEGRATION);
+    expect(integrationHeader(autocompleteRequests()[0]!)).toEqual(INTEGRATION);
   });
 
   it('tags clicks as widget-originated, so both legs of a session are attributable', async () => {
@@ -163,7 +164,20 @@ describe('AutocompleteUI sessions', () => {
     widget.select(0);
     await Promise.resolve();
 
-    expect(JSON.parse(clickRequests()[0]![1]!.body as string).integration).toEqual(INTEGRATION);
+    expect(integrationHeader(clickRequests()[0]!)).toEqual(INTEGRATION);
+  });
+
+  it('keeps attribution out of the request itself', async () => {
+    // it is caller identity, not request content -- a customer's query and body stay theirs
+    const widget = mount();
+
+    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.select(0);
+    await Promise.resolve();
+
+    const url = new URL(String(autocompleteRequests()[0]![0] as string));
+    expect(url.searchParams.get('integration')).toBeNull();
+    expect(JSON.parse(clickRequests()[0]![1]!.body as string)).not.toHaveProperty('integration');
   });
 
   it('reports the widget version, which releases independently of the core SDK', () => {
