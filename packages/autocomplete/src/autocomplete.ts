@@ -89,7 +89,7 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
-  /** UUID grouping this widget's autocomplete requests and clickthroughs into one session */
+  /** UUID grouping this widget's autocomplete requests and selections into one session */
   readonly sessionToken: string;
   /** `x-radar-request-id` of the response that produced the currently displayed results */
   private _lastRequestId?: string;
@@ -634,8 +634,8 @@ class AutocompleteUI {
 
     if (this._lastRequestId) {
       // reported before onSelection: that callback is consumer code, and a throw from it
-      // must not swallow the clickthrough. fire-and-forget -- autocompleteClick never rejects.
-      void this.ctx.apis.Search.autocompleteClick({
+      // must not swallow the report. fire-and-forget -- autocompleteSelect never rejects.
+      void this.ctx.apis.Search.autocompleteSelect({
         sessionToken: this.sessionToken,
         requestId: this._lastRequestId,
         idx: index,

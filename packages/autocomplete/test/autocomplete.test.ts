@@ -54,13 +54,13 @@ const ctx = {
   },
 } satisfies RadarPluginContext;
 
-// respond to autocomplete calls with a request id header, and to click calls with a bare 204
+// respond to autocomplete calls with a request id header, and to select calls with a bare 204
 const mockAutocompleteApi = (requestId = REQUEST_ID) => {
   fetchMock.mockResponse(async (req) => {
     if (req.url.includes('/v1/config')) {
       return JSON.stringify({});
     }
-    if (req.url.includes('/search/autocomplete/click')) {
+    if (req.url.includes('/search/autocomplete/select')) {
       return { body: '', status: 204 };
     }
     return {
@@ -74,8 +74,8 @@ const mockAutocompleteApi = (requestId = REQUEST_ID) => {
 const autocompleteRequests = () =>
   fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete?'));
 
-const clickRequests = () =>
-  fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete/click'));
+const selectRequests = () =>
+  fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete/select'));
 
 // `ctx as never` is the one unchecked point: AutocompleteUI's declared parameter resolves to
 // the dist-built RadarPluginContext, and classes with private members are nominally typed, so
@@ -126,7 +126,7 @@ describe('AutocompleteUI sessions', () => {
     expect(first.sessionToken).not.toEqual(second.sessionToken);
   });
 
-  it('reports a click with the session token, originating request id, and result index', async () => {
+  it('reports a selection with the session token, originating request id, and result index', async () => {
     const widget = mount();
 
     const results = await widget.fetchResults('66 steuben');
@@ -134,16 +134,16 @@ describe('AutocompleteUI sessions', () => {
     widget.select(1);
     await Promise.resolve();
 
-    const click = clickRequests()[0];
-    expect(click).toBeDefined();
-    expect(JSON.parse(click![1]!.body as string)).toEqual({
+    const select = selectRequests()[0];
+    expect(select).toBeDefined();
+    expect(JSON.parse(select![1]!.body as string)).toEqual({
       sessionToken: widget.sessionToken,
       requestId: REQUEST_ID,
       idx: 1,
     });
   });
 
-  it('reports the click against the most recent autocomplete response', async () => {
+  it('reports the selection against the most recent autocomplete response', async () => {
     const widget = mount();
 
     mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000001');
@@ -155,11 +155,11 @@ describe('AutocompleteUI sessions', () => {
     widget.select(0);
     await Promise.resolve();
 
-    const click = clickRequests()[0];
-    expect(JSON.parse(click![1]!.body as string).requestId).toEqual('01a01c2e-7512-704c-aa02-000000000002');
+    const select = selectRequests()[0];
+    expect(JSON.parse(select![1]!.body as string).requestId).toEqual('01a01c2e-7512-704c-aa02-000000000002');
   });
 
-  it('reports the click even when onSelection throws', async () => {
+  it('reports the selection even when onSelection throws', async () => {
     const widget = mount({
       onSelection: () => {
         throw new Error('consumer callback blew up');
@@ -170,15 +170,15 @@ describe('AutocompleteUI sessions', () => {
     expect(() => widget.select(0)).toThrow('consumer callback blew up');
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(1);
+    expect(selectRequests()).toHaveLength(1);
   });
 
-  it('does not report a click when the response carried no request id', async () => {
+  it('does not report a selection when the response carried no request id', async () => {
     fetchMock.mockResponse(async (req) => {
       if (req.url.includes('/v1/config')) {
         return JSON.stringify({});
       }
-      if (req.url.includes('/search/autocomplete/click')) {
+      if (req.url.includes('/search/autocomplete/select')) {
         return { body: '', status: 204 };
       }
       // no x-radar-request-id header
@@ -190,7 +190,7 @@ describe('AutocompleteUI sessions', () => {
     widget.select(0);
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(0);
+    expect(selectRequests()).toHaveLength(0);
   });
 
   it("scopes each widget's requests to its own session token", async () => {
@@ -211,13 +211,13 @@ describe('AutocompleteUI sessions', () => {
     expect(first.sessionToken).not.toEqual(second.sessionToken);
   });
 
-  it('does not report a click when the selected index has no result', async () => {
+  it('does not report a selection when the selected index has no result', async () => {
     const widget = mount();
 
     widget.displayResults(await widget.fetchResults('66 steuben'));
     widget.select(99);
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(0);
+    expect(selectRequests()).toHaveLength(0);
   });
 });

@@ -230,42 +230,52 @@ describe('Search', () => {
       });
     });
   });
-  describe('autocompleteClick', () => {
+  describe('autocompleteSelect', () => {
     const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
     const requestId = '01a01c2e-7512-704c-aa02-81253218d810';
 
     it('should POST the session, request id, and result index', async () => {
       mockRequest(204, '');
 
-      await Search.autocompleteClick({ sessionToken, requestId, idx: 2 });
+      await Search.autocompleteSelect({ sessionToken, requestId, idx: 2 });
 
       const request = getRequest();
       expect(request.method).toEqual('POST');
-      expect(request.url).toContain('/v1/search/autocomplete/click');
+      expect(request.url).toContain('/v1/search/autocomplete/select');
       expect(JSON.parse(request.body!)).toEqual({ sessionToken, requestId, idx: 2 });
     });
 
-    it('should send the click with keepalive so it survives page navigation', async () => {
+    it('should send the selection with keepalive so it survives page navigation', async () => {
       mockRequest(204, '');
 
-      await Search.autocompleteClick({ sessionToken, requestId, idx: 0 });
+      await Search.autocompleteSelect({ sessionToken, requestId, idx: 0 });
 
       const lastCall = [...fetchMock.mock.calls]
         .reverse()
-        .find(([url]) => String(url as string).includes('/autocomplete/click'));
+        .find(([url]) => String(url as string).includes('/autocomplete/select'));
       expect(lastCall?.[1]?.keepalive).toBe(true);
     });
 
     it('should resolve without throwing when the session is unknown or expired', async () => {
       mockRequest(400, { meta: { code: 400 } });
 
-      await expect(Search.autocompleteClick({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
+      await expect(Search.autocompleteSelect({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
     });
 
     it('should resolve without throwing on a network error', async () => {
       fetchMock.mockReject(new TypeError('Network error'));
 
-      await expect(Search.autocompleteClick({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
+      await expect(Search.autocompleteSelect({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
+    });
+
+    it('should route the deprecated autocompleteClick alias to the new path', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteClick({ sessionToken, requestId, idx: 1 });
+
+      const request = getRequest();
+      expect(request.url).toContain('/v1/search/autocomplete/select');
+      expect(request.url).not.toContain('/autocomplete/click');
     });
   });
 });

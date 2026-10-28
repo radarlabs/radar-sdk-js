@@ -4,7 +4,7 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
-  RadarAutocompleteClickParams,
+  RadarAutocompleteSelectParams,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
   RadarSearchPlacesParams,
@@ -55,7 +55,7 @@ class SearchAPI {
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
-      // echoed back to search/autocomplete/click to attribute a selection to this response
+      // echoed back to search/autocomplete/select to attribute a selection to this response
       requestId: response.meta?.requestId,
     };
 
@@ -67,23 +67,31 @@ class SearchAPI {
   }
 
   /**
-   * report a clickthrough on an autocomplete result
+   * report a selection of an autocomplete result
    * @param params - session token, originating request ID, and result index
    */
-  static async autocompleteClick({ sessionToken, requestId, idx }: RadarAutocompleteClickParams): Promise<void> {
+  static async autocompleteSelect({ sessionToken, requestId, idx }: RadarAutocompleteSelectParams): Promise<void> {
     try {
       await Http.request({
         method: 'POST',
-        path: 'search/autocomplete/click',
+        path: 'search/autocomplete/select',
         data: { sessionToken, requestId, idx },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
       });
     } catch (err) {
-      // clickthroughs are fire-and-forget. an expired session or a network blip must never
+      // selections are fire-and-forget. an expired session or a network blip must never
       // surface to the caller, and is never retried
-      Logger.debug(`Autocomplete click not reported: ${String(err)}`);
+      Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
     }
+  }
+
+  /**
+   * @deprecated renamed to {@link SearchAPI.autocompleteSelect}. Now posts to
+   * `search/autocomplete/select`; will be removed in a future major.
+   */
+  static async autocompleteClick(params: RadarAutocompleteSelectParams): Promise<void> {
+    return SearchAPI.autocompleteSelect(params);
   }
 
   /**

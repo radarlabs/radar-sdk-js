@@ -55,7 +55,7 @@ describe('Http', () => {
           return { body: '', status: 204 };
         });
 
-        const response = await Http.request({ method: 'POST', path: 'search/autocomplete/click' });
+        const response = await Http.request({ method: 'POST', path: 'search/autocomplete/select' });
 
         expect(response).toEqual({});
       });
