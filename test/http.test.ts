@@ -47,21 +47,7 @@ describe('Http', () => {
         expect(response.code).toEqual(200);
       });
 
-      it('should send an integration as the X-Radar-Integration header, as name@version', async () => {
-        mockRequest(200, successResponse);
-
-        await Http.request({
-          method: 'GET',
-          path: 'search/autocomplete',
-          data: { query: 'brooklyn' },
-          integration: { name: 'autocomplete-ui', version: '1.1.1' },
-        });
-
-        const request = getRequest();
-        expect(request.headers['X-Radar-Integration']).toEqual('autocomplete-ui@1.1.1');
-      });
-
-      it('should keep the integration out of the query and body', async () => {
+      it('should serialize an integration into the request body as name@version', async () => {
         mockRequest(200, successResponse);
 
         await Http.request({
@@ -72,31 +58,30 @@ describe('Http', () => {
         });
 
         const request = getRequest();
-        expect(JSON.parse(request.body!)).toEqual({ idx: 0 });
-        expect(request.url).not.toContain('integration');
+        expect(JSON.parse(request.body!)).toEqual({ idx: 0, integration: 'autocomplete-ui@1.1.1' });
       });
 
-      it('should omit the header entirely for direct SDK use', async () => {
-        mockRequest(200, successResponse);
-
-        await Http.request({ method: 'GET', path: 'search/autocomplete', data: { query: 'brooklyn' } });
-
-        const request = getRequest();
-        expect(request.headers['X-Radar-Integration']).toBeUndefined();
-      });
-
-      it('should not let a caller-supplied header override widget attribution', async () => {
+      it('should serialize an integration into the query string on GET', async () => {
         mockRequest(200, successResponse);
 
         await Http.request({
           method: 'GET',
           path: 'search/autocomplete',
           data: { query: 'brooklyn' },
-          headers: { 'X-Radar-Integration': 'not-a-widget@9.9.9' },
           integration: { name: 'autocomplete-ui', version: '1.1.1' },
         });
 
-        expect(getRequest().headers['X-Radar-Integration']).toEqual('autocomplete-ui@1.1.1');
+        const request = getRequest();
+        expect(request.url).toContain('integration=autocomplete-ui%401.1.1');
+      });
+
+      it('should omit the integration param entirely for direct SDK use', async () => {
+        mockRequest(200, successResponse);
+
+        await Http.request({ method: 'GET', path: 'search/autocomplete', data: { query: 'brooklyn' } });
+
+        const request = getRequest();
+        expect(request.url).not.toContain('integration');
       });
 
       it('should resolve with an empty object on a 204 with no body', async () => {

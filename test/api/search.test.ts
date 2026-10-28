@@ -164,7 +164,7 @@ describe('Search', () => {
 
         await Search.autocomplete({ query }, undefined, { name: 'autocomplete-ui', version: '1.1.1' });
 
-        expect(getRequest().headers['X-Radar-Integration']).toEqual('autocomplete-ui@1.1.1');
+        expect(getRequest().url).toContain('integration=autocomplete-ui%401.1.1');
       });
 
       it('should leave the request untagged for a direct SDK integration', async () => {
@@ -172,9 +172,7 @@ describe('Search', () => {
 
         await Search.autocomplete({ query });
 
-        const request = getRequest();
-        expect(request.headers['X-Radar-Integration']).toBeUndefined();
-        expect(request.url).not.toContain('integration');
+        expect(getRequest().url).not.toContain('integration');
       });
 
       it('should return the originating x-radar-request-id on the response', async () => {
