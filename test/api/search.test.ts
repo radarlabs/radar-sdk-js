@@ -231,24 +231,47 @@ describe('Search', () => {
     });
   });
   describe('autocompleteSelect', () => {
-    const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
-    const requestId = '01a01c2e-7512-704c-aa02-81253218d810';
+    const resultId = 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk';
 
-    it('should POST the session, request id, and result index', async () => {
+    it('should POST the resultId and nothing else', async () => {
       mockRequest(204, '');
 
-      await Search.autocompleteSelect({ sessionToken, requestId, idx: 2 });
+      await Search.autocompleteSelect({ resultId });
 
       const request = getRequest();
       expect(request.method).toEqual('POST');
       expect(request.url).toContain('/v1/search/autocomplete/select');
-      expect(JSON.parse(request.body!)).toEqual({ sessionToken, requestId, idx: 2 });
+      expect(JSON.parse(request.body!)).toEqual({ resultId });
+    });
+
+    it('should accept an autocomplete result verbatim, ignoring its other fields', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteSelect({
+        resultId,
+        formattedAddress: '123 Main St',
+        latitude: 40.7,
+        longitude: -73.9,
+      } as any);
+
+      expect(JSON.parse(getRequest().body!)).toEqual({ resultId });
+    });
+
+    it('should not call the API when the result carries no resultId', async () => {
+      fetchMock.resetMocks();
+
+      await Search.autocompleteSelect({} as any);
+
+      const selectCalls = fetchMock.mock.calls.filter(([url]) =>
+        String(url as string).includes('/autocomplete/select'),
+      );
+      expect(selectCalls).toHaveLength(0);
     });
 
     it('should send the selection with keepalive so it survives page navigation', async () => {
       mockRequest(204, '');
 
-      await Search.autocompleteSelect({ sessionToken, requestId, idx: 0 });
+      await Search.autocompleteSelect({ resultId });
 
       const lastCall = [...fetchMock.mock.calls]
         .reverse()
@@ -259,23 +282,13 @@ describe('Search', () => {
     it('should resolve without throwing when the session is unknown or expired', async () => {
       mockRequest(400, { meta: { code: 400 } });
 
-      await expect(Search.autocompleteSelect({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toBeUndefined();
     });
 
     it('should resolve without throwing on a network error', async () => {
       fetchMock.mockReject(new TypeError('Network error'));
 
-      await expect(Search.autocompleteSelect({ sessionToken, requestId, idx: 0 })).resolves.toBeUndefined();
-    });
-
-    it('should route the deprecated autocompleteClick alias to the new path', async () => {
-      mockRequest(204, '');
-
-      await Search.autocompleteClick({ sessionToken, requestId, idx: 1 });
-
-      const request = getRequest();
-      expect(request.url).toContain('/v1/search/autocomplete/select');
-      expect(request.url).not.toContain('/autocomplete/click');
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toBeUndefined();
     });
   });
 });

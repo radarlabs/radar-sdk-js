@@ -24,6 +24,7 @@ import type {
   Location,
   NavigatorPosition,
   RadarAutocompleteParams,
+  RadarAutocompleteSelectParams,
   RadarAutocompleteResponse,
   RadarContextResponse,
   RadarConversionParams,
@@ -315,6 +316,16 @@ class Radar {
   /** autocomplete partial addresses and place names */
   public static autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete(params, requestId);
+  }
+
+  /**
+   * report which autocomplete result the user chose
+   *
+   * Pass the address straight back from {@link Radar.autocomplete}; it carries the handle the
+   * API needs. Requires a `sessionToken` on the originating request. Never rejects.
+   */
+  public static selectAutocompleteAddress(address: RadarAutocompleteSelectParams): Promise<void> {
+    return SearchAPI.autocompleteSelect(address);
   }
 
   /** search for geofences near a location */

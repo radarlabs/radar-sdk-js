@@ -411,6 +411,11 @@ export interface RadarTimeZone {
 /** autocomplete address result with optional unit */
 export interface RadarAutocompleteAddress extends RadarAddress {
   unit?: string;
+  /**
+   * Opaque handle for this result, present when the request carried a `sessionToken`.
+   * Pass the whole address to {@link Radar.selectAutocompleteAddress}; never parse this.
+   */
+  resultId?: string;
 }
 
 /** forward/reverse geocode address result with unit and time zone */
@@ -501,22 +506,12 @@ export interface RadarAutocompleteParams {
 /** response from {@link Radar.autocomplete} */
 export interface RadarAutocompleteResponse extends RadarResponse {
   addresses: RadarAutocompleteAddress[];
-  /** the `x-radar-request-id` of the originating request, echoed back when reporting a selection */
+  /** the `x-radar-request-id` of the originating request */
   requestId?: string;
 }
 
-/** parameters for reporting an autocomplete selection */
-export interface RadarAutocompleteSelectParams {
-  /** the session UUID sent on the originating autocomplete request */
-  sessionToken: string;
-  /** the `x-radar-request-id` of the autocomplete response the selection came from */
-  requestId: string;
-  /** zero-based index of the selected result */
-  idx: number;
-}
-
-/** @deprecated use {@link RadarAutocompleteSelectParams} */
-export type RadarAutocompleteClickParams = RadarAutocompleteSelectParams;
+/** the selected result, as returned by {@link Radar.autocomplete} */
+export type RadarAutocompleteSelectParams = Pick<RadarAutocompleteAddress, 'resultId'>;
 
 /** parameters for {@link Radar.searchPlaces} */
 export interface RadarSearchPlacesParams {

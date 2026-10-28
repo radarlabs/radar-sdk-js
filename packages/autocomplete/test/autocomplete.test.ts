@@ -55,7 +55,11 @@ const ctx = {
 } satisfies RadarPluginContext;
 
 // respond to autocomplete calls with a request id header, and to select calls with a bare 204
-const mockAutocompleteApi = (requestId = REQUEST_ID) => {
+/** the server stamps one handle per result; the suffix identifies which response it came from */
+const addressesFrom = (response: string) =>
+  addresses.map((address, idx) => ({ ...address, resultId: `v1_${response}-${idx}` }));
+
+const mockAutocompleteApi = (response = 'first', requestId = REQUEST_ID) => {
   fetchMock.mockResponse(async (req) => {
     if (req.url.includes('/v1/config')) {
       return JSON.stringify({});
@@ -64,7 +68,7 @@ const mockAutocompleteApi = (requestId = REQUEST_ID) => {
       return { body: '', status: 204 };
     }
     return {
-      body: JSON.stringify({ meta: {}, addresses }),
+      body: JSON.stringify({ meta: {}, addresses: addressesFrom(response) }),
       status: 200,
       headers: { 'x-radar-request-id': requestId },
     };
@@ -126,7 +130,7 @@ describe('AutocompleteUI sessions', () => {
     expect(first.sessionToken).not.toEqual(second.sessionToken);
   });
 
-  it('reports a selection with the session token, originating request id, and result index', async () => {
+  it('reports a selection with the handle carried by the chosen result, and nothing else', async () => {
     const widget = mount();
 
     const results = await widget.fetchResults('66 steuben');
@@ -136,27 +140,23 @@ describe('AutocompleteUI sessions', () => {
 
     const select = selectRequests()[0];
     expect(select).toBeDefined();
-    expect(JSON.parse(select![1]!.body as string)).toEqual({
-      sessionToken: widget.sessionToken,
-      requestId: REQUEST_ID,
-      idx: 1,
-    });
+    expect(JSON.parse(select![1]!.body as string)).toEqual({ resultId: 'v1_first-1' });
   });
 
   it('reports the selection against the most recent autocomplete response', async () => {
     const widget = mount();
 
-    mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000001');
+    mockAutocompleteApi('stale');
     widget.displayResults(await widget.fetchResults('66 steu'));
 
-    mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000002');
+    mockAutocompleteApi('current');
     widget.displayResults(await widget.fetchResults('66 steuben'));
 
     widget.select(0);
     await Promise.resolve();
 
     const select = selectRequests()[0];
-    expect(JSON.parse(select![1]!.body as string).requestId).toEqual('01a01c2e-7512-704c-aa02-000000000002');
+    expect(JSON.parse(select![1]!.body as string)).toEqual({ resultId: 'v1_current-0' });
   });
 
   it('reports the selection even when onSelection throws', async () => {
@@ -173,7 +173,7 @@ describe('AutocompleteUI sessions', () => {
     expect(selectRequests()).toHaveLength(1);
   });
 
-  it('does not report a selection when the response carried no request id', async () => {
+  it('does not report a selection when the results carry no handle', async () => {
     fetchMock.mockResponse(async (req) => {
       if (req.url.includes('/v1/config')) {
         return JSON.stringify({});
@@ -181,7 +181,7 @@ describe('AutocompleteUI sessions', () => {
       if (req.url.includes('/search/autocomplete/select')) {
         return { body: '', status: 204 };
       }
-      // no x-radar-request-id header
+      // no resultId on the results: the server opened no selectable session
       return { body: JSON.stringify({ meta: {}, addresses }), status: 200 };
     });
     const widget = mount();

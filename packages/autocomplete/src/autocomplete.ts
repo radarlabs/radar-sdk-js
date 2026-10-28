@@ -92,7 +92,6 @@ class AutocompleteUI {
   /** UUID grouping this widget's autocomplete requests and selections into one session */
   readonly sessionToken: string;
   /** `x-radar-request-id` of the response that produced the currently displayed results */
-  private _lastRequestId?: string;
   private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;
@@ -405,8 +404,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui');
-    this._lastRequestId = requestId;
+    const { addresses } = await apis.Search.autocomplete(params, 'autocomplete-ui');
     return addresses;
   }
 
@@ -632,18 +630,11 @@ class AutocompleteUI {
     }
     this.inputField.value = inputValue;
 
-    if (this._lastRequestId) {
+    if (result.resultId) {
       // before onSelection: a throw from that consumer callback must not swallow the report
-      void this.ctx.apis.Search.autocompleteSelect({
-        sessionToken: this.sessionToken,
-        requestId: this._lastRequestId,
-        idx: index,
-      });
+      void this.ctx.apis.Search.autocompleteSelect(result);
     } else {
-      Logger.warn(
-        'Could not report autocomplete selection: the autocomplete response carried no request ID. ' +
-          'Check that the x-radar-request-id response header is exposed to the browser.',
-      );
+      Logger.warn('Could not report autocomplete selection: the result carried no resultId.');
     }
 
     const onSelection = this.config.onSelection;
