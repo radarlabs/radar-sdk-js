@@ -90,6 +90,14 @@ export interface RadarResponse {
   response?: unknown;
 }
 
+/** identifies Radar UI widget as the caller, so widget traffic is separable from direct SDK use. */
+export interface RadarIntegration {
+  /** stable widget identifier, e.g. `'autocomplete-ui'` */
+  name: string;
+  /** the widget package's version */
+  version: string;
+}
+
 /** travel mode for routing and trips */
 export type RadarTravelMode = 'car' | 'foot' | 'bike' | 'motorbike' | 'truck';
 

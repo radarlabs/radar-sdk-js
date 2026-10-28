@@ -16,6 +16,8 @@ import {
 import Logger from './logger';
 import Navigator from './navigator';
 
+import type { RadarIntegration } from './types';
+
 /** HTTP methods supported by the SDK */
 type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
 
@@ -58,6 +60,8 @@ interface HttpRequestOptions {
   requestId?: string;
   /** when true, the request survives a page unload (fire-and-forget beacons) */
   keepalive?: boolean;
+  /** first-party widget that originated this request, reported to Radar for attribution */
+  integration?: RadarIntegration;
 }
 
 const inFlightRequests = new Map<string, AbortController>();
@@ -150,6 +154,7 @@ class Http {
     responseType,
     requestId,
     keepalive,
+    integration,
   }: HttpRequestOptions): Promise<(T & { meta?: RadarApiMeta }) | RadarBlobResponse> {
     const options = Config.get();
 
@@ -164,6 +169,11 @@ class Http {
 
     // filter out undefined values from request data
     const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
+
+    // a param, not a header: the API response log preserves query and body, but only a fixed set of headers.
+    if (integration) {
+      filtered.integration = `${integration.name}@${integration.version}`;
+    }
 
     let body: string | undefined;
 

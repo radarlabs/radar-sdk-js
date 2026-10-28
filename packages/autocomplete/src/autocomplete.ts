@@ -1,8 +1,18 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
 import generateUUID from './uuid';
+import version from './version';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
-import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
+import type {
+  RadarAutocompleteAddress,
+  RadarAutocompleteParams,
+  Location,
+  RadarIntegration,
+  RadarPluginContext,
+} from 'radar-sdk-js';
+
+/** tags this widget's requests so they are separable from direct Radar.autocomplete() use */
+const INTEGRATION: RadarIntegration = { name: 'autocomplete-ui', version };
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -405,7 +415,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui', INTEGRATION);
     this._lastRequestId = requestId;
     return addresses;
   }
@@ -635,11 +645,14 @@ class AutocompleteUI {
     if (this._lastRequestId) {
       // reported before onSelection: that callback is consumer code, and a throw from it
       // must not swallow the clickthrough. fire-and-forget -- autocompleteClick never rejects.
-      void this.ctx.apis.Search.autocompleteClick({
-        sessionToken: this.sessionToken,
-        requestId: this._lastRequestId,
-        idx: index,
-      });
+      void this.ctx.apis.Search.autocompleteClick(
+        {
+          sessionToken: this.sessionToken,
+          requestId: this._lastRequestId,
+          idx: index,
+        },
+        INTEGRATION,
+      );
     } else {
       Logger.warn(
         'Could not report autocomplete selection: the autocomplete response carried no request ID. ' +
