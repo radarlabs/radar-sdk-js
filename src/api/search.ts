@@ -74,19 +74,27 @@ class SearchAPI {
   }
 
   /**
-   * report a selection of an autocomplete result
-   * @param params - session token, originating request ID, and result index
+   * report which autocomplete result the user chose
+   * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
    * @param integration - first-party widget making the call; omitted for direct SDK use
    */
   static async autocompleteSelect(
-    { sessionToken, requestId, idx }: RadarAutocompleteSelectParams,
+    address: RadarAutocompleteSelectParams,
     integration?: RadarIntegration,
   ): Promise<void> {
+    // Results only carry a handle when the originating request opened a session. Without one
+    // there is nothing to report against, and posting would be a guaranteed 400.
+    const resultId = address?.resultId;
+    if (!resultId) {
+      Logger.debug('Autocomplete selection not reported: the result carries no resultId.');
+      return;
+    }
+
     try {
       await Http.request({
         method: 'POST',
         path: 'search/autocomplete/select',
-        data: { sessionToken, requestId, idx },
+        data: { resultId },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
         integration,
@@ -95,14 +103,6 @@ class SearchAPI {
       // fire-and-forget: an expired session or network blip never surfaces to the caller, never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
     }
-  }
-
-  /** @deprecated use {@link SearchAPI.autocompleteSelect} */
-  static async autocompleteClick(
-    params: RadarAutocompleteSelectParams,
-    integration?: RadarIntegration,
-  ): Promise<void> {
-    return SearchAPI.autocompleteSelect(params, integration);
   }
 
   /**
