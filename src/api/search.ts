@@ -4,7 +4,7 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
-  RadarAutocompleteClickParams,
+  RadarAutocompleteSelectParams,
   RadarIntegration,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
@@ -62,7 +62,7 @@ class SearchAPI {
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
-      // echoed back to search/autocomplete/click to attribute a selection to this response
+      // echoed back to search/autocomplete/select to attribute a selection to this response
       requestId: response.meta?.requestId,
     };
 
@@ -74,28 +74,39 @@ class SearchAPI {
   }
 
   /**
-   * report a clickthrough on an autocomplete result
+   * report a selection of an autocomplete result
    * @param params - session token, originating request ID, and result index
    * @param integration - first-party widget making the call; omitted for direct SDK use
    */
-  static async autocompleteClick(
-    { sessionToken, requestId, idx }: RadarAutocompleteClickParams,
+  static async autocompleteSelect(
+    { sessionToken, requestId, idx }: RadarAutocompleteSelectParams,
     integration?: RadarIntegration,
   ): Promise<void> {
     try {
       await Http.request({
         method: 'POST',
-        path: 'search/autocomplete/click',
+        path: 'search/autocomplete/select',
         data: { sessionToken, requestId, idx },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
         integration,
       });
     } catch (err) {
-      // clickthroughs are fire-and-forget. an expired session or a network blip must never
+      // selections are fire-and-forget. an expired session or a network blip must never
       // surface to the caller, and is never retried
-      Logger.debug(`Autocomplete click not reported: ${String(err)}`);
+      Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
     }
+  }
+
+  /**
+   * @deprecated renamed to {@link SearchAPI.autocompleteSelect}. Now posts to
+   * `search/autocomplete/select`; will be removed in a future major.
+   */
+  static async autocompleteClick(
+    params: RadarAutocompleteSelectParams,
+    integration?: RadarIntegration,
+  ): Promise<void> {
+    return SearchAPI.autocompleteSelect(params, integration);
   }
 
   /**
