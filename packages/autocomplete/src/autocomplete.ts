@@ -11,11 +11,7 @@ import type {
   RadarPluginContext,
 } from 'radar-sdk-js';
 
-/**
- * marks this widget's requests as widget-originated, separating them from a customer's own
- * integration built directly on Radar.autocomplete(). the widget version travels with it because
- * the widget ships on its own release cadence, so the core SDK version cannot stand in for it.
- */
+/** tags this widget's requests so they are separable from direct Radar.autocomplete() use */
 const INTEGRATION: RadarIntegration = { name: 'autocomplete-ui', version };
 
 const CLASSNAMES = {

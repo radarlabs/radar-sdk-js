@@ -91,15 +91,13 @@ export interface RadarResponse {
 }
 
 /**
- * identifies a first-party Radar UI widget as the originator of a request, so widget traffic can
- * be told apart from a customer's own integration built directly on the SDK.
- *
- * set by the widget itself -- never by customer code, which is exactly what makes it meaningful.
+ * identifies a first-party Radar UI widget as the caller, so widget traffic is separable from
+ * direct SDK use. an analytics hint, not a trustworthy signal -- it is only ever absent by default.
  */
 export interface RadarIntegration {
   /** stable widget identifier, e.g. `'autocomplete-ui'` */
   name: string;
-  /** the widget package's version, independent of the core SDK version */
+  /** the widget package's version, which releases independently of the core SDK */
   version: string;
 }
 

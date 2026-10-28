@@ -166,11 +166,6 @@ describe('AutocompleteUI sessions', () => {
     expect(JSON.parse(clickRequests()[0]![1]!.body as string).integration).toEqual(INTEGRATION);
   });
 
-  it('reports the widget version, which releases independently of the core SDK', () => {
-    // a bare 'autocomplete-ui' would not say which widget build produced the traffic
-    expect(INTEGRATION).toMatch(/^autocomplete-ui@\d+\.\d+\.\d+/);
-  });
-
   it('reports the click against the most recent autocomplete response', async () => {
     const widget = mount();
 

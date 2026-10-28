@@ -170,10 +170,8 @@ class Http {
     // filter out undefined values from request data
     const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
 
-    // sent as a request param rather than a header: Radar's API response logs preserve the full
-    // query and body for these endpoints, but capture only a fixed set of headers, so a custom
-    // header would not reach analytics without a server change. serialized in one place so
-    // switching transports later is a change here and nowhere else.
+    // a param, not a header: the API response log preserves query and body, but only a fixed set
+    // of headers. serialized here so the transport can change in one place.
     if (integration) {
       filtered.integration = `${integration.name}@${integration.version}`;
     }
