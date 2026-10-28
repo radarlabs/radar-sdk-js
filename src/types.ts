@@ -90,14 +90,11 @@ export interface RadarResponse {
   response?: unknown;
 }
 
-/**
- * identifies a first-party Radar UI widget as the caller, so widget traffic is separable from
- * direct SDK use. an analytics hint, not a trustworthy signal -- it is only ever absent by default.
- */
+/** identifies Radar UI widget as the caller, so widget traffic is separable from direct SDK use. */
 export interface RadarIntegration {
   /** stable widget identifier, e.g. `'autocomplete-ui'` */
   name: string;
-  /** the widget package's version, which releases independently of the core SDK */
+  /** the widget package's version */
   version: string;
 }
 

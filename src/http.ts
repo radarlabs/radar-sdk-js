@@ -170,8 +170,7 @@ class Http {
     // filter out undefined values from request data
     const filtered = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v !== undefined));
 
-    // a param, not a header: the API response log preserves query and body, but only a fixed set
-    // of headers. serialized here so the transport can change in one place.
+    // a param, not a header: the API response log preserves query and body, but only a fixed set of headers.
     if (integration) {
       filtered.integration = `${integration.name}@${integration.version}`;
     }
