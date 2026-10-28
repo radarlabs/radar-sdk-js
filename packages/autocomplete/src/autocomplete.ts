@@ -633,8 +633,7 @@ class AutocompleteUI {
     this.inputField.value = inputValue;
 
     if (this._lastRequestId) {
-      // reported before onSelection: that callback is consumer code, and a throw from it
-      // must not swallow the report. fire-and-forget -- autocompleteSelect never rejects.
+      // before onSelection: a throw from that consumer callback must not swallow the report
       void this.ctx.apis.Search.autocompleteSelect({
         sessionToken: this.sessionToken,
         requestId: this._lastRequestId,

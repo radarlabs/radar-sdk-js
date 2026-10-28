@@ -80,16 +80,12 @@ class SearchAPI {
         keepalive: true,
       });
     } catch (err) {
-      // selections are fire-and-forget. an expired session or a network blip must never
-      // surface to the caller, and is never retried
+      // fire-and-forget: an expired session or network blip never surfaces to the caller, never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
     }
   }
 
-  /**
-   * @deprecated renamed to {@link SearchAPI.autocompleteSelect}. Now posts to
-   * `search/autocomplete/select`; will be removed in a future major.
-   */
+  /** @deprecated use {@link SearchAPI.autocompleteSelect} */
   static async autocompleteClick(params: RadarAutocompleteSelectParams): Promise<void> {
     return SearchAPI.autocompleteSelect(params);
   }

@@ -515,9 +515,7 @@ export interface RadarAutocompleteSelectParams {
   idx: number;
 }
 
-/**
- * @deprecated renamed to {@link RadarAutocompleteSelectParams}. Will be removed in a future major.
- */
+/** @deprecated use {@link RadarAutocompleteSelectParams} */
 export type RadarAutocompleteClickParams = RadarAutocompleteSelectParams;
 
 /** parameters for {@link Radar.searchPlaces} */
