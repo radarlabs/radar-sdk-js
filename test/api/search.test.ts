@@ -159,6 +159,22 @@ describe('Search', () => {
         expect(getRequest().url).toContain('sessionToken=ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f');
       });
 
+      it('should tag the request when a first-party widget originated it', async () => {
+        mockRequest(200, autocompleteResponse);
+
+        await Search.autocomplete({ query }, undefined, { name: 'autocomplete-ui', version: '1.1.1' });
+
+        expect(getRequest().url).toContain('integration=autocomplete-ui%401.1.1');
+      });
+
+      it('should leave the request untagged for a direct SDK integration', async () => {
+        mockRequest(200, autocompleteResponse);
+
+        await Search.autocomplete({ query });
+
+        expect(getRequest().url).not.toContain('integration');
+      });
+
       it('should return the originating x-radar-request-id on the response', async () => {
         fetchMock.mockResponse(async (req) => {
           if (req.url.includes('/v1/config')) {

@@ -5,6 +5,7 @@ import Navigator from '../navigator';
 
 import type {
   RadarAutocompleteClickParams,
+  RadarIntegration,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
   RadarSearchPlacesParams,
@@ -19,9 +20,14 @@ class SearchAPI {
    * autocomplete partial addresses and place names
    * @param params - query and search configuration
    * @param requestId - optional ID for deduplicating in-flight requests
+   * @param integration - first-party widget making the call; omitted for direct SDK use
    * @returns matching addresses
    */
-  static async autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
+  static async autocomplete(
+    params: RadarAutocompleteParams,
+    requestId?: string,
+    integration?: RadarIntegration,
+  ): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
     const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode, sessionToken } = params;
@@ -51,6 +57,7 @@ class SearchAPI {
         sessionToken,
       },
       requestId,
+      integration,
     });
 
     const autocompleteRes: RadarAutocompleteResponse = {
@@ -69,8 +76,12 @@ class SearchAPI {
   /**
    * report a clickthrough on an autocomplete result
    * @param params - session token, originating request ID, and result index
+   * @param integration - first-party widget making the call; omitted for direct SDK use
    */
-  static async autocompleteClick({ sessionToken, requestId, idx }: RadarAutocompleteClickParams): Promise<void> {
+  static async autocompleteClick(
+    { sessionToken, requestId, idx }: RadarAutocompleteClickParams,
+    integration?: RadarIntegration,
+  ): Promise<void> {
     try {
       await Http.request({
         method: 'POST',
@@ -78,6 +89,7 @@ class SearchAPI {
         data: { sessionToken, requestId, idx },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
+        integration,
       });
     } catch (err) {
       // clickthroughs are fire-and-forget. an expired session or a network blip must never

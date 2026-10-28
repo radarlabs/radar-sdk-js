@@ -18,6 +18,7 @@ import Navigator from '../../../src/navigator';
 import Session from '../../../src/session';
 import Storage from '../../../src/storage';
 import AutocompleteUI from '../src/autocomplete';
+import WIDGET_VERSION from '../src/version';
 
 import type { RadarPluginContext } from '../../../src/plugin';
 import type { RadarAutocompleteUIOptions } from '../src/types';
@@ -25,6 +26,8 @@ import type { RadarAutocompleteUIOptions } from '../src/types';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 const REQUEST_ID = '01a01c2e-7512-704c-aa02-81253218d810';
+
+const INTEGRATION = `autocomplete-ui@${WIDGET_VERSION}`;
 
 const addresses = [
   { formattedAddress: '66 Steuben St, Brooklyn, NY 11205 USA', addressLabel: '66 Steuben St' },
@@ -140,7 +143,32 @@ describe('AutocompleteUI sessions', () => {
       sessionToken: widget.sessionToken,
       requestId: REQUEST_ID,
       idx: 1,
+      integration: INTEGRATION,
     });
+  });
+
+  it('tags autocomplete requests as widget-originated', async () => {
+    const widget = mount();
+
+    await widget.fetchResults('66 steuben');
+
+    const url = new URL(String(autocompleteRequests()[0]![0] as string));
+    expect(url.searchParams.get('integration')).toEqual(INTEGRATION);
+  });
+
+  it('tags clicks as widget-originated, so both legs of a session are attributable', async () => {
+    const widget = mount();
+
+    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.select(0);
+    await Promise.resolve();
+
+    expect(JSON.parse(clickRequests()[0]![1]!.body as string).integration).toEqual(INTEGRATION);
+  });
+
+  it('reports the widget version, which releases independently of the core SDK', () => {
+    // a bare 'autocomplete-ui' would not say which widget build produced the traffic
+    expect(INTEGRATION).toMatch(/^autocomplete-ui@\d+\.\d+\.\d+/);
   });
 
   it('reports the click against the most recent autocomplete response', async () => {

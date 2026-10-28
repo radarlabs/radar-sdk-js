@@ -90,6 +90,19 @@ export interface RadarResponse {
   response?: unknown;
 }
 
+/**
+ * identifies a first-party Radar UI widget as the originator of a request, so widget traffic can
+ * be told apart from a customer's own integration built directly on the SDK.
+ *
+ * set by the widget itself -- never by customer code, which is exactly what makes it meaningful.
+ */
+export interface RadarIntegration {
+  /** stable widget identifier, e.g. `'autocomplete-ui'` */
+  name: string;
+  /** the widget package's version, independent of the core SDK version */
+  version: string;
+}
+
 /** travel mode for routing and trips */
 export type RadarTravelMode = 'car' | 'foot' | 'bike' | 'motorbike' | 'truck';
 
