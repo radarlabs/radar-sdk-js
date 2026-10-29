@@ -1,8 +1,13 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
-import generateUUID from './uuid';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
-import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
+import type {
+  AutocompleteSession,
+  RadarAutocompleteAddress,
+  RadarAutocompleteParams,
+  Location,
+  RadarPluginContext,
+} from 'radar-sdk-js';
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -89,8 +94,13 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
-  /** UUID grouping this widget's autocomplete requests and selections into one session */
-  readonly sessionToken: string;
+  /** this widget owns one session: it is a single address field */
+  private readonly session: AutocompleteSession;
+
+  /** the token this widget's session sends; kept public for analytics correlation */
+  public get sessionToken(): string {
+    return this.session.sessionToken;
+  }
   /** `x-radar-request-id` of the response that produced the currently displayed results */
   private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
@@ -156,7 +166,7 @@ class AutocompleteUI {
     }, this.config.debounceMS);
     this.results = [];
     this._highlightedIndex = -1;
-    this.sessionToken = generateUUID();
+    this.session = new ctx.AutocompleteSession();
 
     // set threshold alias
     if (this.config.threshold !== undefined) {
@@ -381,10 +391,9 @@ class AutocompleteUI {
    * @returns matching addresses
    */
   public async fetchResults(query: string) {
-    const { apis } = this.ctx;
     const { limit, layers, countryCode, expandUnits, mailable, lang, postalCode, onRequest } = this.config;
 
-    const params: RadarAutocompleteParams = {
+    const params: Omit<RadarAutocompleteParams, 'sessionToken'> = {
       query,
       limit,
       layers,
@@ -393,7 +402,6 @@ class AutocompleteUI {
       mailable,
       lang,
       postalCode,
-      sessionToken: this.sessionToken,
     };
 
     if (this.near) {
@@ -404,7 +412,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses } = await apis.Search.autocomplete(params, 'autocomplete-ui');
+    const { addresses } = await this.session.autocomplete(params, 'autocomplete-ui');
     return addresses;
   }
 
@@ -632,7 +640,7 @@ class AutocompleteUI {
 
     if (result.resultId) {
       // before onSelection: a throw from that consumer callback must not swallow the report
-      void this.ctx.apis.Search.autocompleteSelect(result);
+      void this.session.select(result);
     } else {
       Logger.warn('Could not report autocomplete selection: the result carried no resultId.');
     }

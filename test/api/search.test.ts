@@ -310,13 +310,13 @@ describe('Search', () => {
     it('should resolve without throwing when the session is unknown or expired', async () => {
       mockRequest(400, { meta: { code: 400 } });
 
-      await expect(Search.autocompleteSelect({ resultId })).resolves.toBeUndefined();
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toEqual({});
     });
 
     it('should resolve without throwing on a network error', async () => {
       fetchMock.mockReject(new TypeError('Network error'));
 
-      await expect(Search.autocompleteSelect({ resultId })).resolves.toBeUndefined();
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toEqual({});
     });
   });
 });

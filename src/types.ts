@@ -513,6 +513,12 @@ export interface RadarAutocompleteResponse extends RadarResponse {
 /** the selected result, as returned by {@link Radar.autocomplete} */
 export type RadarAutocompleteSelectParams = Pick<RadarAutocompleteAddress, 'resultId'>;
 
+/** response from {@link AutocompleteSession.select} */
+export interface RadarAutocompleteSelectResponse extends RadarResponse {
+  /** the enriched address, present only when the project has address enrichment enabled */
+  address?: RadarAutocompleteAddress;
+}
+
 /** parameters for {@link Radar.searchPlaces} */
 export interface RadarSearchPlacesParams {
   /** center point or `'lat,lng'` string (defaults to device location) */

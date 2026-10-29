@@ -5,7 +5,9 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
+  RadarAutocompleteAddress,
   RadarAutocompleteSelectParams,
+  RadarAutocompleteSelectResponse,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
   RadarSearchPlacesParams,
@@ -81,7 +83,7 @@ class SearchAPI {
    * report which autocomplete result the user chose
    * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
    */
-  static async autocompleteSelect(address: RadarAutocompleteSelectParams): Promise<void> {
+  static async autocompleteSelect(address: RadarAutocompleteSelectParams): Promise<RadarAutocompleteSelectResponse> {
     // Results only carry a handle when the originating request opened a session. A missing one is
     // programmer error -- no sessionToken on the originating autocomplete, or an address that did
     // not come from autocomplete at all -- so unlike the operational failures below, it is loud.
@@ -94,16 +96,20 @@ class SearchAPI {
     }
 
     try {
-      await Http.request({
+      const response = await Http.request({
         method: 'POST',
         path: 'search/autocomplete/select',
         data: { resultId },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
       });
+
+      // a 204 means the selection was recorded but the project does not enrich; there is no address
+      return { address: (response as { address?: RadarAutocompleteAddress }).address };
     } catch (err) {
       // fire-and-forget: an expired session or network blip never surfaces to the caller, never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
+      return {};
     }
   }
 

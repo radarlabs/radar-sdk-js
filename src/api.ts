@@ -7,6 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
+import AutocompleteSession from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -24,7 +25,6 @@ import type {
   Location,
   NavigatorPosition,
   RadarAutocompleteParams,
-  RadarAutocompleteSelectParams,
   RadarAutocompleteResponse,
   RadarContextResponse,
   RadarConversionParams,
@@ -99,6 +99,7 @@ class Radar {
   private static _getPluginContext(): RadarPluginContext {
     return {
       Radar: Radar as RadarStatic,
+      AutocompleteSession,
       Config,
       Http,
       Storage,
@@ -316,20 +317,6 @@ class Radar {
   /** autocomplete partial addresses and place names */
   public static autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete(params, requestId);
-  }
-
-  /**
-   * report which autocomplete result the user chose
-   *
-   * Pass the address straight back from {@link Radar.autocomplete}; it carries the handle the
-   * API needs, which requires a `sessionToken` on that originating request.
-   *
-   * Rejects with {@link errors.RadarBadRequestError} if the address carries no handle, since that
-   * can only mean it was called wrong. Network and server failures are swallowed, so a blip can
-   * never break a selection handler.
-   */
-  public static selectAutocompleteAddress(address: RadarAutocompleteSelectParams): Promise<void> {
-    return SearchAPI.autocompleteSelect(address);
   }
 
   /** search for geofences near a location */
