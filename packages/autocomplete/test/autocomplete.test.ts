@@ -39,7 +39,7 @@ const addresses = [
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
   integration: { name: 'autocomplete', version: WIDGET_VERSION },
-  createAutocompleteSession: openTaggedSession,
+  createAutocompleteSession: () => openTaggedSession({ name: 'autocomplete', version: WIDGET_VERSION }),
   Config,
   Http,
   Storage,
