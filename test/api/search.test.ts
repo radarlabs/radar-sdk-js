@@ -3,6 +3,7 @@ import fetchMock from 'jest-fetch-mock';
 import Radar from '../../src';
 import Search from '../../src/api/search';
 import Config from '../../src/config';
+import { RadarBadRequestError } from '../../src/errors';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import { latitude, longitude } from '../common';
@@ -230,6 +231,31 @@ describe('Search', () => {
       });
     });
   });
+  describe('autocomplete sessionToken', () => {
+    it('should reject a non-UUID sessionToken without calling the API', async () => {
+      fetchMock.resetMocks();
+
+      // a malformed token fails the whole search server-side, not just selection
+      await expect(Search.autocomplete({ query: '123 Main', sessionToken: 'not-a-uuid' })).rejects.toThrow(
+        RadarBadRequestError,
+      );
+
+      const searchCalls = fetchMock.mock.calls.filter(([url]) =>
+        String(url as string).includes('/search/autocomplete'),
+      );
+      expect(searchCalls).toHaveLength(0);
+    });
+
+    it('should forward a well-formed sessionToken', async () => {
+      mockRequest(200, { addresses: [] });
+      const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
+
+      await Search.autocomplete({ query: '123 Main', sessionToken });
+
+      expect(getRequest().url).toContain(`sessionToken=${sessionToken}`);
+    });
+  });
+
   describe('autocompleteSelect', () => {
     const resultId = 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk';
 
@@ -257,10 +283,12 @@ describe('Search', () => {
       expect(JSON.parse(getRequest().body!)).toEqual({ resultId });
     });
 
-    it('should not call the API when the result carries no resultId', async () => {
+    it('should reject, without calling the API, when the result carries no resultId', async () => {
       fetchMock.resetMocks();
 
-      await Search.autocompleteSelect({} as any);
+      // programmer error, unlike the operational failures below: either the originating
+      // autocomplete opened no session, or this address never came from autocomplete
+      await expect(Search.autocompleteSelect({} as any)).rejects.toThrow(RadarBadRequestError);
 
       const selectCalls = fetchMock.mock.calls.filter(([url]) =>
         String(url as string).includes('/autocomplete/select'),

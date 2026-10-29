@@ -322,7 +322,11 @@ class Radar {
    * report which autocomplete result the user chose
    *
    * Pass the address straight back from {@link Radar.autocomplete}; it carries the handle the
-   * API needs. Requires a `sessionToken` on the originating request. Never rejects.
+   * API needs, which requires a `sessionToken` on that originating request.
+   *
+   * Rejects with {@link errors.RadarBadRequestError} if the address carries no handle, since that
+   * can only mean it was called wrong. Network and server failures are swallowed, so a blip can
+   * never break a selection handler.
    */
   public static selectAutocompleteAddress(address: RadarAutocompleteSelectParams): Promise<void> {
     return SearchAPI.autocompleteSelect(address);

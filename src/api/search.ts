@@ -1,4 +1,5 @@
 import Config from '../config';
+import { RadarBadRequestError } from '../errors';
 import Http from '../http';
 import Logger from '../logger';
 import Navigator from '../navigator';
@@ -13,6 +14,10 @@ import type {
   RadarSearchGeofencesResponse,
 } from '../types';
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const badRequest = (message: string) => new RadarBadRequestError({ meta: { message } });
+
 /** @internal search API — use Radar.autocomplete / searchGeofences / searchPlaces instead */
 class SearchAPI {
   /**
@@ -26,6 +31,12 @@ class SearchAPI {
 
     const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode, sessionToken } = params;
     let { near } = params;
+
+    // A malformed token fails the whole search, not just selection -- the API rejects the
+    // autocomplete request itself -- so catch it here rather than at the wire.
+    if (sessionToken !== undefined && !UUID_PATTERN.test(sessionToken)) {
+      throw badRequest('sessionToken: must be a UUID.');
+    }
 
     // near can be provided as a string or Location object
     // if "near" is not provided, request will fallback to IP based location
@@ -71,12 +82,15 @@ class SearchAPI {
    * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
    */
   static async autocompleteSelect(address: RadarAutocompleteSelectParams): Promise<void> {
-    // Results only carry a handle when the originating request opened a session. Without one
-    // there is nothing to report against, and posting would be a guaranteed 400.
+    // Results only carry a handle when the originating request opened a session. A missing one is
+    // programmer error -- no sessionToken on the originating autocomplete, or an address that did
+    // not come from autocomplete at all -- so unlike the operational failures below, it is loud.
     const resultId = address?.resultId;
     if (!resultId) {
-      Logger.debug('Autocomplete selection not reported: the result carries no resultId.');
-      return;
+      throw badRequest(
+        'resultId: this address carries no resultId. Pass a sessionToken on the originating ' +
+          'autocomplete request, and select an address it returned.',
+      );
     }
 
     try {
