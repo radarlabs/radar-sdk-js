@@ -7,7 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import AutocompleteSession from './autocompleteSession';
+import { openTaggedSession } from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -100,7 +100,7 @@ class Radar {
       Radar: Radar as RadarStatic,
       // a plugin ships on its own cadence, so X-Radar-SDK-Version cannot stand in for it
       integration: { name: plugin.name, version: plugin.version },
-      AutocompleteSession,
+      createAutocompleteSession: openTaggedSession,
       Config,
       Http,
       Storage,

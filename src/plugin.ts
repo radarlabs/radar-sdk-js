@@ -37,8 +37,11 @@ export interface RadarPluginContext {
   Radar: RadarStatic;
   /** identifies this plugin on the requests it originates */
   integration: RadarIntegration;
-  /** opens an autocomplete session; one per search field */
-  AutocompleteSession: typeof AutocompleteSession;
+  /**
+   * opens an autocomplete session; one per search field.
+   * @param integration - identifies this widget on both legs of the session
+   */
+  createAutocompleteSession: (integration?: RadarIntegration) => AutocompleteSession;
   /** SDK configuration singleton */
   Config: typeof Config;
   /** fetch-based HTTP client */
