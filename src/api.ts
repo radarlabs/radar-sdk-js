@@ -84,22 +84,25 @@ class Radar {
 
   /** register one or more plugins (e.g. maps, autocomplete, fraud) */
   public static registerPlugin(...plugins: RadarPlugin[]) {
-    const ctx = Radar._getPluginContext();
     for (const plugin of plugins) {
       if (Radar._plugins.has(plugin.name)) {
         Logger.warn(`plugin "${plugin.name}" already registered.`);
         continue;
       }
 
-      plugin.install(ctx);
+      plugin.install(Radar._getPluginContext(plugin));
       Radar._plugins.set(plugin.name, plugin);
     }
   }
 
-  private static _getPluginContext(): RadarPluginContext {
+  private static _getPluginContext(plugin: RadarPlugin): RadarPluginContext {
+    // a plugin's requests are tagged with its own name and version: it ships on its own
+    // cadence, so X-Radar-SDK-Version cannot stand in for it
+    const integration = { name: plugin.name, version: plugin.version };
+
     return {
       Radar: Radar as RadarStatic,
-      createAutocompleteSession: openTaggedSession,
+      createAutocompleteSession: () => openTaggedSession(integration),
       Config,
       Http,
       Storage,
