@@ -231,31 +231,6 @@ describe('Search', () => {
       });
     });
   });
-  describe('autocomplete sessionToken', () => {
-    it('should reject a non-UUID sessionToken without calling the API', async () => {
-      fetchMock.resetMocks();
-
-      // a malformed token fails the whole search server-side, not just selection
-      await expect(Search.autocomplete({ query: '123 Main', sessionToken: 'not-a-uuid' })).rejects.toThrow(
-        RadarBadRequestError,
-      );
-
-      const searchCalls = fetchMock.mock.calls.filter(([url]) =>
-        String(url as string).includes('/search/autocomplete'),
-      );
-      expect(searchCalls).toHaveLength(0);
-    });
-
-    it('should forward a well-formed sessionToken', async () => {
-      mockRequest(200, { addresses: [] });
-      const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
-
-      await Search.autocomplete({ query: '123 Main', sessionToken });
-
-      expect(getRequest().url).toContain(`sessionToken=${sessionToken}`);
-    });
-  });
-
   describe('autocompleteSelect', () => {
     const resultId = 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk';
 

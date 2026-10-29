@@ -500,8 +500,6 @@ export interface RadarAutocompleteParams {
   lang?: string;
   /** filter by postal code */
   postalCode?: string;
-  /** UUID grouping related autocomplete requests and their selection into one session */
-  sessionToken?: string;
 }
 
 /** response from {@link Radar.autocomplete} */

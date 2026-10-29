@@ -8,9 +8,6 @@ import type {
   RadarAutocompleteSelectResponse,
 } from './types';
 
-/** params for a session's autocomplete call; the session supplies the token */
-export type RadarAutocompleteSessionParams = Omit<RadarAutocompleteParams, 'sessionToken'>;
-
 /**
  * An autocomplete search field and the selection a user makes in it.
  *
@@ -30,7 +27,7 @@ class AutocompleteSession {
    * @param requestId - optional ID for deduplicating in-flight requests
    * @returns matching addresses, each selectable via {@link AutocompleteSession.select}
    */
-  public autocomplete(params: RadarAutocompleteSessionParams, requestId?: string): Promise<RadarAutocompleteResponse> {
+  public autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId);
   }
 
