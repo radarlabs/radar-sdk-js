@@ -412,8 +412,12 @@ export interface RadarTimeZone {
 export interface RadarAutocompleteAddress extends RadarAddress {
   unit?: string;
   /**
-   * Opaque handle for this result, present when the request carried a `sessionToken`.
-   * Pass the whole address to {@link Radar.selectAutocompleteAddress}; never parse this.
+   * Handle for this result, present when the request opened a session.
+   *
+   * It names the result within that session, not the address: the same address from a different
+   * request carries a different handle, and a handle stops working once its session expires. It
+   * is not an address identifier and should not be stored as one. Pass the whole address to
+   * {@link AutocompleteSession.select}.
    */
   resultId?: string;
 }
