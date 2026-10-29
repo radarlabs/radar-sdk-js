@@ -5,7 +5,7 @@ import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
-  RadarAutocompleteAddress,
+  RadarAutocompleteEnrichedAddress,
   RadarAutocompleteSelectParams,
   RadarAutocompleteSelectResponse,
   RadarIntegration,
@@ -115,7 +115,8 @@ class SearchAPI {
         integration,
       });
 
-      return { address: (response as { address?: RadarAutocompleteAddress }).address };
+      // a 204 carries no body, so there is nothing to pick off and `address` stays undefined
+      return { address: (response as { address?: RadarAutocompleteEnrichedAddress }).address };
     } catch (err) {
       // network and server failures never surface to the caller, and are never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
