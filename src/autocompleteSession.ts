@@ -3,6 +3,7 @@ import generateUUID from './uuid';
 
 import type {
   RadarAutocompleteParams,
+  RadarIntegration,
   RadarAutocompleteResponse,
   RadarAutocompleteSelectParams,
   RadarAutocompleteSelectResponse,
@@ -17,8 +18,15 @@ class AutocompleteSession {
   /** the token this session sends */
   public readonly sessionToken: string;
 
-  constructor() {
+  /** tags both legs of this session, so first-party widget traffic stays separable */
+  private readonly integration?: RadarIntegration;
+
+  /**
+   * @param integration - the first-party widget opening this session; omitted for direct SDK use
+   */
+  constructor(integration?: RadarIntegration) {
     this.sessionToken = generateUUID();
+    this.integration = integration;
   }
 
   /**
@@ -28,7 +36,7 @@ class AutocompleteSession {
    * @returns matching addresses, each selectable via {@link AutocompleteSession.select}
    */
   public autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
-    return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId);
+    return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId, this.integration);
   }
 
   /**
@@ -38,7 +46,7 @@ class AutocompleteSession {
    * @throws {errors.RadarBadRequestError} if the address did not come from this SDK's autocomplete
    */
   public select(address: RadarAutocompleteSelectParams): Promise<RadarAutocompleteSelectResponse> {
-    return SearchAPI.autocompleteSelect(address);
+    return SearchAPI.autocompleteSelect(address, this.integration);
   }
 }
 

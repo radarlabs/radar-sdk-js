@@ -8,6 +8,7 @@ import type {
   RadarAutocompleteEnrichedAddress,
   RadarAutocompleteSelectParams,
   RadarAutocompleteSelectResponse,
+  RadarIntegration,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
   RadarSearchPlacesParams,
@@ -34,11 +35,13 @@ class SearchAPI {
    * autocomplete partial addresses and place names
    * @param params - query and search configuration
    * @param requestId - optional ID for deduplicating in-flight requests
+   * @param integration - first-party widget making the call; omitted for direct SDK use
    * @returns matching addresses
    */
   static async autocomplete(
     params: RadarAutocompleteRequestParams,
     requestId?: string,
+    integration?: RadarIntegration,
   ): Promise<RadarAutocompleteResponse> {
     const options = Config.get();
 
@@ -69,6 +72,7 @@ class SearchAPI {
         sessionToken,
       },
       requestId,
+      integration,
     });
 
     const autocompleteRes: RadarAutocompleteResponse = {
@@ -87,8 +91,12 @@ class SearchAPI {
   /**
    * report which autocomplete result the user chose
    * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
+   * @param integration - first-party widget making the call; omitted for direct SDK use
    */
-  static async autocompleteSelect(address: RadarAutocompleteSelectParams): Promise<RadarAutocompleteSelectResponse> {
+  static async autocompleteSelect(
+    address: RadarAutocompleteSelectParams,
+    integration?: RadarIntegration,
+  ): Promise<RadarAutocompleteSelectResponse> {
     const resultId = address?.resultId;
     if (!resultId) {
       throw badRequest(
@@ -104,6 +112,7 @@ class SearchAPI {
         data: { resultId },
         // the selection may navigate the page; keepalive lets the report outlive it
         keepalive: true,
+        integration,
       });
 
       // a 204 carries no body, so there is nothing to pick off and `address` stays undefined

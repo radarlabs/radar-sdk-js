@@ -1,4 +1,5 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
+import version from './version';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
 import type {
@@ -6,8 +7,12 @@ import type {
   RadarAutocompleteAddress,
   RadarAutocompleteParams,
   Location,
+  RadarIntegration,
   RadarPluginContext,
 } from 'radar-sdk-js';
+
+/** tags this widget's requests so they are separable from direct Radar.autocomplete() use */
+const INTEGRATION: RadarIntegration = { name: 'autocomplete-ui', version };
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -166,7 +171,7 @@ class AutocompleteUI {
     }, this.config.debounceMS);
     this.results = [];
     this._highlightedIndex = -1;
-    this.session = new ctx.AutocompleteSession();
+    this.session = new ctx.AutocompleteSession(INTEGRATION);
 
     // set threshold alias
     if (this.config.threshold !== undefined) {

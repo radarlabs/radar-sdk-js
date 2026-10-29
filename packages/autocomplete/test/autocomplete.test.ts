@@ -19,6 +19,7 @@ import Navigator from '../../../src/navigator';
 import Session from '../../../src/session';
 import Storage from '../../../src/storage';
 import AutocompleteUI from '../src/autocomplete';
+import WIDGET_VERSION from '../src/version';
 
 import type { RadarPluginContext } from '../../../src/plugin';
 import type { RadarAutocompleteUIOptions } from '../src/types';
@@ -26,6 +27,8 @@ import type { RadarAutocompleteUIOptions } from '../src/types';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 const REQUEST_ID = '01a01c2e-7512-704c-aa02-81253218d810';
+
+const INTEGRATION = `autocomplete-ui@${WIDGET_VERSION}`;
 
 const addresses = [
   { formattedAddress: '66 Steuben St, Brooklyn, NY 11205 USA', addressLabel: '66 Steuben St' },
@@ -142,7 +145,29 @@ describe('AutocompleteUI sessions', () => {
 
     const select = selectRequests()[0];
     expect(select).toBeDefined();
-    expect(JSON.parse(select![1]!.body as string)).toEqual({ resultId: 'v1_first-1' });
+    expect(JSON.parse(select![1]!.body as string)).toEqual({
+      resultId: 'v1_first-1',
+      integration: INTEGRATION,
+    });
+  });
+
+  it('tags autocomplete requests as widget-originated', async () => {
+    const widget = mount();
+
+    await widget.fetchResults('66 steuben');
+
+    const url = new URL(String(autocompleteRequests()[0]![0] as string));
+    expect(url.searchParams.get('integration')).toEqual(INTEGRATION);
+  });
+
+  it('tags selections as widget-originated, so both legs of a session are attributable', async () => {
+    const widget = mount();
+
+    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.select(0);
+    await Promise.resolve();
+
+    expect(JSON.parse(selectRequests()[0]![1]!.body as string).integration).toEqual(INTEGRATION);
   });
 
   it('reports the selection against the most recent autocomplete response', async () => {
@@ -158,7 +183,10 @@ describe('AutocompleteUI sessions', () => {
     await Promise.resolve();
 
     const select = selectRequests()[0];
-    expect(JSON.parse(select![1]!.body as string)).toEqual({ resultId: 'v1_current-0' });
+    expect(JSON.parse(select![1]!.body as string)).toEqual({
+      resultId: 'v1_current-0',
+      integration: INTEGRATION,
+    });
   });
 
   it('reports the selection even when onSelection throws', async () => {
