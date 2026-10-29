@@ -96,12 +96,12 @@ class Radar {
   }
 
   private static _getPluginContext(plugin: RadarPlugin): RadarPluginContext {
-    // a plugin's requests are tagged with its own name and version: it ships on its own
-    // cadence, so X-Radar-SDK-Version cannot stand in for it
+    // a plugin ships on its own cadence, so X-Radar-SDK-Version cannot stand in for it
     const integration = { name: plugin.name, version: plugin.version };
 
     return {
       Radar: Radar as RadarStatic,
+      integration,
       createAutocompleteSession: () => openTaggedSession(integration),
       Config,
       Http,

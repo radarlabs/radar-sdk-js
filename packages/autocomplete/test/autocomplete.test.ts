@@ -38,6 +38,7 @@ const addresses = [
 // the real SDK modules, assembled the same way Radar.registerPlugin does.
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
+  integration: { name: 'autocomplete', version: WIDGET_VERSION },
   createAutocompleteSession: () => openTaggedSession({ name: 'autocomplete', version: WIDGET_VERSION }),
   Config,
   Http,

@@ -16,6 +16,7 @@ import type Logger from './logger';
 import type Navigator from './navigator';
 import type Session from './session';
 import type Storage from './storage';
+import type { RadarIntegration } from './types';
 
 /** interface that all Radar plugins must implement */
 export interface RadarPlugin {
@@ -34,6 +35,8 @@ export type RadarStatic = typeof Radar & Record<string, unknown>;
 export interface RadarPluginContext {
   /** the Radar static class for attaching new namespaces (e.g. `ctx.Radar.ui`) */
   Radar: RadarStatic;
+  /** identifies this plugin on the requests it originates */
+  integration: RadarIntegration;
   /** opens an autocomplete session tagged to this plugin; one per search field */
   createAutocompleteSession: () => AutocompleteSession;
   /** SDK configuration singleton */
