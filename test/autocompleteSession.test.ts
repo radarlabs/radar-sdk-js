@@ -8,7 +8,11 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 describe('AutocompleteSession', () => {
   const resultId = 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk';
-  const enriched = { formattedAddress: '123 Main St', locationDetails: { floor: '2' } };
+  // exactly what /select returned against staging: two fields, nothing else
+  const enriched = {
+    formattedAddress: '123 Main St, New York, NY 10001 US',
+    locationDetails: { usage: 'unknown', dwelling: 'unknown', grounds: [], places: [] },
+  };
 
   beforeEach(() => {
     Radar.initialize('prj_test_pk_123');
@@ -82,12 +86,25 @@ describe('AutocompleteSession', () => {
   });
 
   it('returns no address when the selection was only recorded', async () => {
+    // a project without enrichment answers 204 with no body at all
     const session = new AutocompleteSession();
     mockRequest(204, '');
 
     const response = await session.select({ resultId });
 
     expect(response.address).toBeUndefined();
+  });
+
+  it('surfaces the enrichment fields and nothing more', async () => {
+    const session = new AutocompleteSession();
+    mockRequest(200, { address: enriched });
+
+    const { address } = await session.select({ resultId });
+
+    expect(Object.keys(address!).sort()).toEqual(['formattedAddress', 'locationDetails']);
+    expect(address!.locationDetails.usage).toEqual('unknown');
+    expect(address!.locationDetails.grounds).toEqual([]);
+    expect(address!.locationDetails.places).toEqual([]);
   });
 
   it('rejects a result that carries no handle, without calling the API', async () => {

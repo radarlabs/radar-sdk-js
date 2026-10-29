@@ -512,10 +512,35 @@ export interface RadarAutocompleteResponse extends RadarResponse {
 /** the selected result, as returned by {@link Radar.autocomplete} */
 export type RadarAutocompleteSelectParams = Pick<RadarAutocompleteAddress, 'resultId'>;
 
+/** a place on the grounds of an enriched address */
+export interface RadarAddressPlace {
+  name: string;
+  categories: string[];
+}
+
+/** what address enrichment knows about a location */
+export interface RadarAddressLocationDetails {
+  /** how the location is used, or `'unknown'` */
+  usage: string;
+  /** the dwelling type, `'n/a'` for usages that have none, or `'unknown'` */
+  dwelling: string;
+  grounds: string[];
+  places: RadarAddressPlace[];
+}
+
+/**
+ * The enriched form of a selected address. Carries only these two fields — it is not a
+ * {@link RadarAutocompleteAddress}, and none of that type's other fields are returned.
+ */
+export interface RadarAutocompleteEnrichedAddress {
+  formattedAddress?: string;
+  locationDetails: RadarAddressLocationDetails;
+}
+
 /** response from {@link AutocompleteSession.select} */
 export interface RadarAutocompleteSelectResponse extends RadarResponse {
-  /** the enriched address, present only when the project has address enrichment enabled */
-  address?: RadarAutocompleteAddress;
+  /** the enriched address; absent when the project does not enrich, which answers 204 */
+  address?: RadarAutocompleteEnrichedAddress;
 }
 
 /** parameters for {@link Radar.searchPlaces} */
