@@ -27,7 +27,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0
 
 const REQUEST_ID = '01a01c2e-7512-704c-aa02-81253218d810';
 
-const INTEGRATION = `autocomplete-ui@${WIDGET_VERSION}`;
+const INTEGRATION = `autocomplete@${WIDGET_VERSION}`;
 
 const addresses = [
   { formattedAddress: '66 Steuben St, Brooklyn, NY 11205 USA', addressLabel: '66 Steuben St' },
@@ -37,6 +37,7 @@ const addresses = [
 // the real SDK modules, assembled the same way Radar.registerPlugin does.
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
+  integration: { name: 'autocomplete', version: WIDGET_VERSION },
   Config,
   Http,
   Storage,

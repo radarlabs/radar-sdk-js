@@ -1,18 +1,8 @@
 import { RadarAutocompleteContainerNotFound } from './errors';
 import generateUUID from './uuid';
-import version from './version';
 
 import type { RadarAutocompleteUIOptions, RadarAutocompleteConfig } from './types';
-import type {
-  RadarAutocompleteAddress,
-  RadarAutocompleteParams,
-  Location,
-  RadarIntegration,
-  RadarPluginContext,
-} from 'radar-sdk-js';
-
-/** tags this widget's requests so they are separable from direct Radar.autocomplete() use */
-const INTEGRATION: RadarIntegration = { name: 'autocomplete-ui', version };
+import type { RadarAutocompleteAddress, RadarAutocompleteParams, Location, RadarPluginContext } from 'radar-sdk-js';
 
 const CLASSNAMES = {
   WRAPPER: 'radar-autocomplete-wrapper',
@@ -415,7 +405,7 @@ class AutocompleteUI {
       onRequest(params);
     }
 
-    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui', INTEGRATION);
+    const { addresses, requestId } = await apis.Search.autocomplete(params, 'autocomplete-ui', this.ctx.integration);
     this._lastRequestId = requestId;
     return addresses;
   }
@@ -651,7 +641,7 @@ class AutocompleteUI {
           requestId: this._lastRequestId,
           idx: index,
         },
-        INTEGRATION,
+        this.ctx.integration,
       );
     } else {
       Logger.warn(
