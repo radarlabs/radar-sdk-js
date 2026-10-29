@@ -393,7 +393,7 @@ class AutocompleteUI {
   public async fetchResults(query: string) {
     const { limit, layers, countryCode, expandUnits, mailable, lang, postalCode, onRequest } = this.config;
 
-    const params: Omit<RadarAutocompleteParams, 'sessionToken'> = {
+    const params: RadarAutocompleteParams = {
       query,
       limit,
       layers,
