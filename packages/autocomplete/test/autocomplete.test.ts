@@ -10,6 +10,7 @@ import RoutingAPI from '../../../src/api/routing';
 import SearchAPI from '../../../src/api/search';
 import TrackAPI from '../../../src/api/track';
 import TripsAPI from '../../../src/api/trips';
+import AutocompleteSession from '../../../src/autocompleteSession';
 import Config from '../../../src/config';
 import Device from '../../../src/device';
 import Http from '../../../src/http';
@@ -38,6 +39,7 @@ const addresses = [
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
   integration: { name: 'autocomplete', version: WIDGET_VERSION },
+  AutocompleteSession,
   Config,
   Http,
   Storage,

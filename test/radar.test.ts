@@ -478,27 +478,6 @@ describe('Radar', () => {
     });
   });
 
-  describe('selectAutocompleteAddress', () => {
-    let selectStub: jest.SpyInstance<Promise<void>>;
-
-    beforeEach(() => {
-      selectStub = jest.spyOn(SearchAPI, 'autocompleteSelect');
-    });
-
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    it('should pass the selected result straight through', async () => {
-      selectStub.mockResolvedValue(undefined);
-      const selected = { resultId: 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk' };
-
-      await Radar.selectAutocompleteAddress(selected);
-
-      expect(selectStub).toHaveBeenCalledWith(selected);
-    });
-  });
-
   describe('forwardGeocode', () => {
     let geocodeStub: jest.SpyInstance<Promise<RadarGeocodeResponse>>;
 
