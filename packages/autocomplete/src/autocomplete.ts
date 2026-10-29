@@ -171,7 +171,7 @@ class AutocompleteUI {
     }, this.config.debounceMS);
     this.results = [];
     this._highlightedIndex = -1;
-    this.session = new ctx.AutocompleteSession(INTEGRATION);
+    this.session = ctx.createAutocompleteSession(INTEGRATION);
 
     // set threshold alias
     if (this.config.threshold !== undefined) {

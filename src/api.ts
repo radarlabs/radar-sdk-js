@@ -7,7 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import AutocompleteSession from './autocompleteSession';
+import { openTaggedSession } from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -99,7 +99,7 @@ class Radar {
   private static _getPluginContext(): RadarPluginContext {
     return {
       Radar: Radar as RadarStatic,
-      AutocompleteSession,
+      createAutocompleteSession: openTaggedSession,
       Config,
       Http,
       Storage,

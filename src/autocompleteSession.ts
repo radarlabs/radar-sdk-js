@@ -10,6 +10,12 @@ import type {
 } from './types';
 
 /**
+ * Integration tags, kept off the class so they stay out of its public surface: a customer
+ * opening a session cannot set one, and only {@link openTaggedSession} ever writes here.
+ */
+const integrations = new WeakMap<AutocompleteSession, RadarIntegration>();
+
+/**
  * An autocomplete search field and the selection a user makes in it.
  *
  * Create one session per address field.
@@ -18,15 +24,8 @@ class AutocompleteSession {
   /** the token this session sends */
   public readonly sessionToken: string;
 
-  /** tags both legs of this session, so first-party widget traffic stays separable */
-  private readonly integration?: RadarIntegration;
-
-  /**
-   * @param integration - the first-party widget opening this session; omitted for direct SDK use
-   */
-  constructor(integration?: RadarIntegration) {
+  constructor() {
     this.sessionToken = generateUUID();
-    this.integration = integration;
   }
 
   /**
@@ -36,7 +35,7 @@ class AutocompleteSession {
    * @returns matching addresses, each selectable via {@link AutocompleteSession.select}
    */
   public autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
-    return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId, this.integration);
+    return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId, integrations.get(this));
   }
 
   /**
@@ -46,8 +45,21 @@ class AutocompleteSession {
    * @throws {errors.RadarBadRequestError} if the address did not come from this SDK's autocomplete
    */
   public select(address: RadarAutocompleteSelectParams): Promise<RadarAutocompleteSelectResponse> {
-    return SearchAPI.autocompleteSelect(address, this.integration);
+    return SearchAPI.autocompleteSelect(address, integrations.get(this));
   }
 }
+
+/**
+ * @internal open a session whose requests are tagged as coming from a first-party widget.
+ *
+ * Reached through {@link RadarPluginContext.createAutocompleteSession}, never by customer code.
+ */
+export const openTaggedSession = (integration?: RadarIntegration): AutocompleteSession => {
+  const session = new AutocompleteSession();
+  if (integration) {
+    integrations.set(session, integration);
+  }
+  return session;
+};
 
 export default AutocompleteSession;

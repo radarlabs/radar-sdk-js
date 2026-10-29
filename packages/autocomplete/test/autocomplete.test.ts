@@ -10,7 +10,7 @@ import RoutingAPI from '../../../src/api/routing';
 import SearchAPI from '../../../src/api/search';
 import TrackAPI from '../../../src/api/track';
 import TripsAPI from '../../../src/api/trips';
-import AutocompleteSession from '../../../src/autocompleteSession';
+import { openTaggedSession } from '../../../src/autocompleteSession';
 import Config from '../../../src/config';
 import Device from '../../../src/device';
 import Http from '../../../src/http';
@@ -38,7 +38,7 @@ const addresses = [
 // the real SDK modules, assembled the same way Radar.registerPlugin does.
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
-  AutocompleteSession,
+  createAutocompleteSession: openTaggedSession,
   Config,
   Http,
   Storage,
