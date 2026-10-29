@@ -94,10 +94,10 @@ class AutocompleteUI {
   config: RadarAutocompleteConfig;
   isOpen: boolean;
   results: RadarAutocompleteAddress[];
-  /** this widget owns one session: it is a single address field */
+  /** one session per widget: a widget is one address field */
   private readonly session: AutocompleteSession;
 
-  /** the token this widget's session sends; kept public for analytics correlation */
+  /** the token this widget's session sends */
   public get sessionToken(): string {
     return this.session.sessionToken;
   }
@@ -639,7 +639,7 @@ class AutocompleteUI {
     this.inputField.value = inputValue;
 
     if (result.resultId) {
-      // before onSelection: a throw from that consumer callback must not swallow the report
+      // before onSelection, so a throw from that consumer callback cannot swallow the report
       void this.session.select(result);
     } else {
       Logger.warn('Could not report autocomplete selection: the result carried no resultId.');

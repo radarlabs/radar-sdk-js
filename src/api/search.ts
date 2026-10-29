@@ -34,8 +34,6 @@ class SearchAPI {
     const { query, limit, layers, countryCode, expandUnits, mailable, lang, postalCode, sessionToken } = params;
     let { near } = params;
 
-    // A malformed token fails the whole search, not just selection -- the API rejects the
-    // autocomplete request itself -- so catch it here rather than at the wire.
     if (sessionToken !== undefined && !UUID_PATTERN.test(sessionToken)) {
       throw badRequest('sessionToken: must be a UUID.');
     }
@@ -84,9 +82,6 @@ class SearchAPI {
    * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
    */
   static async autocompleteSelect(address: RadarAutocompleteSelectParams): Promise<RadarAutocompleteSelectResponse> {
-    // Results only carry a handle when the originating request opened a session. A missing one is
-    // programmer error -- no sessionToken on the originating autocomplete, or an address that did
-    // not come from autocomplete at all -- so unlike the operational failures below, it is loud.
     const resultId = address?.resultId;
     if (!resultId) {
       throw badRequest(
@@ -104,10 +99,9 @@ class SearchAPI {
         keepalive: true,
       });
 
-      // a 204 means the selection was recorded but the project does not enrich; there is no address
       return { address: (response as { address?: RadarAutocompleteAddress }).address };
     } catch (err) {
-      // fire-and-forget: an expired session or network blip never surfaces to the caller, never retried
+      // network and server failures never surface to the caller, and are never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
       return {};
     }
