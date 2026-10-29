@@ -8,6 +8,7 @@ import type RoutingAPI from './api/routing';
 import type SearchAPI from './api/search';
 import type TrackAPI from './api/track';
 import type TripsAPI from './api/trips';
+import type AutocompleteSession from './autocompleteSession';
 import type Config from './config';
 import type Device from './device';
 import type Http from './http';
@@ -36,6 +37,8 @@ export interface RadarPluginContext {
   Radar: RadarStatic;
   /** identifies this plugin on the requests it originates */
   integration: RadarIntegration;
+  /** opens an autocomplete session tagged to this plugin; one per search field */
+  createAutocompleteSession: () => AutocompleteSession;
   /** SDK configuration singleton */
   Config: typeof Config;
   /** fetch-based HTTP client */

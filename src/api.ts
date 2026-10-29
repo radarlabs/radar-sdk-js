@@ -7,6 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
+import { openTaggedSession } from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -95,10 +96,13 @@ class Radar {
   }
 
   private static _getPluginContext(plugin: RadarPlugin): RadarPluginContext {
+    // a plugin ships on its own cadence, so X-Radar-SDK-Version cannot stand in for it
+    const integration = { name: plugin.name, version: plugin.version };
+
     return {
       Radar: Radar as RadarStatic,
-      // a plugin ships on its own cadence, so X-Radar-SDK-Version cannot stand in for it
-      integration: { name: plugin.name, version: plugin.version },
+      integration,
+      createAutocompleteSession: () => openTaggedSession(integration),
       Config,
       Http,
       Storage,

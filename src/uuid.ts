@@ -1,17 +1,9 @@
-/**
- * generate a random v4 UUID
- *
- * NOTE: mirrors the generator private to the core SDK's device.ts.
- * Duplicate here rather than import across RadarPluginContext boundary.
- *
- * @returns a newly generated UUID
- */
+/** generate a v4 UUID, falling back to getRandomValues on browsers without crypto.randomUUID */
 const generateUUID = (): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
 
-  // fallback for older browsers
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   bytes[6] = (bytes[6]! & 0x0f) | 0x40; // version 4

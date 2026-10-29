@@ -237,7 +237,7 @@ class Http {
         if (responseType === 'blob') {
           parsed = { code: response.status, data: await response.blob() };
         } else {
-          // some endpoints (e.g. search/autocomplete/click) reply 204 with no body,
+          // some endpoints (e.g. search/autocomplete/select) reply 204 with no body,
           // which response.json() would reject on
           const text = await response.text();
           parsed = (text ? JSON.parse(text) : {}) as RadarApiResponse;
