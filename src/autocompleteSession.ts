@@ -1,5 +1,6 @@
 import SearchAPI from './api/search';
-import generateUUID from './uuid';
+import { RadarBadRequestError } from './errors';
+import generateUUID, { UUID_PATTERN } from './uuid';
 
 import type {
   RadarAutocompleteParams,
@@ -24,8 +25,17 @@ class AutocompleteSession {
   /** the token this session sends */
   public readonly sessionToken: string;
 
-  constructor() {
-    this.sessionToken = generateUUID();
+  /**
+   * @param sessionToken resumes a session from a token minted elsewhere. Intended for wrapper
+   *   SDKs that cannot hold a session instance; omit it to mint a new session.
+   * @throws {errors.RadarBadRequestError} if `sessionToken` is given and is not a UUID
+   */
+  constructor(sessionToken?: string) {
+    if (sessionToken !== undefined && !UUID_PATTERN.test(sessionToken)) {
+      throw new RadarBadRequestError({ meta: { message: 'sessionToken: must be a UUID.' } });
+    }
+
+    this.sessionToken = sessionToken ?? generateUUID();
   }
 
   /**

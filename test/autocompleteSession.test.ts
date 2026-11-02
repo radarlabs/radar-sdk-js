@@ -29,6 +29,24 @@ describe('AutocompleteSession', () => {
     expect(session.sessionToken).toMatch(UUID_PATTERN);
   });
 
+  it('resumes a session from a token minted elsewhere', async () => {
+    const token = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
+    const session = new AutocompleteSession(token);
+
+    expect(session.sessionToken).toEqual(token);
+
+    mockRequest(200, { addresses: [] });
+    await session.autocomplete({ query: '123' });
+
+    expect(getRequest().url).toContain(`sessionToken=${token}`);
+  });
+
+  it('refuses a resumed token that is not a UUID', () => {
+    for (const bad of ['not-a-uuid', '', '1-1-1-1-1']) {
+      expect(() => new AutocompleteSession(bad)).toThrow(RadarBadRequestError);
+    }
+  });
+
   it('gives each session a distinct token', () => {
     // the whole point of the type: a second address field gets a second session
     const billing = new AutocompleteSession();
