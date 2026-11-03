@@ -7,7 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import { openTaggedSession } from './autocompleteSession';
+import AutocompleteSessionClass, { openTaggedSession } from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -76,6 +76,9 @@ class Radar {
   private static _plugins: Map<string, RadarPlugin> = new Map();
 
   public static errors = errors;
+
+  /** opens an autocomplete session; also a named export for bundler users */
+  public static AutocompleteSession = AutocompleteSessionClass;
 
   /** current SDK version string */
   public static get VERSION() {

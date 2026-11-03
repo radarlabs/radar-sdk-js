@@ -4,15 +4,20 @@
     <strong>Error</strong> Something went wrong. Check the developer console for details.
   </div>
 
-  <p>Customize the autocomplete widget by providing an <code>&lt;input&gt;</code> as the container element.</p>
+  <p>
+    Build your own input with an <code>AutocompleteSession</code>. The session groups everything typed
+    into one field with the result the user picks. Create one session per address field.
+  </p>
 
   <div id="autocomplete-warning" class="callout gray">
     Add publishable key to see autocomplete input
   </div>
 
   <div>
-    <input id="autocomplete" name="address" type="text" style="width: 300px" />
+    <input id="autocomplete" name="address" type="text" autocomplete="off" placeholder="start typing an address" style="width: 300px" />
   </div>
+
+  <ul id="results" class="list-group mt-2" style="width: 600px; display: none;"></ul>
 
   <div id="result-container" class="mt-4" style="display: none;">
     <p class="mb-1"><b>Selected result</b></p>
@@ -21,36 +26,84 @@
 </div>
 
 <script>
-  let autocomplete;
+  let session;
+  let debounce;
+
+  const renderResults = (addresses) => {
+    const $results = $('#results').empty();
+
+    if (!addresses.length) {
+      $results.hide();
+      return;
+    }
+
+    addresses.forEach((address) => {
+      $('<li>')
+        .addClass('list-group-item list-group-item-action')
+        .css('cursor', 'pointer')
+        .text(address.formattedAddress)
+        .on('click', () => select(address))
+        .appendTo($results);
+    });
+
+    $results.show();
+  };
+
+  // reporting the selection closes the session, and returns the enriched address
+  // when the project has address enrichment enabled
+  const select = async (address) => {
+    $('#results').hide();
+    $('#autocomplete').val(address.formattedAddress);
+
+    const { address: enriched } = await session.select(address);
+
+    $('#result').html(JSON.stringify(enriched ?? address, null, 2));
+    $('#result-container').show();
+    hljs.highlightAll();
+  };
+
+  const search = async (query) => {
+    const { addresses } = await session.autocomplete({
+      query,
+      countryCode: 'US',
+      layers: ['address'],
+      limit: 5,
+    });
+
+    renderResults(addresses ?? []);
+  };
+
   const init = (publishableKey) => {
     $('#error-alert').hide();
     $('#autocomplete-warning').hide();
+    $('#results').hide();
+    $('#result-container').hide();
 
     Radar.initialize(publishableKey, { debug: true });
 
-    // prevent duplicate inputs
-    if (autocomplete) {
-      autocomplete.remove();
-    }
+    // one session per field, held for as long as the user is filling it in
+    session = new Radar.AutocompleteSession();
+    console.log('SESSION', session.sessionToken);
 
-    autocomplete = Radar.ui.autocomplete({
-      container: 'autocomplete',
-      countryCode: 'US',
-      threshold: 2,
-      onSelection: (result) => {
-        console.log(result);
-        $('#result').html(JSON.stringify(result, null, 2));
-        $('#result-container').show();
-        hljs.highlightAll();
-      },
-      width: '600px',
+    $('#autocomplete').off('input').on('input', (e) => {
+      const query = e.target.value;
+      clearTimeout(debounce);
+
+      if (query.length < 3) {
+        $('#results').hide();
+        return;
+      }
+
+      debounce = setTimeout(() => {
+        search(query).catch((err) => {
+          console.error(err);
+          $('#error-alert').show();
+        });
+      }, 200);
     });
-
-    console.log('AUTOCOMPLETE', autocomplete);
   };
 
-
-  // initalize map on api key changes
+  // initalize on api key changes
   $('#publishableKey').on('change', () => {
     const publishableKey = $('#publishableKey').val();
     if (publishableKey) {
