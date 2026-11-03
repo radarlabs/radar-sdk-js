@@ -29,20 +29,20 @@
   let session;
   let debounce;
 
-  const renderResults = (addresses) => {
+  const renderResults = (results) => {
     const $results = $('#results').empty();
 
-    if (!addresses.length) {
+    if (!results.length) {
       $results.hide();
       return;
     }
 
-    addresses.forEach((address) => {
+    results.forEach((result) => {
       $('<li>')
         .addClass('list-group-item list-group-item-action')
         .css('cursor', 'pointer')
-        .text(address.formattedAddress)
-        .on('click', () => select(address))
+        .text(result.formattedAddress)
+        .on('click', () => select(result))
         .appendTo($results);
     });
 
@@ -51,26 +51,28 @@
 
   // reporting the selection closes the session, and returns the enriched address
   // when the project has address enrichment enabled
-  const select = async (address) => {
+  const select = async (result) => {
     $('#results').hide();
-    $('#autocomplete').val(address.formattedAddress);
+    $('#autocomplete').val(result.formattedAddress);
 
-    const { address: enriched } = await session.select(address);
+    const { address: enriched } = await session.select(result);
 
-    $('#result').html(JSON.stringify(enriched ?? address, null, 2));
+    $('#result').html(JSON.stringify(enriched ?? result, null, 2));
     $('#result-container').show();
     hljs.highlightAll();
   };
 
   const search = async (query) => {
-    const { addresses } = await session.autocomplete({
+    // the API returns results across layers; this page filters to address so that
+    // selecting one has enrichment to resolve
+    const { addresses: results } = await session.autocomplete({
       query,
       countryCode: 'US',
       layers: ['address'],
       limit: 5,
     });
 
-    renderResults(addresses ?? []);
+    renderResults(results ?? []);
   };
 
   const init = (publishableKey) => {
