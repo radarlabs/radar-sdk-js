@@ -49,8 +49,9 @@
     $results.show();
   };
 
-  // reporting the selection closes the session, and returns the enriched address
-  // when the project has address enrichment enabled
+  // reporting the selection closes the session. an address result comes back enriched
+  // when the project has address enrichment enabled; other layers have nothing to enrich,
+  // so fall back to rendering the result as it arrived
   const select = async (result) => {
     $('#results').hide();
     $('#autocomplete').val(result.formattedAddress);
@@ -63,12 +64,9 @@
   };
 
   const search = async (query) => {
-    // the API returns results across layers; this page filters to address so that
-    // selecting one has enrichment to resolve
     const { addresses: results } = await session.autocomplete({
       query,
       countryCode: 'US',
-      layers: ['address'],
       limit: 5,
     });
 
