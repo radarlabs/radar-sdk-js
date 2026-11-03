@@ -23,6 +23,11 @@
     <p class="mb-1"><b>Selected result</b></p>
     <pre><code id="result" class="code-sample language-json"></code></pre>
   </div>
+
+  <div id="enriched-container" class="mt-4" style="display: none;">
+    <p class="mb-1"><b>Select response</b></p>
+    <pre><code id="enriched" class="code-sample language-json"></code></pre>
+  </div>
 </div>
 
 <script>
@@ -51,15 +56,23 @@
 
   // reporting the selection closes the session. an address result comes back enriched
   // when the project has address enrichment enabled; other layers have nothing to enrich,
-  // so fall back to rendering the result as it arrived
+  // and the select response carries no address at all
   const select = async (result) => {
     $('#results').hide();
     $('#autocomplete').val(result.formattedAddress);
 
+    $('#result').html(JSON.stringify(result, null, 2));
+    $('#result-container').show();
+
     const { address: enriched } = await session.select(result);
 
-    $('#result').html(JSON.stringify(enriched ?? result, null, 2));
-    $('#result-container').show();
+    if (enriched) {
+      $('#enriched').html(JSON.stringify(enriched, null, 2));
+      $('#enriched-container').show();
+    } else {
+      $('#enriched-container').hide();
+    }
+
     hljs.highlightAll();
   };
 
@@ -78,6 +91,7 @@
     $('#autocomplete-warning').hide();
     $('#results').hide();
     $('#result-container').hide();
+    $('#enriched-container').hide();
 
     Radar.initialize(publishableKey, { debug: true });
 

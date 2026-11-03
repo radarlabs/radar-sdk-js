@@ -48,7 +48,7 @@
     "bump-plugin-version": "node ./scripts/bump-plugin-version.cjs",
     "test": "jest --collect-coverage --runInBand",
     "test:watch": "jest --watch",
-    "demo": "npm run build && node ./demo/server.cjs",
+    "demo": "npm run build:all && node ./demo/server.cjs",
     "compile-site": "node ./scripts/compile-site.cjs",
     "spell-check": "cspell **/*.md -c cspell.json",
     "prepare": "husky",
