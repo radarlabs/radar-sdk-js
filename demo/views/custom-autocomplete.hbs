@@ -54,9 +54,9 @@
     $results.show();
   };
 
-  // reporting the selection closes the session. an address result comes back enriched
-  // when the project has address enrichment enabled; other layers have nothing to enrich,
-  // and the select response carries no address at all
+  // reporting the selection is how autocomplete quality is measured. an address result comes
+  // back enriched when the project has address enrichment enabled; other layers have nothing
+  // to enrich, and the select response carries no address at all
   const select = async (result) => {
     $('#results').hide();
     $('#autocomplete').val(result.formattedAddress);

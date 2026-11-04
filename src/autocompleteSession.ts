@@ -49,7 +49,8 @@ class AutocompleteSession {
   }
 
   /**
-   * report which result the user chose
+   * report which result the user chose; selections are how autocomplete quality is
+   * measured and improved
    * @param address - the selected result, as returned by {@link AutocompleteSession.autocomplete}
    * @returns the enriched address, where available
    * @throws {errors.RadarBadRequestError} if the address did not come from this SDK's autocomplete
