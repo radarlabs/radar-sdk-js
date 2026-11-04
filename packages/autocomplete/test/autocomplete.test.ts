@@ -62,10 +62,13 @@ const ctx = {
 const addressesFrom = (response: string) =>
   addresses.map((address, idx) => ({ ...address, resultId: `v1_${response}-${idx}` }));
 
+/** the address the enrichment tests search for and select */
+const ENRICHED_ADDRESS = { formattedAddress: '111 5th Ave, New York, NY 10003 USA', addressLabel: '111 5th Ave' };
+
 /** what /select returns for a project with address enrichment enabled */
 const ENRICHED = {
-  formattedAddress: '66 Steuben St, Brooklyn, NY 11205 USA',
-  locationDetails: { usage: 'residential', dwelling: 'unknown', grounds: [], places: [] },
+  formattedAddress: ENRICHED_ADDRESS.formattedAddress,
+  locationDetails: { usage: 'nonResidential', dwelling: 'n/a', grounds: [], places: [] },
 };
 
 // respond to autocomplete calls with stamped results, and to select calls with a bare 204, or
@@ -81,7 +84,14 @@ const mockAutocompleteApi = (response = 'first', enriched?: typeof ENRICHED) => 
         ? { body: JSON.stringify({ meta: {}, address: enriched }), status: 200 }
         : { body: '', status: 204 };
     }
-    return { body: JSON.stringify({ meta: {}, addresses: addressesFrom(response) }), status: 200 };
+    return {
+      body: JSON.stringify({
+        meta: {},
+        // a search that ends in an enriched selection returns the address being enriched
+        addresses: enriched ? [{ ...ENRICHED_ADDRESS, resultId: `v1_${response}-0` }] : addressesFrom(response),
+      }),
+      status: 200,
+    };
   });
 };
 
@@ -192,7 +202,7 @@ describe('AutocompleteUI sessions', () => {
     const onEnrichment = jest.fn();
     const widget = mount({ onEnrichment });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
     await flushReport();
 
@@ -220,7 +230,7 @@ describe('AutocompleteUI sessions', () => {
       onEnrichment: () => order.push('enrichment'),
     });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
 
     // the input is usable before the network answers
@@ -263,7 +273,7 @@ describe('AutocompleteUI sessions', () => {
       },
     });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
     await flushReport();
 
