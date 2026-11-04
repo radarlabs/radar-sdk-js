@@ -97,7 +97,6 @@
 
     // one session per field, held for as long as the user is filling it in
     session = new Radar.AutocompleteSession();
-    console.log('SESSION', session.sessionToken);
 
     $('#autocomplete').off('input').on('input', (e) => {
       const query = e.target.value;
