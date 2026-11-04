@@ -29,8 +29,8 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0
 const INTEGRATION = `autocomplete@${WIDGET_VERSION}`;
 
 const addresses = [
-  { formattedAddress: '66 Steuben St, Brooklyn, NY 11205 USA', addressLabel: '66 Steuben St' },
-  { formattedAddress: '67 Steuben St, Brooklyn, NY 11205 USA', addressLabel: '67 Steuben St' },
+  { formattedAddress: '111 5th Ave, New York, NY 10003 USA', addressLabel: '111 5th Ave' },
+  { formattedAddress: '113 5th Ave, New York, NY 10003 USA', addressLabel: '113 5th Ave' },
 ];
 
 // the real SDK modules, assembled the same way Radar.registerPlugin does.
@@ -62,12 +62,9 @@ const ctx = {
 const addressesFrom = (response: string) =>
   addresses.map((address, idx) => ({ ...address, resultId: `v1_${response}-${idx}` }));
 
-/** the address the enrichment tests search for and select */
-const ENRICHED_ADDRESS = { formattedAddress: '111 5th Ave, New York, NY 10003 USA', addressLabel: '111 5th Ave' };
-
 /** what /select returns for a project with address enrichment enabled */
 const ENRICHED = {
-  formattedAddress: ENRICHED_ADDRESS.formattedAddress,
+  formattedAddress: addresses[0]!.formattedAddress,
   locationDetails: { usage: 'nonResidential', dwelling: 'n/a', grounds: [], places: [] },
 };
 
@@ -85,11 +82,7 @@ const mockAutocompleteApi = (response = 'first', enriched?: typeof ENRICHED) => 
         : { body: '', status: 204 };
     }
     return {
-      body: JSON.stringify({
-        meta: {},
-        // a search that ends in an enriched selection returns the address being enriched
-        addresses: enriched ? [{ ...ENRICHED_ADDRESS, resultId: `v1_${response}-0` }] : addressesFrom(response),
-      }),
+      body: JSON.stringify({ meta: {}, addresses: addressesFrom(response) }),
       status: 200,
     };
   });
@@ -125,7 +118,7 @@ describe('AutocompleteUI sessions', () => {
   it('sends a session token UUID on every autocomplete request', async () => {
     const widget = mount();
 
-    await widget.fetchResults('66 steuben');
+    await widget.fetchResults('111 5th ave');
 
     const url = new URL(String(autocompleteRequests()[0]![0] as string));
     expect(url.searchParams.get('sessionToken')).toMatch(UUID_PATTERN);
@@ -134,8 +127,8 @@ describe('AutocompleteUI sessions', () => {
   it('reuses the same session token across requests', async () => {
     const widget = mount();
 
-    await widget.fetchResults('66 steu');
-    await widget.fetchResults('66 steuben');
+    await widget.fetchResults('111 5th');
+    await widget.fetchResults('111 5th ave');
 
     const tokens = autocompleteRequests().map(([url]) =>
       new URL(String(url as string)).searchParams.get('sessionToken'),
@@ -156,7 +149,7 @@ describe('AutocompleteUI sessions', () => {
   it('reports a selection with the handle carried by the chosen result, and nothing else', async () => {
     const widget = mount();
 
-    const results = await widget.fetchResults('66 steuben');
+    const results = await widget.fetchResults('111 5th ave');
     widget.displayResults(results);
     widget.select(1);
     await Promise.resolve();
@@ -172,7 +165,7 @@ describe('AutocompleteUI sessions', () => {
   it('tags autocomplete requests as widget-originated', async () => {
     const widget = mount();
 
-    await widget.fetchResults('66 steuben');
+    await widget.fetchResults('111 5th ave');
 
     const url = new URL(String(autocompleteRequests()[0]![0] as string));
     expect(url.searchParams.get('integration')).toEqual(INTEGRATION);
@@ -182,10 +175,10 @@ describe('AutocompleteUI sessions', () => {
     const widget = mount();
 
     mockAutocompleteApi('stale');
-    widget.displayResults(await widget.fetchResults('66 steu'));
+    widget.displayResults(await widget.fetchResults('111 5th'));
 
     mockAutocompleteApi('current');
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
 
     widget.select(0);
     await Promise.resolve();
@@ -213,7 +206,7 @@ describe('AutocompleteUI sessions', () => {
     const onEnrichment = jest.fn();
     const widget = mount({ onEnrichment });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
     await flushReport();
 
@@ -254,7 +247,7 @@ describe('AutocompleteUI sessions', () => {
     const onEnrichment = jest.fn();
     const widget = mount({ onError, onEnrichment });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
     await flushReport();
 
@@ -287,7 +280,7 @@ describe('AutocompleteUI sessions', () => {
       },
     });
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     expect(() => widget.select(0)).toThrow('consumer callback blew up');
     await Promise.resolve();
 
@@ -307,7 +300,7 @@ describe('AutocompleteUI sessions', () => {
     });
     const widget = mount();
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
     await Promise.resolve();
 
@@ -322,7 +315,7 @@ describe('AutocompleteUI sessions', () => {
     // serialized on purpose: both widgets share the 'autocomplete-ui' dedup key, so concurrent
     // fetches abort each other. that behavior predates session association and is deliberately left
     // alone, so this asserts only that session tokens do not leak between widgets.
-    await first.fetchResults('66 steu');
+    await first.fetchResults('111 5th');
     await second.fetchResults('120 fifth');
 
     const tokens = autocompleteRequests().map(([url]) =>
@@ -335,7 +328,7 @@ describe('AutocompleteUI sessions', () => {
   it('does not report a selection when the selected index has no result', async () => {
     const widget = mount();
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
+    widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(99);
     await Promise.resolve();
 
