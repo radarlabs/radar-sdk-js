@@ -638,8 +638,21 @@ class AutocompleteUI {
     this.inputField.value = inputValue;
 
     if (result.resultId) {
-      // before onSelection, so a throw from that consumer callback cannot swallow the report
-      void this.session.select(result);
+      // not awaited, so onSelection and the input stay ahead of the network. started before
+      // onSelection so a throw from that consumer callback cannot swallow the report
+      void this.session
+        .select(result)
+        .then(({ address }) => {
+          const onEnrichment = this.config.onEnrichment;
+          if (onEnrichment && address) {
+            onEnrichment(address);
+          }
+        })
+        // the API layer already swallows network and server failures, so the only way to land
+        // here is onEnrichment itself throwing, which would otherwise go unhandled
+        .catch((error: Error) => {
+          Logger.warn(`Autocomplete enrichment callback failed: ${error.message}`);
+        });
     } else {
       Logger.warn('Could not report autocomplete selection: the result carried no resultId.');
     }
