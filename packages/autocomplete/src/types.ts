@@ -1,4 +1,4 @@
-import type { RadarAutocompleteAddress, RadarAutocompleteParams } from 'radar-sdk-js';
+import type { RadarAutocompleteAddress, RadarAutocompleteEnrichedAddress, RadarAutocompleteParams } from 'radar-sdk-js';
 
 /** configuration options for the autocomplete UI widget */
 export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams, 'query'> {
@@ -16,6 +16,12 @@ export interface RadarAutocompleteUIOptions extends Omit<RadarAutocompleteParams
   placeholder?: string;
   /** callback invoked when a result is selected */
   onSelection?: (selection: RadarAutocompleteAddress) => void;
+  /**
+   * callback invoked when the selected result comes back enriched, which only happens
+   * when the project has address enrichment enabled. fires after `onSelection`, once the
+   * report completes
+   */
+  onEnrichment?: (enriched: RadarAutocompleteEnrichedAddress) => void;
   /** callback invoked before each autocomplete request */
   onRequest?: (params: RadarAutocompleteParams) => void;
   /** callback invoked when results are returned */
