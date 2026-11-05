@@ -44,7 +44,10 @@ class AutocompleteSession {
    * @param requestId - optional ID for deduplicating in-flight requests
    * @returns matching addresses, each selectable via {@link AutocompleteSession.select}
    */
-  public autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
+  public autocomplete(
+    params: Omit<RadarAutocompleteParams, 'sessionToken'>,
+    requestId?: string,
+  ): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete({ ...params, sessionToken: this.sessionToken }, requestId, integrations.get(this));
   }
 
