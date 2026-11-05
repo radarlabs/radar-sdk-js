@@ -650,8 +650,8 @@ class AutocompleteUI {
         })
         // the API layer already swallows network and server failures, so the only way to land
         // here is onEnrichment itself throwing, which would otherwise go unhandled
-        .catch((error: Error) => {
-          Logger.warn(`Autocomplete enrichment callback failed: ${error.message}`);
+        .catch((error: unknown) => {
+          Logger.warn(`Autocomplete enrichment callback failed: ${String(error)}`);
         });
     } else {
       Logger.warn('Could not report autocomplete selection: the result carried no resultId.');

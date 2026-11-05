@@ -22,6 +22,7 @@ import AutocompleteUI from '../src/autocomplete';
 import WIDGET_VERSION from '../src/version';
 
 import type { RadarPluginContext } from '../../../src/plugin';
+import type { RadarAutocompleteEnrichedAddress } from '../../../src/types';
 import type { RadarAutocompleteUIOptions } from '../src/types';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -63,14 +64,14 @@ const addressesFrom = (response: string) =>
   addresses.map((address, idx) => ({ ...address, resultId: `v1_${response}-${idx}` }));
 
 /** what /select returns for a project with address enrichment enabled */
-const ENRICHED = {
+const ENRICHED: RadarAutocompleteEnrichedAddress = {
   formattedAddress: addresses[0]!.formattedAddress,
   locationDetails: { usage: 'nonResidential', dwelling: 'n/a', grounds: [], places: [] },
 };
 
 // respond to autocomplete calls with stamped results, and to select calls with a bare 204, or
 // with `enriched` when the project enriches
-const mockAutocompleteApi = (response = 'first', enriched?: typeof ENRICHED) => {
+const mockAutocompleteApi = (response = 'first', enriched?: RadarAutocompleteEnrichedAddress) => {
   fetchMock.mockResponse(async (req) => {
     if (req.url.includes('/v1/config')) {
       return JSON.stringify({});
@@ -152,7 +153,7 @@ describe('AutocompleteUI sessions', () => {
     const results = await widget.fetchResults('111 5th ave');
     widget.displayResults(results);
     widget.select(1);
-    await Promise.resolve();
+    await flushReport();
 
     const select = selectRequests()[0];
     expect(select).toBeDefined();
@@ -181,7 +182,7 @@ describe('AutocompleteUI sessions', () => {
     widget.displayResults(await widget.fetchResults('111 5th ave'));
 
     widget.select(0);
-    await Promise.resolve();
+    await flushReport();
 
     const select = selectRequests()[0];
     expect(JSON.parse(select![1]!.body as string)).toEqual({
@@ -282,7 +283,7 @@ describe('AutocompleteUI sessions', () => {
 
     widget.displayResults(await widget.fetchResults('111 5th ave'));
     expect(() => widget.select(0)).toThrow('consumer callback blew up');
-    await Promise.resolve();
+    await flushReport();
 
     expect(selectRequests()).toHaveLength(1);
   });
@@ -302,7 +303,7 @@ describe('AutocompleteUI sessions', () => {
 
     widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(0);
-    await Promise.resolve();
+    await flushReport();
 
     expect(selectRequests()).toHaveLength(0);
   });
@@ -330,7 +331,7 @@ describe('AutocompleteUI sessions', () => {
 
     widget.displayResults(await widget.fetchResults('111 5th ave'));
     widget.select(99);
-    await Promise.resolve();
+    await flushReport();
 
     expect(selectRequests()).toHaveLength(0);
   });
