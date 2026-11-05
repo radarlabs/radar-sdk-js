@@ -7,7 +7,7 @@ import RoutingAPI from './api/routing';
 import SearchAPI from './api/search';
 import TrackAPI from './api/track';
 import TripsAPI from './api/trips';
-import AutocompleteSessionClass, { openTaggedSession } from './autocompleteSession';
+import AutocompleteSession, { openTaggedSession } from './autocompleteSession';
 import Config from './config';
 import Device from './device';
 import * as errors from './errors';
@@ -78,7 +78,7 @@ class Radar {
   public static errors = errors;
 
   /** opens an autocomplete session; also a named export for bundler users */
-  public static AutocompleteSession = AutocompleteSessionClass;
+  public static AutocompleteSession = AutocompleteSession;
 
   /** current SDK version string */
   public static get VERSION() {
@@ -321,7 +321,10 @@ class Radar {
     return GeocodingAPI.ipGeocode();
   }
 
-  /** autocomplete partial addresses and place names */
+  /**
+   * autocomplete partial addresses and place names. results carry no `resultId`, so they
+   * cannot be selected; use {@link AutocompleteSession} to report selections
+   */
   public static autocomplete(params: RadarAutocompleteParams, requestId?: string): Promise<RadarAutocompleteResponse> {
     return SearchAPI.autocomplete(params, requestId);
   }

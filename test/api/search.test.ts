@@ -9,7 +9,7 @@ import Navigator from '../../src/navigator';
 import { latitude, longitude } from '../common';
 import { getRequest, getResponseWithDebug, mockRequest } from '../utils';
 
-import type { RadarGeocodeLayer, RadarOptions } from '../../src/types';
+import type { RadarAutocompleteAddress, RadarGeocodeLayer, RadarOptions } from '../../src/types';
 
 describe('Search', () => {
   const radius = 100;
@@ -264,12 +264,14 @@ describe('Search', () => {
     it('should accept an autocomplete result verbatim, ignoring its other fields', async () => {
       mockRequest(204, '');
 
-      await Search.autocompleteSelect({
+      const address: RadarAutocompleteAddress = {
         resultId,
         formattedAddress: '123 Main St',
         latitude: 40.7,
         longitude: -73.9,
-      } as any);
+        geometry: { type: 'Point', coordinates: [-73.9, 40.7] },
+      };
+      await Search.autocompleteSelect(address);
 
       expect(JSON.parse(getRequest().body!)).toEqual({ resultId });
     });
@@ -279,7 +281,7 @@ describe('Search', () => {
 
       // programmer error, unlike the operational failures below: either the originating
       // autocomplete opened no session, or this address never came from autocomplete
-      await expect(Search.autocompleteSelect({} as any)).rejects.toThrow(RadarBadRequestError);
+      await expect(Search.autocompleteSelect({})).rejects.toThrow(RadarBadRequestError);
 
       const selectCalls = fetchMock.mock.calls.filter(([url]) =>
         String(url as string).includes('/autocomplete/select'),

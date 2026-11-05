@@ -101,7 +101,6 @@ class AutocompleteUI {
   public get sessionToken(): string {
     return this.session.sessionToken;
   }
-  /** `x-radar-request-id` of the response that produced the currently displayed results */
   private _highlightedIndex: number;
   debouncedFetchResults: (query: string) => Promise<RadarAutocompleteAddress[] | null>;
   near?: string;

@@ -18,8 +18,6 @@ import type {
   RadarSearchGeofencesResponse,
 } from '../types';
 
-const badRequest = (message: string) => new RadarBadRequestError({ meta: { message } });
-
 /** @internal search API — use Radar.autocomplete / searchGeofences / searchPlaces instead */
 class SearchAPI {
   /**
@@ -68,7 +66,6 @@ class SearchAPI {
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
-      // echoed back to search/autocomplete/select to attribute a selection to this response
       requestId: response.meta?.requestId,
     };
 
@@ -90,14 +87,17 @@ class SearchAPI {
   ): Promise<RadarAutocompleteSelectResponse> {
     const resultId = address?.resultId;
     if (!resultId) {
-      throw badRequest(
-        'resultId: this address carries no resultId. Run the search through ' +
-          'AutocompleteSession.autocomplete, and select an address it returned.',
-      );
+      throw new RadarBadRequestError({
+        meta: {
+          message:
+            'resultId: this address carries no resultId. Run the search through ' +
+            'AutocompleteSession.autocomplete, and select an address it returned.',
+        },
+      });
     }
 
     try {
-      const response = await Http.request({
+      const response = await Http.request<{ address?: RadarAutocompleteEnrichedAddress }>({
         method: 'POST',
         path: 'search/autocomplete/select',
         data: { resultId },
@@ -107,7 +107,7 @@ class SearchAPI {
       });
 
       // a 204 carries no body, so there is nothing to pick off and `address` stays undefined
-      return { address: (response as { address?: RadarAutocompleteEnrichedAddress }).address };
+      return { address: response.address };
     } catch (err) {
       // network and server failures never surface to the caller, and are never retried
       Logger.debug(`Autocomplete selection not reported: ${String(err)}`);

@@ -535,7 +535,7 @@ export interface RadarAutocompleteClickParams {
   idx: number;
 }
 
-/** the selected result, as returned by {@link Radar.autocomplete} */
+/** the selected result, as returned by {@link AutocompleteSession.autocomplete} */
 export type RadarAutocompleteSelectParams = Pick<RadarAutocompleteAddress, 'resultId'>;
 
 /** a place on the grounds of an enriched address */
