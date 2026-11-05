@@ -1,10 +1,14 @@
 import Config from '../config';
+import { RadarBadRequestError } from '../errors';
 import Http from '../http';
 import Logger from '../logger';
 import Navigator from '../navigator';
 
 import type {
   RadarAutocompleteClickParams,
+  RadarAutocompleteEnrichedAddress,
+  RadarAutocompleteSelectParams,
+  RadarAutocompleteSelectResponse,
   RadarIntegration,
   RadarAutocompleteParams,
   RadarAutocompleteResponse,
@@ -62,7 +66,6 @@ class SearchAPI {
 
     const autocompleteRes: RadarAutocompleteResponse = {
       addresses: response.addresses,
-      // echoed back to search/autocomplete/click to attribute a selection to this response
       requestId: response.meta?.requestId,
     };
 
@@ -74,6 +77,48 @@ class SearchAPI {
   }
 
   /**
+   * report which autocomplete result the user chose
+   * @param address - the selected result, as returned by {@link SearchAPI.autocomplete}
+   * @param integration - first-party widget making the call; omitted for direct SDK use
+   */
+  static async autocompleteSelect(
+    address: RadarAutocompleteSelectParams,
+    integration?: RadarIntegration,
+  ): Promise<RadarAutocompleteSelectResponse> {
+    const resultId = address?.resultId;
+    if (!resultId) {
+      throw new RadarBadRequestError({
+        meta: {
+          message:
+            'resultId: this address carries no resultId. Run the search through ' +
+            'AutocompleteSession.autocomplete, and select an address it returned.',
+        },
+      });
+    }
+
+    try {
+      const response = await Http.request<{ address?: RadarAutocompleteEnrichedAddress }>({
+        method: 'POST',
+        path: 'search/autocomplete/select',
+        data: { resultId },
+        // the selection may navigate the page; keepalive lets the report outlive it
+        keepalive: true,
+        integration,
+      });
+
+      // a 204 carries no body, so there is nothing to pick off and `address` stays undefined
+      return { address: response.address };
+    } catch (err) {
+      // network and server failures never surface to the caller, and are never retried
+      Logger.debug(`Autocomplete selection not reported: ${String(err)}`);
+      return {};
+    }
+  }
+
+  /**
+   * @deprecated use {@link SearchAPI.autocompleteSelect}. kept so autocomplete plugin <= 1.1.1,
+   *   which calls this through the plugin context, keeps working against 5.x
+   *
    * report a clickthrough on an autocomplete result
    * @param params - session token, originating request ID, and result index
    * @param integration - first-party widget making the call; omitted for direct SDK use

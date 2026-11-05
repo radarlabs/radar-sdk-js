@@ -10,6 +10,7 @@ import RoutingAPI from '../../../src/api/routing';
 import SearchAPI from '../../../src/api/search';
 import TrackAPI from '../../../src/api/track';
 import TripsAPI from '../../../src/api/trips';
+import { openTaggedSession } from '../../../src/autocompleteSession';
 import Config from '../../../src/config';
 import Device from '../../../src/device';
 import Http from '../../../src/http';
@@ -25,8 +26,6 @@ import type { RadarAutocompleteUIOptions } from '../src/types';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-const REQUEST_ID = '01a01c2e-7512-704c-aa02-81253218d810';
-
 const INTEGRATION = `autocomplete@${WIDGET_VERSION}`;
 
 const addresses = [
@@ -38,6 +37,7 @@ const addresses = [
 const ctx = {
   Radar: Radar as RadarPluginContext['Radar'],
   integration: { name: 'autocomplete', version: WIDGET_VERSION },
+  createAutocompleteSession: () => openTaggedSession({ name: 'autocomplete', version: WIDGET_VERSION }),
   Config,
   Http,
   Storage,
@@ -58,28 +58,28 @@ const ctx = {
   },
 } satisfies RadarPluginContext;
 
-// respond to autocomplete calls with a request id header, and to click calls with a bare 204
-const mockAutocompleteApi = (requestId = REQUEST_ID) => {
+/** the server stamps one handle per result; the suffix identifies which response it came from */
+const addressesFrom = (response: string) =>
+  addresses.map((address, idx) => ({ ...address, resultId: `v1_${response}-${idx}` }));
+
+// respond to autocomplete calls with stamped results, and to select calls with a bare 204
+const mockAutocompleteApi = (response = 'first') => {
   fetchMock.mockResponse(async (req) => {
     if (req.url.includes('/v1/config')) {
       return JSON.stringify({});
     }
-    if (req.url.includes('/search/autocomplete/click')) {
+    if (req.url.includes('/search/autocomplete/select')) {
       return { body: '', status: 204 };
     }
-    return {
-      body: JSON.stringify({ meta: {}, addresses }),
-      status: 200,
-      headers: { 'x-radar-request-id': requestId },
-    };
+    return { body: JSON.stringify({ meta: {}, addresses: addressesFrom(response) }), status: 200 };
   });
 };
 
 const autocompleteRequests = () =>
   fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete?'));
 
-const clickRequests = () =>
-  fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete/click'));
+const selectRequests = () =>
+  fetchMock.mock.calls.filter(([url]) => String(url as string).includes('/search/autocomplete/select'));
 
 // `ctx as never` is the one unchecked point: AutocompleteUI's declared parameter resolves to
 // the dist-built RadarPluginContext, and classes with private members are nominally typed, so
@@ -130,7 +130,7 @@ describe('AutocompleteUI sessions', () => {
     expect(first.sessionToken).not.toEqual(second.sessionToken);
   });
 
-  it('reports a click with the session token, originating request id, and result index', async () => {
+  it('reports a selection with the handle carried by the chosen result, and nothing else', async () => {
     const widget = mount();
 
     const results = await widget.fetchResults('66 steuben');
@@ -138,12 +138,10 @@ describe('AutocompleteUI sessions', () => {
     widget.select(1);
     await Promise.resolve();
 
-    const click = clickRequests()[0];
-    expect(click).toBeDefined();
-    expect(JSON.parse(click![1]!.body as string)).toEqual({
-      sessionToken: widget.sessionToken,
-      requestId: REQUEST_ID,
-      idx: 1,
+    const select = selectRequests()[0];
+    expect(select).toBeDefined();
+    expect(JSON.parse(select![1]!.body as string)).toEqual({
+      resultId: 'v1_first-1',
       integration: INTEGRATION,
     });
   });
@@ -157,33 +155,26 @@ describe('AutocompleteUI sessions', () => {
     expect(url.searchParams.get('integration')).toEqual(INTEGRATION);
   });
 
-  it('tags clicks as widget-originated, so both legs of a session are attributable', async () => {
+  it('reports the selection against the most recent autocomplete response', async () => {
     const widget = mount();
 
-    widget.displayResults(await widget.fetchResults('66 steuben'));
-    widget.select(0);
-    await Promise.resolve();
-
-    expect(JSON.parse(clickRequests()[0]![1]!.body as string).integration).toEqual(INTEGRATION);
-  });
-
-  it('reports the click against the most recent autocomplete response', async () => {
-    const widget = mount();
-
-    mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000001');
+    mockAutocompleteApi('stale');
     widget.displayResults(await widget.fetchResults('66 steu'));
 
-    mockAutocompleteApi('01a01c2e-7512-704c-aa02-000000000002');
+    mockAutocompleteApi('current');
     widget.displayResults(await widget.fetchResults('66 steuben'));
 
     widget.select(0);
     await Promise.resolve();
 
-    const click = clickRequests()[0];
-    expect(JSON.parse(click![1]!.body as string).requestId).toEqual('01a01c2e-7512-704c-aa02-000000000002');
+    const select = selectRequests()[0];
+    expect(JSON.parse(select![1]!.body as string)).toEqual({
+      resultId: 'v1_current-0',
+      integration: INTEGRATION,
+    });
   });
 
-  it('reports the click even when onSelection throws', async () => {
+  it('reports the selection even when onSelection throws', async () => {
     const widget = mount({
       onSelection: () => {
         throw new Error('consumer callback blew up');
@@ -194,18 +185,18 @@ describe('AutocompleteUI sessions', () => {
     expect(() => widget.select(0)).toThrow('consumer callback blew up');
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(1);
+    expect(selectRequests()).toHaveLength(1);
   });
 
-  it('does not report a click when the response carried no request id', async () => {
+  it('does not report a selection when the results carry no handle', async () => {
     fetchMock.mockResponse(async (req) => {
       if (req.url.includes('/v1/config')) {
         return JSON.stringify({});
       }
-      if (req.url.includes('/search/autocomplete/click')) {
+      if (req.url.includes('/search/autocomplete/select')) {
         return { body: '', status: 204 };
       }
-      // no x-radar-request-id header
+      // no resultId on the results: the server opened no selectable session
       return { body: JSON.stringify({ meta: {}, addresses }), status: 200 };
     });
     const widget = mount();
@@ -214,7 +205,7 @@ describe('AutocompleteUI sessions', () => {
     widget.select(0);
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(0);
+    expect(selectRequests()).toHaveLength(0);
   });
 
   it("scopes each widget's requests to its own session token", async () => {
@@ -235,13 +226,13 @@ describe('AutocompleteUI sessions', () => {
     expect(first.sessionToken).not.toEqual(second.sessionToken);
   });
 
-  it('does not report a click when the selected index has no result', async () => {
+  it('does not report a selection when the selected index has no result', async () => {
     const widget = mount();
 
     widget.displayResults(await widget.fetchResults('66 steuben'));
     widget.select(99);
     await Promise.resolve();
 
-    expect(clickRequests()).toHaveLength(0);
+    expect(selectRequests()).toHaveLength(0);
   });
 });

@@ -3,12 +3,13 @@ import fetchMock from 'jest-fetch-mock';
 import Radar from '../../src';
 import Search from '../../src/api/search';
 import Config from '../../src/config';
+import { RadarBadRequestError } from '../../src/errors';
 import Http from '../../src/http';
 import Navigator from '../../src/navigator';
 import { latitude, longitude } from '../common';
 import { getRequest, getResponseWithDebug, mockRequest } from '../utils';
 
-import type { RadarGeocodeLayer, RadarOptions } from '../../src/types';
+import type { RadarAutocompleteAddress, RadarGeocodeLayer, RadarOptions } from '../../src/types';
 
 describe('Search', () => {
   const radius = 100;
@@ -246,6 +247,72 @@ describe('Search', () => {
       });
     });
   });
+  describe('autocompleteSelect', () => {
+    const resultId = 'v1_QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGk';
+
+    it('should POST the resultId and nothing else', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteSelect({ resultId });
+
+      const request = getRequest();
+      expect(request.method).toEqual('POST');
+      expect(request.url).toContain('/v1/search/autocomplete/select');
+      expect(JSON.parse(request.body!)).toEqual({ resultId });
+    });
+
+    it('should accept an autocomplete result verbatim, ignoring its other fields', async () => {
+      mockRequest(204, '');
+
+      const address: RadarAutocompleteAddress = {
+        resultId,
+        formattedAddress: '123 Main St',
+        latitude: 40.7,
+        longitude: -73.9,
+        geometry: { type: 'Point', coordinates: [-73.9, 40.7] },
+      };
+      await Search.autocompleteSelect(address);
+
+      expect(JSON.parse(getRequest().body!)).toEqual({ resultId });
+    });
+
+    it('should reject, without calling the API, when the result carries no resultId', async () => {
+      fetchMock.resetMocks();
+
+      // programmer error, unlike the operational failures below: either the originating
+      // autocomplete opened no session, or this address never came from autocomplete
+      await expect(Search.autocompleteSelect({})).rejects.toThrow(RadarBadRequestError);
+
+      const selectCalls = fetchMock.mock.calls.filter(([url]) =>
+        String(url as string).includes('/autocomplete/select'),
+      );
+      expect(selectCalls).toHaveLength(0);
+    });
+
+    it('should send the selection with keepalive so it survives page navigation', async () => {
+      mockRequest(204, '');
+
+      await Search.autocompleteSelect({ resultId });
+
+      const lastCall = [...fetchMock.mock.calls]
+        .reverse()
+        .find(([url]) => String(url as string).includes('/autocomplete/select'));
+      expect(lastCall?.[1]?.keepalive).toBe(true);
+    });
+
+    it('should resolve without throwing when the session is unknown or expired', async () => {
+      mockRequest(400, { meta: { code: 400 } });
+
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toEqual({});
+    });
+
+    it('should resolve without throwing on a network error', async () => {
+      fetchMock.mockReject(new TypeError('Network error'));
+
+      await expect(Search.autocompleteSelect({ resultId })).resolves.toEqual({});
+    });
+  });
+  // still called by autocomplete plugin <= 1.1.1 through the plugin context
   describe('autocompleteClick', () => {
     const sessionToken = 'ffbcb2ca-1d1c-4f96-9b91-fd0b0b0e1b7f';
     const requestId = '01a01c2e-7512-704c-aa02-81253218d810';
