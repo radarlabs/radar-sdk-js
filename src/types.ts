@@ -1,3 +1,5 @@
+import type { LineString, Point } from 'geojson';
+
 /** log verbosity level for the SDK */
 export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
 
@@ -86,6 +88,16 @@ export interface RadarConfigResponse {
 
 /** base response shape shared by all API responses */
 export interface RadarResponse {
+  meta?: {
+    code: number;
+    message?: string;
+    level?: string;
+    param?: string;
+    requestId?: string;
+    config?: { shutdown?: boolean };
+    trackingOptions?: Record<string, unknown>;
+    featureSettings?: Record<string, unknown>;
+  };
   /** raw API response body (only present in debug mode) */
   response?: unknown;
 }
@@ -240,6 +252,61 @@ export interface RadarFraud {
   compromised: boolean;
   jumped: boolean;
   sharing: boolean;
+  inaccurate?: boolean;
+  encrypted?: boolean;
+  sdkVersion?: string;
+  risk?: number;
+  rf1?: number;
+  usersForThisDevice?: number;
+  devicesForThisUser?: number;
+  blocked?: boolean;
+  lastJumpedAt?: string;
+  lastCompromisedAt?: string;
+  lastProxyAt?: string;
+  lastMockedAt?: string;
+  lastSharingAt?: string;
+  lastRiskScoreNotifiedAt?: string;
+  lastInaccurateAt?: string;
+  ipAddress?: RadarFraudIpAddress;
+  privacy?: RadarNetworkPrivacy;
+  asn?: RadarNetworkAsn;
+  macAddresses?: string[];
+}
+
+/** NOTE(jasonl): Public IP geography and network fields in fraud results. */
+export interface RadarFraudIpAddress extends Partial<Omit<RadarAddress, 'layer'>> {
+  connectionType?: string;
+  stateConfidence?: string;
+  countryConfidence?: string;
+  stateAllowed?: boolean;
+  countryAllowed?: boolean;
+  layer?: string;
+  timeZone?: RadarTimeZone;
+  chainSlug?: string;
+  ssid?: string;
+  bssid?: string;
+}
+
+/** NOTE(jasonl): Public network privacy signals. */
+export interface RadarNetworkPrivacy {
+  hosting?: boolean;
+  proxy?: boolean;
+  relay?: boolean;
+  service?: string;
+  tor?: boolean;
+  vpn?: boolean;
+  residentialProxy?: boolean;
+}
+
+/** NOTE(jasonl): Public autonomous system information. */
+export interface RadarNetworkAsn {
+  asn?: string;
+  country?: string;
+  domain?: string;
+  name?: string;
+  network?: string;
+  route?: string;
+  type?: string;
 }
 
 /** a place chain (e.g. Starbucks, McDonald's) */
@@ -264,6 +331,14 @@ export interface RadarRegion {
   type: string;
   code: string;
   name: string;
+  icon?: string;
+  passed?: boolean;
+  expected?: boolean;
+  allowed?: boolean;
+  inBufferZone?: boolean;
+  distanceToBorder?: number;
+  inExclusionZone?: boolean;
+  inInclusionZone?: boolean;
 }
 
 /** a Radar event triggered by user location changes */
@@ -274,9 +349,18 @@ export interface RadarEvent {
   confidence: RadarEventConfidence;
   geofence?: RadarGeofence;
   place?: RadarPlace;
-  alternatePlaces?: RadarPlace;
+  alternatePlaces?: RadarPlace[];
   region?: RadarRegion;
   trip?: RadarTrip;
+  user?: RadarUser;
+  fraud?: RadarFraud;
+  location?: Point;
+  locationAccuracy?: number;
+  createdAt?: string;
+  country?: RadarRegion;
+  state?: RadarRegion;
+  dma?: RadarRegion;
+  postalCode?: RadarRegion;
 }
 
 /** a tracked Radar user with location context */
@@ -294,6 +378,16 @@ export interface RadarUser {
   dma?: RadarRegion;
   postalCode?: RadarRegion;
   fraud?: RadarFraud;
+  location?: Point;
+  locationAccuracy?: number;
+  locationId?: string;
+  locationAccuracyDataType?: 'ip' | 'gps' | 'wifi' | 'gsm';
+  passed?: boolean;
+  failureReasons?: string[];
+  warningReasons?: string[];
+  expectedCountryCode?: string;
+  expectedStateCode?: string;
+  city?: RadarRegion;
   expectedAddress?: RadarExpectedAddress;
 }
 
@@ -302,6 +396,36 @@ export interface RadarTrackResponse extends RadarResponse {
   location?: Location;
   user?: RadarUser;
   events?: RadarEvent[];
+  nearbyGeofences?: RadarNearbyGeofence[];
+  nearbyBeaconRegions?: RadarNearbyBeaconRegion[];
+  inAppMessages?: RadarInAppMessage[];
+  locationMetadata?: Record<string, unknown>;
+}
+
+/** NOTE(jasonl): Circle geofences returned for client monitoring. */
+export interface RadarNearbyGeofence extends Omit<RadarGeofence, 'description'> {
+  description?: string;
+  type?: 'circle';
+  geometryCenter?: Point;
+  geometryRadius?: number;
+  operatingHours?: unknown;
+}
+
+/** NOTE(jasonl): Beacon regions returned for client monitoring. */
+export interface RadarNearbyBeaconRegion {
+  uuid: string;
+  metadata: string;
+  major?: string;
+  minor?: string;
+}
+
+/** NOTE(jasonl): Public in-app message content. */
+export interface RadarInAppMessage {
+  title: { text: string; color: string };
+  body: { text: string; color: string };
+  button?: { text: string; color: string; backgroundColor: string; deepLink?: string };
+  image?: { name: string; url: string };
+  metadata: Record<string, unknown>;
 }
 
 /** response from {@link Radar.getContext} */
@@ -381,7 +505,7 @@ export interface RadarAddress {
   dma?: string;
   dmaCode?: string;
   formattedAddress?: string;
-  geometry: GeoJSON.Point;
+  geometry: Point;
   latitude: number;
   longitude: number;
   layer?: RadarGeocodeLayer;
@@ -587,7 +711,7 @@ export interface RadarSearchPlacesParams {
 
 /** a place search result with location geometry */
 export interface RadarSearchPlace extends RadarPlace {
-  location?: GeoJSON.Point;
+  location?: Point;
 }
 
 /** response from {@link Radar.searchPlaces} */
@@ -636,7 +760,7 @@ export interface RadarRouteDuration {
 export interface RadarRoute {
   distance?: RadarRouteDistance;
   duration?: RadarRouteDuration;
-  geometry?: GeoJSON.LineString;
+  geometry?: LineString;
 }
 
 /** routes keyed by travel mode */

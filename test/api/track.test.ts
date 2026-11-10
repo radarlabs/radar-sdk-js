@@ -90,6 +90,20 @@ describe('Track', () => {
         expect(trackRes.events).toEqual(mockResponse.events);
         expect(trackRes.location).toEqual(nycOffice);
       });
+
+      it('keeps public Track metadata and nearby results', async () => {
+        const publicFields = {
+          meta: { code: 200, requestId: 'track-request' },
+          nearbyGeofences: [{ _id: 'nearby-geofence', type: 'circle', geometryRadius: 100 }],
+          nearbyBeaconRegions: [{ uuid: 'beacon-uuid', metadata: '{}', major: '1' }],
+          inAppMessages: [
+            { title: { text: 'Nearby', color: '#000000' }, body: { text: 'Welcome', color: '#000000' }, metadata: {} },
+          ],
+          locationMetadata: { activityType: 'walking' },
+        };
+        mockRequest(200, { ...mockResponse, ...publicFields });
+        expect(await Track.trackOnce({ userId: 'test-user' })).toMatchObject(publicFields);
+      });
     });
 
     describe('Position overrides provided', () => {

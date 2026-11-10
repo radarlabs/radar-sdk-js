@@ -88,9 +88,14 @@ class TrackAPI {
     const location = { latitude, longitude, accuracy };
 
     const trackRes: RadarTrackResponse = {
+      meta: response.meta,
       user,
       events,
       location,
+      nearbyGeofences: response.nearbyGeofences,
+      nearbyBeaconRegions: response.nearbyBeaconRegions,
+      inAppMessages: response.inAppMessages,
+      locationMetadata: response.locationMetadata,
     };
 
     if (options.debug) {
