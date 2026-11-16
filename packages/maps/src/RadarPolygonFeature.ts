@@ -65,15 +65,7 @@ class RadarPolygonFeature extends RadarMapFeature {
       }
     };
 
-    // ensure map is ready before modifying source and layers
-    if (map.loaded()) {
-      addFeatureToMap();
-    } else {
-      void map.once('data', () => {
-        // wait for map to be ready
-        addFeatureToMap();
-      });
-    }
+    this.addWhenReady(addFeatureToMap);
 
     return this;
   }
