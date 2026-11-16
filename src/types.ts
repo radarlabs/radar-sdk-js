@@ -42,7 +42,7 @@ export interface RadarBaseOptions {
   locationTimeout?: number;
   /** geolocation accuracy hint */
   desiredAccuracy?: 'high' | 'medium' | 'low';
-  /** callback that returns extra headers to send with every request */
+  /** callback that returns extra headers sent with Radar API requests (maps: style requests only, unless using authToken) */
   getRequestHeaders?: () => Record<string, string>;
   /** enable debug logging */
   debug?: boolean;

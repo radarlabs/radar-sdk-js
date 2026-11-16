@@ -66,6 +66,15 @@ const getStyle = (options: RadarOptions, mapOptions: RadarMapOptions) => {
   return mapOptions.style; // style object or URL
 };
 
+// whether `url` is on the Radar API host the SDK is configured with
+const isRadarHost = (url: string, host?: string) => {
+  try {
+    return !!host && new URL(url).origin === new URL(host).origin;
+  } catch {
+    return false;
+  }
+};
+
 /** MapLibre GL map wrapper with Radar styling, markers, and feature management */
 class RadarMap extends Map {
   _markers: RadarMarker[] = [];
@@ -97,7 +106,11 @@ class RadarMap extends Map {
         url = createStyleURL(config, { ...mapOptions, style: url });
       }
 
-      return { url, headers: Config.getDefaultHeaders() };
+      // headers force a CORS preflight; Radar tile/font URLs carry the key, JWTs can't (MAPS-2739, MAPS-2749)
+      if (isRadarHost(url, config.host) && (resourceType === 'Style' || Config.get().authToken)) {
+        return { url, headers: Config.getDefaultHeaders() };
+      }
+      return { url };
     };
 
     super(mapOptions); // initialize MapLibre instance
