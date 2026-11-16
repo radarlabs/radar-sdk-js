@@ -6,6 +6,7 @@ import postcss from 'rollup-plugin-postcss';
 
 import type { RollupOptions } from 'rollup';
 
+// Keep one-shot browser builds out of TypeScript's automatic type-root watch path.
 const config: RollupOptions[] = [
   {
     input: 'src/index.ts',
@@ -17,7 +18,7 @@ const config: RollupOptions[] = [
     },
     external: ['radar-sdk-js', 'maplibre-gl'],
     plugins: [
-      typescript({ declaration: true, declarationDir: './dist' }),
+      typescript({ types: ['geojson'], noEmitOnError: true, declaration: true, declarationDir: './dist' }),
       nodeResolve(),
       postcss({
         extract: 'radar-maps.css',
@@ -50,7 +51,13 @@ const config: RollupOptions[] = [
     ],
     external: ['radar-sdk-js'],
     plugins: [
-      typescript({ declaration: false, declarationDir: undefined, outDir: './cdn' }),
+      typescript({
+        types: ['geojson'],
+        noEmitOnError: true,
+        declaration: false,
+        declarationDir: undefined,
+        outDir: './cdn',
+      }),
       nodeResolve(),
       commonjs(),
       postcss({

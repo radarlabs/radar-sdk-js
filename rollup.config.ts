@@ -4,6 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 
 import type { RollupOptions } from 'rollup';
 
+// Keep one-shot browser builds out of TypeScript's automatic type-root watch path.
 const config: RollupOptions[] = [
   // ES Module (written to /dist)
   {
@@ -16,7 +17,10 @@ const config: RollupOptions[] = [
         sourcemap: true,
       },
     ],
-    plugins: [typescript({ declaration: true, declarationDir: './dist' }), nodeResolve()],
+    plugins: [
+      typescript({ types: ['geojson'], noEmitOnError: true, declaration: true, declarationDir: './dist' }),
+      nodeResolve(),
+    ],
   },
 
   // IIFE (browser bundles, written to /cdn)
@@ -35,7 +39,10 @@ const config: RollupOptions[] = [
         plugins: [terser()],
       },
     ],
-    plugins: [typescript({ declaration: false, outDir: './cdn' }), nodeResolve()],
+    plugins: [
+      typescript({ types: ['geojson'], noEmitOnError: true, declaration: false, outDir: './cdn' }),
+      nodeResolve(),
+    ],
   },
 
   // ESM plugin types entry (for plugin authors)
@@ -49,7 +56,10 @@ const config: RollupOptions[] = [
         sourcemap: true,
       },
     ],
-    plugins: [typescript({ declaration: true, declarationDir: './dist' }), nodeResolve()],
+    plugins: [
+      typescript({ types: ['geojson'], noEmitOnError: true, declaration: true, declarationDir: './dist' }),
+      nodeResolve(),
+    ],
   },
 ];
 
